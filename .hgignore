@@ -1,0 +1,13 @@
+syntax: glob
+*.user
+*.ncb
+*~
+*.DS_Store
+*.orig
+Build/*
+Binary/*
+Documentation/*
+*CMakeFiles
+*cmake_install.cmake
+*.dir
+CMakeCache.txt
