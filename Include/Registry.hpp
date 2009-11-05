@@ -79,6 +79,8 @@ class Registry {
 public:
 	typedef shared_ptr<Registry> Ptr;
 
+	Registry();
+
 	template <typename T, typename A>
 	inline void
 	mutator(const string& n, void (T::*m)(const A&)) {
@@ -92,11 +94,6 @@ public:
 	}
 
 	static Ptr instance() { static Ptr p(new Registry()); return p; }
-
-private:
-	
-
-
 };
 
 }

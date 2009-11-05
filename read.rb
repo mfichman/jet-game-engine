@@ -43,10 +43,10 @@ class CppClass
     
     def print_members(io)
         @accessors.each do |accessor|
-            puts("    #{@name}::accessor(\"#{accessor}\", &#{@name}::#{accessor});")
+            io.puts("    Registry::accessor(\"#{accessor}\", &#{@name}::#{accessor});")
         end
         @mutators.each do |mutator|
-            puts("    #{@name}::mutator(\"#{mutator}\", &#{@name}::#{mutator});")
+            io.puts("    Registry::mutator(\"#{mutator}\", &#{@name}::#{mutator});")
         end
     end
 end
@@ -75,7 +75,7 @@ ARGV.each do |arg|
         text = clsmd[3]
         while (mbrmd = rregex.match(text)) do
           #(::Ptr$)|
-            if not /(Itr$)/ =~ mbrmd[1] then
+            if not /(Itr$)/ =~ mbrmd[1] and not /make/ =~ mbrmd[2] then
                 cls.accessors << mbrmd[2]
             end
             text = mbrmd.post_match
@@ -99,13 +99,15 @@ ARGV.each do |arg|
 end
 
 def dump(hash, io)
+	io.puts("#include <Registry.hpp>")
     hash.each_value do |cls|
         io.puts("#include <#{cls.name}.hpp>")
     end
 
-    io.puts
-    io.puts("void register()")
-    io.puts("{")
+	io.puts
+	io.puts("using namespace Jet;")
+    io.puts 
+    io.puts("Registry::Registry() {")
 
     hash.each_value do |cls|
         cls.resolve_members
@@ -116,7 +118,9 @@ def dump(hash, io)
 end
 
 
-dump(hash, $stdout)
+File.open("../Source/Registry.cpp", "w") do |io|
+	dump(hash, io)
+end
 
 
 
