@@ -14,6 +14,6 @@
 #add_subdirectory(Timer)
 #add_subdirectory(Audio)
 
-file(GLOB files "*.cpp")
 
-add_library(Jet ${files})
+add_subdirectory(Test)
+add_subdirectory(Jet)
