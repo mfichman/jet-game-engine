@@ -1,0 +1,52 @@
+DIV.tabs
+{
+   padding		: 0px 0px 0px 0px;
+}
+
+
+DIV.tabs UL 
+{
+
+   list-style		: none;
+   padding		: 0px 0px 0px 0px;
+   border		: dotted 1px #333333;
+   background		: #FFFFFF;
+   margin		: 0px 0px 2px 0px;
+}
+
+DIV.tabs LI 
+{
+   display		: inline;
+}
+
+DIV.tabs A 
+{
+   text-decoration	: none;
+   color		: #0000BB;
+   font-size		: 10pt;
+   font-family		: "Trebuchet MS";
+   font-style		: italic;
+   font-weight		: normal;
+   margin		: 0px 2px 0px 0px;
+   padding		: 0px 6px 0px 6px;
+   border-right		: dotted 1px #333333;
+}
+
+DIV.tabs A:hover 
+{
+   color		: #EE4400;
+   background		: #FFFFFF;
+   font-weight		: normal;
+}
+
+DIV.tabs A:visited
+{
+    font-weight		: normal;
+}
+
+
+DIV.tabs LI.current A
+{
+   color		: #EE4400;
+   font-weight		: normal;
+}

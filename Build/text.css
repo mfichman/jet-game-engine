@@ -1,0 +1,45 @@
+
+
+DIV.title 
+{
+   text-align		: left;
+   font-size		: 24pt;
+   font-family		: "Georgia";
+   font-weight		: bolder;
+   color		: #EE4400;
+   padding		: 8px 0px 8px 72px;
+   margin		: 0 35% 0 10%;
+   border		: dotted 1px #000000;
+   background		: #FFFFFF;
+}
+
+DIV.text 
+{
+   float                : left;
+   font-family		: "Verdana";
+   font-size		: 10pt;
+   padding		: 12px 18px 18px 42px; 
+   text-indent		: -24px;
+   margin		: 0px 25% 2px 10%;
+   color		: #555555;
+   border		: dotted 1px #000000;
+   background		: #FFFFFF;
+}
+
+DIV.text A 
+{
+   text-decoration	: none;
+   font-weight		: bolder;
+   color		: 0000BB;
+}
+
+DIV.text A:hover 
+{
+   color		: #EE4400;
+}
+
+SPAN.subtitle 
+{
+   font-weight		: bolder;
+   color		: #333333;
+}

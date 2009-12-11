@@ -4,7 +4,9 @@ syntax: glob
 *~
 *.DS_Store
 *.orig
-Build/*
+Build/TempSource/*
+Build/Debug/*
+Build/Makefile
 Binary/*
 Documentation/*
 *CMakeFiles

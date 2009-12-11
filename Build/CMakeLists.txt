@@ -1,0 +1,32 @@
+cmake_minimum_required(VERSION 2.6)
+project(Jet)
+set(CMAKE_BUILD_TYPE Debug)
+#set(CMAKE_BUILD_TYPE Release)
+set(EXECUTABLE_OUTPUT_PATH ${Jet_SOURCE_DIR}/../Binary)
+set(LIBRARY_OUTPUT_PATH ${Jet_SOURCE_DIR}/../Binary)
+set(Jet_INCLUDE_DIR ${Jet_SOURCE_DIR}/../Include)
+
+include_directories(${Jet_INCLUDE_DIR})
+
+if(WIN32 AND NOT UNIX)
+add_definitions(/DWINDOWS)
+include_directories(C:\\Include)
+include_directories(D:\\Include)
+link_directories(C:\\Libraries)
+link_directories(D:\\Libraries)
+add_definitions(/D_SCL_SECURE_NO_WARNINGS)
+add_definitions(/DBOOST_ALL_NO_LIB)
+#add_definitions(/O2)
+endif()
+
+if(UNIX AND APPLE)
+add_definitions(-Bstatic)
+add_definitions(-DDARWIN)
+endif()
+
+if(UNIX AND NOT APPLE)
+add_definitions(-DLINUX)
+endif()
+
+add_subdirectory(../Source ../Build/TempSource)
+#add_subdirectory(../Test ../Build/TempTest)
