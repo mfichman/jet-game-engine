@@ -28,17 +28,19 @@
 #include <Jet/Graphics/Quad.hpp>
 #include <Jet/Graphics/Model.hpp>
 #include <Jet/Graphics/TextBox.hpp>
+#include <Jet/Types.hpp>
 
 using namespace Jet;
 using namespace Jet::Graphics;
 using namespace std;
 using namespace std::tr1;
 using namespace std::tr1::placeholders;
+using namespace boost;
 
-shared_ptr<Texture>
+intrusive_ptr<Texture>
 Engine::textureCreate(const string& name) {
-    Texture::Ptr t(new Texture(name), bind(&Engine::textureDestroy, this, _1));
-    texture_[name] = t.get();
+    Texture::Ptr t(new Texture(name));
+    texture_[name] = t;
     
     for (ListenerItr i = listener_.begin(); i != listener_.end(); i++) {
         (*i)->onTextureCreate(t);
@@ -47,10 +49,10 @@ Engine::textureCreate(const string& name) {
     return t;
 }
 
-shared_ptr<Cubemap>
+intrusive_ptr<Cubemap>
 Engine::cubemapCreate(const string& name) {
-    Cubemap::Ptr t(new Cubemap(name), bind(&Engine::cubemapDestroy, this, _1));
-    cubemap_[name] = t.get();
+    Cubemap::Ptr t(new Cubemap(name));
+    cubemap_[name] = t;
     
     for (ListenerItr i = listener_.begin(); i != listener_.end(); i++) {
         (*i)->onCubemapCreate(t);
@@ -59,10 +61,10 @@ Engine::cubemapCreate(const string& name) {
     return t;
 }
 
-shared_ptr<Mesh>
+intrusive_ptr<Mesh>
 Engine::meshCreate(const string& name) {
-    Mesh::Ptr t(new Mesh(name), bind(&Engine::meshDestroy, this, _1));
-    mesh_[name] = t.get();
+    Mesh::Ptr t(new Mesh(name));
+    mesh_[name] = t;
     
     for (ListenerItr i = listener_.begin(); i != listener_.end(); i++) {
         (*i)->onMeshCreate(t);
@@ -72,10 +74,10 @@ Engine::meshCreate(const string& name) {
     return t;
 }
 
-shared_ptr<Shader>
+intrusive_ptr<Shader>
 Engine::shaderCreate(const string& name) {
-    Shader::Ptr t(new Shader(name), bind(&Engine::shaderDestroy, this, _1));
-    shader_[name] = t.get();
+    Shader::Ptr t(new Shader(name));
+    shader_[name] = t;
     
     for (ListenerItr i = listener_.begin(); i != listener_.end(); i++) {
         (*i)->onShaderCreate(t);
@@ -84,67 +86,25 @@ Engine::shaderCreate(const string& name) {
     return t;
 }
 
-shared_ptr<Quad>
+intrusive_ptr<Quad>
 Engine::quadCreate() {
     Quad::Ptr t(new Quad());
-    quad_.push_back(t.get());
+    quad_.push_back(t);
     return t;
 }
 
-shared_ptr<Model>
+intrusive_ptr<Model>
 Engine::modelCreate() {
     Model::Ptr t(new Model());
-    model_.push_back(t.get());
+    model_.push_back(t);
     return t;
 }
 
-shared_ptr<TextBox>
+intrusive_ptr<TextBox>
 Engine::textBoxCreate() {
     TextBox::Ptr t(new TextBox());
-    textBox_.push_back(t.get());
+    textBox_.push_back(t);
     return t;
-}
-
-void
-Engine::textureDestroy(Texture* t)
-{
-
-}
-
-void
-Engine::cubemapDestroy(Cubemap* c)
-{
-
-}
-
-void
-Engine::meshDestroy(Mesh* m)
-{
-
-}
-
-void
-Engine::shaderDestroy(Shader* s)
-{
-
-}
-
-void
-Engine::quadDestroy(Quad* s)
-{
-
-}
-
-void
-Engine::modelDestroy(Model* m)
-{
-
-}
-
-void
-Engine::textBoxDestroy(TextBox* t)
-{
-
 }
 
 

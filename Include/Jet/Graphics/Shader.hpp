@@ -34,7 +34,7 @@ class Engine;
 class Shader : public Resource, public Interface {
 public:
     friend class Engine;
-    typedef shared_ptr<Shader> Ptr;
+    typedef intrusive_ptr<Shader> Ptr;
     
 private:
     Shader(const std::string& name) : Resource(name) {}

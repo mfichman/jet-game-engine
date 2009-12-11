@@ -21,27 +21,34 @@
  */
 #pragma once
 
-#include <Jet/Types.hpp>
+#include <Jet/Physics/Engine.hpp>
+#include <ode/ode.h>
 
-namespace Jet { namespace Graphics {
-using namespace std;
-using namespace std::tr1;
+namespace Jet { namespace Impl { namespace Ode {
+using namespace Physics;
 
-class Renderable {
-public:   
-    typedef intrusive_ptr<Renderable> Ptr;
-    typedef RangedOrdinal<int, 0, 256> RenderPriority;
-    enum Visibility { visible, invisible };
+class EngineReactor : public Engine::Listener {
 
-    RenderPriority  renderPriority() const { return renderPriority_; }
-    void            renderPriority(RenderPriority p) { renderPriority_ = p; }
-    Visibility      visibility() const { return visibility_; }
-    void            visibility(Visibility v) { visibility_ = v; }
+public:
+    typedef intrusive_ptr<EngineReactor> Ptr;
+
+    EngineReactor(Engine::Ptr e);
+    ~EngineReactor();
+    void onObjectCreate(Object::Ptr o);
+    void onSphereCreate(Sphere::Ptr c);
+    void onBoxCreate(Box::Ptr s);
+    void onPlaneCreate(Plane::Ptr m);
+    void onRayCreate(Ray::Ptr s);
     
-protected:
-    Renderable() : renderPriority_(0) {}
-    RenderPriority  renderPriority_;
-    Visibility      visibility_;    
+    inline dWorldID world() { return world_; }
+    inline dSpaceID space() { return space_; }
+    
+private:
+    Engine::Ptr engine_;
+    dWorldID world_;
+    dSpaceID space_;
+    dJointGroupID joints_;
+    dContact contact_;
 };
 
-}}
+}}}

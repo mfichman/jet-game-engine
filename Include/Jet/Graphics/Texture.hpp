@@ -35,7 +35,7 @@ class Texture : public Resource, public Interface {
 public:
     friend class Engine;
     typedef RangedOrdinal<int, 0, 3> Index;
-    typedef shared_ptr<Texture> Ptr;
+    typedef intrusive_ptr<Texture> Ptr;
     
 private:
     Texture(const std::string& name) : Resource(name) {}

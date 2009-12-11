@@ -24,6 +24,10 @@
 #include <Jet/Iterator.hpp>
 #include <Jet/Types.hpp>
 #include <Jet/Interface.hpp>
+#include <Jet/Physics/Sphere.hpp>
+#include <Jet/Physics/Plane.hpp>
+#include <Jet/Physics/Ray.hpp>
+#include <Jet/Physics/Box.hpp>
 #include <vector>
 
 namespace Jet { class Root; }
@@ -42,33 +46,27 @@ class Engine : public Interface {
 public:
     class Listener;
 	friend class Root;
-	typedef shared_ptr<Engine> Ptr;
+	typedef intrusive_ptr<Engine> Ptr;
 	
-	typedef vector<shared_ptr<Body> >       BodyContainer;
-	typedef vector<shared_ptr<Sphere> >     SphereContainer;
-	typedef vector<shared_ptr<Box> >        BoxContainer;
-	typedef vector<shared_ptr<Plane> >      PlaneContainer;
-	typedef vector<shared_ptr<Ray> >        RayContainer;
+	typedef vector<Object::Ptr>     ObjectContainer;
+	typedef vector<Sphere::Ptr>     SphereContainer;
+	typedef vector<Box::Ptr>        BoxContainer;
+	typedef vector<Plane::Ptr>      PlaneContainer;
+	typedef vector<Ray::Ptr>        RayContainer;
 	
-	typedef Iterator<BodyContainer>         BodyItr;
+	typedef Iterator<ObjectContainer>       ObjectItr;
 	typedef Iterator<SphereContainer>       SphereItr;
 	typedef Iterator<BoxContainer>          BoxItr;
 	typedef Iterator<PlaneContainer>        PlaneItr;
 	typedef Iterator<RayContainer>          RayItr;
 
-	shared_ptr<Body>	bodyCreate();
-	shared_ptr<Sphere>  sphereCreate();
-    shared_ptr<Box>		boxCreate();
-    shared_ptr<Plane>	planeCreate();
-    shared_ptr<Ray>		rayCreate();
+    Object::Ptr             objectCreate();
+	Sphere::Ptr             sphereCreate();
+    Box::Ptr		        boxCreate();
+    Plane::Ptr              planeCreate();
+    Ray::Ptr		        rayCreate();
     
-	void				bodyDestroy(Body* p);
-    void				sphereDestroy(Sphere* p);
-    void				boxDestroy(Box* p);
-    void				planeDestroy(Plane* p);
-    void				rayDestroy(Ray* p);    
-    
-	inline BodyItr		bodyItr() { return BodyItr(body_); }
+    inline ObjectItr    objectItr() { return ObjectItr(object_); }
 	inline SphereItr    sphereItr() { return SphereItr(sphere_); }
 	inline BoxItr		boxItr() { return BoxItr(box_); }
 	inline PlaneItr	    planeItr() { return PlaneItr(plane_); }
@@ -77,27 +75,23 @@ public:
 private:
 	Engine() {}
 
-    BodyContainer       body_;
+    ObjectContainer     object_;
     SphereContainer     sphere_;
     BoxContainer        box_;
     PlaneContainer      plane_;
     RayContainer        ray_;
 };
 
-class Engine::Listener {
+class Engine::Listener : public Interface{
 public:
+    typedef intrusive_ptr<Engine::Listener> Ptr;
+
     virtual ~Listener() {}
-    virtual void onBodyCreate(shared_ptr<Body> t) {}
-    virtual void onSphereCreate(shared_ptr<Sphere> c) {}
-    virtual void onBoxCreate(shared_ptr<Box> s) {}
-    virtual void onPlaneCreate(shared_ptr<Plane> m) {}
-    virtual void onRayCreate(shared_ptr<Ray> s) {}
-    
-    virtual void onBodyDestroy(Body* t) {}
-    virtual void onSphereDestroy(Sphere* c) {}
-    virtual void onBoxDestroy(Box* s) {}
-    virtual void onPlaneDestroy(Plane* m) {}
-    virtual void onRayDestroy(Ray* s) {}
+    virtual void onObjectCreate(Object::Ptr o)=0;
+    virtual void onSphereCreate(Sphere::Ptr c)=0;
+    virtual void onBoxCreate(Box::Ptr s)=0;
+    virtual void onPlaneCreate(Plane::Ptr m)=0;
+    virtual void onRayCreate(Ray::Ptr s)=0;
 };
 
 }}

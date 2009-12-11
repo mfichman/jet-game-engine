@@ -19,29 +19,20 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#pragma once
-
+ 
 #include <Jet/Types.hpp>
+#include <Jet/Interface.hpp>
 
-namespace Jet { namespace Graphics {
-using namespace std;
-using namespace std::tr1;
+using namespace Jet;
 
-class Renderable {
-public:   
-    typedef intrusive_ptr<Renderable> Ptr;
-    typedef RangedOrdinal<int, 0, 256> RenderPriority;
-    enum Visibility { visible, invisible };
 
-    RenderPriority  renderPriority() const { return renderPriority_; }
-    void            renderPriority(RenderPriority p) { renderPriority_ = p; }
-    Visibility      visibility() const { return visibility_; }
-    void            visibility(Visibility v) { visibility_ = v; }
-    
-protected:
-    Renderable() : renderPriority_(0) {}
-    RenderPriority  renderPriority_;
-    Visibility      visibility_;    
-};
+void 
+Jet::intrusive_ptr_add_ref(Interface* t) {
+    t->refCountInc();
+}
 
-}}
+void  
+Jet::intrusive_ptr_release(Interface* t) {
+    t->refCountDec();
+}
+

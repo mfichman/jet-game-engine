@@ -35,7 +35,7 @@ class Cubemap : public Resource, public Interface {
 public:
     friend class Engine;
     typedef RangedOrdinal<int, 0, 1> Index;
-    typedef shared_ptr<Cubemap> Ptr;
+    typedef intrusive_ptr<Cubemap> Ptr;
     
 private:
     Cubemap(const std::string& name) : Resource(name) {}

@@ -27,10 +27,11 @@
 namespace Jet { namespace Physics {
 using namespace std;
 using namespace std::tr1;
+using namespace boost;
 
 class Plane : public Interface {
 public:
-    typedef shared_ptr<Plane> Ptr;
+    typedef intrusive_ptr<Plane> Ptr;
     
     inline Vector          normal() const { return normal_; }
     inline void            normal(const Vector& n) { normal_ = n; }

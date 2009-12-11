@@ -21,6 +21,7 @@
  */
 #pragma once
 
+#include <boost/intrusive_ptr.hpp>
 #ifdef WINDOWS
 #include <memory>
 #include <functional>
@@ -44,7 +45,7 @@ public:
 	static const int size = N;
 	typedef T value_type;
 
-	inline T& operator[](int index) {
+	inline const T& operator[](int index) const {
 		if (index < 0 || index > N) {
 			throw std::out_of_range("Tuple");
 		}
@@ -52,6 +53,12 @@ public:
 	}
 	inline void operator=(const Tuple<T, N>& o) {
 		copy(o.values_, o.values_ + N, values_);
+	}
+	inline bool operator==(const Tuple<T, N>& o) {
+	    return equal(values_, values_ + N, o.values_);
+	}
+	inline bool operator!=(const Tuple<T, N>& o) {
+	    return !operator==(o);
 	}
 
 private:
@@ -71,6 +78,7 @@ public:
     inline const T& value() const { return value_; }
     inline void value(T t) { value_ = t; }
     inline bool operator==(const Nominal<T>& o) const { return value_ == o.value_; }
+     inline bool operator!=(const Nominal<T>& o) const { return value_ != o.value_; }
 	inline const Nominal& operator=(const Nominal& o) { value_ = o.value_; return *this; }
     inline operator T() { return value_; }
     
@@ -79,8 +87,7 @@ protected:
 };
 
 template <typename T>
-class Ordinal : public Nominal<T>
-{
+class Ordinal : public Nominal<T> {
 public:
 	inline Ordinal() : Nominal<T>(0) {}
     inline Ordinal(const T& value) : Nominal<T>(value) {}
@@ -89,8 +96,7 @@ public:
 };
 
 template <typename T, long MIN, long MAX>
-class RangedOrdinal : public Ordinal<T>
-{
+class RangedOrdinal : public Ordinal<T> {
 public:
     inline RangedOrdinal() : Ordinal<T>(0) {}
     inline RangedOrdinal(const T& value) : Ordinal<T>(value) {
@@ -104,8 +110,7 @@ public:
 
 
 template <typename T>
-class Number : public Ordinal<T> 
-{
+class Number : public Ordinal<T> {
 public:
 	inline Number() : Ordinal<T>(0) {}
     inline Number(const T& value) : Ordinal<T>(value) {}
@@ -140,5 +145,9 @@ struct Frame
     float time_;
     float delta_;
 };
+
+class Interface;
+void intrusive_ptr_add_ref(Interface* t);
+void intrusive_ptr_release(Interface* t);
 
 }

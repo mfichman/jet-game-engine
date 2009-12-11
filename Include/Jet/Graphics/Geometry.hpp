@@ -22,7 +22,7 @@
 #pragma once
 
 #include <Jet/Types.hpp>
-#include <Jet/Object.hpp>
+#include <Jet/Physics/Object.hpp>
 #include <Jet/Graphics/Renderable.hpp>
 #include <Jet/Graphics/Texture.hpp>
 #include <Jet/Graphics/Shader.hpp>
@@ -30,10 +30,11 @@
 namespace Jet { namespace Graphics {
 using namespace std;
 using namespace std::tr1;
+using namespace Physics;
 
 class Geometry : public Renderable {
 public:
-    typedef shared_ptr<Geometry> Ptr;
+    typedef intrusive_ptr<Geometry> Ptr;
 
     Vector          scale() const { return scale_; }
     void            scale(const Vector& s) { scale_ = s; }
@@ -41,8 +42,8 @@ public:
     void 		    texture(Texture::Index i, Texture::Ptr t) { texture_[i] = t; }
     Shader::Ptr 	shader() const { return shader_; }
     void 		    shader(Shader::Ptr s) { shader_ = s; }
-    Object::Ptr     parent() const { return parent_; }
-    void            parent(Object::Ptr b) { parent_ = b; }
+    Object::Ptr     object() const { return parent_; }
+    void            object(Object::Ptr b) { parent_ = b; }
   
     
 protected:

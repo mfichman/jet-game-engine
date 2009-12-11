@@ -2,7 +2,7 @@
 #include <Jet/Graphics/Model.hpp>
 #include <Jet/Physics/Engine.hpp>
 #include <Jet/Physics/Box.hpp>
-#include <Jet/Object.hpp>
+#include <Jet/Physics/Object.hpp>
 #include <Jet/Root.hpp>
 #include <Jet/Registry.hpp>
 #include <iostream>

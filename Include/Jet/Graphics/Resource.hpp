@@ -30,7 +30,7 @@ using namespace std::tr1;
 
 class Resource {
 public:
-    typedef shared_ptr<Resource> Ptr;
+    typedef intrusive_ptr<Resource> Ptr;
 
     string          name() const { return name_; }
     ID              id() const { return id_; }

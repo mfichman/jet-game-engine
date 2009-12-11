@@ -24,6 +24,13 @@
 #include <Jet/Types.hpp>
 #include <Jet/Interface.hpp>
 #include <Jet/Iterator.hpp>
+#include <Jet/Graphics/Texture.hpp>
+#include <Jet/Graphics/Cubemap.hpp>
+#include <Jet/Graphics/Mesh.hpp>
+#include <Jet/Graphics/Shader.hpp>
+#include <Jet/Graphics/Quad.hpp>
+#include <Jet/Graphics/Model.hpp>
+#include <Jet/Graphics/TextBox.hpp>
 #include <map>
 #include <vector>
 
@@ -46,15 +53,15 @@ public:
 	class Listener;
 	class Options;
 	friend class Root;
-	typedef shared_ptr<Engine> Ptr;
+	typedef intrusive_ptr<Engine> Ptr;
 	
-	typedef map<string, Texture* >   TextureContainer;
-	typedef map<string, Cubemap* >   CubemapContainer;
-	typedef map<string, Mesh* >      MeshContainer;
-	typedef map<string, Shader* >    ShaderContainer;
-	typedef vector<Quad* >           QuadContainer;
-	typedef vector<Model* >          ModelContainer;
-	typedef vector<TextBox* >        TextBoxContainer;
+	typedef map<string, Texture::Ptr>   TextureContainer;
+	typedef map<string, Cubemap::Ptr>   CubemapContainer;
+	typedef map<string, Mesh::Ptr>      MeshContainer;
+	typedef map<string, Shader::Ptr>    ShaderContainer;
+	typedef vector<Quad::Ptr>           QuadContainer;
+	typedef vector<Model::Ptr>          ModelContainer;
+	typedef vector<TextBox::Ptr>        TextBoxContainer;
 	
 	typedef Iterator<TextureContainer>          TextureItr;
 	typedef Iterator<CubemapContainer>          CubemapItr;
@@ -68,21 +75,13 @@ public:
 	enum MultisampleQuality { ms0, ms1, ms2, ms3, ms4, ms5 };
 	enum DisplayMode { windowed, fullscreen };
 
-	shared_ptr<Texture>	    textureCreate(const string& name);
-	shared_ptr<Cubemap>     cubemapCreate(const string& name);
-	shared_ptr<Mesh>        meshCreate(const string& name);
-	shared_ptr<Shader> 	    shaderCreate(const string& name);
-	shared_ptr<Quad>        quadCreate();
-	shared_ptr<Model>       modelCreate();
-	shared_ptr<TextBox>     textBoxCreate();
-	
-	void                    textureDestroy(Texture* t);
-	void                    cubemapDestroy(Cubemap* c);
-	void                    meshDestroy(Mesh* m);
-	void                    shaderDestroy(Shader* s);
-	void                    quadDestroy(Quad* s);
-	void                    modelDestroy(Model* m);
-	void                    textBoxDestroy(TextBox* t);
+	Texture::Ptr	        textureCreate(const string& name);
+	Cubemap::Ptr            cubemapCreate(const string& name);
+	Mesh::Ptr               meshCreate(const string& name);
+	Shader::Ptr 	        shaderCreate(const string& name);
+	Quad::Ptr               quadCreate();
+	Model::Ptr              modelCreate();
+	TextBox::Ptr            textBoxCreate();
 	
 	void                    listener(Listener* listener);
 		
@@ -104,7 +103,7 @@ private:
 	QuadContainer           quad_;
 	ModelContainer          model_;
 	TextBoxContainer        textBox_;
-	vector<Listener*>       listener_;
+	vector<Listener*> listener_;
 };
 
 class Engine::Options {
@@ -124,21 +123,13 @@ public:
 class Engine::Listener {
 public:
     virtual ~Listener() {}
-    virtual void onTextureCreate(shared_ptr<Texture> t) {}
-    virtual void onCubemapCreate(shared_ptr<Cubemap> c) {}
-    virtual void onShaderCreate(shared_ptr<Shader> s) {}
-    virtual void onMeshCreate(shared_ptr<Mesh> m) {}
-    virtual void onQuadCreate(shared_ptr<Quad> s) {}
-    virtual void onModelCreate(shared_ptr<Model> s) {}
-    virtual void onTextBoxCreate(shared_ptr<TextBox> t) {}
-    
-    virtual void onTextureDestroy(Texture* t) {}
-    virtual void onCubemapDestroy(Cubemap* c) {}
-    virtual void onShaderDestroy(Shader* s) {}
-    virtual void onMeshDestroy(Mesh* m) {}
-    virtual void onQuadDestroy(Quad* s) {}
-    virtual void onModelDestroy(Model* s) {}
-    virtual void onTextBoxDestroy(TextBox* t) {}
+    virtual void onTextureCreate(intrusive_ptr<Texture> t) {}
+    virtual void onCubemapCreate(intrusive_ptr<Cubemap> c) {}
+    virtual void onShaderCreate(intrusive_ptr<Shader> s) {}
+    virtual void onMeshCreate(intrusive_ptr<Mesh> m) {}
+    virtual void onQuadCreate(intrusive_ptr<Quad> s) {}
+    virtual void onModelCreate(intrusive_ptr<Model> s) {}
+    virtual void onTextBoxCreate(intrusive_ptr<TextBox> t) {}
     
     virtual void onOptions(shared_ptr<Options> o) {}
 };

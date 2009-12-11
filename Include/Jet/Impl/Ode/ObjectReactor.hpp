@@ -21,30 +21,40 @@
  */
 #pragma once
 
-#include <Jet/Object.hpp>
-#include <Jet/Types.hpp>
-#include <Jet/Interface.hpp>
+#include <Jet/Physics/Object.hpp>
+#include <Jet/Impl/Ode/EngineReactor.hpp>
+#include <ode/ode.h>
 
-namespace Jet { namespace Physics {
-using namespace std;
-using namespace std::tr1;
+namespace Jet { namespace Impl { namespace Ode {
+using namespace Physics;
 
-class Body : public Interface {
+class ObjectReactor : public Object::Listener {
+
 public:
-    typedef shared_ptr<Body> Ptr;
-
-	inline Object::Ptr  object() const { return object_; }
-    inline void         object(Object::Ptr o) { modState(modified); object_ = o; }
-    inline Vector       velocity() const { return velocity_; }
-    inline void         velocity(const Vector& v) { modState(modified); velocity_ = v; }
-    inline Vector       angularVelocity() const { return angularVelocity_; }
-    inline void         angularVelocity(const Vector& v) { modState(modified); angularVelocity_ = v; }
+    typedef intrusive_ptr<ObjectReactor> Ptr;
     
+    ObjectReactor(Object::Ptr o, EngineReactor::Ptr e);
+    ~ObjectReactor();
+    void onPosition();
+    void onRotation();
+    void onLinearVelocity();
+    void onAngularVelocity();
+    void onForce();
+    void onTorque();
+    void onObject();
+    void onDynamic();
+    inline Object::Ptr object() { return object_; }
+    inline dGeomID geom() { return geom_; }
+    inline dBodyID body() { return body_; }
+    inline dMass mass() { return mass_; }
+    void massAdd(const dMass& mass);
+    void massSub(const dMass& mass);
     
-protected:
-    Object::Ptr         object_;
-    Vector              velocity_;
-    Vector              angularVelocity_;
+private:
+    dGeomID geom_;
+    dBodyID body_;
+    dMass mass_;
+    Object::Ptr object_;
 };
 
-}}
+}}}

@@ -31,7 +31,7 @@ using namespace std::tr1;
 
 class Material : public Resource, public Interface {
 public:
-    typedef shared_ptr<Material> Ptr;
+    typedef intrusive_ptr<Material> Ptr;
     
     Color           diffuseColor() const;
     void            diffuseColor(const Color& c);

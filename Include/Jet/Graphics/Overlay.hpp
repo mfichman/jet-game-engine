@@ -30,7 +30,7 @@ using namespace std::tr1;
 
 class Overlay : public Renderable {
 public:
-    typedef shared_ptr<Overlay> Ptr;
+    typedef intrusive_ptr<Overlay> Ptr;
 
     Coord           position() const { return position_; }
     void            position(Coord c) { position_ = c; }

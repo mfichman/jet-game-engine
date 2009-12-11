@@ -22,27 +22,28 @@
 #pragma once
 
 #include <Jet/Types.hpp>
-#include <Jet/Object.hpp>
+#include <Jet/Physics/Object.hpp>
 
 namespace Jet { namespace Physics {
 using namespace std;
 using namespace std::tr1;
+using namespace boost;
 
 class Ray : public Interface {
 public:
-    typedef shared_ptr<Ray> Ptr;
+    typedef intrusive_ptr<Ray> Ptr;
     
     inline float        length() const { return length_; }
     inline void         length(float l) { length_ = l; }
     inline Vector       direction() const { return direction_; }
     inline void         direction(const Vector& v) { direction_ = v; }
-    inline Body::Ptr    parent() const { return parent_; }
-    inline void         parent(Body::Ptr p) { parent_ = p; }
+    inline Object::Ptr  object() const { return object_; }
+    inline void         object(Object::Ptr p) { object_ = p; }
     
 protected:
     float           length_;
     Vector          direction_;
-    Body::Ptr		parent_;
+    Object::Ptr		object_;
 };
 
 }}

@@ -22,16 +22,17 @@
 #pragma once
 
 #include <Jet/Types.hpp>
-#include <Jet/Object.hpp>
+#include <Jet/Physics/Object.hpp>
 #include <Jet/Interface.hpp>
 
 namespace Jet { namespace Graphics {
 using namespace std;
 using namespace std::tr1;
+using namespace Physics;
 
 class Camera : public Interface {
 public:
-    typedef shared_ptr<Camera> Ptr;
+    typedef intrusive_ptr<Camera> Ptr;
     typedef RangedOrdinal<float, 0, 1> Tightness;
 
     inline Object::Ptr      target() const { return target_; }

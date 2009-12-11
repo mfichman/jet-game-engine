@@ -34,7 +34,7 @@ class Quad : public Geometry, public Interface {
 public:
     friend class Engine;
     typedef RangedOrdinal<int, 0, 3> Index;
-    typedef shared_ptr<Quad> Ptr;
+    typedef intrusive_ptr<Quad> Ptr;
 
     Vertex          vertex(Index i) { return vertex_[i]; }
     void            vertex(Index i, const Vertex& v) { vertex_[i] = v; }

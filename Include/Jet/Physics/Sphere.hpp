@@ -21,25 +21,25 @@
  */
 
 #include <Jet/Types.hpp>
-#include <Jet/Object.hpp>
-#include <Jet/Physics/Body.hpp>
+#include <Jet/Physics/Object.hpp>
 
 namespace Jet { namespace Physics {
 using namespace std;
 using namespace std::tr1;
+using namespace boost;
 
 class Sphere : public Interface {
 public:
-    typedef shared_ptr<Sphere> Ptr;
+    typedef intrusive_ptr<Sphere> Ptr;
     
     inline float		    radius() const { return radius_; }
     inline void		        radius(const float& w) { radius_ = w; }
-    inline Body::Ptr		parent() const { return parent_; }
-    inline void             parent(Body::Ptr p) { parent_ = p; }
+    inline Object::Ptr      object() const { return object_; }
+    inline void             object(Object::Ptr p) { object_ = p; }
     
 protected:
     float          radius_;
-    Body::Ptr      parent_;
+    Object::Ptr    object_;
 };
 
 }}

@@ -27,13 +27,14 @@
 namespace Jet { namespace Graphics {
 using namespace std;
 using namespace std::tr1;
+using namespace boost;
 
 class Engine;
 
 class TextBox : public Overlay, public Interface {
 public:
     friend class Engine;
-    typedef std::tr1::shared_ptr<TextBox> Ptr;
+    typedef intrusive_ptr<TextBox> Ptr;
     
 
     std::string     fontFamily() const { return fontFamily_; }

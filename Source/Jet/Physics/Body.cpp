@@ -19,31 +19,41 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#pragma once
+ 
+#include <Jet/Physics/Body.hpp>
+ 
+using namespace Jet;
+using namespace Jet::Physics;
+   
+void         
+Body::linearVelocity(const Vector& v) { 
+    velocity_ = v; 
+}
 
-#include <Jet/Types.hpp>
+void 
+Body::angularVelocity(const Vector& v) { 
+    angularVelocity_ = v; 
+}
 
-namespace Jet { 
-using namespace std;
-using namespace std::tr1;
+void
+Body::force(const Vector& v) { 
+    force_ = v; 
+}
 
-class Anchor : public Interface {
-public:
-    typedef shared_ptr<Anchor> Ptr;
-	typedef shared_ptr<const Anchor> ConstPtr;
-	friend class Object;
+void 
+Body::forceAdd(const Vector& v) { 
+}
+
+void 
+Body::torque(const Vector& v) { 
+   torque_ = v; 
+}
+
+void 
+Body::torqueAdd(const Vector& v) { 
+}
     
-    inline Vector       position() const { return position_; }
-    inline void         position(const Vector& v) { modState(modified); position_ = v; }
-    inline Quaternion   rotation() const { return rotation_; }
-    inline void         rotation(const Quaternion& q) { modState(modified); rotation_ = q; }
-	inline Anchor::Ptr	parent() { return parent_; }
-	inline void			parent(Anchor::Ptr p) { parent_ = p; }
-    
-protected:    
-	Anchor::Ptr			parent_;
-    Vector              position_;
-    Quaternion          rotation_;
-};
-
+void 
+Body::object(Object* o) {
+    object_ = o;
 }

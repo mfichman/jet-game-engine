@@ -19,29 +19,61 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#pragma once
+ 
+#include <Jet/Object.hpp>
 
-#include <Jet/Types.hpp>
-
-namespace Jet { namespace Graphics {
-using namespace std;
-using namespace std::tr1;
-
-class Renderable {
-public:   
-    typedef intrusive_ptr<Renderable> Ptr;
-    typedef RangedOrdinal<int, 0, 256> RenderPriority;
-    enum Visibility { visible, invisible };
-
-    RenderPriority  renderPriority() const { return renderPriority_; }
-    void            renderPriority(RenderPriority p) { renderPriority_ = p; }
-    Visibility      visibility() const { return visibility_; }
-    void            visibility(Visibility v) { visibility_ = v; }
+using namespace Jet;
     
-protected:
-    Renderable() : renderPriority_(0) {}
-    RenderPriority  renderPriority_;
-    Visibility      visibility_;    
-};
+void
+Object::frame(FrameID f) {
+    if (frame_ != f) {
+        frame_ = f;
+    }
+}
 
-}}
+void
+Object::listener(Listener::Ptr l) {
+    listener_ = l;
+}
+
+void
+Object::position(const Vector& v) {
+   if (position_ != v) {
+        position_ = v;
+        if (listener_) {
+            listener_->onPosition(Ptr(this));
+        }
+   }
+}
+
+void
+Object::rotation(const Quaternion& q) {
+    if (rotation_ != q) {
+        rotation_ = q;
+        if (listener_) {
+            listener_->onRotation(Ptr(this));
+        }
+    }
+}
+
+void 
+Object::body(Body::Ptr p) {
+    if (body_ != p) {
+        if (body_) body_->object(NULL);
+        body_ = p;
+        if (body_) body_->object(this);
+        if (listener_) {
+            listener_->onBody(Ptr(this));
+        }
+    }
+}
+
+void 
+Object::object(Object::Ptr p) {
+    if (object_ != p) {
+        object_ = p;
+        if (listener_) {
+            listener_->onObject(Ptr(this));
+        }
+    }
+}

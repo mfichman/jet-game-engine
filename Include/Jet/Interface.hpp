@@ -21,44 +21,27 @@
  */
 #pragma once
 
+#include <Jet/Types.hpp>
 #include <string>
  
 namespace Jet {
 using namespace std;
 using namespace std::tr1;
+using namespace boost;
 
 class Interface {
 public: 
-	typedef shared_ptr<Interface> Ptr;
-    enum ModState { modified, unmodified };
-    class Listener;
+	typedef intrusive_ptr<Interface> Ptr;
     
 	virtual ~Interface() {}
-    inline ModState     modState() { return modState_; }
-    Listener*           listener() { return listener_; }
-	inline void         listener(Listener* l) { listener_ = l; }
+	inline int          refCount() const { return refCount_; }
+    void                refCountInc() const;
+    void                refCountDec() const;
 
 protected:
-	Interface() : listener_(0) {}
-    inline void modState(ModState s);
+	Interface() : refCount_(0) {}
     
 private:
-    ModState            modState_;
-    Listener*           listener_; 
+    int                 refCount_;
 };
-
-class Interface::Listener
-{
-public:
-    virtual void        onModState(Interface* obj)=0;
-};
-
-inline void
-Interface::modState(Interface::ModState s) { 
-	if (listener_ && s != modState_) {
-		listener_->onModState(this);
-	}
-	modState_ = s;
-}
-
 }

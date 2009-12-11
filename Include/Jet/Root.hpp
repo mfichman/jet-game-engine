@@ -28,12 +28,12 @@ namespace Jet {
 using namespace std;
 using namespace std::tr1;
 
-class Root {
+class Root : public Interface {
 public:
-	typedef shared_ptr<Graphics::Engine> GraphicsPtr;
-	typedef shared_ptr<Physics::Engine> PhysicsPtr;
+	typedef intrusive_ptr<Graphics::Engine> GraphicsPtr;
+	typedef intrusive_ptr<Physics::Engine> PhysicsPtr;
 	typedef shared_ptr<Registry> RegistryPtr;
-	typedef shared_ptr<Root> Ptr;
+	typedef intrusive_ptr<Root> Ptr;
 
 	inline GraphicsPtr	graphics() { return graphics_; }
 	inline PhysicsPtr	physics() { return physics_; }

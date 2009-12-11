@@ -31,6 +31,7 @@ namespace Jet {
 using namespace std;
 using namespace std::tr1;
 using namespace std::tr1::placeholders;
+using namespace boost;
 
 class Interface;
 class Source;
@@ -38,8 +39,8 @@ class Sink;
 
 class Class {
 public:
-    typedef function<void (shared_ptr<Interface>, Source&)>  Mutator;
-    typedef function<void (shared_ptr<Interface>, Sink&)>    Accessor;
+    typedef function<void (intrusive_ptr<Interface>, Source&)>  Mutator;
+    typedef function<void (intrusive_ptr<Interface>, Sink&)>    Accessor;
     typedef shared_ptr<Class> Ptr;
 
 
@@ -71,7 +72,7 @@ public:
     typedef void result_type;
     
     MutatorFunctor(Function f) : f_(f) {}
-    void operator()(shared_ptr<Interface> i, Source& s) const;
+    void operator()(intrusive_ptr<Interface> i, Source& s) const;
     
 private:
     Function f_;
@@ -84,7 +85,7 @@ public:
     typedef void result_type;
     
     MutatorFunctor(Function f) : f_(f) {}
-    void operator()(shared_ptr<Interface> i, Source& s) const;
+    void operator()(intrusive_ptr<Interface> i, Source& s) const;
     
 private:
     Function f_;
@@ -97,7 +98,7 @@ public:
     typedef void result_type;
 
     AccessorFunctor(Function f) : f_(f) {} 
-    void operator()(shared_ptr<Interface> i, Sink& s) const;
+    void operator()(intrusive_ptr<Interface> i, Sink& s) const;
     
 private:
     Function f_;
@@ -117,7 +118,7 @@ Class::accessor(const string& n, A (C::*f)(void) const) {
 
 template <typename C, typename A>
 void 
-MutatorFunctor<C, A>::operator()(shared_ptr<Interface> i, Source& s) const {
+MutatorFunctor<C, A>::operator()(intrusive_ptr<Interface> i, Source& s) const {
     C* obj = dynamic_cast<C*>(i.get());
     if (obj) {
         A a;
@@ -131,7 +132,7 @@ MutatorFunctor<C, A>::operator()(shared_ptr<Interface> i, Source& s) const {
 
 template <typename C, typename A>
 void 
-MutatorFunctor<C, const A&>::operator()(shared_ptr<Interface> i, Source& s) const {
+MutatorFunctor<C, const A&>::operator()(intrusive_ptr<Interface> i, Source& s) const {
     C* obj = dynamic_cast<C*>(i.get());
     if (obj) {
         A a;
@@ -145,7 +146,7 @@ MutatorFunctor<C, const A&>::operator()(shared_ptr<Interface> i, Source& s) cons
 
 template <typename C, typename A>
 void
-AccessorFunctor<C, A>::operator()(shared_ptr<Interface> i, Sink& s) const {
+AccessorFunctor<C, A>::operator()(intrusive_ptr<Interface> i, Sink& s) const {
     C* obj = dynamic_cast<C*>(i.get());
     if (obj) {
         //s(((*obj).*f_)());

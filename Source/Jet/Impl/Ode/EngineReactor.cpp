@@ -18,38 +18,58 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- */
-#pragma once
+ */  
+ 
+#include <Jet/Impl/Ode/EngineReactor.hpp>
 
-#include <Jet/Types.hpp>
-#include <Jet/Interface.hpp>
-#include <Jet/Anchor.hpp>
-#include <iostream>
+using namespace Jet::Impl::Ode;
+using namespace Jet::Physics;
 
-namespace Jet {
-using namespace std;
-using namespace std::tr1;
-
-class Object : public Interface {
+class Initializer {
 public:
-    typedef shared_ptr<Object> Ptr;
-    
-    inline Vector			position() const { return anchor_->position_; }
-	inline void				position(const Vector& v) { modState(modified); anchor_->position_ = v; }
-    inline Quaternion		rotation() const { return anchor_->rotation_; }
-    inline void				rotation(const Quaternion& q) { modState(modified); anchor_->rotation_ = q; }
-	inline Anchor::ConstPtr	anchor() const { return anchor_; }
-	inline void				anchor(Anchor::Ptr o) { anchor_ = o; }
-    inline FrameID			frame() const { return frame_; }
-    inline void				frame(FrameID f) { modState(unmodified); frame_ = f; } 
-    
-	static Object::Ptr		make() { return Object::Ptr(new Object()); }
-
-protected:  
-	Object() : anchor_(new Anchor()) {}
-
-	Anchor::Ptr			anchor_;
-    FrameID             frame_;
+    inline Initializer() { dInitODE(); }
+    inline ~Initializer() { dCloseODE(); }
 };
+Initializer init;
+
+EngineReactor::EngineReactor(Engine::Ptr e) :
+    engine_(e) {
+    
+    world_ = dWorldCreate();
+    space_ = dSimpleSpaceCreate(0);
+    joints_ = dJointGroupCreate(1024);
+    contact_.surface.mode = dContactBounce;
+    contact_.surface.mu = 0.2f;
+    contact_.surface.bounce_vel = 0.0f;
+}
+
+EngineReactor::~EngineReactor() {
+    dJointGroupDestroy(joints_);
+    dSpaceDestroy(space_);
+    dWorldDestroy(world_);
+}
+
+void 
+EngineReactor::onObjectCreate(Object::Ptr o) {
+    
+}
+ 
+void 
+EngineReactor::onSphereCreate(Sphere::Ptr c) {
+
+}
+    
+void 
+EngineReactor::onBoxCreate(Box::Ptr s) {
+
+}
+
+void
+EngineReactor::onPlaneCreate(Plane::Ptr m) {
+
+}
+
+void 
+EngineReactor::onRayCreate(Ray::Ptr s) {
 
 }

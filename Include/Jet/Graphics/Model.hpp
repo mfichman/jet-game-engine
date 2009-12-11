@@ -36,7 +36,7 @@ class Engine;
 class Model : public Geometry, public Interface {
 public:
     friend class Engine;
-    typedef shared_ptr<Model> Ptr;
+    typedef intrusive_ptr<Model> Ptr;
 
     Mesh::Ptr       mesh() const { return mesh_; }
     void            mesh(Mesh::Ptr m) { mesh_ = m; }

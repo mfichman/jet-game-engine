@@ -34,7 +34,7 @@ class Engine;
 class Mesh : public Resource, public Interface {
 public:
     friend class Engine;
-    typedef shared_ptr<Mesh> Ptr;
+    typedef intrusive_ptr<Mesh> Ptr;
     
 private:
     Mesh(const std::string& name) : Resource(name) {}
