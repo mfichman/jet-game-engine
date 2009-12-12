@@ -21,6 +21,7 @@
  */  
  
 #include <Jet/Impl/Ode/ObjectReactor.hpp>
+#include <Jet/Impl/Ode/EngineReactor.hpp>
 
 using namespace Jet::Impl::Ode;
 using namespace Jet::Physics;
@@ -28,6 +29,7 @@ using namespace Jet::Physics;
 //------------------------------------------------------------------------------
 ObjectReactor::ObjectReactor(Object::Ptr o, EngineReactor::Ptr e) :
     object_(o),
+    engine_(e),    
     body_(dBodyCreate(e->world())),
     geom_(dCreateSphere(e->space(), 10.0f)) {
     
@@ -94,6 +96,28 @@ ObjectReactor::onTorque() {
 //------------------------------------------------------------------------------
 void 
 ObjectReactor::onObject() {
+    if (parent_) {
+    
+        // Subract the mass of this object from the parent
+        dMass neg = mass_;
+        neg.mass = -neg.mass;
+        dMass total;
+        dBodyGetMass(parent_->body_, &total);
+        dMassAdd(&total, &neg);
+        dBodySetMass(parent_->body_, &total);
+    }
+    
+    if (object_->parent()) {
+    
+        // Add the mass of this object to the parent
+        parent_ = engine_->reactor(object_->parent());
+        dMass total = parent_->mass_;
+        dMassAdd(&total, &mass_);
+        dBodySetMass(parent_->body_, &total);
+        dBodyDisable(body_);
+        
+        dGeomSetBody(geom_, parent->body_);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -107,7 +131,6 @@ ObjectReactor::onDynamic() {
         dBodySetQuaternion(body_, quat);
         dGeomSetBody(geom_, body_);
         dBodyEnable(body_);
-        
     } else {
         dGeomSetBody(geom_, 0);
         dBodyDisable(body_);

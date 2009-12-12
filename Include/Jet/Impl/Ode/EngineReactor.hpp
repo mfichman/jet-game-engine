@@ -22,10 +22,12 @@
 #pragma once
 
 #include <Jet/Physics/Engine.hpp>
+#include <Jet/Impl/Ode/ObjectReactor.hpp>
 #include <ode/ode.h>
 
 namespace Jet { namespace Impl { namespace Ode {
 using namespace Physics;
+class ObjectReactor;
 
 class EngineReactor : public Engine::Listener {
 
@@ -42,6 +44,7 @@ public:
     
     inline dWorldID world() { return world_; }
     inline dSpaceID space() { return space_; }
+    inline ObjectReactor::Ptr reactor(Object::Ptr o) { return reactor_[o]; }
     
 private:
     Engine::Ptr engine_;
@@ -49,6 +52,7 @@ private:
     dSpaceID space_;
     dJointGroupID joints_;
     dContact contact_;
+    map<Object::Ptr, ObjectReactor::Ptr> reactor_;
 };
 
 }}}

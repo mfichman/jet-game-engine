@@ -22,18 +22,19 @@
 #pragma once
 
 #include <Jet/Physics/Object.hpp>
-#include <Jet/Impl/Ode/EngineReactor.hpp>
 #include <ode/ode.h>
 
 namespace Jet { namespace Impl { namespace Ode {
 using namespace Physics;
+class EngineReactor;
 
 class ObjectReactor : public Object::Listener {
 
 public:
     typedef intrusive_ptr<ObjectReactor> Ptr;
+    typedef intrusive_ptr<EngineReactor> EngineReactorPtr;
     
-    ObjectReactor(Object::Ptr o, EngineReactor::Ptr e);
+    ObjectReactor(Object::Ptr o, EngineReactorPtr e);
     ~ObjectReactor();
     void onPosition();
     void onRotation();
@@ -51,10 +52,12 @@ public:
     void massSub(const dMass& mass);
     
 private:
+    ObjectReactor::Ptr parent_;
     dGeomID geom_;
     dBodyID body_;
     dMass mass_;
     Object::Ptr object_;
+    EngineReactorPtr engine_;
 };
 
 }}}
