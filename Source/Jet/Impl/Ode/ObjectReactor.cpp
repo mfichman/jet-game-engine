@@ -116,7 +116,7 @@ ObjectReactor::onObject() {
         dBodySetMass(parent_->body_, &total);
         dBodyDisable(body_);
         
-        dGeomSetBody(geom_, parent->body_);
+        dGeomSetBody(geom_, parent_->body_);
     }
 }
 
