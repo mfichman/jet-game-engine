@@ -19,40 +19,26 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#pragma once;
+#pragma once
 
+#include <Types.hpp>
 #include <vector>
-#include <map>
 
-namespace Jet {
+namespace Jet { namespace Script {
 using namespace std;
+using namespace std::tr1;
 
-template <typename T>
-class Iterator { 
+class Entity {
 public:
-	Iterator(T& v) : iter_(v.begin()), end_(v.end()) {}
-	void operator++() { iter_++; }
-	typename T::value_type& operator*() { return *iter_; }
-	typename T::value_type& operator->() { return *iter_; }
-	operator bool() { return iter_ != end_; }
-
-private:
-	typename T::iterator iter_;
-	typename T::iterator end_;
-};
-
-template <typename K, typename V>
-class Iterator<map<K,V> > {
-public:
-    Iterator(map<K,V>& m) : iter_(m.begin()), end_(m.end()) {}
-    void operator++() { iter_++; }
-    V& operator*() { return iter_->second; }
-    V& operator->() { return iter_->second; }
-    operator bool() { return iter_ != end_; }
+    typedef shared_ptr<Entity> Ptr;
+    typedef Iterator<map<string, Interface::Ptr> > InterfaceItr;
     
-private:
-    typename map<K,V>::iterator iter_;
-    typename map<K,V>::iterator end_;
+    inline Interface::Ptr interface(const string& n) { return interface_[n]; }
+    inline void interface(const string& n, Interface::Ptr i) { interface_[n] = i; }
+    InterfaceItr interfaceItr() { return InterfaceItr(interface_); }
+    
+public:
+    map<string, Interface::Ptr> interface_;
 };
 
-}
+}}

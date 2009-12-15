@@ -26,6 +26,7 @@
 #include <Jet/Sink.hpp>
 #include <map>
 #include <string>
+#include <iostream>
 
 namespace Jet {
 using namespace std;

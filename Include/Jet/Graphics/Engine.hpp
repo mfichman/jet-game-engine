@@ -52,7 +52,7 @@ class Engine : public Interface {
 public:
 	class Listener;
 	class Options;
-	friend class Root;
+	friend class Jet::Root;
 	typedef intrusive_ptr<Engine> Ptr;
 	
 	typedef map<string, Texture::Ptr>   TextureContainer;

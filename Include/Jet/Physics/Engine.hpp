@@ -45,7 +45,7 @@ class Ray;
 class Engine : public Interface {
 public:
     class Listener;
-	friend class Root;
+	friend class Jet::Root;
 	typedef intrusive_ptr<Engine> Ptr;
 	
 	typedef vector<Object::Ptr>     ObjectContainer;

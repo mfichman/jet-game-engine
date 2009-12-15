@@ -30,6 +30,7 @@
 #include <tr1/functional>
 #endif
 #include <limits>
+#include <stdexcept>
 
 namespace Jet {
 using namespace std;
@@ -91,8 +92,8 @@ class Ordinal : public Nominal<T> {
 public:
 	inline Ordinal() : Nominal<T>(0) {}
     inline Ordinal(const T& value) : Nominal<T>(value) {}
-    inline bool operator<(const T& o) const { return value_ < o.value_; }
-    inline bool operator>(const T& o) const { return value_ > o.value_; }
+    inline bool operator<(const T& o) const { return this->value_ < o.value_; }
+    inline bool operator>(const T& o) const { return this->value_ > o.value_; }
 };
 
 template <typename T, long MIN, long MAX>
@@ -114,14 +115,14 @@ class Number : public Ordinal<T> {
 public:
 	inline Number() : Ordinal<T>(0) {}
     inline Number(const T& value) : Ordinal<T>(value) {}
-    inline T operator+(const T& o) const { return Real(value_ + o.value); }
-    inline T operator*(const T& o) const { return Real(value_ * o.value); }
-    inline T operator/(const T& o) const { return Real(value_ / o.value); }
-    inline T operator-(const T& o) const { return Real(value_ - o.value); }
-    inline void operator+=(const T& o) const { value_ += o.value; }
-    inline void operator-=(const T& o) const { value_ -= o.value; }
-    inline void operator*=(const T& o) const { value_ *= o.value; }
-    inline void operator/=(const T& o) const { value_ /= o.value; }
+    inline T operator+(const T& o) const { return Real(this->value_ + o.value); }
+    inline T operator*(const T& o) const { return Real(this->value_ * o.value); }
+    inline T operator/(const T& o) const { return Real(this->value_ / o.value); }
+    inline T operator-(const T& o) const { return Real(this->value_ - o.value); }
+    inline void operator+=(const T& o) const { this->value_ += o.value; }
+    inline void operator-=(const T& o) const { this->value_ -= o.value; }
+    inline void operator*=(const T& o) const { this->value_ *= o.value; }
+    inline void operator/=(const T& o) const { this->value_ /= o.value; }
 };
 
 

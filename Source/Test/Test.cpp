@@ -50,6 +50,6 @@ int main(int argc, char** argv) {
 	Object::Ptr o = Object::make();
 	
 	Class::Ptr c = r->type(o);
-	c->mutator("position")(o, SimpleSource());
-	c->accessor("position")(o, SimpleSink());
+	//c->mutator("position")(o, SimpleSource());
+	//c->accessor("position")(o, SimpleSink());
 }
