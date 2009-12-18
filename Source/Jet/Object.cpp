@@ -19,29 +19,36 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#pragma once
 
-#include <Jet/Types.hpp>
+#include <Jet/Object.hpp>
+#include <algorithm>
 
-namespace Jet { namespace Graphics {
+using namespace Jet;
 using namespace std;
-using namespace std::tr1;
 
-class Renderable {
-public:   
-    typedef intrusive_ptr<Renderable> Ptr;
-    typedef RangedOrdinal<int, 0, 256> RenderPriority;
-    enum Visibility { visible, invisible };
+//------------------------------------------------------------------------------
+void
+Object::position(const Vector& v) {
+    if (position_ != v) {
+        position_ = v;
+        publisher_.notify(&Listener::onPosition);
+    }
+}
 
-    RenderPriority  renderPriority() const { return renderPriority_; }
-    void            renderPriority(RenderPriority p) { renderPriority_ = p; }
-    Visibility      visibility() const { return visibility_; }
-    void            visibility(Visibility v) { visibility_ = v; }
-    
-protected:
-    Renderable() : renderPriority_(0) {}
-    RenderPriority  renderPriority_;
-    Visibility      visibility_;    
-};
+//------------------------------------------------------------------------------
+void
+Object::rotation(const Quaternion& q) {
+    if (rotation_ != q) {
+        rotation_ = q;
+        publisher_.notify(&Listener::onRotation);
+    }
+}
 
-}}
+//------------------------------------------------------------------------------
+void
+Object::networkSync(NetworkSync s) {
+    if (networkSync_ != s) {
+        networkSync_ = s;
+        publisher_.notify(&Listener::onNetworkSync);
+    }
+}

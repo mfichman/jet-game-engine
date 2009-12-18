@@ -19,26 +19,46 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#pragma once
 
-#include <Jet/Types.hpp>
-#include <Jet/Graphics/Resource.hpp>
-#include <string>
+#include <Jet/Model.hpp>
 
-namespace Jet { namespace Graphics {
-using namespace std;
-using namespace std::tr1;
+using namespace Jet;
 
-class Engine;
+void 
+Model::scale(const Vector& s) {
+    if (scale_ != s) {
+        scale_ = s;
+        publisher_.notify(&Listener::onScale);
+    }
+}
+void 
+Model::texture(TextureIndex j, const string& t) {
+    if (texture_[j] != t) {
+        texture_[j] = t;
+        publisher_.notify(&Listener::onTexture, j);
+    }
+}
 
-class Cubemap : public Resource, public Interface {
-public:
-    friend class Engine;
-    typedef RangedOrdinal<int, 0, 1> Index;
-    typedef intrusive_ptr<Cubemap> Ptr;
-    
-private:
-    Cubemap(const std::string& name) : Resource(name) {}
-};
+void 
+Model::cubemap(CubemapIndex j, const string& t) {
+    if (cubemap_[j] != t) {
+        cubemap_[j] = t;
+        publisher_.notify(&Listener::onCubemap, j);
+    }
+}
 
-}}
+void 
+Model::shader(const string& s) { 
+    if (shader_ != s) {
+        shader_ = s;    
+        publisher_.notify(&Listener::onShader);
+    }
+}
+
+void 
+Model::mesh(const string& m) {
+    if (mesh_ != m) {
+        mesh_ = m;
+        publisher_.notify(&Listener::onMesh);
+    }
+}

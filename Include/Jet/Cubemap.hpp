@@ -21,24 +21,20 @@
  */
 #pragma once
 
-#include <Types.hpp>
-#include <vector>
+#include <Jet/Types.hpp>
+#include <Jet/Resource.hpp>
+#include <string>
 
-namespace Jet { namespace Script {
+namespace Jet {
 using namespace std;
 using namespace std::tr1;
 
-class Entity {
+class Cubemap : public Resource {
 public:
-    typedef shared_ptr<Entity> Ptr;
-    typedef Iterator<map<string, Interface::Ptr> > InterfaceItr;
+    typedef intrusive_ptr<Cubemap> Ptr;
     
-    inline Interface::Ptr interface(const string& n) { return interface_[n]; }
-    inline void interface(const string& n, Interface::Ptr i) { interface_[n] = i; }
-    InterfaceItr interfaceItr() { return InterfaceItr(interface_); }
-    
-public:
-    map<string, Interface::Ptr> interface_;
+private:
+    Cubemap(const std::string& name) : Resource(name) {}
 };
 
-}}
+}

@@ -21,18 +21,48 @@
  */
 #pragma once
 
-namespace Jet { namespace Network {
+#include <Jet/Types.hpp>
+#include <Jet/Interface.hpp>
+#include <iostream>
+#include <list>
 
-class Engine {
+namespace Jet {
+using namespace std;
+using namespace std::tr1;
+using namespace boost;
+class Root;
+
+class Entity : public Interface {
 public:
     class Listener;
+    friend class Root;
+    typedef intrusive_ptr<Entity> Ptr;
+    enum NetworkSync { disabled, enabled };
     
-    Tracker::Ptr    tracker();
-    
-    void            trackerDestroy(Tracker* t);   
-    
-private:
+    // Attributes
+    inline NetworkSync      networkSync() const { return networkSync_; }
+    void                    networkSync(NetworkSync s);
+    inline const string&    updateMethod() const { return updateMethod_; }
+    void                    updateMethod(const string& s);
+    void                    time(double time);
 
+    // Utility
+    inline Publisher<Listener>& publisher() const { return publisher_; };
+
+private:
+    Entity() {}
+
+    mutable Publisher<Listener> publisher_;
+    NetworkSync networkSync_;
+    string updateMethod_;
 };
 
-}}
+class Entity::Listener : public Interface {
+public:
+    typedef intrusive_ptr<Entity::Listener> Ptr;
+    
+    virtual void onNetworkSync()=0;
+    virtual void onUpdateMethod()=0;
+};
+
+}

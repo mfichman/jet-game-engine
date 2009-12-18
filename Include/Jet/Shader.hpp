@@ -22,33 +22,19 @@
 #pragma once
 
 #include <Jet/Types.hpp>
-#include <Jet/Physics/Object.hpp>
-#include <Jet/Interface.hpp>
+#include <Jet/Resource.hpp>
+#include <string>
 
-namespace Jet { namespace Graphics {
+namespace Jet {
 using namespace std;
 using namespace std::tr1;
-using namespace Physics;
 
-class Camera : public Interface {
+class Shader : public Resource {
 public:
-    typedef intrusive_ptr<Camera> Ptr;
-    typedef RangedOrdinal<float, 0, 1> Tightness;
-
-    inline Object::Ptr      target() const { return target_; }
-    inline void             target(Object::Ptr t) { target_ = t; }
-    inline Vector           up() const { return up_; }
-    inline void             up(const Vector& u) { up_ = u; }
-    inline Object::Ptr      parent() const { return parent_; }
-    inline void             parent(Object::Ptr p) { parent_ = p; }
-    inline Tightness        tightness() { return tightness_; }
-    inline void             tightness(Tightness t) { tightness_ = t; }
-
-protected:
-    Vector                  up_;
-    Object::Ptr             target_;
-    Object::Ptr             parent_;
-    Tightness               tightness_;
+    typedef intrusive_ptr<Shader> Ptr;
+    
+private:
+    Shader(const std::string& name) : Resource(name) {}
 };
 
-}}
+}

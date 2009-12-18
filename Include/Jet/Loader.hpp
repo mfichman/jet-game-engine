@@ -19,31 +19,49 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#pragma once
 
 #include <Jet/Types.hpp>
-#include <Jet/Physics/Object.hpp>
+#include <Jet/Publisher.hpp>
+#include <Jet/Texture.hpp>
+#include <Jet/Cubemap.hpp>
+#include <Jet/Mesh.hpp>
+#include <Jet/Shader.hpp>
+#include <map>
 
-namespace Jet { namespace Physics {
+namespace Jet {
 using namespace std;
 using namespace std::tr1;
-using namespace boost;
+class Root;
 
-class Box : public Interface {
+class Loader : public Interface {
 public:
-    typedef intrusive_ptr<Box> Ptr;
+    class Listener;
+    friend class Root;
+	typedef intrusive_ptr<Loader> Ptr;
+
+    // Attributes
+    Texture::Ptr    textureNew(const string& o);
+    Cubemap::Ptr    cubemapNew(const string& o);
+    Mesh::Ptr       meshNew(const string& o);
+    Shader::Ptr     shaderNew(const string& o);
+
+    // Utility
+    Publisher<Listener>& publisher() const { return publisher_; }
+
+private:
+    Loader() {}
     
-    inline float        width() const { return width_; }
-    inline void		    width(float w) { width_ = w; }
-    inline float        height() const { return height_; }
-    inline void         height(float h) { height_ = h; }
-    inline Object::Ptr  object() const { return object_; }
-    inline void         object(Object::Ptr p) { object_ = p; }
-    
-protected:
-    float               width_;
-    float               height_;
-    Object::Ptr         object_;
+    mutable Publisher<Listener> publisher_;
 };
 
-}}
+class Loader::Listener : public Interface {
+public:
+    typedef intrusive_ptr<Loader::Listener> Ptr;
+
+    virtual void onTextureNew(Texture::Ptr o)=0;
+    virtual void onCubemapNew(Cubemap::Ptr o)=0;
+    virtual void onMeshNew(Mesh::Ptr o)=0;
+    virtual void onShaderNew(Shader::Ptr o)=0;
+};
+
+}

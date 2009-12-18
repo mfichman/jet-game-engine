@@ -22,34 +22,21 @@
 #pragma once
 
 #include <Jet/Types.hpp>
-#include <Jet/Graphics/Resource.hpp>
+#include <Jet/Interface.hpp>
+#include <Jet/Resource.hpp>
 #include <string>
 
-namespace Jet { namespace Graphics {
+namespace Jet {
 using namespace std;
 using namespace std::tr1;
 
-class Material : public Resource, public Interface {
+class Texture : public Resource {
 public:
-    typedef intrusive_ptr<Material> Ptr;
+    typedef RangedOrdinal<int, 0, 3> Index;
+    typedef intrusive_ptr<Texture> Ptr;
     
-    Color           diffuseColor() const;
-    void            diffuseColor(const Color& c);
-    Color           ambientColor() const;
-    void            ambientColor(const Color& c);
-    Color           specularColor() const;
-    void            specularColor(const Color& c);
-    float           specularPower() const;
-    void            specularPower(float p);
-    float           reflectivity() const;
-    void            reflectivity(float r);
-
 private:
-    Color           diffuseColor_;
-    Color           ambientColor_;
-    Color           specularColor_;
-    float           specularPower_;
-    float           reflectivity_;
+    Texture(const std::string& name) : Resource(name) {}
 };
 
-}}
+}

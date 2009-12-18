@@ -1,19 +1,5 @@
 /* WARNING this file is auto-generated.  Do not modify */
 #include <Jet/Registry.hpp>
-#include <Jet/Physics/Box.hpp>
-#include <Jet/Graphics/Quad.hpp>
-#include <Jet/Graphics/Material.hpp>
-#include <Jet/Graphics/Cubemap.hpp>
-#include <Jet/Physics/Sphere.hpp>
-#include <Jet/Graphics/Model.hpp>
-#include <Jet/Graphics/Mesh.hpp>
-#include <Jet/Graphics/Texture.hpp>
-#include <Jet/Physics/Plane.hpp>
-#include <Jet/Graphics/TextBox.hpp>
-#include <Jet/Physics/Object.hpp>
-#include <Jet/Graphics/Shader.hpp>
-#include <Jet/Graphics/Camera.hpp>
-#include <Jet/Physics/Ray.hpp>
 
 using namespace Jet;
 

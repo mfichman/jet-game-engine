@@ -42,6 +42,6 @@ protected:
 	Interface() : refCount_(0) {}
     
 private:
-    int                 refCount_;
+    mutable int                 refCount_;
 };
 }

@@ -22,23 +22,37 @@
 #pragma once
 
 #include <Jet/Types.hpp>
-#include <string>
+#include <Jet/Object.hpp>
 
-namespace Jet { namespace Graphics {
+namespace Jet {
 using namespace std;
 using namespace std::tr1;
+class Root;
 
-class Resource {
-public:
-    typedef intrusive_ptr<Resource> Ptr;
+class Camera : public Interface {
+public:  
+    friend class Root; 
+    typedef intrusive_ptr<Camera> Ptr;
+    typedef RangedOrdinal<float, 0, 1> Tightness;
 
-    string          name() const { return name_; }
-    ID              id() const { return id_; }
-    
+    // Attributes
+    inline Object::Ptr      target() const { return target_; }
+    inline void             target(Object::Ptr t);
+    inline Vector           up() const { return up_; }
+    inline void             up(const Vector& u);
+    inline Tightness        tightness() const { return tightness_; }
+    inline void             tightness(Tightness t);
+
+    // Components
+    inline Object::Ptr      object() const { return object_; }
+
 protected:
-    Resource(const string& name) : name_(name) {}
-    string          name_;
-    ID              id_;
+    Camera() : object_(new Object) {}
+
+    Vector                  up_;
+    Object::Ptr             target_;
+    Tightness               tightness_;
+    Object::Ptr             object_;
 };
 
-}}
+}

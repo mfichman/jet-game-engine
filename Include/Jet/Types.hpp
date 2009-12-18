@@ -61,6 +61,11 @@ public:
 	inline bool operator!=(const Tuple<T, N>& o) {
 	    return !operator==(o);
 	}
+    inline void operator+=(const Tuple<T, N>& o) {
+        for (int i = 0; i < N; i++) {
+            values_[i] += o.values_[i];
+        }
+    }
 
 private:
 	T values_[N];

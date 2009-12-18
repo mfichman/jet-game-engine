@@ -20,9 +20,15 @@
  * IN THE SOFTWARE.
  */
 
-#include <Jet/Graphics/Engine.hpp>
-#include <Jet/Physics/Engine.hpp>
 #include <Jet/Registry.hpp>
+#include <Jet/Actor.hpp>
+#include <Jet/Camera.hpp>
+#include <Jet/Entity.hpp>
+#include <Jet/Model.hpp>
+#include <Jet/Quad.hpp>
+#include <Jet/Publisher.hpp>
+#include <Jet/Loader.hpp>
+#include <map>
 
 namespace Jet {
 using namespace std;
@@ -30,23 +36,52 @@ using namespace std::tr1;
 
 class Root : public Interface {
 public:
-	typedef intrusive_ptr<Graphics::Engine> GraphicsPtr;
-	typedef intrusive_ptr<Physics::Engine> PhysicsPtr;
-	typedef shared_ptr<Registry> RegistryPtr;
+    class Listener;
 	typedef intrusive_ptr<Root> Ptr;
 
-	inline GraphicsPtr	graphics() { return graphics_; }
-	inline PhysicsPtr	physics() { return physics_; }
-	inline RegistryPtr  registry() { return registry_; }
+	static Root::Ptr	    make() { return Root::Ptr(new Root()); }
 
-	static Root::Ptr	make() { return Root::Ptr(new Root()); }
+    // Attributes
+	inline Registry::Ptr    registry() { return registry_; }
+    inline Loader::Ptr      loader() { return loader_; }    
+
+    Model::Ptr              modelNew(const string& name="");
+    Entity::Ptr             entityNew(const string& name="");
+    Camera::Ptr             cameraNew(const string& name="");
+    Quad::Ptr               quadNew(const string& name="");
+
+    Model::Ptr              model(const string& name);
+    Entity::Ptr             entity(const string& name);
+    Camera::Ptr             camera(const string& name);
+    Quad::Ptr               quad(const string& name);
+
+    inline Camera::Ptr      activeCamera() const { return activeCamera_; }
+    void                    activeCamera(Camera::Ptr c);
+
+    // Utility
+    Publisher<Listener>&    publisher() const { return publisher_; }
 
 private:
-	Root() : graphics_(new Graphics::Engine), physics_(new Physics::Engine),
-	    registry_(new Registry()) {}
-	GraphicsPtr		graphics_;
-	PhysicsPtr		physics_;
-	RegistryPtr     registry_;
+	Root() : registry_(new Registry), loader_(new Loader) {}
+
+    mutable Publisher<Listener> publisher_;
+	Registry::Ptr registry_;
+    Loader::Ptr loader_;
+    Camera::Ptr activeCamera_;
+    map<string, Model::Ptr> model_;
+    map<string, Entity::Ptr> entity_;
+    map<string, Camera::Ptr> camera_;
+    map<string, Quad::Ptr> quad_;
+};
+
+class Root::Listener : public Interface {
+public:
+    typedef intrusive_ptr<Root::Listener> Ptr;
+
+    virtual void onModelNew(Model::Ptr)=0;
+    virtual void onEntityNew(Entity::Ptr)=0;
+    virtual void onCameraNew(Camera::Ptr)=0;
+    virtual void onQuadNew(Quad::Ptr)=0;
 };
 
 }

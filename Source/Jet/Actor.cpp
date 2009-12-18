@@ -20,22 +20,57 @@
  * IN THE SOFTWARE.
  */
 
-#include <Jet/Interface.hpp>
+#include <Jet/Actor.hpp>
 
 using namespace Jet;
 
 //------------------------------------------------------------------------------
-void 
-Interface::refCountInc() const  {
-    this->refCount_++;
+void
+Actor::linearVelocity(const Vector& v) {
+    if (linearVelocity_ != v) {
+        linearVelocity_ = v;
+        publisher_.notify(&Listener::onLinearVelocity);
+    }
 }
 
 //------------------------------------------------------------------------------
-void 
-Interface::refCountDec() const  {
-
-    this->refCount_--; 
-    if (this->refCount_ <= 0) {
-        delete this;
+void                
+Actor::angularVelocity(const Vector& v) {
+    if (angularVelocity_ != v) {
+        angularVelocity_ = v;
+        publisher_.notify(&Listener::onAngularVelocity);
     }
+
+}
+
+//------------------------------------------------------------------------------
+void                
+Actor::force(const Vector& v) {
+    if (force_ != v) {
+        force_ = v;
+        publisher_.notify(&Listener::onForce);
+    }
+}
+
+//------------------------------------------------------------------------------
+void                
+Actor::forceAdd(const Vector& v) {
+    force_ += v;
+    publisher_.notify(&Listener::onForce);
+}
+
+//------------------------------------------------------------------------------
+void                
+Actor::torque(const Vector& v) {
+    if (torque_ != v) {
+        torque_ = v;
+        publisher_.notify(&Listener::onTorque);
+    }
+}
+
+//------------------------------------------------------------------------------
+void                
+Actor::torqueAdd(const Vector& v) {
+    torque_ += v;
+    publisher_.notify(&Listener::onTorque);
 }

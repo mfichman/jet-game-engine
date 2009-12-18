@@ -23,7 +23,11 @@
 
 #include <Jet/Types.hpp>
 #include <Jet/Interface.hpp>
+#include <Jet/Object.hpp>
 #include <Jet/Publisher.hpp>
+#include <Jet/Camera.hpp>
+#include <Jet/Model.hpp>
+#include <Jet/Quad.hpp>
 #include <iostream>
 #include <list>
 
@@ -31,42 +35,53 @@ namespace Jet {
 using namespace std;
 using namespace std::tr1;
 using namespace boost;
+class Root;
 
-class Object : public Interface {
+class Actor : public Interface {
 public:
     class Listener;
-    typedef intrusive_ptr<Object> Ptr;
-    enum NetworkSync { disabled, enabled };
+    friend class Root;
+    typedef intrusive_ptr<Actor> Ptr;
+    
+    // Attributes
+    inline Vector       linearVelocity() const { return linearVelocity_; }
+    void                linearVelocity(const Vector& v);
+    inline Vector       angularVelocity() const { return angularVelocity_; }
+    void                angularVelocity(const Vector& v);
+    inline Vector       force() const { return force_; }
+    void                force(const Vector& v);
+    void                forceAdd(const Vector& v);
+    inline Vector       torque() const { return torque_; }
+    void                torque(const Vector& v);
+    void                torqueAdd(const Vector& v);
 
-    // Attributes    
-    inline Vector       position() const { return position_; }
-    void                position(const Vector& v);
-    inline Quaternion   rotation() const { return rotation_; }
-    void                rotation(const Quaternion& q);
-    inline NetworkSync  networkSync() const { return networkSync_; }
-    void                networkSync(NetworkSync s);
+    // Components
+    inline Object::Ptr  object() const { return object_; }
 
     // Utility
-    inline Publisher<Listener>& publisher() const { publisher_; }
+    inline Publisher<Listener>& publisher() const { return publisher_; }
 
 private:
+    Actor() : object_(new Object) {}    
+
     mutable Publisher<Listener> publisher_;
-    NetworkSync networkSync_;
     Vector position_;
     Quaternion rotation_;
     Vector linearVelocity_;
     Vector angularVelocity_;
     Vector force_;
     Vector torque_;
+    Object::Ptr object_;
 };
 
-class Object::Listener : public Interface {
+class Actor::Listener : public Interface {
 public:
-    typedef intrusive_ptr<Listener> Ptr;
+    typedef intrusive_ptr<Actor::Listener> Ptr;
     
-    virtual void onPosition()=0;
-    virtual void onRotation()=0;
-    virtual void onNetworkSync()=0;
+    virtual void onLinearVelocity()=0;
+    virtual void onAngularVelocity()=0;
+    virtual void onForce()=0;
+    virtual void onTorque()=0;
 };
 
 }

@@ -19,27 +19,25 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
+#pragma once
 
 #include <Jet/Types.hpp>
+#include <Jet/Resource.hpp>
+#include <string>
 
-using namespace Jet { using namespace Network {
+namespace Jet {
+using namespace std;
+using namespace std::tr1;
 
-class Body
-{
+class Engine;
+
+class Mesh : public Resource {
 public:
-    typedef std::tr1::shared_ptr<Body> Ptr;
-
-    inline Object:Ptr   object() const { return object_; ]
-    inline void         object(Object::Ptr o) { object_ = o; }
-    inline Vector       velocity() const { return velocity_; }
-    inline void         velocity(const Vector& v) { velocity_ = v; }
-    inline Vector       angularVelocity() const { return angularVelocity_; }
-    inline void         angularVelocity(const Vector& v) { angularVelocity_ = v; }
+    friend class Engine;
+    typedef intrusive_ptr<Mesh> Ptr;
     
-protected:
-    Object::Ptr         object_;
-    Vector              velocity_;
-    Vector              angularVelocity_;
+private:
+    Mesh(const std::string& name) : Resource(name) {}
 };
 
-}}
+}

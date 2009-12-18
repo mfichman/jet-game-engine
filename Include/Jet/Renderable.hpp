@@ -20,38 +20,37 @@
  * IN THE SOFTWARE.
  */
 #pragma once
-
+ 
 #include <Jet/Types.hpp>
-#include <Jet/Physics/Object.hpp>
-#include <Jet/Graphics/Renderable.hpp>
-#include <Jet/Graphics/Texture.hpp>
-#include <Jet/Graphics/Shader.hpp>
+#include <Jet/Object.hpp>
 
-namespace Jet { namespace Graphics {
+namespace Jet {
 using namespace std;
 using namespace std::tr1;
-using namespace Physics;
 
-class Geometry : public Renderable {
-public:
-    typedef intrusive_ptr<Geometry> Ptr;
+class Renderable : public Interface {
+public:   
+    class Listener;
+    typedef intrusive_ptr<Renderable> Ptr;
+    typedef RangedOrdinal<int, 0, 256> Priority;
+    enum Visibility { invisible, visible };
 
-    Vector          scale() const { return scale_; }
-    void            scale(const Vector& s) { scale_ = s; }
-    Texture::Ptr 	texture(Texture::Index i) const { return texture_[i]; }
-    void 		    texture(Texture::Index i, Texture::Ptr t) { texture_[i] = t; }
-    Shader::Ptr 	shader() const { return shader_; }
-    void 		    shader(Shader::Ptr s) { shader_ = s; }
-    Object::Ptr     object() const { return parent_; }
-    void            object(Object::Ptr b) { parent_ = b; }
-  
-    
-protected:
-    Geometry() {}
-    Object::Ptr     parent_;
-    Vector          scale_;
-	Texture::Ptr    texture_[Texture::Index::maxValue];
-    Shader::Ptr     shader_;
+    inline Priority         priority() const { return priority_; }
+    void                    priority(Priority p);
+    inline Visibility       visibility() const { return visibility_; }
+    void                    visibility(Visibility v);  
+
+private:
+    Priority        priority_;
+    Visibility      visibility_;
 };
 
-}}
+class Renderable::Listener : public Interface {
+public:
+    typedef intrusive_ptr<Renderable::Listener> Ptr;
+
+    virtual void onPriority()=0;
+    virtual void onVisibility()=0;
+};
+
+}
