@@ -19,6 +19,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
+#pragma once
 
 #include <Jet/Types.hpp>
 #include <Jet/Publisher.hpp>
@@ -26,16 +27,18 @@
 #include <Jet/Cubemap.hpp>
 #include <Jet/Mesh.hpp>
 #include <Jet/Shader.hpp>
+#include <Jet/Module.hpp>
 #include <map>
 
 namespace Jet {
 using namespace std;
 using namespace std::tr1;
+using namespace boost;
 class Root;
 
 class Loader : public Interface {
 public:
-    class Listener;
+    class Observer;
     friend class Root;
 	typedef intrusive_ptr<Loader> Ptr;
 
@@ -44,24 +47,37 @@ public:
     Cubemap::Ptr    cubemapNew(const string& o);
     Mesh::Ptr       meshNew(const string& o);
     Shader::Ptr     shaderNew(const string& o);
+    Module::Ptr     moduleNew(const string& o);
+
+    Texture::Ptr    texture(const string& o) { return texture_[o]; }
+    Cubemap::Ptr    cubemap(const string& o) { return cubemap_[o]; }
+    Mesh::Ptr       mesh(const string& o) { return mesh_[o]; }
+    Shader::Ptr     shader(const string& o) { return shader_[o]; }
+    Module::Ptr     module(const string& o) { return module_[o]; }
 
     // Utility
-    Publisher<Listener>& publisher() const { return publisher_; }
+    Publisher<Observer>& publisher() const { return publisher_; }
 
 private:
     Loader() {}
     
-    mutable Publisher<Listener> publisher_;
+    mutable Publisher<Observer> publisher_;
+    map<string, Texture::Ptr> texture_;
+    map<string, Cubemap::Ptr> cubemap_;
+    map<string, Mesh::Ptr> mesh_;
+    map<string, Shader::Ptr> shader_;
+    map<string, Module::Ptr> module_;
 };
 
-class Loader::Listener : public Interface {
+class Loader::Observer : public Interface {
 public:
-    typedef intrusive_ptr<Loader::Listener> Ptr;
+    typedef intrusive_ptr<Loader::Observer> Ptr;
 
     virtual void onTextureNew(Texture::Ptr o)=0;
     virtual void onCubemapNew(Cubemap::Ptr o)=0;
     virtual void onMeshNew(Mesh::Ptr o)=0;
     virtual void onShaderNew(Shader::Ptr o)=0;
+    virtual void onModuleNew(Module::Ptr o)=0;
 };
 
 }
