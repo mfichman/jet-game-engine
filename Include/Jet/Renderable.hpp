@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 Matt Fichman
+ * Copyright (c) 2009 Matt Fichman
  *
  * Permission is hereby granted, free of charge, to any person obtaining a 
  * copy of this software and associated documentation files (the "Software"),
@@ -23,6 +23,8 @@
  
 #include <Jet/Types.hpp>
 #include <Jet/Object.hpp>
+#include <Jet/Publisher.hpp>
+
 
 namespace Jet {
 using namespace std;
@@ -30,24 +32,29 @@ using namespace std::tr1;
 
 class Renderable : public Interface {
 public:   
-    class Listener;
+    class Observer;
     typedef intrusive_ptr<Renderable> Ptr;
     typedef RangedOrdinal<int, 0, 256> Priority;
     enum Visibility { invisible, visible };
 
+    // Attributes
     inline Priority         priority() const { return priority_; }
     void                    priority(Priority p);
     inline Visibility       visibility() const { return visibility_; }
     void                    visibility(Visibility v);  
 
+    // Utility
+    Publisher<Observer>&    publisher() const { return publisher_; }
+
 private:
-    Priority        priority_;
-    Visibility      visibility_;
+    mutable Publisher<Observer> publisher_;
+    Priority priority_;
+    Visibility visibility_;
 };
 
-class Renderable::Listener : public Interface {
+class Renderable::Observer : public Interface {
 public:
-    typedef intrusive_ptr<Renderable::Listener> Ptr;
+    typedef intrusive_ptr<Renderable::Observer> Ptr;
 
     virtual void onPriority()=0;
     virtual void onVisibility()=0;

@@ -21,25 +21,42 @@
  */
 #pragma once
 
-#include <Jet/Types.hpp>
-#include <string>
+#include <Jet/Root.hpp>
+#include <Jet/Impl/Ode/ActorReactor.hpp>
+#include <ode/ode.h>
+#include <vector>
 
-namespace Jet {
+namespace Jet { namespace Impl { namespace Ode {
 using namespace std;
 using namespace std::tr1;
 using namespace boost;
 
-class Resource : public Interface {
+class RootReactor : public Root::Observer {
 public:
-    typedef intrusive_ptr<Resource> Ptr;
-
-    const string&   name() const { return name_; }
-    ID              id() const { return id_; }
+    typedef intrusive_ptr<RootReactor> Ptr;
+    RootReactor(Root::Ptr e);
+    ~RootReactor();
     
-protected:
-    Resource(const string& name) : name_(name) {}
-    string          name_;
-    ID              id_;
+    void onActorNew(Actor::Ptr);
+    void onModelNew(Model::Ptr);
+    void onEntityNew(Entity::Ptr);
+    void onCameraNew(Camera::Ptr);
+    void onQuadNew(Quad::Ptr);
+    void onListenerNew(Listener::Ptr);
+    void onCloudNew(Listener::Ptr);
+
+    inline dWorldID world() { return world_; }
+    inline dSpaceID space() { return space_; }
+    inline ActorReactor::Ptr actorReactor(Actor::Ptr p) { return actorReactor_[p]; }
+
+private:
+    Root::Ptr root_;
+    dWorldID world_;
+    dSpaceID space_;
+    dJointGroupID joints_;
+    dContact contact_;
+    map<Actor::Ptr, ActorReactor::Ptr> actorReactor_;
+    vector<Interface::Ptr> reactors_;
 };
 
-}
+}}}

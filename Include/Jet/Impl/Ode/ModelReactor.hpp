@@ -21,25 +21,44 @@
  */
 #pragma once
 
-#include <Jet/Types.hpp>
-#include <string>
+#include <Jet/Model.hpp>
+#include <Jet/Root.hpp>
+#include <Jet/Impl/Ode/RootReactor.hpp>
+#include <ode/ode.h>
 
-namespace Jet {
+namespace Jet { namespace Impl { namespace Ode {
 using namespace std;
 using namespace std::tr1;
 using namespace boost;
 
-class Resource : public Interface {
-public:
-    typedef intrusive_ptr<Resource> Ptr;
+class ModelReactor : public Model::Observer, public Object::Observer, 
+    public Anchor::Observer, public Collidable::Observer {
 
-    const string&   name() const { return name_; }
-    ID              id() const { return id_; }
-    
-protected:
-    Resource(const string& name) : name_(name) {}
-    string          name_;
-    ID              id_;
+public:
+    typedef intrusive_ptr<ModelReactor> Ptr;
+
+    ModelReactor(Model::Ptr m, RootReactor::Ptr e);
+    ~ModelReactor();
+
+    void onScale() {}
+    void onTexture(Model::TextureIndex i) {}
+    void onCubemap(Model::CubemapIndex i) {}
+    void onShader() {}
+    void onNetworkSync() {}
+    void onPosition();
+    void onRotation();
+    void onMesh();
+    void onParent();
+    void onCollisionMethod() {}
+    void onSolidity() {}
+    void onState();
+
+    inline dGeomID geom() { return geom_; }
+
+private:
+    RootReactor::Ptr rootReactor_;
+    dGeomID geom_;
+    Model::Ptr model_;
 };
 
-}
+}}}

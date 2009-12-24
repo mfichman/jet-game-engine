@@ -22,24 +22,46 @@
 #pragma once
 
 #include <Jet/Types.hpp>
-#include <string>
+#include <Jet/Interface.hpp>
+#include <Jet/Publisher.hpp>
 
 namespace Jet {
 using namespace std;
 using namespace std::tr1;
 using namespace boost;
 
-class Resource : public Interface {
+class Collidable : public Interface {
 public:
-    typedef intrusive_ptr<Resource> Ptr;
+    class Observer;
+    typedef intrusive_ptr<Collidable> Ptr;
+    enum Solidity { phantom, solid };
+    enum State { disabled, enabled };
 
-    const string&   name() const { return name_; }
-    ID              id() const { return id_; }
+    // Attributes
+    const string&   collisionMethod() const { return collisionMethod_; }
+    void            collisionMethod(const string& o);
+    Solidity        solidity() const { return solidity_; }
+    void            solidity(Solidity s);
+    State           state() const { return state_; }
+    void            state(State s);
     
-protected:
-    Resource(const string& name) : name_(name) {}
-    string          name_;
-    ID              id_;
+    // Utility
+    Publisher<Observer>& publisher() const { return publisher_; }
+
+private:
+    mutable Publisher<Observer> publisher_;
+    string collisionMethod_;
+    Solidity solidity_;
+    State state_;   
+};
+
+class Collidable::Observer : public virtual Interface {
+public:
+    typedef intrusive_ptr<Collidable::Observer> Ptr;
+
+    virtual void onCollisionMethod()=0;
+    virtual void onSolidity()=0;
+    virtual void onState()=0;
 };
 
 }

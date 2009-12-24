@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 Matt Fichman
+ * Copyright (c) 2009 Matt Fichman
  *
  * Permission is hereby granted, free of charge, to any person obtaining a 
  * copy of this software and associated documentation files (the "Software"),
@@ -22,8 +22,6 @@
 #pragma once
  
 #include <Jet/Types.hpp>
-#include <Jet/Object.hpp>
-#include <Jet/Renderable.hpp>
 #include <list>
 #include <algorithm>
 
@@ -35,34 +33,34 @@ template <typename T>
 class Publisher {
 public:   
     // Utility
-    void listenerAdd(T* l);
-    void listenerDel(T* l);
+    void observerAdd(T* l);
+    void observerDel(T* l);
     void notify(void (T::*funct)(void));
 
     template <typename V>
     void notify(void (T::*funct)(V), V v);
 
 private:
-    list<T*> listener_;
+    list<T*> observer_;
 };
 
 template <typename T>
 void
-Publisher<T>::listenerAdd(T* l) {
-    listener_.push_back(l);
+Publisher<T>::observerAdd(T* l) {
+    observer_.push_back(l);
 }
 
 template <typename T>
 void
-Publisher<T>::listenerDel(T* l) {
-    listener_.erase(find(listener_.begin(), listener_.end(), l));
+Publisher<T>::observerDel(T* l) {
+    observer_.erase(find(observer_.begin(), observer_.end(), l));
 }
 
 template <typename T>
 void
 Publisher<T>::notify(void (T::*funct)(void)) {
     //(object_->*funct)(void);
-    for (typename list<T*>::iterator i = listener_.begin(); i != listener_.end(); i++) {
+    for (typename list<T*>::iterator i = observer_.begin(); i != observer_.end(); i++) {
         ((*i)->*funct)();
     }
 }
@@ -71,7 +69,7 @@ template <typename T>
 template <typename V>
 void
 Publisher<T>::notify(void (T::*funct)(V), V v) {
-    for (typename list<T*>::iterator i = listener_.begin(); i != listener_.end(); i++) {
+    for (typename list<T*>::iterator i = observer_.begin(); i != observer_.end(); i++) {
         ((*i)->*funct)(v);
     }
 }

@@ -1,3 +1,3 @@
-#add_subdirectory(Ode)
+add_subdirectory(Ode)
 
 

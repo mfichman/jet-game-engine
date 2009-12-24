@@ -19,27 +19,33 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#pragma once
 
-#include <Jet/Types.hpp>
-#include <string>
+#include <Jet/Entity.hpp>
 
-namespace Jet {
-using namespace std;
-using namespace std::tr1;
-using namespace boost;
+using namespace Jet;
 
-class Resource : public Interface {
-public:
-    typedef intrusive_ptr<Resource> Ptr;
-
-    const string&   name() const { return name_; }
-    ID              id() const { return id_; }
-    
-protected:
-    Resource(const string& name) : name_(name) {}
-    string          name_;
-    ID              id_;
-};
-
+//------------------------------------------------------------------------------
+void                    
+Entity::networkSync(NetworkSync s) {
+    if (s != networkSync_) {
+        publisher_.notify(&Observer::onNetworkSync);
+    }
 }
+
+//------------------------------------------------------------------------------
+void                    
+Entity::updateMethod(const string& s) {
+    if (s != updateMethod_) {
+        publisher_.notify(&Observer::onUpdateMethod);
+    }
+}
+
+//------------------------------------------------------------------------------
+void                    
+Entity::time(double t) {
+    if (t != time_) {
+        time_ = t;
+        publisher_.notify(&Observer::onTime);
+    }
+}
+

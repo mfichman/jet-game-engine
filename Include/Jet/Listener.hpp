@@ -20,26 +20,37 @@
  * IN THE SOFTWARE.
  */
 #pragma once
-
+ 
 #include <Jet/Types.hpp>
-#include <string>
+#include <Jet/Anchor.hpp>
 
 namespace Jet {
 using namespace std;
 using namespace std::tr1;
 using namespace boost;
+class Root;
 
-class Resource : public Interface {
+class Listener : public Interface {
 public:
-    typedef intrusive_ptr<Resource> Ptr;
+    friend class Root;
+    typedef intrusive_ptr<Listener> Ptr;
 
-    const string&   name() const { return name_; }
-    ID              id() const { return id_; }
-    
-protected:
-    Resource(const string& name) : name_(name) {}
-    string          name_;
-    ID              id_;
+    // Attributes
+    inline Object::Ptr  target() const { return target_; }
+    void                target(Object::Ptr t);
+    inline Vector       up() const { return up_; }
+    void                up(const Vector& u);
+
+    // Components
+    inline Object::Ptr      object() const { return object_; }
+    inline Anchor::Ptr      anchor() const { return anchor_; }
+
+private:
+    Listener() : object_(new Object), anchor_(new Anchor) {}
+
+    Object::Ptr object_;
+    Anchor::Ptr anchor_;
+    Object::Ptr target_;
+    Vector up_;
 };
-
 }

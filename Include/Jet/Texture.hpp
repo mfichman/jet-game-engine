@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 Matt Fichman
+ * Copyright (c) 2009 Matt Fichman
  *
  * Permission is hereby granted, free of charge, to any person obtaining a 
  * copy of this software and associated documentation files (the "Software"),
@@ -32,7 +32,6 @@ using namespace std::tr1;
 
 class Texture : public Resource {
 public:
-    typedef RangedOrdinal<int, 0, 3> Index;
     typedef intrusive_ptr<Texture> Ptr;
     
 private:

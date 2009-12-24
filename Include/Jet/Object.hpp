@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 Matt Fichman
+ * Copyright (c) 2009 Matt Fichman
  *
  * Permission is hereby granted, free of charge, to any person obtaining a 
  * copy of this software and associated documentation files (the "Software"),
@@ -34,23 +34,23 @@ using namespace boost;
 
 class Object : public Interface {
 public:
-    class Listener;
+    class Observer;
     typedef intrusive_ptr<Object> Ptr;
     enum NetworkSync { disabled, enabled };
 
     // Attributes    
-    inline Vector       position() const { return position_; }
-    void                position(const Vector& v);
-    inline Quaternion   rotation() const { return rotation_; }
-    void                rotation(const Quaternion& q);
-    inline NetworkSync  networkSync() const { return networkSync_; }
-    void                networkSync(NetworkSync s);
+    inline const Vector&        position() const { return position_; }
+    void                        position(const Vector& v);
+    inline const Quaternion&    rotation() const { return rotation_; }
+    void                        rotation(const Quaternion& q);
+    inline NetworkSync          networkSync() const { return networkSync_; }
+    void                        networkSync(NetworkSync s);
 
     // Utility
-    inline Publisher<Listener>& publisher() const { publisher_; }
+    inline Publisher<Observer>& publisher() const { publisher_; }
 
 private:
-    mutable Publisher<Listener> publisher_;
+    mutable Publisher<Observer> publisher_;
     NetworkSync networkSync_;
     Vector position_;
     Quaternion rotation_;
@@ -60,9 +60,9 @@ private:
     Vector torque_;
 };
 
-class Object::Listener : public Interface {
+class Object::Observer : public virtual Interface {
 public:
-    typedef intrusive_ptr<Listener> Ptr;
+    typedef intrusive_ptr<Observer> Ptr;
     
     virtual void onPosition()=0;
     virtual void onRotation()=0;

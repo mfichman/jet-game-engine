@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 Matt Fichman
+ * Copyright (c) 2009 Matt Fichman
  *
  * Permission is hereby granted, free of charge, to any person obtaining a 
  * copy of this software and associated documentation files (the "Software"),
@@ -55,10 +55,10 @@ public:
 	inline void operator=(const Tuple<T, N>& o) {
 		copy(o.values_, o.values_ + N, values_);
 	}
-	inline bool operator==(const Tuple<T, N>& o) {
+	inline bool operator==(const Tuple<T, N>& o) const {
 	    return equal(values_, values_ + N, o.values_);
 	}
-	inline bool operator!=(const Tuple<T, N>& o) {
+	inline bool operator!=(const Tuple<T, N>& o) const {
 	    return !operator==(o);
 	}
     inline void operator+=(const Tuple<T, N>& o) {
@@ -145,15 +145,37 @@ class FontPoint : public RangedOrdinal<short, 4, 64> {};
 class Dimension : public Tuple<short, 2> {};
 class Vertex : public Tuple<int, 2> {};
 
-struct Frame
-{
+struct Frame {
     FrameID frameId_;
     float time_;
     float delta_;
 };
 
+struct Particle {
+    float life_;
+
+    bool operator<(const Particle& r) { return true; }
+};
+
+struct Box {
+    float width_;
+    float height_;
+    float depth;
+    float x_;
+    float y_;
+    float z_;
+};
+
+struct Sphere {
+    float radius_;
+    float x_;
+    float y_;
+    float z_;
+};
+
 class Interface;
 void intrusive_ptr_add_ref(Interface* t);
 void intrusive_ptr_release(Interface* t);
+
 
 }

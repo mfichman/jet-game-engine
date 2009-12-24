@@ -19,27 +19,25 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#pragma once
 
-#include <Jet/Types.hpp>
-#include <string>
+#include <Jet/Camera.hpp>
 
-namespace Jet {
-using namespace std;
-using namespace std::tr1;
-using namespace boost;
+using namespace Jet;
 
-class Resource : public Interface {
-public:
-    typedef intrusive_ptr<Resource> Ptr;
+//------------------------------------------------------------------------------
+void             
+Camera::target(Object::Ptr t) {
+    target_ = t;
+}
 
-    const string&   name() const { return name_; }
-    ID              id() const { return id_; }
-    
-protected:
-    Resource(const string& name) : name_(name) {}
-    string          name_;
-    ID              id_;
-};
+//------------------------------------------------------------------------------
+void             
+Camera::up(const Vector& u) {
+    up_ = u;
+}
 
+//------------------------------------------------------------------------------
+void             
+Camera::tightness(Tightness t) {
+    tightness_ = t;
 }

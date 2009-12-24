@@ -19,27 +19,39 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#pragma once
 
-#include <Jet/Types.hpp>
-#include <string>
+#include <Jet/Speaker.hpp>
 
-namespace Jet {
-using namespace std;
-using namespace std::tr1;
-using namespace boost;
+using namespace Jet;
 
-class Resource : public Interface {
-public:
-    typedef intrusive_ptr<Resource> Ptr;
+//------------------------------------------------------------------------------
+void 
+Speaker::clip(const string& s) {
+    if (s != clip_) {
+        clip_ = s;
+        publisher_.notify(&Observer::onClip);
+    }
+}
 
-    const string&   name() const { return name_; }
-    ID              id() const { return id_; }
-    
-protected:
-    Resource(const string& name) : name_(name) {}
-    string          name_;
-    ID              id_;
-};
+//------------------------------------------------------------------------------
+void
+Speaker::volume(Volume v) {
+    if (v != volume_) {
+        volume_ = v;
+        publisher_.notify(&Observer::onVolume);
+    }
+}
 
+//------------------------------------------------------------------------------
+void
+Speaker::channelsInc() {
+    channels_++;
+    publisher_.notify(&Observer::onChannelsInc);
+}
+
+//------------------------------------------------------------------------------
+void
+Speaker::channelsDec() {
+    channels_ = min(channels_, channels_ - 1);
+    publisher_.notify(&Observer::onChannelsDec);
 }

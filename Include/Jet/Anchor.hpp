@@ -22,24 +22,36 @@
 #pragma once
 
 #include <Jet/Types.hpp>
-#include <string>
-
+#include <Jet/Interface.hpp>
+#include <Jet/Actor.hpp>
+ 
 namespace Jet {
 using namespace std;
 using namespace std::tr1;
 using namespace boost;
 
-class Resource : public Interface {
-public:
-    typedef intrusive_ptr<Resource> Ptr;
+class Anchor : public Interface {
+public: 
+    class Observer;
+	typedef intrusive_ptr<Anchor> Ptr;
 
-    const string&   name() const { return name_; }
-    ID              id() const { return id_; }
+    // Attributes
+    inline Actor::Ptr   parent() { return parent_; }
+    void                parent(Actor::Ptr a);
+
+    // Utility
+    inline Publisher<Observer>& publisher() const { return publisher_; }
     
-protected:
-    Resource(const string& name) : name_(name) {}
-    string          name_;
-    ID              id_;
+private:
+    mutable Publisher<Observer> publisher_;
+    Actor::Ptr parent_;
+};
+
+class Anchor::Observer : public virtual Interface { 
+public:
+    typedef intrusive_ptr<Anchor::Observer> Ptr;
+
+    virtual void onParent()=0;
 };
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 Matt Fichman
+ * Copyright (c) 2009 Matt Fichman
  *
  * Permission is hereby granted, free of charge, to any person obtaining a 
  * copy of this software and associated documentation files (the "Software"),
@@ -23,6 +23,7 @@
 
 #include <Jet/Types.hpp>
 #include <Jet/Object.hpp>
+#include <Jet/Anchor.hpp>
 
 namespace Jet {
 using namespace std;
@@ -36,23 +37,25 @@ public:
     typedef RangedOrdinal<float, 0, 1> Tightness;
 
     // Attributes
-    inline Object::Ptr      target() const { return target_; }
-    inline void             target(Object::Ptr t);
-    inline Vector           up() const { return up_; }
-    inline void             up(const Vector& u);
-    inline Tightness        tightness() const { return tightness_; }
-    inline void             tightness(Tightness t);
+    inline Object::Ptr  target() const { return target_; }
+    void                target(Object::Ptr t);
+    inline Vector       up() const { return up_; }
+    void                up(const Vector& u);
+    inline Tightness    tightness() const { return tightness_; }
+    void                tightness(Tightness t);
 
     // Components
     inline Object::Ptr      object() const { return object_; }
+    inline Anchor::Ptr      anchor() const { return anchor_; }
 
 protected:
-    Camera() : object_(new Object) {}
+    Camera() : object_(new Object), anchor_(new Anchor()) {}
 
-    Vector                  up_;
-    Object::Ptr             target_;
-    Tightness               tightness_;
-    Object::Ptr             object_;
+    Vector up_;
+    Object::Ptr target_;
+    Tightness tightness_;
+    Object::Ptr object_;
+    Anchor::Ptr anchor_;
 };
 
 }

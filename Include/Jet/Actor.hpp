@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 Matt Fichman
+ * Copyright (c) 2009 Matt Fichman
  *
  * Permission is hereby granted, free of charge, to any person obtaining a 
  * copy of this software and associated documentation files (the "Software"),
@@ -25,9 +25,6 @@
 #include <Jet/Interface.hpp>
 #include <Jet/Object.hpp>
 #include <Jet/Publisher.hpp>
-#include <Jet/Camera.hpp>
-#include <Jet/Model.hpp>
-#include <Jet/Quad.hpp>
 #include <iostream>
 #include <list>
 
@@ -39,7 +36,8 @@ class Root;
 
 class Actor : public Interface {
 public:
-    class Listener;
+    class Observer;
+    class Functor;
     friend class Root;
     typedef intrusive_ptr<Actor> Ptr;
     
@@ -59,12 +57,12 @@ public:
     inline Object::Ptr  object() const { return object_; }
 
     // Utility
-    inline Publisher<Listener>& publisher() const { return publisher_; }
+    inline Publisher<Observer>& publisher() const { return publisher_; }
 
 private:
     Actor() : object_(new Object) {}    
 
-    mutable Publisher<Listener> publisher_;
+    mutable Publisher<Observer> publisher_;
     Vector position_;
     Quaternion rotation_;
     Vector linearVelocity_;
@@ -74,9 +72,9 @@ private:
     Object::Ptr object_;
 };
 
-class Actor::Listener : public Interface {
+class Actor::Observer : public Interface {
 public:
-    typedef intrusive_ptr<Actor::Listener> Ptr;
+    typedef intrusive_ptr<Actor::Observer> Ptr;
     
     virtual void onLinearVelocity()=0;
     virtual void onAngularVelocity()=0;

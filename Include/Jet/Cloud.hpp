@@ -20,26 +20,45 @@
  * IN THE SOFTWARE.
  */
 #pragma once
-
+ 
 #include <Jet/Types.hpp>
-#include <string>
+#include <Jet/Anchor.hpp>
+#include <Jet/Iterator.hpp>
+#include <Jet/Collidable.hpp>
+#include <vector>
+#include <algorithm>
 
 namespace Jet {
 using namespace std;
 using namespace std::tr1;
 using namespace boost;
+class Root;
 
-class Resource : public Interface {
+class Cloud : public Interface {
 public:
-    typedef intrusive_ptr<Resource> Ptr;
+    friend class Root;
+    typedef intrusive_ptr<Cloud> Ptr;
 
-    const string&   name() const { return name_; }
-    ID              id() const { return id_; }
+    inline Iterator<vector<Particle> > particleItr() { return Iterator<vector<Particle> >(particle_); }
+    Particle&                   topParticle() { return particle_.front(); }
+    void                        topParticleDel() { pop_heap(particle_.begin(), particle_.end()); }
+    void                        particleNew(Particle& o);
+    inline const string&        particleMethod() { return particleMethod_; }
+    void                        particleMethod(const string& s);
     
+    // Components
+    inline Object::Ptr          object() const { return object_; }
+    inline Anchor::Ptr          anchor() const { return anchor_; }
+    inline Collidable::Ptr      collidable() const { return collidable_; }
+
 protected:
-    Resource(const string& name) : name_(name) {}
-    string          name_;
-    ID              id_;
+    Cloud() : object_(new Object), anchor_(new Anchor), collidable_(new Collidable) {}
+
+    Object::Ptr object_;
+    Anchor::Ptr anchor_;
+    Collidable::Ptr collidable_;
+    string particleMethod_;
+    vector<Particle> particle_;
 };
 
 }

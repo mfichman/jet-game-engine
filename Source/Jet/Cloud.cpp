@@ -19,27 +19,20 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#pragma once
 
-#include <Jet/Types.hpp>
-#include <string>
+#include <Jet/Cloud.hpp>
 
-namespace Jet {
-using namespace std;
-using namespace std::tr1;
-using namespace boost;
+using namespace Jet;
 
-class Resource : public Interface {
-public:
-    typedef intrusive_ptr<Resource> Ptr;
+//------------------------------------------------------------------------------
+void 
+Cloud::particleNew(Particle& o) {
+    particle_.push_back(o);
+    push_heap(particle_.begin(), particle_.end());
+}
 
-    const string&   name() const { return name_; }
-    ID              id() const { return id_; }
-    
-protected:
-    Resource(const string& name) : name_(name) {}
-    string          name_;
-    ID              id_;
-};
-
+//------------------------------------------------------------------------------
+void
+Cloud::particleMethod(const string& s) {
+    particleMethod_ = s;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 Matt Fichman
+ * Copyright (c) 2009 Matt Fichman
  *
  * Permission is hereby granted, free of charge, to any person obtaining a 
  * copy of this software and associated documentation files (the "Software"),
@@ -31,7 +31,7 @@ void
 Object::position(const Vector& v) {
     if (position_ != v) {
         position_ = v;
-        publisher_.notify(&Listener::onPosition);
+        publisher_.notify(&Observer::onPosition);
     }
 }
 
@@ -40,7 +40,7 @@ void
 Object::rotation(const Quaternion& q) {
     if (rotation_ != q) {
         rotation_ = q;
-        publisher_.notify(&Listener::onRotation);
+        publisher_.notify(&Observer::onRotation);
     }
 }
 
@@ -49,6 +49,6 @@ void
 Object::networkSync(NetworkSync s) {
     if (networkSync_ != s) {
         networkSync_ = s;
-        publisher_.notify(&Listener::onNetworkSync);
+        publisher_.notify(&Observer::onNetworkSync);
     }
 }

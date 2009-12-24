@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 Matt Fichman
+ * Copyright (c) 2009 Matt Fichman
  *
  * Permission is hereby granted, free of charge, to any person obtaining a 
  * copy of this software and associated documentation files (the "Software"),
@@ -19,40 +19,16 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#pragma once
 
-#include <Jet/Physics/Engine.hpp>
-#include <Jet/Impl/Ode/ObjectReactor.hpp>
-#include <ode/ode.h>
+#include <Jet/Anchor.hpp>
 
-namespace Jet { namespace Impl { namespace Ode {
-using namespace Physics;
-class ObjectReactor;
+using namespace Jet;
 
-class EngineReactor : public Engine::Listener {
-
-public:
-    typedef intrusive_ptr<EngineReactor> Ptr;
-
-    EngineReactor(Engine::Ptr e);
-    ~EngineReactor();
-    void onObjectCreate(Object::Ptr o);
-    void onSphereCreate(Sphere::Ptr c);
-    void onBoxCreate(Box::Ptr s);
-    void onPlaneCreate(Plane::Ptr m);
-    void onRayCreate(Ray::Ptr s);
-    
-    inline dWorldID world() { return world_; }
-    inline dSpaceID space() { return space_; }
-    inline ObjectReactor::Ptr reactor(Object::Ptr o) { return reactor_[o]; }
-    
-private:
-    Engine::Ptr engine_;
-    dWorldID world_;
-    dSpaceID space_;
-    dJointGroupID joints_;
-    dContact contact_;
-    map<Object::Ptr, ObjectReactor::Ptr> reactor_;
-};
-
-}}}
+//------------------------------------------------------------------------------
+void
+Anchor::parent(Actor::Ptr o) {
+    if (o != parent_) {
+        parent_ = o;
+        publisher_.notify(&Observer::onParent);
+    }
+}

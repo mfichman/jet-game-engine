@@ -20,57 +20,67 @@
  * IN THE SOFTWARE.
  */
 
-#include <Jet/Actor.hpp>
+#include <Jet/Impl/Ode/RootReactor.hpp>
+#include <Jet/Impl/Ode/ModelReactor.hpp>
 
 using namespace Jet;
+using namespace Jet::Impl::Ode;
 
+//------------------------------------------------------------------------------
+RootReactor::RootReactor(Root::Ptr e) :
+    root_(e),
+    world_(dWorldCreate()),
+    space_(dSimpleSpaceCreate(0)),
+    joints_(dJointGroupCreate(1024)) {
+
+}
+
+//------------------------------------------------------------------------------
+RootReactor::~RootReactor() {
+    reactors_.clear();
+    actorReactor_.clear();
+    dJointGroupDestroy(joints_);
+    dSpaceDestroy(space_);
+    dWorldDestroy(world_);
+}
+ 
 //------------------------------------------------------------------------------
 void
-Actor::linearVelocity(const Vector& v) {
-    if (linearVelocity_ != v) {
-        linearVelocity_ = v;
-        publisher_.notify(&Observer::onLinearVelocity);
-    }
+RootReactor::onActorNew(Actor::Ptr a) {
+}
+
+//------------------------------------------------------------------------------   
+void
+RootReactor::onModelNew(Model::Ptr m) {
+    reactors_.push_back(new ModelReactor(m, this));
 }
 
 //------------------------------------------------------------------------------
-void                
-Actor::angularVelocity(const Vector& v) {
-    if (angularVelocity_ != v) {
-        angularVelocity_ = v;
-        publisher_.notify(&Observer::onAngularVelocity);
-    }
+void 
+RootReactor::onEntityNew(Entity::Ptr) {
 
 }
 
 //------------------------------------------------------------------------------
-void                
-Actor::force(const Vector& v) {
-    if (force_ != v) {
-        force_ = v;
-        publisher_.notify(&Observer::onForce);
-    }
+void 
+RootReactor::onCameraNew(Camera::Ptr) {
+
 }
 
 //------------------------------------------------------------------------------
-void                
-Actor::forceAdd(const Vector& v) {
-    force_ += v;
-    publisher_.notify(&Observer::onForce);
+void 
+RootReactor::onQuadNew(Quad::Ptr) {
+
 }
 
 //------------------------------------------------------------------------------
-void                
-Actor::torque(const Vector& v) {
-    if (torque_ != v) {
-        torque_ = v;
-        publisher_.notify(&Observer::onTorque);
-    }
+void 
+RootReactor::onListenerNew(Listener::Ptr) {
+
 }
 
 //------------------------------------------------------------------------------
-void                
-Actor::torqueAdd(const Vector& v) {
-    torque_ += v;
-    publisher_.notify(&Observer::onTorque);
+void 
+RootReactor::onCloudNew(Listener::Ptr) {
+
 }

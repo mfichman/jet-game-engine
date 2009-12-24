@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 Matt Fichman
+ * Copyright (c) 2009 Matt Fichman
  *
  * Permission is hereby granted, free of charge, to any person obtaining a 
  * copy of this software and associated documentation files (the "Software"),
@@ -28,14 +28,14 @@ void
 Model::scale(const Vector& s) {
     if (scale_ != s) {
         scale_ = s;
-        publisher_.notify(&Listener::onScale);
+        publisher_.notify(&Observer::onScale);
     }
 }
 void 
 Model::texture(TextureIndex j, const string& t) {
     if (texture_[j] != t) {
         texture_[j] = t;
-        publisher_.notify(&Listener::onTexture, j);
+        publisher_.notify(&Observer::onTexture, j);
     }
 }
 
@@ -43,7 +43,7 @@ void
 Model::cubemap(CubemapIndex j, const string& t) {
     if (cubemap_[j] != t) {
         cubemap_[j] = t;
-        publisher_.notify(&Listener::onCubemap, j);
+        publisher_.notify(&Observer::onCubemap, j);
     }
 }
 
@@ -51,14 +51,14 @@ void
 Model::shader(const string& s) { 
     if (shader_ != s) {
         shader_ = s;    
-        publisher_.notify(&Listener::onShader);
+        publisher_.notify(&Observer::onShader);
     }
 }
 
 void 
-Model::mesh(const string& m) {
+Model::mesh(Mesh::Ptr m) {
     if (mesh_ != m) {
         mesh_ = m;
-        publisher_.notify(&Listener::onMesh);
+        publisher_.notify(&Observer::onMesh);
     }
 }

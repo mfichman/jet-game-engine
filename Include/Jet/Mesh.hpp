@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 Matt Fichman
+ * Copyright (c) 2009 Matt Fichman
  *
  * Permission is hereby granted, free of charge, to any person obtaining a 
  * copy of this software and associated documentation files (the "Software"),
@@ -35,9 +35,17 @@ class Mesh : public Resource {
 public:
     friend class Engine;
     typedef intrusive_ptr<Mesh> Ptr;
-    
+ 
+    inline const Sphere&    boundingSphere() const { return boundingSphere_; }
+    inline void             boundingSphere(const Sphere& s) { boundingSphere_ = s; }
+    inline const Box&       boundingBox() const { return boundingBox_; }
+    inline void             boundingBox(const Box& b) { boundingBox_ = b; }
+   
 private:
     Mesh(const std::string& name) : Resource(name) {}
+
+    Sphere boundingSphere_;
+    Box boundingBox_;
 };
 
 }

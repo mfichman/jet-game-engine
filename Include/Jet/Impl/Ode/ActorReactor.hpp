@@ -21,25 +21,25 @@
  */
 #pragma once
 
-#include <Jet/Types.hpp>
-#include <string>
+#include <Jet/Model.hpp>
+#include <Jet/Root.hpp>
+#include <Jet/Impl/Ode/RootReactor.hpp>
+#include <ode/ode.h>
 
-namespace Jet {
+namespace Jet { namespace Impl { namespace Ode {
 using namespace std;
 using namespace std::tr1;
 using namespace boost;
 
-class Resource : public Interface {
+class ActorReactor : public Actor::Observer {
 public:
-    typedef intrusive_ptr<Resource> Ptr;
+    typedef intrusive_ptr<ActorReactor> Ptr;
 
-    const string&   name() const { return name_; }
-    ID              id() const { return id_; }
-    
-protected:
-    Resource(const string& name) : name_(name) {}
-    string          name_;
-    ID              id_;
+    inline dBodyID body() { return body_; }
+
+private:
+    dBodyID body_;
+
 };
 
-}
+}}}

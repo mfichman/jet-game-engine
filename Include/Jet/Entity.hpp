@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 Matt Fichman
+ * Copyright (c) 2009 Matt Fichman
  *
  * Permission is hereby granted, free of charge, to any person obtaining a 
  * copy of this software and associated documentation files (the "Software"),
@@ -23,6 +23,7 @@
 
 #include <Jet/Types.hpp>
 #include <Jet/Interface.hpp>
+#include <Jet/Publisher.hpp>
 #include <iostream>
 #include <list>
 
@@ -34,7 +35,7 @@ class Root;
 
 class Entity : public Interface {
 public:
-    class Listener;
+    class Observer;
     friend class Root;
     typedef intrusive_ptr<Entity> Ptr;
     enum NetworkSync { disabled, enabled };
@@ -44,25 +45,28 @@ public:
     void                    networkSync(NetworkSync s);
     inline const string&    updateMethod() const { return updateMethod_; }
     void                    updateMethod(const string& s);
+    inline double           time() const { return time_; }
     void                    time(double time);
 
     // Utility
-    inline Publisher<Listener>& publisher() const { return publisher_; };
+    inline Publisher<Observer>& publisher() const { return publisher_; };
 
 private:
     Entity() {}
 
-    mutable Publisher<Listener> publisher_;
+    mutable Publisher<Observer> publisher_;
     NetworkSync networkSync_;
     string updateMethod_;
+    double time_;
 };
 
-class Entity::Listener : public Interface {
+class Entity::Observer : public Interface {
 public:
-    typedef intrusive_ptr<Entity::Listener> Ptr;
+    typedef intrusive_ptr<Entity::Observer> Ptr;
     
     virtual void onNetworkSync()=0;
     virtual void onUpdateMethod()=0;
+    virtual void onTime()=0;
 };
 
 }

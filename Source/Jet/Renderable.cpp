@@ -19,27 +19,25 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#pragma once
 
-#include <Jet/Types.hpp>
-#include <string>
+#include <Jet/Renderable.hpp>
 
-namespace Jet {
-using namespace std;
-using namespace std::tr1;
-using namespace boost;
+using namespace Jet;
 
-class Resource : public Interface {
-public:
-    typedef intrusive_ptr<Resource> Ptr;
+//------------------------------------------------------------------------------
+void                    
+Renderable::priority(Priority p) {
+    if (p != priority_) {
+        priority_ = p;
+        publisher_.notify(&Observer::onPriority);
+    }
+}
 
-    const string&   name() const { return name_; }
-    ID              id() const { return id_; }
-    
-protected:
-    Resource(const string& name) : name_(name) {}
-    string          name_;
-    ID              id_;
-};
-
+//------------------------------------------------------------------------------
+void                    
+Renderable::visibility(Visibility v) {
+    if (v != visibility_) {
+        visibility_ = v;
+        publisher_.notify(&Observer::onVisibility);
+    }
 }

@@ -19,49 +19,59 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-
+#pragma once
+ 
 #include <Jet/Types.hpp>
-#include <Jet/Publisher.hpp>
-#include <Jet/Texture.hpp>
-#include <Jet/Cubemap.hpp>
-#include <Jet/Mesh.hpp>
-#include <Jet/Shader.hpp>
-#include <map>
+#include <Jet/Anchor.hpp>
 
 namespace Jet {
 using namespace std;
 using namespace std::tr1;
+using namespace boost;
 class Root;
 
-class Loader : public Interface {
+class Speaker : public Interface {
 public:
-    class Listener;
+    class Observer;
     friend class Root;
-	typedef intrusive_ptr<Loader> Ptr;
+    typedef RangedOrdinal<float, 0, 1> Volume;
+    typedef intrusive_ptr<Speaker> Ptr;
 
     // Attributes
-    Texture::Ptr    textureNew(const string& o);
-    Cubemap::Ptr    cubemapNew(const string& o);
-    Mesh::Ptr       meshNew(const string& o);
-    Shader::Ptr     shaderNew(const string& o);
+    inline string           clip() const { return clip_; }
+    void                    clip(const string& s);
+    inline Volume           volume() const { return volume_; }
+    void                    volume(Volume v);
+    inline int              channels() const { return channels_; }
+    void                    channelsInc();
+    void                    channelsDec();
+
+    // Components
+    inline Object::Ptr      object() const { return object_; }
+    inline Anchor::Ptr      anchor() const { return anchor_; }
 
     // Utility
-    Publisher<Listener>& publisher() const { return publisher_; }
+    inline Publisher<Observer>& publisher() const { return publisher_; }
 
-private:
-    Loader() {}
-    
-    mutable Publisher<Listener> publisher_;
+protected:
+    Speaker() : object_(new Object), anchor_(new Anchor) {}
+
+    mutable Publisher<Observer> publisher_;
+    Object::Ptr object_;
+    Anchor::Ptr anchor_;
+    int channels_;
+    string clip_;     
+    Volume volume_;
 };
 
-class Loader::Listener : public Interface {
+class Speaker::Observer : public Interface {
 public:
-    typedef intrusive_ptr<Loader::Listener> Ptr;
+    typedef intrusive_ptr<Speaker::Observer> Ptr;
 
-    virtual void onTextureNew(Texture::Ptr o)=0;
-    virtual void onCubemapNew(Cubemap::Ptr o)=0;
-    virtual void onMeshNew(Mesh::Ptr o)=0;
-    virtual void onShaderNew(Shader::Ptr o)=0;
+    virtual void onClip();
+    virtual void onVolume();
+    virtual void onChannelsInc();
+    virtual void onChannelsDec();
 };
 
 }

@@ -19,27 +19,34 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#pragma once
 
-#include <Jet/Types.hpp>
-#include <string>
+#include <Jet/Collidable.hpp>
 
-namespace Jet {
-using namespace std;
-using namespace std::tr1;
-using namespace boost;
+using namespace Jet;
 
-class Resource : public Interface {
-public:
-    typedef intrusive_ptr<Resource> Ptr;
+//------------------------------------------------------------------------------
+void            
+Collidable::collisionMethod(const string& o) {
+    if (o != collisionMethod_) {
+        collisionMethod_ = o;
+        publisher_.notify(&Observer::onCollisionMethod);
+    }
+}
 
-    const string&   name() const { return name_; }
-    ID              id() const { return id_; }
-    
-protected:
-    Resource(const string& name) : name_(name) {}
-    string          name_;
-    ID              id_;
-};
+//------------------------------------------------------------------------------
+void            
+Collidable::solidity(Solidity s) {
+    if (s != solidity_) {
+        solidity_ = s;
+        publisher_.notify(&Observer::onSolidity);
+    }
+}
 
+//------------------------------------------------------------------------------
+void            
+Collidable::state(State s) {
+    if (s != state_) {
+        state_ = s;
+        publisher_.notify(&Observer::onState);
+    }
 }
