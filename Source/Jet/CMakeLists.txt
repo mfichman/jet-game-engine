@@ -1,5 +1,6 @@
-file(GLOB files "*.cpp" "Graphics/*.cpp")
+file(GLOB files "*.cpp")
 
-add_library(Jet ${files})
+add_library(Jet SHARED ${files})
+target_link_libraries(Jet dl)
 
 add_subdirectory(Impl)

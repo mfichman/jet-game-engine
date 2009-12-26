@@ -41,8 +41,10 @@ public:
     // Attributes    
     inline const Vector&        position() const { return position_; }
     void                        position(const Vector& v);
+    void                        positionUpdate(const Vector& v);
     inline const Quaternion&    rotation() const { return rotation_; }
     void                        rotation(const Quaternion& q);
+    void                        rotationUpdate(const Quaternion& q);
     inline NetworkSync          networkSync() const { return networkSync_; }
     void                        networkSync(NetworkSync s);
 

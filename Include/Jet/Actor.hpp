@@ -44,8 +44,10 @@ public:
     // Attributes
     inline Vector       linearVelocity() const { return linearVelocity_; }
     void                linearVelocity(const Vector& v);
+    void                linearVelocityUpdate(const Vector& v);
     inline Vector       angularVelocity() const { return angularVelocity_; }
     void                angularVelocity(const Vector& v);
+    void                angularVelocityUpdate(const Vector& v);
     inline Vector       force() const { return force_; }
     void                force(const Vector& v);
     void                forceAdd(const Vector& v);
@@ -72,7 +74,7 @@ private:
     Object::Ptr object_;
 };
 
-class Actor::Observer : public Interface {
+class Actor::Observer : public virtual Interface {
 public:
     typedef intrusive_ptr<Actor::Observer> Ptr;
     

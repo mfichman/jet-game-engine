@@ -24,6 +24,8 @@
 #include <Jet/Model.hpp>
 #include <Jet/Root.hpp>
 #include <Jet/Impl/Ode/RootReactor.hpp>
+#include <Jet/Impl/Ode/ActorReactor.hpp>
+
 #include <ode/ode.h>
 
 namespace Jet { namespace Impl { namespace Ode {
@@ -52,12 +54,17 @@ public:
     void onCollisionMethod() {}
     void onSolidity() {}
     void onState();
+    void onMass();
 
     inline dGeomID geom() { return geom_; }
+    void massDetach();
+    void massAttach();
 
 private:
     RootReactor::Ptr rootReactor_;
+    ActorReactor::Ptr actorReactor_;
     dGeomID geom_;
+    dMass mass_;
     Model::Ptr model_;
 };
 

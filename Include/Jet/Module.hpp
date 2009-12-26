@@ -29,12 +29,21 @@ namespace Jet {
 using namespace std;
 using namespace std::tr1;
 
+class Loader;
+
 class Module : public Resource {
 public:
+    friend class Loader;
     typedef intrusive_ptr<Module> Ptr;
+
+    inline Interface::Ptr   reactor() const { return reactor_; }
+    inline void*            handle() const { return handle_; }
     
 private:
-    Module(const std::string& name) : Resource(name) {}
+    Module(const std::string& n, Interface::Ptr r, void* h) : Resource(n), reactor_(r), handle_(h) {}
+
+    Interface::Ptr reactor_;  
+    void* handle_;  
 };
 
 }

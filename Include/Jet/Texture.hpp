@@ -30,8 +30,11 @@ namespace Jet {
 using namespace std;
 using namespace std::tr1;
 
+class Loader;
+
 class Texture : public Resource {
 public:
+    friend class Loader;
     typedef intrusive_ptr<Texture> Ptr;
     
 private:

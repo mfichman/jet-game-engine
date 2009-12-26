@@ -22,9 +22,21 @@
 
 #include <Jet/Impl/Ode/RootReactor.hpp>
 #include <Jet/Impl/Ode/ModelReactor.hpp>
+#include <Jet/Impl/Ode/ActorReactor.hpp>
 
 using namespace Jet;
 using namespace Jet::Impl::Ode;
+
+//------------------------------------------------------------------------------
+extern "C" { 
+
+Interface::Ptr
+moduleLoad(Root* r) {  
+cout << "fuck" << endl; 
+    return 0;//new RootReactor(r);
+}
+
+}
 
 //------------------------------------------------------------------------------
 RootReactor::RootReactor(Root::Ptr e) :
@@ -33,20 +45,25 @@ RootReactor::RootReactor(Root::Ptr e) :
     space_(dSimpleSpaceCreate(0)),
     joints_(dJointGroupCreate(1024)) {
 
+    root_->publisher().observerAdd(this);
 }
 
 //------------------------------------------------------------------------------
 RootReactor::~RootReactor() {
+
+cout << "goodbye" << endl;
     reactors_.clear();
     actorReactor_.clear();
     dJointGroupDestroy(joints_);
     dSpaceDestroy(space_);
     dWorldDestroy(world_);
+    root_->publisher().observerDel(this);
 }
  
 //------------------------------------------------------------------------------
 void
 RootReactor::onActorNew(Actor::Ptr a) {
+    actorReactor_[a] = new ActorReactor(a, this);
 }
 
 //------------------------------------------------------------------------------   
@@ -80,7 +97,19 @@ RootReactor::onListenerNew(Listener::Ptr) {
 }
 
 //------------------------------------------------------------------------------
+void
+RootReactor::onSpeakerNew(Speaker::Ptr) {
+
+}
+
+//------------------------------------------------------------------------------
 void 
-RootReactor::onCloudNew(Listener::Ptr) {
+RootReactor::onCloudNew(Cloud::Ptr) {
+
+}
+
+//------------------------------------------------------------------------------
+void
+RootReactor::onTime() {
 
 }

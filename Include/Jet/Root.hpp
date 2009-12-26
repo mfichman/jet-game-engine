@@ -75,7 +75,13 @@ public:
     Publisher<Observer>&    publisher() const { return publisher_; }
 
 private:
-	Root() : registry_(new Registry), loader_(new Loader) {}
+	Root() : registry_(new Registry), loader_(new Loader(this)) {}
+
+    template <typename T>
+    inline typename T::Ptr objectNew(
+        const string&, 
+        map<string, typename T::Ptr>&, 
+        void (Root::Observer::*)(typename T::Ptr)); 
 
     mutable Publisher<Observer> publisher_;
 	Registry::Ptr registry_;
@@ -101,8 +107,8 @@ public:
     virtual void onCameraNew(Camera::Ptr)=0;
     virtual void onQuadNew(Quad::Ptr)=0;
     virtual void onListenerNew(Listener::Ptr)=0;
+    virtual void onSpeakerNew(Speaker::Ptr)=0;
     virtual void onCloudNew(Cloud::Ptr)=0;
     virtual void onTime()=0;
 };
-
 }

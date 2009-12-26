@@ -29,8 +29,11 @@ namespace Jet {
 using namespace std;
 using namespace std::tr1;
 
+class Loader;
+
 class Shader : public Resource {
 public:
+    friend class Loader;
     typedef intrusive_ptr<Shader> Ptr;
     
 private:

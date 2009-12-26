@@ -37,11 +37,23 @@ Object::position(const Vector& v) {
 
 //------------------------------------------------------------------------------
 void
+Object::positionUpdate(const Vector& v) {
+    position_ = v;
+}
+
+//------------------------------------------------------------------------------
+void
 Object::rotation(const Quaternion& q) {
     if (rotation_ != q) {
         rotation_ = q;
         publisher_.notify(&Observer::onRotation);
     }
+}
+
+//------------------------------------------------------------------------------
+void
+Object::rotationUpdate(const Quaternion& q) {
+    rotation_ = q;
 }
 
 //------------------------------------------------------------------------------

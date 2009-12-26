@@ -20,42 +20,21 @@
  * IN THE SOFTWARE.
  */
 
-#include <Jet/Collidable.hpp>
+#include <Jet/Impl/Ode/ActorReactor.hpp>
 
 using namespace Jet;
+using namespace Jet::Impl::Ode;
 
 //------------------------------------------------------------------------------
-void            
-Collidable::collisionMethod(const string& o) {
-    if (o != collisionMethod_) {
-        collisionMethod_ = o;
-        publisher_.notify(&Observer::onCollisionMethod);
-    }
+ActorReactor::ActorReactor(Actor::Ptr a, RootReactor::Ptr e) :
+    actor_(a),
+    rootReactor_(e),
+    body_(dBodyCreate(e->world())) {
+
+
 }
 
 //------------------------------------------------------------------------------
-void            
-Collidable::solidity(Solidity s) {
-    if (s != solidity_) {
-        solidity_ = s;
-        publisher_.notify(&Observer::onSolidity);
-    }
-}
-
-//------------------------------------------------------------------------------
-void            
-Collidable::state(State s) {
-    if (s != state_) {
-        state_ = s;
-        publisher_.notify(&Observer::onState);
-    }
-}
-
-//------------------------------------------------------------------------------
-void
-Collidable::mass(float m) {
-    if (m != mass_) {
-        mass_ = m;
-        publisher_.notify(&Observer::onMass);
-    }
+ActorReactor::~ActorReactor() {
+    dBodyDestroy(body_);
 }

@@ -29,11 +29,11 @@ namespace Jet {
 using namespace std;
 using namespace std::tr1;
 
-class Engine;
+class Loader;
 
 class Mesh : public Resource {
 public:
-    friend class Engine;
+    friend class Loader;
     typedef intrusive_ptr<Mesh> Ptr;
  
     inline const Sphere&    boundingSphere() const { return boundingSphere_; }

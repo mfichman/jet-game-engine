@@ -31,15 +31,27 @@ using namespace std;
 using namespace std::tr1;
 using namespace boost;
 
-class ActorReactor : public Actor::Observer {
+class ActorReactor : public Actor::Observer, public Object::Observer {
 public:
     typedef intrusive_ptr<ActorReactor> Ptr;
+
+    ActorReactor(Actor::Ptr a, RootReactor::Ptr e);
+    ~ActorReactor();
+
+    void onLinearVelocity() {}
+    void onAngularVelocity() {}
+    void onForce() {}
+    void onTorque() {}
+    void onNetworkSync() {}
+    void onPosition() {}
+    void onRotation() {}
 
     inline dBodyID body() { return body_; }
 
 private:
+    RootReactor::Ptr rootReactor_;
     dBodyID body_;
-
+    Actor::Ptr actor_;
 };
 
 }}}

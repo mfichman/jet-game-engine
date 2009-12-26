@@ -44,6 +44,8 @@ public:
     void            solidity(Solidity s);
     State           state() const { return state_; }
     void            state(State s);
+    float           mass() const { return mass_; }
+    void            mass(float mass);
     
     // Utility
     Publisher<Observer>& publisher() const { return publisher_; }
@@ -52,7 +54,8 @@ private:
     mutable Publisher<Observer> publisher_;
     string collisionMethod_;
     Solidity solidity_;
-    State state_;   
+    State state_;
+    float mass_;
 };
 
 class Collidable::Observer : public virtual Interface {
@@ -62,6 +65,7 @@ public:
     virtual void onCollisionMethod()=0;
     virtual void onSolidity()=0;
     virtual void onState()=0;
+    virtual void onMass()=0;
 };
 
 }

@@ -29,8 +29,11 @@ namespace Jet {
 using namespace std;
 using namespace std::tr1;
 
+class Loader;
+
 class Cubemap : public Resource {
 public:
+    friend class Loader;
     typedef intrusive_ptr<Cubemap> Ptr;
     
 private:

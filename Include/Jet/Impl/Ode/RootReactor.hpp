@@ -22,7 +22,6 @@
 #pragma once
 
 #include <Jet/Root.hpp>
-#include <Jet/Impl/Ode/ActorReactor.hpp>
 #include <ode/ode.h>
 #include <vector>
 
@@ -30,6 +29,9 @@ namespace Jet { namespace Impl { namespace Ode {
 using namespace std;
 using namespace std::tr1;
 using namespace boost;
+
+class ActorReactor;
+typedef intrusive_ptr<ActorReactor> ActorReactorPtr;
 
 class RootReactor : public Root::Observer {
 public:
@@ -43,11 +45,13 @@ public:
     void onCameraNew(Camera::Ptr);
     void onQuadNew(Quad::Ptr);
     void onListenerNew(Listener::Ptr);
-    void onCloudNew(Listener::Ptr);
+    void onSpeakerNew(Speaker::Ptr);
+    void onCloudNew(Cloud::Ptr);
+    void onTime();
 
     inline dWorldID world() { return world_; }
     inline dSpaceID space() { return space_; }
-    inline ActorReactor::Ptr actorReactor(Actor::Ptr p) { return actorReactor_[p]; }
+    inline ActorReactorPtr actorReactor(Actor::Ptr p) { return actorReactor_[p]; }
 
 private:
     Root::Ptr root_;
@@ -55,7 +59,7 @@ private:
     dSpaceID space_;
     dJointGroupID joints_;
     dContact contact_;
-    map<Actor::Ptr, ActorReactor::Ptr> actorReactor_;
+    map<Actor::Ptr, ActorReactorPtr> actorReactor_;
     vector<Interface::Ptr> reactors_;
 };
 

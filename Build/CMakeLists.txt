@@ -20,11 +20,12 @@ add_definitions(/DBOOST_ALL_NO_LIB)
 endif()
 
 if(UNIX AND APPLE)
-add_definitions(-Bstatic)
+add_definitions(-g)
 add_definitions(-DDARWIN)
 endif()
 
 if(UNIX AND NOT APPLE)
+add_definitions(-g)
 add_definitions(-DLINUX)
 endif()
 

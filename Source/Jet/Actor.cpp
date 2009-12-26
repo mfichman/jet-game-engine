@@ -34,13 +34,24 @@ Actor::linearVelocity(const Vector& v) {
 }
 
 //------------------------------------------------------------------------------
+void
+Actor::linearVelocityUpdate(const Vector& v) {
+    linearVelocity_ = v;
+}   
+
+//------------------------------------------------------------------------------
 void                
 Actor::angularVelocity(const Vector& v) {
     if (angularVelocity_ != v) {
         angularVelocity_ = v;
         publisher_.notify(&Observer::onAngularVelocity);
     }
+}
 
+//------------------------------------------------------------------------------
+void
+Actor::angularVelocityUpdate(const Vector& v) {
+    angularVelocity_ = v;
 }
 
 //------------------------------------------------------------------------------

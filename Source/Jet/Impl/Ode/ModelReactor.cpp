@@ -21,6 +21,7 @@
  */
 
 #include <Jet/Impl/Ode/ModelReactor.hpp>
+#include <Jet/Impl/Ode/ActorReactor.hpp>
 
 using namespace Jet;
 using namespace Jet::Impl::Ode;    
@@ -36,6 +37,7 @@ ModelReactor::ModelReactor(Model::Ptr m, RootReactor::Ptr e) :
     model_->anchor()->publisher().observerAdd(this);
     model_->collidable()->publisher().observerAdd(this);
     dGeomDisable(geom_);
+    dMassSetZero(&mass_);
 }
 
 //------------------------------------------------------------------------------
@@ -73,9 +75,11 @@ ModelReactor::onRotation() {
 //------------------------------------------------------------------------------
 void
 ModelReactor::onParent() {
-    ActorReactor::Ptr reactor = rootReactor_->actorReactor(model_->anchor()->parent());
-    if (reactor) {
-        dGeomSetBody(geom_, reactor->body());
+    massDetach();
+    actorReactor_ = rootReactor_->actorReactor(model_->anchor()->parent());
+    massAttach();
+    if (actorReactor_) {
+        dGeomSetBody(geom_, actorReactor_->body());
     }
 }
 
@@ -90,3 +94,52 @@ ModelReactor::onState() {
     }   
 }
 
+//------------------------------------------------------------------------------
+void
+ModelReactor::onMass() {
+    massDetach();
+    massAttach();
+}
+
+//------------------------------------------------------------------------------
+void
+ModelReactor::massDetach() {
+    Mesh::Ptr mesh = model_->mesh();      
+    if (actorReactor_ && mesh) {
+
+        // Get the total mass
+        dMass totalMass;
+        dBodyGetMass(actorReactor_->body(), &totalMass);
+ 
+        // Subtract out the mass of the model
+        mass_.mass *= -1;
+        dMassAdd(&totalMass, &mass_);
+        mass_.mass *= -1;
+    }
+}
+
+//------------------------------------------------------------------------------
+void
+ModelReactor::massAttach() {
+    Mesh::Ptr mesh = model_->mesh();      
+    if (actorReactor_ && mesh) {
+        const Vector& position = model_->object()->position();
+        const Quaternion& rotation = model_->object()->rotation();  
+
+        // Get the total mass
+        dMass totalMass;
+        dBodyGetMass(actorReactor_->body(), &totalMass);
+
+        // Get rotation matrix
+        dMatrix3 rotationMatrix;
+        dRfromQ(rotationMatrix, (dReal*)&rotation);
+
+        // Recalculate mass, and translate for offset
+        dMassSetSphereTotal(&mass_, model_->collidable()->mass(), mesh->boundingSphere().radius_);
+        dMassRotate(&mass_, rotationMatrix);
+        dMassTranslate(&mass_, position[1], position[1], position[2]);
+
+        // Add to the total    
+        dMassAdd(&totalMass, &mass_);
+    }
+}

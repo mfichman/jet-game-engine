@@ -40,7 +40,8 @@ class Loader : public Interface {
 public:
     class Observer;
     friend class Root;
-	typedef intrusive_ptr<Loader> Ptr;
+	typedef intrusive_ptr<Loader> Ptr;  
+    typedef Interface::Ptr (*ModuleLoadFn)(Root*);
 
     // Attributes
     Texture::Ptr    textureNew(const string& o);
@@ -48,6 +49,8 @@ public:
     Mesh::Ptr       meshNew(const string& o);
     Shader::Ptr     shaderNew(const string& o);
     Module::Ptr     moduleNew(const string& o);
+
+    void            moduleDel(const string& o);
 
     Texture::Ptr    texture(const string& o) { return texture_[o]; }
     Cubemap::Ptr    cubemap(const string& o) { return cubemap_[o]; }
@@ -59,7 +62,7 @@ public:
     Publisher<Observer>& publisher() const { return publisher_; }
 
 private:
-    Loader() {}
+    Loader(Root* r) : root_(r) {}
     
     mutable Publisher<Observer> publisher_;
     map<string, Texture::Ptr> texture_;
@@ -67,6 +70,7 @@ private:
     map<string, Mesh::Ptr> mesh_;
     map<string, Shader::Ptr> shader_;
     map<string, Module::Ptr> module_;
+    Root* root_;
 };
 
 class Loader::Observer : public Interface {
