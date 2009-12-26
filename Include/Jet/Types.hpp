@@ -52,6 +52,13 @@ public:
 		}
 		return values_[index];
 	}
+    inline T& operator[](int index) { 
+        if (index < 0 || index > N) {
+            throw std::out_of_range("Tuple");
+        }
+        return values_[index];
+    }
+
 	inline void operator=(const Tuple<T, N>& o) {
 		copy(o.values_, o.values_ + N, values_);
 	}

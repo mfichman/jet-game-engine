@@ -11,16 +11,18 @@ using namespace std::tr1::placeholders;
 int main(int argc, char** argv) {
 
 	Root::Ptr root = Root::make();
+
     Loader::Ptr loader = root->loader();
-
-    std::cout << "Loading" << endl;
     loader->moduleNew("./libOde.so");
+    //loader->moduleDel("./libOde.so");
 
-    std::cout << "Unloading" << endl;
-    loader->moduleDel("./libOde.so");
+    Vector vec;
+    vec[0] = 1.0f;
 
-    loader->moduleNew("./sdflkjs.so");
-	
+    Model::Ptr model = root->modelNew();
+    model->object()->position(vec);
+
+
 
 	//Object::Ptr o = Object::make();
 	
