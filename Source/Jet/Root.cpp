@@ -32,10 +32,11 @@ typename T::Ptr Root::objectNew(
     void (Root::Observer::*fn)(typename T::Ptr)) {
 
     typename map<string, typename T::Ptr>::iterator i = m.find(name);
-    if (i != m.end()) {
+    if (i == m.end()) {
         typename T::Ptr t = new T;
         m[name] = t;
         publisher_.notify(fn, t);       
+        return t;    
     } else {
         return i->second;
     }

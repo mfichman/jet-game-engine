@@ -18,6 +18,8 @@ int main(int argc, char** argv) {
 
     std::cout << "Unloading" << endl;
     loader->moduleDel("./libOde.so");
+
+    loader->moduleNew("./sdflkjs.so");
 	
 
 	//Object::Ptr o = Object::make();

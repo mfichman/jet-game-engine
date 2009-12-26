@@ -29,8 +29,8 @@ using namespace Jet::Impl::Ode;
 //------------------------------------------------------------------------------
 ModelReactor::ModelReactor(Model::Ptr m, RootReactor::Ptr e) : 
     rootReactor_(e),
-    model_(m),
-    geom_(dCreateSphere(e->space(), 10.0f)) {
+    geom_(dCreateSphere(e->space(), 10.0f)),
+    model_(m) {
     
     model_->publisher().observerAdd(this);
     model_->object()->publisher().observerAdd(this);

@@ -63,6 +63,12 @@ public:
 
 private:
     Loader(Root* r) : root_(r) {}
+
+    template <typename T>
+    inline typename T::Ptr objectNew(
+        const string&, 
+        map<string, typename T::Ptr>&, 
+        void (Loader::Observer::*)(typename T::Ptr)); 
     
     mutable Publisher<Observer> publisher_;
     map<string, Texture::Ptr> texture_;

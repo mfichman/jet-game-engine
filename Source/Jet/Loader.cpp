@@ -34,59 +34,47 @@ using namespace Jet;
 using namespace std;
 
 //------------------------------------------------------------------------------
-Texture::Ptr 
-Loader::textureNew(const string& o) {
-    map<string, Texture::Ptr>::iterator i = texture_.find(o);
-    if (i == texture_.end()) {
-        Texture::Ptr t = new Texture(o);
-        texture_[o] = t;
-        publisher_.notify(&Observer::onTextureNew, t);
+template <typename T>
+typename T::Ptr Loader::objectNew(
+    const string& name, 
+    map<string, typename T::Ptr>& m,
+    void (Loader::Observer::*fn)(typename T::Ptr)) {
+
+    typename map<string, typename T::Ptr>::iterator i = m.find(name);
+    if (i == m.end()) {
+        typename T::Ptr t = new T(name);
+        m[name] = t;
+        publisher_.notify(fn, t);
+        return t;
     } else {
         return i->second;
     }
+}
+
+//------------------------------------------------------------------------------
+Texture::Ptr 
+Loader::textureNew(const string& o) {
+    return objectNew<Texture>(o, texture_, &Observer::onTextureNew);
 }
 
 //------------------------------------------------------------------------------
 Cubemap::Ptr
 Loader::cubemapNew(const string& o) {
-    map<string, Cubemap::Ptr>::iterator i = cubemap_.find(o);
-    if (i == cubemap_.end()) {
-        Cubemap::Ptr c = new Cubemap(o);
-        cubemap_[o] = c;
-        publisher_.notify(&Observer::onCubemapNew, c);
-    } else {
-        return i->second;
-    }
+    return objectNew<Cubemap>(o, cubemap_, &Observer::onCubemapNew);
 }
 
 //------------------------------------------------------------------------------
 Mesh::Ptr       
 Loader::meshNew(const string& o) {
-    map<string, Mesh::Ptr>::iterator i = mesh_.find(o);
-    if (i == mesh_.end()) {
-        Mesh::Ptr m = new Mesh(o);
-        mesh_[o] = m;
-        publisher_.notify(&Observer::onMeshNew, m);
-    } else {
-        return i->second;
-    }
+    return objectNew<Mesh>(o, mesh_, &Observer::onMeshNew);
 }
 
 //------------------------------------------------------------------------------
 Shader::Ptr     
 Loader::shaderNew(const string& o) {
-    map<string, Shader::Ptr>::iterator i = shader_.find(o);
-    if (i == shader_.end()) {
-        Shader::Ptr s = new Shader(o);
-        shader_[o] = s;
-        publisher_.notify(&Observer::onShaderNew, s);
-    } else {
-        return i->second;
-    }
+    return objectNew<Shader>(o, shader_, &Observer::onShaderNew);
 }
 
-#include <cerrno>
-#include <cstring>
 //------------------------------------------------------------------------------
 Module::Ptr
 Loader::moduleNew(const string& o) {
@@ -96,25 +84,27 @@ Loader::moduleNew(const string& o) {
 #ifdef WINDOWS
         HMODULE handle = LoadLibrary(o.c_str());
         if (!handle) {
-            throw std::range_error("Could not find module " + o);
+            throw std::range_error("Could not load module " + o);
         }
         ModuleLoadFn load = (ModuleLoadFn)GetProcAddress(handle, "moduleLoad");
         if (!load) {
-            throw std::range_error("Could not find module load function for " + o);
+            throw std::range_error("Could not load module " + o + ": no 'moduleLoad' symbol");
         }
 #else
         void *handle = dlopen(o.c_str(), RTLD_LAZY);
         if (!handle) {
-            throw std::range_error("Could not find module " + o);
+            throw std::range_error("Could not load module " + o + ": " + dlerror());
         } 
         ModuleLoadFn load = (ModuleLoadFn)dlsym(handle, "moduleLoad");
         if (!handle) {
-            throw std::range_error("Could not find module load function for " + o);
+            throw std::range_error("Could not load module " + o + ": " + dlerror());
         }
 #endif
         Module::Ptr module = new Module(o, load(root_), (void*)handle);
+        
         module_[o] = module;
         publisher_.notify(&Observer::onModuleNew, module);
+        return module;
     } else {
         return i->second;
     }
@@ -124,17 +114,20 @@ Loader::moduleNew(const string& o) {
 void
 Loader::moduleDel(const string& o) {
     map<string, Module::Ptr>::iterator i = module_.find(o);
- 
-cout << ";dlkf;lk" << endl;
+
    if (i != module_.end()) {
 #ifdef WINDOWS
-
-#else
-        cout << "shutdown" << endl;
-        
+        HMODULE handle = (HMODULE)i->second->handle();
+        module_.erase(i);
+        if (!FreeLibrary(handle)) {
+            throw std::range_error("Could not unload module " + o);
+        }
+#else   
         void* handle = i->second->handle();
         module_.erase(i);
-        dlclose(handle);        
+        if (dlclose(handle)) {
+            throw std::range_error(dlerror());
+        }        
 #endif
     }
 

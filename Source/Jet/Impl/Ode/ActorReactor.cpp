@@ -27,9 +27,9 @@ using namespace Jet::Impl::Ode;
 
 //------------------------------------------------------------------------------
 ActorReactor::ActorReactor(Actor::Ptr a, RootReactor::Ptr e) :
-    actor_(a),
     rootReactor_(e),
-    body_(dBodyCreate(e->world())) {
+    body_(dBodyCreate(e->world())),
+    actor_(a) {
 
 
 }

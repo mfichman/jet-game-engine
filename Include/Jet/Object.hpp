@@ -49,7 +49,7 @@ public:
     void                        networkSync(NetworkSync s);
 
     // Utility
-    inline Publisher<Observer>& publisher() const { publisher_; }
+    inline Publisher<Observer>& publisher() const { return publisher_; }
 
 private:
     mutable Publisher<Observer> publisher_;

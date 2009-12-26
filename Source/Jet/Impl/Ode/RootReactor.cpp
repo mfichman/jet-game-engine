@@ -32,8 +32,7 @@ extern "C" {
 
 Interface::Ptr
 moduleLoad(Root* r) {  
-cout << "fuck" << endl; 
-    return 0;//new RootReactor(r);
+    return new RootReactor(r);
 }
 
 }
@@ -50,8 +49,6 @@ RootReactor::RootReactor(Root::Ptr e) :
 
 //------------------------------------------------------------------------------
 RootReactor::~RootReactor() {
-
-cout << "goodbye" << endl;
     reactors_.clear();
     actorReactor_.clear();
     dJointGroupDestroy(joints_);

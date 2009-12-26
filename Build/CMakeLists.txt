@@ -21,11 +21,13 @@ endif()
 
 if(UNIX AND APPLE)
 add_definitions(-g)
+add_definitions(-Wall -Werror)
 add_definitions(-DDARWIN)
 endif()
 
 if(UNIX AND NOT APPLE)
 add_definitions(-g)
+add_definitions(-Wall -Werror)
 add_definitions(-DLINUX)
 endif()
 
