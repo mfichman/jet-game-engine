@@ -19,26 +19,39 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
- 
+#pragma once
+
 #include <Jet/Types.hpp>
 #include <Jet/Interface.hpp>
+#include <Jet/Publisher.hpp>
 
-using namespace Jet;
+namespace Jet {
+using namespace std;
+using namespace std::tr1;
 
-//------------------------------------------------------------------------------
-void 
-Jet::intrusive_ptr_add_ref(Interface* t) {
-    t->refCountInc();
-}
+class Audio : public Interface {
+public:
+    class Observer;
+    typedef intrusive_ptr<Audio> Ptr;
+    typedef RangedOrdinal<float, 0, 1> Volume;
 
-//------------------------------------------------------------------------------
-void  
-Jet::intrusive_ptr_release(Interface* t) {
-    t->refCountDec();
-}
+    // Attributes
+    inline Volume           masterVolume() const { return masterVolume_; }
+    void                    masterVolume(Volume v);
 
-//------------------------------------------------------------------------------
-bool
-Resolution::operator==(const Resolution& r) const {
-    return (width_ == r.width_) && (height_ == r.height_) && (fullscreen_ == r.fullscreen_);
+    // Utility
+    inline Publisher<Observer>& publisher() const { return publisher_; }
+
+private:
+    mutable Publisher<Observer> publisher_;
+    Volume masterVolume_;
+};
+
+class Audio::Observer : public virtual Interface {
+public:
+    typedef intrusive_ptr<Audio::Observer> Ptr;
+    
+    virtual void onMasterVolume()=0; 
+};
+
 }

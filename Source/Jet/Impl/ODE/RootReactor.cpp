@@ -20,21 +20,17 @@
  * IN THE SOFTWARE.
  */
 
-#include <Jet/Impl/Ode/RootReactor.hpp>
-#include <Jet/Impl/Ode/ModelReactor.hpp>
-#include <Jet/Impl/Ode/ActorReactor.hpp>
+#include <Jet/Impl/ODE/RootReactor.hpp>
+#include <Jet/Impl/ODE/ModelReactor.hpp>
+#include <Jet/Impl/ODE/ActorReactor.hpp>
 
 using namespace Jet;
-using namespace Jet::Impl::Ode;
+using namespace Jet::Impl::ODE;
 
 //------------------------------------------------------------------------------
-extern "C" { 
-
-Interface::Ptr
+extern "C" Interface::Ptr
 moduleLoad(Root* r) {  
     return new RootReactor(r);
-}
-
 }
 
 //------------------------------------------------------------------------------
@@ -84,12 +80,6 @@ RootReactor::onCameraNew(Camera::Ptr) {
 //------------------------------------------------------------------------------
 void 
 RootReactor::onQuadNew(Quad::Ptr) {
-
-}
-
-//------------------------------------------------------------------------------
-void 
-RootReactor::onListenerNew(Listener::Ptr) {
 
 }
 

@@ -43,6 +43,21 @@ typename T::Ptr Root::objectNew(
 }
 
 //------------------------------------------------------------------------------
+Root::Root() :
+    registry_(new Registry), 
+    loader_(new Loader(this)),
+    video_(new Video),
+    audio_(new Audio),    
+    window_(new Window)
+{}
+
+//------------------------------------------------------------------------------
+Actor::Ptr
+Root::actorNew(const string& name) {
+    return objectNew<Actor>(name, actor_, &Observer::onActorNew);
+}
+
+//------------------------------------------------------------------------------
 Model::Ptr              
 Root::modelNew(const string& name) {
     return objectNew<Model>(name, model_, &Observer::onModelNew);
@@ -73,12 +88,6 @@ Root::speakerNew(const string& name) {
 }
     
 //------------------------------------------------------------------------------
-Listener::Ptr           
-Root::listenerNew(const string& name) {
-    return objectNew<Listener>(name, listener_, &Observer::onListenerNew);
-}
-    
-//------------------------------------------------------------------------------
 Cloud::Ptr              
 Root::cloudNew(const string& name) {
     return objectNew<Cloud>(name, cloud_, &Observer::onCloudNew);
@@ -89,14 +98,6 @@ void
 Root::activeCamera(Camera::Ptr c) {
     if (c != activeCamera_) {
         activeCamera_ = c;
-    }
-}
-    
-//------------------------------------------------------------------------------
-void                    
-Root::activeListener(Listener::Ptr l) {
-    if (l != activeListener_) {
-        activeListener_ = l;
     }
 }
     

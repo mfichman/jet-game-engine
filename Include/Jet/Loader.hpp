@@ -28,6 +28,7 @@
 #include <Jet/Mesh.hpp>
 #include <Jet/Shader.hpp>
 #include <Jet/Module.hpp>
+#include <Jet/Sound.hpp>
 #include <map>
 
 namespace Jet {
@@ -49,6 +50,7 @@ public:
     Mesh::Ptr       meshNew(const string& o);
     Shader::Ptr     shaderNew(const string& o);
     Module::Ptr     moduleNew(const string& o);
+    Sound::Ptr      soundNew(const string& o);
 
     void            moduleDel(const string& o);
 
@@ -57,6 +59,7 @@ public:
     Mesh::Ptr       mesh(const string& o) { return mesh_[o]; }
     Shader::Ptr     shader(const string& o) { return shader_[o]; }
     Module::Ptr     module(const string& o) { return module_[o]; }
+    Sound::Ptr      sound(const string& o) { return sound_[o]; };
 
     // Utility
     Publisher<Observer>& publisher() const { return publisher_; }
@@ -76,10 +79,11 @@ private:
     map<string, Mesh::Ptr> mesh_;
     map<string, Shader::Ptr> shader_;
     map<string, Module::Ptr> module_;
+    map<string, Sound::Ptr> sound_;
     Root* root_;
 };
 
-class Loader::Observer : public Interface {
+class Loader::Observer : public virtual Interface {
 public:
     typedef intrusive_ptr<Loader::Observer> Ptr;
 
@@ -88,6 +92,7 @@ public:
     virtual void onMeshNew(Mesh::Ptr o)=0;
     virtual void onShaderNew(Shader::Ptr o)=0;
     virtual void onModuleNew(Module::Ptr o)=0;
+    virtual void onSoundNew(Sound::Ptr o)=0;
 };
 
 }

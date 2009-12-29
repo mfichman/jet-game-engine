@@ -20,57 +20,54 @@
  * IN THE SOFTWARE.
  */
 #pragma once
- 
+
 #include <Jet/Types.hpp>
-#include <Jet/Anchor.hpp>
+#include <Jet/Interface.hpp>
+#include <Jet/Publisher.hpp>
 
 namespace Jet {
 using namespace std;
 using namespace std::tr1;
-using namespace boost;
-class Root;
 
-class Speaker : public Interface {
+class Video : public Interface {
 public:
     class Observer;
-    friend class Root;
-    typedef RangedOrdinal<float, 0, 1> Volume;
-    typedef intrusive_ptr<Speaker> Ptr;
-    enum State { statePlay, stateLoop, stateStop };
+    typedef intrusive_ptr<Video> Ptr;
+    enum Antialiasing { antialiasDisabled, antialiasEnabled };
+    enum Quality { qualityLow, qualityHigh };
+    enum Bloom { bloomDisabled, bloomEnabled };
+    enum State { deviceLost, deviceCreated };
 
     // Attributes
-    inline string           clip() const { return clip_; }
-    void                    clip(const string& s);
-    inline Volume           volume() const { return volume_; }
-    void                    volume(Volume v);
+    inline Quality          quality() const { return quality_; }
+    void                    quality(Quality q);
+    inline Antialiasing     antialiasing() const { return antialiasing_; }
+    void                    antialiasing(Antialiasing a);
+    inline Bloom            bloom() const { return bloom_; }
+    void                    bloom(Bloom b);
     inline State            state() const { return state_; }
     void                    state(State s);
-
-    // Components
-    inline Object::Ptr      object() const { return object_; }
-    inline Anchor::Ptr      anchor() const { return anchor_; }
 
     // Utility
     inline Publisher<Observer>& publisher() const { return publisher_; }
 
-protected:
-    Speaker() : object_(new Object), anchor_(new Anchor) {}
-
+private:
     mutable Publisher<Observer> publisher_;
-    Object::Ptr object_;
-    Anchor::Ptr anchor_;
-    string clip_;     
-    Volume volume_;
+    Quality quality_;
+    Antialiasing antialiasing_;
+    Bloom bloom_;
     State state_;
 };
 
-class Speaker::Observer : public Interface {
+class Video::Observer : public virtual Interface {
 public:
-    typedef intrusive_ptr<Speaker::Observer> Ptr;
-
-    virtual void onClip()=0;
-    virtual void onVolume()=0;
-    virtual void onState()=0;
+    typedef intrusive_ptr<Video::Observer> Ptr;
+    
+    virtual void onResolution()=0;
+    virtual void onQuality()=0;
+    virtual void onAntialiasing()=0;
+    virtual void onBloom()=0;
+    virtual void onState()=0;    
 };
 
 }

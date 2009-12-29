@@ -180,6 +180,15 @@ struct Sphere {
     float z_;
 };
 
+struct Resolution {
+    int width_;
+    int height_;
+    bool fullscreen_;
+
+    bool operator==(const Resolution& r) const;
+    bool operator!=(const Resolution& r) const { return operator==(r); }
+};
+
 class Interface;
 void intrusive_ptr_add_ref(Interface* t);
 void intrusive_ptr_release(Interface* t);

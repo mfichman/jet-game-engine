@@ -19,26 +19,43 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
- 
-#include <Jet/Types.hpp>
-#include <Jet/Interface.hpp>
+
+#include <Jet/Video.hpp>
 
 using namespace Jet;
 
 //------------------------------------------------------------------------------
-void 
-Jet::intrusive_ptr_add_ref(Interface* t) {
-    t->refCountInc();
+void                        
+Video::quality(Quality q) {
+    if (q != quality_) {
+        quality_ = q;
+        publisher_.notify(&Observer::onQuality);
+    }
 }
 
 //------------------------------------------------------------------------------
-void  
-Jet::intrusive_ptr_release(Interface* t) {
-    t->refCountDec();
+void
+Video::antialiasing(Antialiasing a) {
+    if (a != antialiasing_) {
+        antialiasing_ = a;
+        publisher_.notify(&Observer::onAntialiasing);
+    }
 }
 
 //------------------------------------------------------------------------------
-bool
-Resolution::operator==(const Resolution& r) const {
-    return (width_ == r.width_) && (height_ == r.height_) && (fullscreen_ == r.fullscreen_);
+void
+Video::bloom(Bloom b) {
+    if (b != bloom_) {
+        bloom_ = b;
+        publisher_.notify(&Observer::onBloom);
+    }
+}
+
+//------------------------------------------------------------------------------
+void
+Video::state(State s) {
+    if (s != state_) {
+        state_ = s;
+        publisher_.notify(&Observer::onState);
+    }
 }

@@ -19,26 +19,47 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
- 
-#include <Jet/Types.hpp>
-#include <Jet/Interface.hpp>
+#pragma once
 
-using namespace Jet;
+#include <Jet/Root.hpp>
+#include <ode/ode.h>
+#include <vector>
 
-//------------------------------------------------------------------------------
-void 
-Jet::intrusive_ptr_add_ref(Interface* t) {
-    t->refCountInc();
-}
+namespace Jet { namespace Impl { namespace ODE {
+using namespace std;
+using namespace std::tr1;
+using namespace boost;
 
-//------------------------------------------------------------------------------
-void  
-Jet::intrusive_ptr_release(Interface* t) {
-    t->refCountDec();
-}
+class ActorReactor;
+typedef intrusive_ptr<ActorReactor> ActorReactorPtr;
 
-//------------------------------------------------------------------------------
-bool
-Resolution::operator==(const Resolution& r) const {
-    return (width_ == r.width_) && (height_ == r.height_) && (fullscreen_ == r.fullscreen_);
-}
+class RootReactor : public Root::Observer {
+public:
+    typedef intrusive_ptr<RootReactor> Ptr;
+    RootReactor(Root::Ptr e);
+    ~RootReactor();
+    
+    void onActorNew(Actor::Ptr);
+    void onModelNew(Model::Ptr);
+    void onEntityNew(Entity::Ptr);
+    void onCameraNew(Camera::Ptr);
+    void onQuadNew(Quad::Ptr);
+    void onSpeakerNew(Speaker::Ptr);
+    void onCloudNew(Cloud::Ptr);
+    void onTime();
+
+    inline dWorldID world() { return world_; }
+    inline dSpaceID space() { return space_; }
+    inline ActorReactorPtr actorReactor(Actor::Ptr p) { return actorReactor_[p]; }
+
+private:
+    Root::Ptr root_;
+    dWorldID world_;
+    dSpaceID space_;
+    dJointGroupID joints_;
+    dContact contact_;
+    map<Actor::Ptr, ActorReactorPtr> actorReactor_;
+    vector<Interface::Ptr> reactors_;
+};
+
+}}}

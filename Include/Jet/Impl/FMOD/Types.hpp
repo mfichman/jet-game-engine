@@ -19,26 +19,19 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
- 
-#include <Jet/Types.hpp>
-#include <Jet/Interface.hpp>
+#pragma once
 
-using namespace Jet;
+#ifdef WINDOWS
+#define WIN32_LEAN_AND_MEAN
+#define VC_EXTRALEAN
+#include <windows.h>			// NEED to include this, otherwise there are link errors
+#endif
+#include <fmodex/fmod.h>
 
-//------------------------------------------------------------------------------
-void 
-Jet::intrusive_ptr_add_ref(Interface* t) {
-    t->refCountInc();
-}
+namespace Jet { namespace Impl { namespace FMOD {
+using namespace std;
+using namespace std::tr1;
 
-//------------------------------------------------------------------------------
-void  
-Jet::intrusive_ptr_release(Interface* t) {
-    t->refCountDec();
-}
+typedef shared_ptr<FMOD_SOUND> SoundPtr;
 
-//------------------------------------------------------------------------------
-bool
-Resolution::operator==(const Resolution& r) const {
-    return (width_ == r.width_) && (height_ == r.height_) && (fullscreen_ == r.fullscreen_);
-}
+}}}

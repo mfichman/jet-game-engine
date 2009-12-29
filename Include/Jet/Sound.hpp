@@ -19,26 +19,25 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
- 
+#pragma once
+
 #include <Jet/Types.hpp>
-#include <Jet/Interface.hpp>
+#include <Jet/Resource.hpp>
+#include <string>
 
-using namespace Jet;
+namespace Jet {
+using namespace std;
+using namespace std::tr1;
 
-//------------------------------------------------------------------------------
-void 
-Jet::intrusive_ptr_add_ref(Interface* t) {
-    t->refCountInc();
-}
+class Loader;
 
-//------------------------------------------------------------------------------
-void  
-Jet::intrusive_ptr_release(Interface* t) {
-    t->refCountDec();
-}
+class Sound : public Resource {
+public:
+    friend class Loader;
+    typedef intrusive_ptr<Sound> Ptr;
+    
+private:
+    Sound(const std::string& name) : Resource(name) {}
+};
 
-//------------------------------------------------------------------------------
-bool
-Resolution::operator==(const Resolution& r) const {
-    return (width_ == r.width_) && (height_ == r.height_) && (fullscreen_ == r.fullscreen_);
 }

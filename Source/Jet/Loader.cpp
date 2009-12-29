@@ -76,6 +76,12 @@ Loader::shaderNew(const string& o) {
 }
 
 //------------------------------------------------------------------------------
+Sound::Ptr
+Loader::soundNew(const string& o) {
+    return objectNew<Sound>(o, sound_, &Observer::onSoundNew);
+}
+
+//------------------------------------------------------------------------------
 Module::Ptr
 Loader::moduleNew(const string& o) {
     map<string, Module::Ptr>::iterator i = module_.find(o);

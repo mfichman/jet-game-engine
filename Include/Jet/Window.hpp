@@ -21,51 +21,42 @@
  */
 #pragma once
 
-#include <Jet/Model.hpp>
-#include <Jet/Root.hpp>
-#include <Jet/Impl/Ode/RootReactor.hpp>
-#include <Jet/Impl/Ode/ActorReactor.hpp>
+#include <Jet/Types.hpp>
+#include <Jet/Interface.hpp>
+#include <Jet/Publisher.hpp>
 
-#include <ode/ode.h>
-
-namespace Jet { namespace Impl { namespace Ode {
+namespace Jet {
 using namespace std;
 using namespace std::tr1;
-using namespace boost;
 
-class ModelReactor : public Model::Observer, public Object::Observer, 
-    public Anchor::Observer, public Collidable::Observer {
-
+class Window : public Interface {
 public:
-    typedef intrusive_ptr<ModelReactor> Ptr;
+    class Observer;
+    typedef intrusive_ptr<Window> Ptr;
+    enum Antialiasing { antialiasDisabled, antialiasEnabled };
+    enum Quality { qualityLow, qualityHigh };
+    enum Bloom { bloomDisabled, bloomEnabled };
 
-    ModelReactor(Model::Ptr m, RootReactor::Ptr e);
-    ~ModelReactor();
+    // Attributes
+    inline const Resolution&    resolution() const { return resolution_; }
+    void                        resolution(const Resolution& r);
 
-    void onScale() {}
-    void onTexture(Model::TextureIndex i) {}
-    void onCubemap(Model::CubemapIndex i) {}
-    void onShader() {}
-    void onNetworkSync() {}
-    void onPosition();
-    void onRotation();
-    void onMesh();
-    void onParent();
-    void onCollisionMethod() {}
-    void onSolidity() {}
-    void onState();
-    void onMass();
-
-    inline dGeomID geom() { return geom_; }
-    void massDetach();
-    void massAttach();
+    // Utility
+    inline Publisher<Observer>& publisher() const { return publisher_; }
 
 private:
-    RootReactor::Ptr rootReactor_;
-    ActorReactor::Ptr actorReactor_;
-    dGeomID geom_;
-    dMass mass_;
-    Model::Ptr model_;
+    mutable Publisher<Observer> publisher_;
+    Resolution resolution_;
+    Quality quality_;
+    Antialiasing antialiasing_;
+    Bloom bloom_;
 };
 
-}}}
+class Window::Observer : public virtual Interface {
+public:
+    typedef intrusive_ptr<Window::Observer> Ptr;
+    
+    virtual void onResolution()=0;
+};
+
+}

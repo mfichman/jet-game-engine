@@ -20,11 +20,11 @@
  * IN THE SOFTWARE.
  */
 
-#include <Jet/Impl/Ode/ModelReactor.hpp>
-#include <Jet/Impl/Ode/ActorReactor.hpp>
+#include <Jet/Impl/ODE/ModelReactor.hpp>
+#include <Jet/Impl/ODE/ActorReactor.hpp>
 
 using namespace Jet;
-using namespace Jet::Impl::Ode;    
+using namespace Jet::Impl::ODE;    
 
 //------------------------------------------------------------------------------
 ModelReactor::ModelReactor(Model::Ptr m, RootReactor::Ptr e) : 
@@ -62,7 +62,11 @@ ModelReactor::onMesh() {
 void
 ModelReactor::onPosition() {
     const Vector& v = model_->object()->position();
-    dGeomSetOffsetPosition(geom_, v[0], v[1], v[2]);
+    if (actorReactor_) {    
+        dGeomSetOffsetPosition(geom_, v[0], v[1], v[2]);
+    } else {
+        dGeomSetPosition(geom_, v[0], v[1], v[2]);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -79,8 +83,10 @@ ModelReactor::onParent() {
     actorReactor_ = rootReactor_->actorReactor(model_->anchor()->parent());
     massAttach();
     if (actorReactor_) {
+        const Vector& v = model_->object()->position();        
         dGeomSetBody(geom_, actorReactor_->body());
-    }
+        dGeomSetOffsetPosition(geom_, v[0], v[1], v[2]);
+   }
 }
 
 //------------------------------------------------------------------------------

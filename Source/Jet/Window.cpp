@@ -20,18 +20,15 @@
  * IN THE SOFTWARE.
  */
 
-#include <Jet/Listener.hpp>
+#include <Jet/Window.hpp>
 
 using namespace Jet;
 
 //------------------------------------------------------------------------------
-void                
-Listener::target(Object::Ptr t) {
-    target_ = t;
-}
-
-//------------------------------------------------------------------------------
-void                
-Listener::up(const Vector& u) {
-    up_ = u;
+void
+Window::resolution(const Resolution& r) {
+    if (r != resolution_) {
+        resolution_ = r;
+        publisher_.notify(&Observer::onResolution);
+    }
 }

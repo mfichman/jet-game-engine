@@ -19,39 +19,16 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#pragma once
 
-#include <Jet/Model.hpp>
-#include <Jet/Root.hpp>
-#include <Jet/Impl/Ode/RootReactor.hpp>
-#include <ode/ode.h>
+#include <Jet/Audio.hpp>
 
-namespace Jet { namespace Impl { namespace Ode {
-using namespace std;
-using namespace std::tr1;
-using namespace boost;
+using namespace Jet;
 
-class ActorReactor : public Actor::Observer, public Object::Observer {
-public:
-    typedef intrusive_ptr<ActorReactor> Ptr;
-
-    ActorReactor(Actor::Ptr a, RootReactor::Ptr e);
-    ~ActorReactor();
-
-    void onLinearVelocity() {}
-    void onAngularVelocity() {}
-    void onForce() {}
-    void onTorque() {}
-    void onNetworkSync() {}
-    void onPosition() {}
-    void onRotation() {}
-
-    inline dBodyID body() { return body_; }
-
-private:
-    RootReactor::Ptr rootReactor_;
-    dBodyID body_;
-    Actor::Ptr actor_;
-};
-
-}}}
+//------------------------------------------------------------------------------
+void
+Audio::masterVolume(Volume v) {
+    if (v != masterVolume_) {
+        masterVolume_ = v;
+        publisher_.notify(&Observer::onMasterVolume);
+    }
+}

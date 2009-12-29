@@ -19,26 +19,40 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
- 
-#include <Jet/Types.hpp>
-#include <Jet/Interface.hpp>
+#pragma once
 
-using namespace Jet;
+#include <Jet/Impl/D3D9/Types.hpp>
+#include <Jet/Impl/D3D9/RootReactor.hpp>
 
-//------------------------------------------------------------------------------
-void 
-Jet::intrusive_ptr_add_ref(Interface* t) {
-    t->refCountInc();
-}
+namespace Jet { Impl { D3D9 {
+using namespace std;
+using namespace std::tr1;
+using namespace boost;
 
-//------------------------------------------------------------------------------
-void  
-Jet::intrusive_ptr_release(Interface* t) {
-    t->refCountDec();
-}
 
-//------------------------------------------------------------------------------
-bool
-Resolution::operator==(const Resolution& r) const {
-    return (width_ == r.width_) && (height_ == r.height_) && (fullscreen_ == r.fullscreen_);
-}
+class EffectPool {
+public:
+    EffectPool(RootReactor::Ptr e);
+    inline FrameParams& frameParams() const { return frameParams_; }
+    inline EffectPtr basicEffect() const { return basicEffect_; }
+    inline EffectPtr postProcessingEffect() const { return postProcessEffect_; }
+
+    inline D3DXHANDLE objectParamsHandle() const { return objectParamsHandle_; }
+    inline D3DXHANDLE materialHandle() const { return materialHandle_; }
+    inline D3DXHANDLE miscParamsHandle() const { return miscParamsHandle_; }
+    inline D3DXHANDLE extraDataHandle() const { return extraDataHandle_; }
+
+private:
+    RootReactor::Ptr rootReactor_;
+	FrameParameters	frameParams_;
+    EffectPoolPtr effectPool_;
+    EffectPtr basicEffect_;
+    EffectPtr postProcessEffect_;
+    D3DXHANDLE frameParamsHandle_;
+    D3DXHANDLE objectParamsHandle_;
+    D3DXHANDLE materialHandle_;
+    D3DXHANDLE miscParamsHandle_;
+    D3DXHANDLE extraDataHandle_;
+};
+
+}}};

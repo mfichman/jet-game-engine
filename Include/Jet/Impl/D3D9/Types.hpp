@@ -19,26 +19,53 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
- 
-#include <Jet/Types.hpp>
-#include <Jet/Interface.hpp>
+#pragma once
 
-using namespace Jet;
+#define WIN32_LEAN_AND_MEAN
+#define VC_EXTRALEAN
+#define D3D9_DEBUG_INFO
+#include <windows.h>
+#include <d3d9.h>
+#include <d3dx9.h>
+#include <dxerr.h>
 
-//------------------------------------------------------------------------------
-void 
-Jet::intrusive_ptr_add_ref(Interface* t) {
-    t->refCountInc();
-}
+namespace Jet { Impl { D3D9 {
+using namespace std;
+using namespace std::tr1;
 
-//------------------------------------------------------------------------------
-void  
-Jet::intrusive_ptr_release(Interface* t) {
-    t->refCountDec();
-}
+typedef intrusive_ptr<IDirect3D> Direct3DPtr;;
+typedef intrusive_ptr<IDirect3DDevice9> DevicePtr;
+typedef intrusive_ptr<IDirect3DSurface9> SurfacePtr;
+typedef intrusive_ptr<IDirect3DTexture9> TexturePtr;
+typedef intrusive_ptr<IDirect3DCubeTexture9> CubemapPtr;
+typedef intrusive_ptr<ID3DXMesh> MeshPtr;
+typedef intrusive_ptr<ID3DXEffect> EffectPtr;
+typedef intrusive_ptr<ID3DXEffectPool> EffectPoolPtr;
 
-//------------------------------------------------------------------------------
-bool
-Resolution::operator==(const Resolution& r) const {
-    return (width_ == r.width_) && (height_ == r.height_) && (fullscreen_ == r.fullscreen_);
-}
+struct FrameParameters {
+	D3DXCOLOR diffuseLight_;
+	D3DXCOLOR ambientLight_;
+	D3DXCOLOR specularLight_;
+	D3DXVECTOR3	lightDirection_;
+	D3DXVECTOR3	cameraEye_;
+	D3DXVECTOR3	cameraTarget_;
+	D3DXVECTOR3	cameraUp_;
+	float time_;
+	float bufferHeight_;
+	D3DXMATRIX viewProj_;
+};
+
+struct ScreenVertex {
+	D3DXVECTOR4 pos_;
+	D3DXVECTOR2 tex_;
+	static const DWORD FVF;
+};
+
+struct TextureRect {
+	float leftu;
+	float topv;
+	float rightu;
+	float bottomv;
+};
+
+}}}

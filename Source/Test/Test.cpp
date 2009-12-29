@@ -13,14 +13,19 @@ int main(int argc, char** argv) {
 	Root::Ptr root = Root::make();
 
     Loader::Ptr loader = root->loader();
-    loader->moduleNew("./libOde.so");
-    //loader->moduleDel("./libOde.so");
+    loader->moduleNew("./libODE.so");
+    loader->moduleNew("./libFMOD.so");
 
-    Vector vec;
-    vec[0] = 1.0f;
+    Sphere sphere = {10.0f, 0.0f, 0.0f, 0.0f};
+    Mesh::Ptr mesh = loader->meshNew("test.x");
+    mesh->boundingSphere(sphere);
+
+    Actor::Ptr actor = root->actorNew();
 
     Model::Ptr model = root->modelNew();
-    model->object()->position(vec);
+    model->mesh(mesh);
+    model->anchor()->parent(actor);
+    model->collidable()->mass(10.0f);
 
 
 

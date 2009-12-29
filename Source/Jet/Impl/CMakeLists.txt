@@ -1,3 +1,4 @@
-add_subdirectory(Ode)
+add_subdirectory(ODE)
+add_subdirectory(FMOD)
 
 

@@ -19,22 +19,28 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
+#pragma once
 
-#include <Jet/Impl/Ode/ActorReactor.hpp>
+#include <Jet/Options.hpp>
+#include <Jet/Impl/D3D9/Types.hpp>
 
-using namespace Jet;
-using namespace Jet::Impl::Ode;
+namespace Jet { Impl { D3D9 {
+using std;
+using std::tr1;
+using boost;
 
-//------------------------------------------------------------------------------
-ActorReactor::ActorReactor(Actor::Ptr a, RootReactor::Ptr e) :
-    rootReactor_(e),
-    body_(dBodyCreate(e->world())),
-    actor_(a) {
+class WindowReactor : public Window::Observer {
+public:
+    WindowReactor(Window::Ptr o, RootReactor::Ptr r);
+    ~WindowReactor();
+    inline HWND handle() const { return handle_; }
+    
+    void onResolution();
 
+private:    
+    Options::Ptr options_;
+    RootReactor::Ptr rootReactor_;
+    HWND handle_;
+};
 
-}
-
-//------------------------------------------------------------------------------
-ActorReactor::~ActorReactor() {
-    dBodyDestroy(body_);
-}
+}}}

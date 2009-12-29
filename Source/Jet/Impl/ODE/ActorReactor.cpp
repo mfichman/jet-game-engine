@@ -19,48 +19,22 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#pragma once
 
-#include <Jet/Root.hpp>
-#include <ode/ode.h>
-#include <vector>
+#include <Jet/Impl/ODE/ActorReactor.hpp>
 
-namespace Jet { namespace Impl { namespace Ode {
-using namespace std;
-using namespace std::tr1;
-using namespace boost;
+using namespace Jet;
+using namespace Jet::Impl::ODE;
 
-class ActorReactor;
-typedef intrusive_ptr<ActorReactor> ActorReactorPtr;
+//------------------------------------------------------------------------------
+ActorReactor::ActorReactor(Actor::Ptr a, RootReactor::Ptr e) :
+    rootReactor_(e),
+    body_(dBodyCreate(e->world())),
+    actor_(a) {
 
-class RootReactor : public Root::Observer {
-public:
-    typedef intrusive_ptr<RootReactor> Ptr;
-    RootReactor(Root::Ptr e);
-    ~RootReactor();
-    
-    void onActorNew(Actor::Ptr);
-    void onModelNew(Model::Ptr);
-    void onEntityNew(Entity::Ptr);
-    void onCameraNew(Camera::Ptr);
-    void onQuadNew(Quad::Ptr);
-    void onListenerNew(Listener::Ptr);
-    void onSpeakerNew(Speaker::Ptr);
-    void onCloudNew(Cloud::Ptr);
-    void onTime();
 
-    inline dWorldID world() { return world_; }
-    inline dSpaceID space() { return space_; }
-    inline ActorReactorPtr actorReactor(Actor::Ptr p) { return actorReactor_[p]; }
+}
 
-private:
-    Root::Ptr root_;
-    dWorldID world_;
-    dSpaceID space_;
-    dJointGroupID joints_;
-    dContact contact_;
-    map<Actor::Ptr, ActorReactorPtr> actorReactor_;
-    vector<Interface::Ptr> reactors_;
-};
-
-}}}
+//------------------------------------------------------------------------------
+ActorReactor::~ActorReactor() {
+    dBodyDestroy(body_);
+}

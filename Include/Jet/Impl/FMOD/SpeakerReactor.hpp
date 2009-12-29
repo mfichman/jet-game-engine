@@ -20,37 +20,31 @@
  * IN THE SOFTWARE.
  */
 #pragma once
- 
-#include <Jet/Types.hpp>
-#include <Jet/Anchor.hpp>
 
-namespace Jet {
+#include <Jet/Impl/FMOD/RootReactor.hpp>
+#include <Jet/Speaker.hpp>
+
+namespace Jet { namespace Impl { namespace FMOD {
 using namespace std;
 using namespace std::tr1;
 using namespace boost;
-class Root;
 
-class Listener : public Interface {
+class SpeakerReactor : public Speaker::Observer {
 public:
-    friend class Root;
-    typedef intrusive_ptr<Listener> Ptr;
+    typedef intrusive_ptr<SpeakerReactor> Ptr;    
 
-    // Attributes
-    inline Object::Ptr  target() const { return target_; }
-    void                target(Object::Ptr t);
-    inline Vector       up() const { return up_; }
-    void                up(const Vector& u);
+    SpeakerReactor(Speaker::Ptr s, RootReactor::Ptr r);
+    ~SpeakerReactor();
 
-    // Components
-    inline Object::Ptr      object() const { return object_; }
-    inline Anchor::Ptr      anchor() const { return anchor_; }
+    void onClip();
+    void onVolume();
+    void onState();
 
 private:
-    Listener() : object_(new Object), anchor_(new Anchor) {}
-
-    Object::Ptr object_;
-    Anchor::Ptr anchor_;
-    Object::Ptr target_;
-    Vector up_;
+    RootReactor::Ptr rootReactor_;
+    Speaker::Ptr speaker_;
+    SoundPtr sound_;
+    FMOD_CHANNEL* channel_;
 };
-}
+
+}}}

@@ -19,26 +19,39 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
- 
-#include <Jet/Types.hpp>
-#include <Jet/Interface.hpp>
+#pragma once
 
-using namespace Jet;
+#include <Jet/Model.hpp>
+#include <Jet/Root.hpp>
+#include <Jet/Impl/ODE/RootReactor.hpp>
+#include <ode/ode.h>
 
-//------------------------------------------------------------------------------
-void 
-Jet::intrusive_ptr_add_ref(Interface* t) {
-    t->refCountInc();
-}
+namespace Jet { namespace Impl { namespace ODE {
+using namespace std;
+using namespace std::tr1;
+using namespace boost;
 
-//------------------------------------------------------------------------------
-void  
-Jet::intrusive_ptr_release(Interface* t) {
-    t->refCountDec();
-}
+class ActorReactor : public Actor::Observer, public Object::Observer {
+public:
+    typedef intrusive_ptr<ActorReactor> Ptr;
 
-//------------------------------------------------------------------------------
-bool
-Resolution::operator==(const Resolution& r) const {
-    return (width_ == r.width_) && (height_ == r.height_) && (fullscreen_ == r.fullscreen_);
-}
+    ActorReactor(Actor::Ptr a, RootReactor::Ptr e);
+    ~ActorReactor();
+
+    void onLinearVelocity() {}
+    void onAngularVelocity() {}
+    void onForce() {}
+    void onTorque() {}
+    void onNetworkSync() {}
+    void onPosition() {}
+    void onRotation() {}
+
+    inline dBodyID body() { return body_; }
+
+private:
+    RootReactor::Ptr rootReactor_;
+    dBodyID body_;
+    Actor::Ptr actor_;
+};
+
+}}}

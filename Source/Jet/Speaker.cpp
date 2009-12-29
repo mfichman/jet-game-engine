@@ -44,14 +44,9 @@ Speaker::volume(Volume v) {
 
 //------------------------------------------------------------------------------
 void
-Speaker::channelsInc() {
-    channels_++;
-    publisher_.notify(&Observer::onChannelsInc);
-}
-
-//------------------------------------------------------------------------------
-void
-Speaker::channelsDec() {
-    channels_ = min(channels_, channels_ - 1);
-    publisher_.notify(&Observer::onChannelsDec);
+Speaker::state(State s) {
+    if (s != state_) {
+        state_ = s;
+        publisher_.notify(&Observer::onState);
+    }
 }
