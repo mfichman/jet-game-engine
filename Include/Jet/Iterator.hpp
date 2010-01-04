@@ -31,9 +31,9 @@ template <typename T>
 class Iterator { 
 public:
 	Iterator(T& v) : iter_(v.begin()), end_(v.end()) {}
-	void operator++() { iter_++; }
-	typename T::value_type& operator*() { return *iter_; }
-	typename T::value_type& operator->() { return *iter_; }
+	void operator++(int) { iter_++; }
+	typename T::value_type* operator*() const { return &*iter_; }
+	typename T::value_type* operator->() const { return &*iter_; }
 	operator bool() { return iter_ != end_; }
 
 private:

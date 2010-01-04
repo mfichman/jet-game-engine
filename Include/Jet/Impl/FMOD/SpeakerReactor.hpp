@@ -36,7 +36,6 @@ public:
     SpeakerReactor(Speaker::Ptr s, RootReactor::Ptr r);
     ~SpeakerReactor();
 
-    void onClip();
     void onVolume();
     void onState();
 

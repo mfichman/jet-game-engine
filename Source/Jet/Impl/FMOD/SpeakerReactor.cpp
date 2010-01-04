@@ -33,8 +33,6 @@ using namespace Jet::Impl::FMOD;
 	if (result != FMOD_OK) {												\        logic_error(FMOD_ErrorString(result));								\
 	}																		\
 }
-
-
 //------------------------------------------------------------------------------
 SpeakerReactor::SpeakerReactor(Speaker::Ptr s, RootReactor::Ptr r) :
     rootReactor_(r),
@@ -47,12 +45,6 @@ SpeakerReactor::SpeakerReactor(Speaker::Ptr s, RootReactor::Ptr r) :
 //------------------------------------------------------------------------------
 SpeakerReactor::~SpeakerReactor() {
     speaker_->publisher().observerDel(this);
-}
-
-//------------------------------------------------------------------------------
-void 
-SpeakerReactor::onClip() {
-
 }
 
 //------------------------------------------------------------------------------

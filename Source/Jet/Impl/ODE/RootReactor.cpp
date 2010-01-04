@@ -22,6 +22,7 @@
 
 #include <Jet/Impl/ODE/RootReactor.hpp>
 #include <Jet/Impl/ODE/BodyReactor.hpp>
+#include <Jet/Impl/ODE/ModelReactor.hpp>
 
 using namespace Jet;
 using namespace Jet::Impl::ODE;
@@ -42,6 +43,7 @@ RootReactor::RootReactor(Root::Ptr e) :
     joints_(dJointGroupCreate(1024)) {
 
     root_->publisher().observerAdd(this);
+    root_->options()->publisher().observerAdd(this);
 }
 
 //------------------------------------------------------------------------------
@@ -61,5 +63,14 @@ RootReactor::onBodyNew(Body::Ptr a) {
 
 //------------------------------------------------------------------------------
 void
-RootReactor::onTime() {
+RootReactor::onModelNew(Model::Ptr m) {
+    reactors_.push_back(new ModelReactor(m, this));
+}
+
+//------------------------------------------------------------------------------
+void
+RootReactor::onStep() {
+    //dSpaceCollide(space_, this, &onCollision);
+    dWorldStep(world_, root_->options()->physicsDelta());
+    dJointGroupEmpty(joints_);
 }

@@ -47,9 +47,6 @@ public:
 private:
     mutable Publisher<Observer> publisher_;
     Resolution resolution_;
-    Quality quality_;
-    Antialiasing antialiasing_;
-    Bloom bloom_;
 };
 
 class Window::Observer : public virtual Interface {

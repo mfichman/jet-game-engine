@@ -33,17 +33,20 @@ using namespace boost;
 class BodyReactor;
 typedef intrusive_ptr<BodyReactor> BodyReactorPtr;
 
-class RootReactor : public Root::Observer {
+class RootReactor : public Root::Observer, public Options::Observer {
 public:
     typedef intrusive_ptr<RootReactor> Ptr;
     RootReactor(Root::Ptr e);
     ~RootReactor();
     
     void onBodyNew(Body::Ptr);
-    void onTime();
+    void onModelNew(Model::Ptr);
+    void onStep();
+    
 
-    inline dWorldID world() { return world_; }
-    inline dSpaceID space() { return space_; }
+    inline dWorldID world() const { return world_; }
+    inline dSpaceID space() const { return space_; }
+    inline Root::Ptr root() const { return root_; }
 
 private:
     Root::Ptr root_;

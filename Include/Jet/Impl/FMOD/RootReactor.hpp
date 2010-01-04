@@ -31,7 +31,7 @@ using namespace std;
 using namespace std::tr1;
 using namespace boost;
 
-class RootReactor : public Root::Observer, public Audio::Observer, public Loader::Observer {
+class RootReactor : public Root::Observer, public Options::Observer, public Loader::Observer {
 public:
     typedef intrusive_ptr<RootReactor> Ptr; 
     RootReactor(Root::Ptr e);

@@ -49,7 +49,7 @@ RootReactor::RootReactor(Root::Ptr e) :
     root_(e) {
 
     root_->publisher().observerAdd(this);
-    root_->audio()->publisher().observerAdd(this);
+    root_->options()->publisher().observerAdd(this);
 
     FMOD_SPEAKERMODE mode;
     FMOD_CAPS caps;
@@ -64,9 +64,8 @@ RootReactor::RootReactor(Root::Ptr e) :
 
 //------------------------------------------------------------------------------
 RootReactor::~RootReactor() {
-    
     root_->publisher().observerDel(this);
-    root_->audio()->publisher().observerDel(this);
+    root_->options()->publisher().observerDel(this);
 
     reactors_.clear();
     CHECK(FMOD_System_Close(system_));
@@ -91,5 +90,5 @@ RootReactor::onMasterVolume() {
 
     FMOD_CHANNELGROUP* group;
     CHECK(FMOD_System_GetMasterChannelGroup(system_, &group));
-    CHECK(FMOD_ChannelGroup_SetVolume(group, root_->audio()->masterVolume()));
+    CHECK(FMOD_ChannelGroup_SetVolume(group, root_->options()->masterVolume()));
 }

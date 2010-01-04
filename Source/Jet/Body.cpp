@@ -133,3 +133,18 @@ void
 Body::rotationUpdate(const Quaternion& q) {
     rotation_ = q;
 }
+
+//------------------------------------------------------------------------------
+void
+Body::attachmentAdd(const Attachment& a) {
+    attachment_.insert(a);
+    publisher_.notify<const Attachment&>(&Observer::onAttachmentAdd, a);
+}
+
+//------------------------------------------------------------------------------
+void
+Body::attachmentDel(const Attachment& a) {
+    attachment_.erase(a);
+    publisher_.notify<const Attachment&>(&Observer::onAttachmentDel, a);
+}
+

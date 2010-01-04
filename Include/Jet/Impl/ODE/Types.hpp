@@ -25,9 +25,9 @@ namespace Jet { namespace Impl { namespace ODE {
 using namespace std;
 using namespace std::tr1;
 
-//-----------------------------------------------------------------------------
-inline dReal*
-convert(const Quaternion& q) {
+//------------------------------------------------------------------------------
+inline const dReal*
+fromQuaternion(const Quaternion& q) {
     static dReal out[4];
     out[0] = q.w();
     out[1] = q.x();
@@ -36,13 +36,34 @@ convert(const Quaternion& q) {
     return out;
 }
 
-//-----------------------------------------------------------------------------
-inline dReal* 
-convert(const Vector& v) {
+//------------------------------------------------------------------------------
+inline const dReal* 
+fromVector(const Vector& v) {
     static dReal out[3];
     out[0] = v.x();
     out[1] = v.y();
     out[2] = v.z();
+    return out;
+}
+
+//------------------------------------------------------------------------------
+inline const Quaternion&
+toQuaternion(const dReal* q) {
+    static Quaternion out;
+    out[0] = q[1];
+    out[1] = q[2];
+    out[2] = q[3];
+    out[3] = q[0];
+    return out;
+}
+
+//------------------------------------------------------------------------------
+inline const Vector&
+toVector(const dReal* v) {
+    static Vector out;
+    out[0] = v[0];
+    out[1] = v[2];
+    out[2] = v[3];
     return out;
 }
 

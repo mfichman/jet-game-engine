@@ -26,7 +26,7 @@
 #include <Jet/Publisher.hpp>
 #include <Jet/Object.hpp>
 #include <Jet/Iterator.hpp>
-#include <vector>
+#include <set>
 
 namespace Jet {
 using namespace std;
@@ -40,7 +40,7 @@ public:
     class Functor;
     friend class Root;
     typedef intrusive_ptr<Body> Ptr;
-    typedef Iterator<vector<Attachment> > AttachmentItr;
+    typedef Iterator<set<Attachment> > AttachmentItr;
     
     // Attributes
     inline Vector               linearVelocity() const { return linearVelocity_; }
@@ -73,7 +73,7 @@ public:
     inline Publisher<Observer>& publisher() const { return publisher_; }
 
 private:
-    Body() : mass_(0.000001f) {}    
+    Body() : mass_(1.0f), radius_(1.0f) {}    
 
     mutable Publisher<Observer> publisher_;
     Vector linearVelocity_;
@@ -84,7 +84,7 @@ private:
     Real radius_;
     Vector position_;
     Quaternion rotation_;
-    vector<Attachment> attachment_;
+    set<Attachment> attachment_;
 };
 
 class Body::Observer : public virtual Interface {

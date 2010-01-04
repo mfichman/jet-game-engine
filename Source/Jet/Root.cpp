@@ -45,9 +45,10 @@ typename T::Ptr Root::objectNew(
 //------------------------------------------------------------------------------
 Root::Root() :
     registry_(new Registry), 
-    video_(new Video),
-    audio_(new Audio),    
-    window_(new Window)
+    options_(new Options),
+    window_(new Window),
+    iteration_(0)
+    
 {
     loader_ = new Loader(this);
 }
@@ -101,9 +102,10 @@ Root::activeCamera(Camera::Ptr c) {
         activeCamera_ = c;
     }
 }
-    
+
 //------------------------------------------------------------------------------
-void                    
-Root::timeInc(float t) {
-    time_ += t;    
+void
+Root::stepInc(float remainder, Step::Type t) {
+    step_ = Step(step_.id_.value() + 1, remainder, t);
+    publisher_.notify(&Observer::onStep);
 }

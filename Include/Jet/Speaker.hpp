@@ -64,9 +64,9 @@ class Speaker::Observer : public Interface {
 public:
     typedef intrusive_ptr<Speaker::Observer> Ptr;
 
-    virtual void onClip()=0;
-    virtual void onVolume()=0;
-    virtual void onState()=0;
+    virtual void onClip() {}
+    virtual void onVolume() {}
+    virtual void onState() {}
 };
 
 }

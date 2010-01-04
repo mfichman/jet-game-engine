@@ -29,16 +29,58 @@ using namespace Jet::Impl::ODE;
 //------------------------------------------------------------------------------
 BodyReactor::BodyReactor(Body::Ptr a, RootReactor::Ptr e) :
     id_(dBodyCreate(e->world())),
-    body_(a) {
+    body_(a),
+    root_(e->root()) {
 
     dMass mass;
     dMassSetSphereTotal(&mass, body_->mass(), 1.0f);
     dBodySetMass(id_, &mass);
+    dBodySetData(id_, this);
+    dBodySetMovedCallback(id_, &BodyReactor::onBodyMoved);
+    
+    body_->publisher().observerAdd(this);
 }
 
 //------------------------------------------------------------------------------
 BodyReactor::~BodyReactor() {
     dBodyDestroy(id_);
+    
+    body_->publisher().observerDel(this);
+}
+
+//------------------------------------------------------------------------------
+void
+BodyReactor::onBodyMoved(dBodyID id) {
+    BodyReactor::Ptr reactor = static_cast<BodyReactor*>(dBodyGetData(id));
+    Body::Ptr body = reactor->body_;
+   
+    
+    const Step& step = reactor->root_->step();
+    if (Step::typeRender == step.type_) {
+        body->positionUpdate(toVector(dBodyGetPosition(id))); // interp
+        body->rotationUpdate(toQuaternion(dBodyGetQuaternion(id)));
+        body->linearVelocityUpdate(toVector(dBodyGetLinearVel(id)));
+        body->angularVelocityUpdate(toVector(dBodyGetAngularVel(id)));
+        
+       
+        for (Body::AttachmentItr i = body->attachmentItr(); i; i++) {
+            dGeomID geom = static_cast<dGeomID>(i->object_->geometry());
+            if (geom) {
+
+                i->object_->position(toVector(dGeomGetPosition(geom))); // interp
+
+                dQuaternion temp;
+                dGeomGetQuaternion(geom, temp);
+                i->object_->rotation(toQuaternion(temp));
+            } else {
+                // Matrix multiply!?
+            }
+        }
+    }
+    
+    // Do remainder calculations here!  Interpolate the position and rotation
+    // based on the time remainder.  Only do it if this is the final 
+    // simulation step before control is passed to the renderer.
 }
 
 //------------------------------------------------------------------------------
@@ -95,7 +137,7 @@ BodyReactor::onPosition() {
 //------------------------------------------------------------------------------
 void
 BodyReactor::onRotation() {
-    dBodySetRotation(id_, convert(body_->rotation()));
+    dBodySetRotation(id_, fromQuaternion(body_->rotation()));
 }
 
 //------------------------------------------------------------------------------
@@ -104,13 +146,17 @@ BodyReactor::onAttachmentAdd(const Attachment& a) {
     dGeomID geom_ = (dGeomID)a.object_->geometry();
     if (geom_) {
         dGeomSetBody(geom_, id_);
+        dGeomSetOffsetPosition(geom_, a.position_.x(), a.position_.y(), a.position_.z());
+        dGeomSetOffsetQuaternion(geom_, fromQuaternion(a.rotation_));
+        
+        cout << "here" << endl;
     }
 }
 
 //------------------------------------------------------------------------------
 void 
 BodyReactor::onAttachmentDel(const Attachment& a) {
-    dGeomID geom_ = (dGeomID)a.object_->geometry();
+    dGeomID geom_ = static_cast<dGeomID>(a.object_->geometry());
     if (geom_) {
         dGeomSetBody(geom_, 0);
     }

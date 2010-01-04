@@ -264,11 +264,10 @@ public:
 };
 
 //------------------------------------------------------------------------------
-class JETAPI Frame {
+/*class JETAPI Frame {
 public:
     inline Frame(ID f, float t, float d) :
         id_(f),
-        time_(t),
         delta_(d) {
     }
     inline bool operator<(const Frame& r) const { return time_ < r.time_; }
@@ -276,8 +275,25 @@ public:
     inline bool operator!=(const Frame& r) const;
 
     ID id_;
-    float time_;
     float delta_;
+};*/
+class JETAPI Step {
+public:
+    enum Type { typeNormal, typeRender };
+
+    inline Step(ID f, Real r, Type l) :
+        id_(f),
+        remainder_(r),
+        type_(l) {
+    }
+    inline Step() : id_(0), remainder_(0.0f), type_(typeNormal) {}
+    inline bool operator<(const Step& s) const { return id_.value() < s.id_.value(); }
+    inline bool operator==(const Step& s) const;
+    inline bool operator!=(const Step& s) const;
+    
+    ID id_;
+    Real remainder_;
+    Type type_;
 };
 
 //------------------------------------------------------------------------------
@@ -300,6 +316,7 @@ public:
     Attachment(intrusive_ptr<Object> o);
     bool operator==(const Attachment& a) const;
     bool operator!=(const Attachment& a) const;
+    bool operator<(const Attachment& a) const { return object_ < a.object_; }
 
     intrusive_ptr<Object> object_;
     Vector position_;

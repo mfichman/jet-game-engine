@@ -31,8 +31,7 @@
 #include <Jet/Cloud.hpp>
 #include <Jet/Publisher.hpp>
 #include <Jet/Loader.hpp>
-#include <Jet/Video.hpp>
-#include <Jet/Audio.hpp>
+#include <Jet/Options.hpp>
 #include <Jet/Window.hpp>
 #include <map>
 
@@ -49,10 +48,9 @@ public:
 
     // Attributes
 	inline Registry::Ptr    registry() const { return registry_; }
-    inline Loader::Ptr      loader() const { return loader_; }    
+    inline Loader::Ptr      loader() const { return loader_; }  
+    inline Options::Ptr     options() const { return options_; }  
     inline Window::Ptr      window() const { return window_; }
-    inline Video::Ptr       video() const { return video_; }
-    inline Audio::Ptr       audio() const { return audio_; }
 
     Body::Ptr               bodyNew(const string& name="");
     Model::Ptr              modelNew(const string& name="");
@@ -71,8 +69,10 @@ public:
 
     inline Camera::Ptr      activeCamera() const { return activeCamera_; }
     void                    activeCamera(Camera::Ptr c);
-    inline float            time() const { return time_; }
-    void                    timeInc(float t);
+    inline ID               iteration() const { return iteration_; }
+    void                    iterationInc(); 
+    inline const Step&      step() const { return step_; }
+    void                    stepInc(float remainder, Step::Type t);
 
     // Utility
     Publisher<Observer>&    publisher() const { return publisher_; }
@@ -89,11 +89,11 @@ private:
     mutable Publisher<Observer> publisher_;
 	Registry::Ptr registry_;
     Loader::Ptr loader_;
-    Video::Ptr video_;
-    Audio::Ptr audio_;    
+    Options::Ptr options_;  
     Window::Ptr window_;
     Camera::Ptr activeCamera_;
-    float time_;
+    ID iteration_;
+    Step step_;
     map<string, Body::Ptr> body_;
     map<string, Model::Ptr> model_;
     map<string, Entity::Ptr> entity_;
@@ -114,6 +114,7 @@ public:
     virtual void onQuadNew(Quad::Ptr) {}
     virtual void onSpeakerNew(Speaker::Ptr) {}
     virtual void onCloudNew(Cloud::Ptr) {}
-    virtual void onTime() {}
+    virtual void onIteration() {}
+    virtual void onStep() {}
 };
 }

@@ -20,15 +20,53 @@
  * IN THE SOFTWARE.
  */
 
-#include <Jet/Audio.hpp>
+#include <Jet/Options.hpp>
 
 using namespace Jet;
 
 //------------------------------------------------------------------------------
+Options::Options() :
+    masterVolume_(0.5f),
+    quality_(qualityHigh),
+    antialiasing_(antialiasEnabled),
+    bloom_(bloomEnabled),
+    physicsDelta_(0.01f),
+    renderDelta_(0.02f) {
+    
+}
+
+//------------------------------------------------------------------------------
 void
-Audio::masterVolume(Volume v) {
+Options::masterVolume(Volume v) {
     if (v != masterVolume_) {
         masterVolume_ = v;
         publisher_.notify(&Observer::onMasterVolume);
+    }
+}
+
+//------------------------------------------------------------------------------
+void                        
+Options::quality(Quality q) {
+    if (q != quality_) {
+        quality_ = q;
+        publisher_.notify(&Observer::onQuality);
+    }
+}
+
+//------------------------------------------------------------------------------
+void
+Options::antialiasing(Antialiasing a) {
+    if (a != antialiasing_) {
+        antialiasing_ = a;
+        publisher_.notify(&Observer::onAntialiasing);
+    }
+}
+
+//------------------------------------------------------------------------------
+void
+Options::bloom(Bloom b) {
+    if (b != bloom_) {
+        bloom_ = b;
+        publisher_.notify(&Observer::onBloom);
     }
 }

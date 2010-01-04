@@ -29,29 +29,59 @@ namespace Jet {
 using namespace std;
 using namespace std::tr1;
 
-class JETAPI Audio : public Interface {
+class Root;
+
+class JETAPI Options : public Interface {
 public:
     class Observer;
-    typedef intrusive_ptr<Audio> Ptr;
+    friend class Root;
+    typedef intrusive_ptr<Options> Ptr;
     typedef RangedOrdinal<float, 0, 1> Volume;
+    
+    enum Antialiasing { antialiasDisabled, antialiasEnabled };
+    enum Quality { qualityLow, qualityHigh };
+    enum Bloom { bloomDisabled, bloomEnabled };
 
     // Attributes
     inline Volume           masterVolume() const { return masterVolume_; }
     void                    masterVolume(Volume v);
+    inline Quality          quality() const { return quality_; }
+    void                    quality(Quality q);
+    inline Antialiasing     antialiasing() const { return antialiasing_; }
+    void                    antialiasing(Antialiasing a);
+    inline Bloom            bloom() const { return bloom_; }
+    void                    bloom(Bloom b);
+    inline float            physicsDelta() const { return physicsDelta_; }
+    void                    physicsDelta(float t);
+    inline float            renderDelta() const { return renderDelta_; }
+    void                    renderDelta(float t);
 
     // Utility
     inline Publisher<Observer>& publisher() const { return publisher_; }
 
 private:
+    Options();
+
     mutable Publisher<Observer> publisher_;
     Volume masterVolume_;
+    Quality quality_;
+    Antialiasing antialiasing_;
+    Bloom bloom_;
+    float physicsDelta_;
+    float renderDelta_;
+    
 };
 
-class Audio::Observer : public virtual Interface {
+class Options::Observer : public virtual Interface {
 public:
-    typedef intrusive_ptr<Audio::Observer> Ptr;
+    typedef intrusive_ptr<Options::Observer> Ptr;
     
-    virtual void onMasterVolume()=0; 
+    virtual void onMasterVolume() {}
+    virtual void onQuality() {}
+    virtual void onAntialiasing() {}
+    virtual void onBloom() {}
+    virtual void onPhysicsDelta() {}
+    virtual void onRenderDelta() {}
 };
 
 }

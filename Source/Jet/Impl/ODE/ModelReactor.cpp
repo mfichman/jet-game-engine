@@ -31,10 +31,14 @@ ModelReactor::ModelReactor(Model::Ptr m, RootReactor::Ptr r) :
     geom_(dCreateSphere(r->space(), 0.0f)) {
     
     model_->publisher().observerAdd(this);
+    model_->geometry(static_cast<Handle>(geom_));
+    
+    dGeomSetData(geom_, static_cast<Object*>(model_.get()));
 }
 
 //------------------------------------------------------------------------------
 ModelReactor::~ModelReactor() {
+    model_->geometry(0);
     dGeomDestroy(geom_);
 }
 

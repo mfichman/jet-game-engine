@@ -32,13 +32,13 @@ using namespace boost;
 
 class BodyReactor : public Body::Observer {
 public:
-    //class Attacher;
-    //class Detacher;
     typedef intrusive_ptr<BodyReactor> Ptr;
 
     BodyReactor(Body::Ptr a, RootReactor::Ptr e);
     ~BodyReactor();
 
+    static void onBodyMoved(dBodyID);    
+    
     virtual void onLinearVelocity();
     virtual void onAngularVelocity();
     virtual void onForce();
@@ -53,26 +53,7 @@ public:
 private:
     dBodyID id_;
     Body::Ptr body_;
+    Root::Ptr root_;
 };
-
-/*
-class BodyReactor::Attacher : public Object::Functor {
-public:
-    virtual void operator()(Camera*);
-    virtual void operator()(Cloud*);
-    virtual void operator()(Model*);
-    virtual void operator()(Quad*);
-    virtual void operator()(Speaker*);
-};
-
-class BodyReactor::Detacher : public Object::Functor {
-public:
-    virtual void operator()(Camera*);
-    virtual void operator()(Cloud*);
-    virtual void operator()(Model*);
-    virtual void operator()(Quad*);
-    virtual void operator()(Speaker*);
-};
-*/
 
 }}}
