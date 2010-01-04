@@ -22,7 +22,8 @@
 #pragma once
  
 #include <Jet/Types.hpp>
-#include <Jet/Anchor.hpp>
+#include <Jet/Object.hpp>
+#include <Jet/Publisher.hpp>
 
 namespace Jet {
 using namespace std;
@@ -30,7 +31,7 @@ using namespace std::tr1;
 using namespace boost;
 class Root;
 
-class Speaker : public Interface {
+class JETAPI Speaker : public Object {
 public:
     class Observer;
     friend class Root;
@@ -39,26 +40,21 @@ public:
     enum State { statePlay, stateLoop, stateStop };
 
     // Attributes
-    inline string           clip() const { return clip_; }
-    void                    clip(const string& s);
-    inline Volume           volume() const { return volume_; }
-    void                    volume(Volume v);
-    inline State            state() const { return state_; }
-    void                    state(State s);
-
-    // Components
-    inline Object::Ptr      object() const { return object_; }
-    inline Anchor::Ptr      anchor() const { return anchor_; }
+    inline string               clip() const { return clip_; }
+    void                        clip(const string& s);
+    inline Volume               volume() const { return volume_; }
+    void                        volume(Volume v);
+    inline State                state() const { return state_; }
+    void                        state(State s);
+    inline void                 operator()(Object::Functor& f) { f(this); }
 
     // Utility
     inline Publisher<Observer>& publisher() const { return publisher_; }
 
 protected:
-    Speaker() : object_(new Object), anchor_(new Anchor) {}
+    Speaker() {}
 
     mutable Publisher<Observer> publisher_;
-    Object::Ptr object_;
-    Anchor::Ptr anchor_;
     string clip_;     
     Volume volume_;
     State state_;

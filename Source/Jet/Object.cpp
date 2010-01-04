@@ -29,38 +29,17 @@ using namespace std;
 //------------------------------------------------------------------------------
 void
 Object::position(const Vector& v) {
-    if (position_ != v) {
-        position_ = v;
-        publisher_.notify(&Observer::onPosition);
-    }
-}
-
-//------------------------------------------------------------------------------
-void
-Object::positionUpdate(const Vector& v) {
     position_ = v;
 }
 
 //------------------------------------------------------------------------------
 void
 Object::rotation(const Quaternion& q) {
-    if (rotation_ != q) {
-        rotation_ = q;
-        publisher_.notify(&Observer::onRotation);
-    }
-}
-
-//------------------------------------------------------------------------------
-void
-Object::rotationUpdate(const Quaternion& q) {
     rotation_ = q;
 }
 
 //------------------------------------------------------------------------------
 void
-Object::networkSync(NetworkSync s) {
-    if (networkSync_ != s) {
-        networkSync_ = s;
-        publisher_.notify(&Observer::onNetworkSync);
-    }
+Object::geometry(Handle h) {
+    geometry_ = h;
 }

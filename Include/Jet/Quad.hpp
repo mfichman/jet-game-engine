@@ -22,60 +22,63 @@
 #pragma once
  
 #include <Jet/Types.hpp>
-#include <Jet/Anchor.hpp>
-#include <Jet/Renderable.hpp>
-
+#include <Jet/Object.hpp>
+#include <Jet/Publisher.hpp>
 
 namespace Jet {
 using namespace std;
 using namespace std::tr1;
 class Root;
 
-class Quad : public Interface {
+class JETAPI Quad : public Interface {
 public:
     class Observer;
     friend class Root;
     typedef RangedOrdinal<int, 0, 3> VertexIndex;
-    typedef RangedOrdinal<int, 0, 3> TextureIndex;
     typedef intrusive_ptr<Quad> Ptr;
+    enum State { stateDisabled, stateEnabled };
 
     // Attributes
-    inline const Vector&    scale() const { return scale_; }
-    void                    scale(const Vector& s);
-    inline const string& 	texture(TextureIndex i) const { return texture_[i]; }
-    void 		            texture(TextureIndex i, const string& t);
-    inline Vertex           vertex(VertexIndex i) { return vertex_[i]; }
-    void                    vertex(VertexIndex i, const Vertex& v);
-    inline Coord            texCoordScale() const { return texCoordScale_; }
-    void                    texCoordScale(Coord c);
-    
-    // Components
-    Object::Ptr             object() const { return object_; }
-    Renderable::Ptr         renderable() const { return renderable_; }
-    Anchor::Ptr             anchor() const { return anchor_; }
+    inline Vertex               vertex(VertexIndex i) { return vertex_[i]; }
+    void                        vertex(VertexIndex i, const Vertex& v);
+    inline TexCoord             texCoordScale() const { return texCoordScale_; }
+    void                        texCoordScale(TexCoord c);
+    inline const string& 	    texture() const { return texture_; }
+    void 		                texture(const string& t);
+    inline const Vector&        scale() const { return scale_; }
+    void                        scale(const Vector& s);
+    inline const string& 	    shader() const { return shader_; }
+    void 		                shader(const string& s);
+    inline State                state() const { return state_; }
+    void                        state(State v);
+    inline void                 operator()(Object::Functor& f) { f(this); }
 
     // Utility
     inline Publisher<Observer>& publisher() const { return publisher_; }
 
 private:
-    Quad() : object_(new Object), renderable_(new Renderable), anchor_(new Anchor) {}
+    Quad() {}
 
     mutable Publisher<Observer> publisher_;
-    Object::Ptr object_;
-    Renderable::Ptr renderable_;
-    Anchor::Ptr anchor_;
-    Vector scale_; 
-    string texture_[TextureIndex::maxValue];
+
     Vertex vertex_[VertexIndex::maxValue];
-    Coord texCoordScale_;      
+    TexCoord texCoordScale_; 
+    string texture_;
+    Vector scale_;
+    string shader_; 
+    State state_;
 };
 
 class Quad::Observer : public Interface {
 public:
-    virtual void onScale()=0;
-    virtual void onTexture(TextureIndex i)=0;
-    virtual void onVertex(VertexIndex i)=0;
-    virtual void onTexCoordScale()=0;
+    typedef intrusive_ptr<Quad::Observer> Ptr;
+
+    virtual void onVertex(VertexIndex i) {}
+    virtual void onTexCoordScale() {}
+    virtual void onTexture() {}
+    virtual void onScale() {}
+    virtual void onShader() {}
+    virtual void onState() {}   
 };
 
 }

@@ -23,71 +23,68 @@
  
 #include <Jet/Types.hpp>
 #include <Jet/Object.hpp>
-#include <Jet/Renderable.hpp>
-#include <Jet/Collidable.hpp>
 #include <Jet/Publisher.hpp>
-#include <Jet/Anchor.hpp>
 #include <Jet/Mesh.hpp>
-#include <list>
+#include <string>
 
 namespace Jet {
 using namespace std;
 using namespace std::tr1;
 class Root;
 
-class Model : public Interface {
+class JETAPI Model : public Object {
 public:   
     class Observer;
     friend class Root;
     typedef intrusive_ptr<Model> Ptr;
-    typedef RangedOrdinal<int, 0, 3> TextureIndex;
     typedef RangedOrdinal<int, 0, 1> CubemapIndex;
+    typedef RangedOrdinal<int, 0, 1> TextureIndex;
+    enum State { stateEnabled, stateDisabled };
 
     // Attributes
-    inline const Vector&    scale() const { return scale_; }
-    void                    scale(const Vector& s);
-    inline const string& 	texture(TextureIndex i) const { return texture_[i]; }
-    void 		            texture(TextureIndex i, const string& t);
-    inline const string& 	cubemap(CubemapIndex i) const { return cubemap_[i]; }
-    void 		            cubemap(CubemapIndex i, const string& t);
-    inline const string& 	shader() const { return shader_; }
-    void 		            shader(const string& s);
-    inline Mesh::Ptr        mesh() const { return mesh_; }
-    void                    mesh(Mesh::Ptr m);
-
-    // Components
-    inline Object::Ptr      object() const { return object_; }    
-    inline Renderable::Ptr  renderable() const { return renderable_; }
-    inline Collidable::Ptr  collidable() const { return collidable_; }
-    inline Anchor::Ptr      anchor() const { return anchor_; }
+    inline const string& 	    cubemap(CubemapIndex i) const { return cubemap_[i]; }
+    void 		                cubemap(CubemapIndex i, const string& t);
+    inline const string& 	    texture(TextureIndex i) const { return texture_[i]; }
+    void 		                texture(TextureIndex i, const string& t);
+    inline Mesh::Ptr            mesh() const { return mesh_; }
+    void                        mesh(Mesh::Ptr m);
+    inline const Vector&        scale() const { return scale_; }
+    void                        scale(const Vector& s);
+    inline const string& 	    shader() const { return shader_; }
+    void 		                shader(const string& s);
+    inline State                state() const { return state_; }
+    void                        state(State v); 
+    inline const string&        collisionFn() const { return collisionFn_; }
+    void                        collisionFn(const string& o);
+    inline void                 operator()(Object::Functor& f) { f(this); }
 
     // Utility
     inline Publisher<Observer>& publisher() const { return publisher_; }
 
 private:
-    Model() : object_(new Object), renderable_(new Renderable), anchor_(new Anchor), collidable_(new Collidable) {}
+    Model() {}
 
     mutable Publisher<Observer> publisher_;
-    Object::Ptr     object_;
-    Renderable::Ptr renderable_;
-    Anchor::Ptr     anchor_;
-    Collidable::Ptr collidable_;
-    Vector          scale_;
-    string          texture_[TextureIndex::maxValue];
-    string          cubemap_[CubemapIndex::maxValue]; 
-    string          shader_;   
-    Mesh::Ptr       mesh_;
+    string cubemap_[CubemapIndex::maxValue];  
+    string texture_[TextureIndex::maxValue]; 
+    Mesh::Ptr mesh_;
+    Vector scale_;
+    string shader_; 
+    State state_;
+    string collisionFn_;
 };
 
 class Model::Observer : public virtual Interface {
 public:
     typedef intrusive_ptr<Model::Observer> Ptr;
 
-    virtual void onScale()=0;
-    virtual void onTexture(TextureIndex i)=0;
-    virtual void onCubemap(CubemapIndex i)=0;
-    virtual void onShader()=0;
-    virtual void onMesh()=0;
+    virtual void onCubemap(CubemapIndex i) {}
+    virtual void onTexture(TextureIndex i) {}
+    virtual void onMesh() {}
+    virtual void onScale() {}
+    virtual void onShader() {}
+    virtual void onState() {}
+    virtual void onCollisionFn() {}
 };
 
 }

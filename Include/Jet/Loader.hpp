@@ -37,7 +37,7 @@ using namespace std::tr1;
 using namespace boost;
 class Root;
 
-class Loader : public Interface {
+class JETAPI Loader : public Interface {
 public:
     class Observer;
     friend class Root;
@@ -87,12 +87,12 @@ class Loader::Observer : public virtual Interface {
 public:
     typedef intrusive_ptr<Loader::Observer> Ptr;
 
-    virtual void onTextureNew(Texture::Ptr o)=0;
-    virtual void onCubemapNew(Cubemap::Ptr o)=0;
-    virtual void onMeshNew(Mesh::Ptr o)=0;
-    virtual void onShaderNew(Shader::Ptr o)=0;
-    virtual void onModuleNew(Module::Ptr o)=0;
-    virtual void onSoundNew(Sound::Ptr o)=0;
+    virtual void onTextureNew(Texture::Ptr o) {}
+    virtual void onCubemapNew(Cubemap::Ptr o) {}
+    virtual void onMeshNew(Mesh::Ptr o) {}
+    virtual void onShaderNew(Shader::Ptr o) {}
+    virtual void onModuleNew(Module::Ptr o) {}
+    virtual void onSoundNew(Sound::Ptr o) {}
 };
 
 }

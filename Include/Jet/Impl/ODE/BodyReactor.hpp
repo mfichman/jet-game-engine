@@ -21,51 +21,58 @@
  */
 #pragma once
 
-#include <Jet/Types.hpp>
-#include <Jet/Interface.hpp>
-#include <Jet/Publisher.hpp>
+#include <Jet/Body.hpp>
+#include <Jet/Impl/ODE/RootReactor.hpp>
+#include <ode/ode.h>
 
-namespace Jet {
+namespace Jet { namespace Impl { namespace ODE {
 using namespace std;
 using namespace std::tr1;
 using namespace boost;
 
-class Collidable : public Interface {
+class BodyReactor : public Body::Observer {
 public:
-    class Observer;
-    typedef intrusive_ptr<Collidable> Ptr;
-    enum Solidity { phantom, solid };
-    enum State { disabled, enabled };
+    //class Attacher;
+    //class Detacher;
+    typedef intrusive_ptr<BodyReactor> Ptr;
 
-    // Attributes
-    const string&   collisionMethod() const { return collisionMethod_; }
-    void            collisionMethod(const string& o);
-    Solidity        solidity() const { return solidity_; }
-    void            solidity(Solidity s);
-    State           state() const { return state_; }
-    void            state(State s);
-    float           mass() const { return mass_; }
-    void            mass(float mass);
-    
-    // Utility
-    Publisher<Observer>& publisher() const { return publisher_; }
+    BodyReactor(Body::Ptr a, RootReactor::Ptr e);
+    ~BodyReactor();
+
+    virtual void onLinearVelocity();
+    virtual void onAngularVelocity();
+    virtual void onForce();
+    virtual void onTorque();
+    virtual void onMass();
+    virtual void onRadius();
+    virtual void onPosition();
+    virtual void onRotation();
+    virtual void onAttachmentAdd(const Attachment&);
+    virtual void onAttachmentDel(const Attachment&);
 
 private:
-    mutable Publisher<Observer> publisher_;
-    string collisionMethod_;
-    Solidity solidity_;
-    State state_;
-    float mass_;
+    dBodyID id_;
+    Body::Ptr body_;
 };
 
-class Collidable::Observer : public virtual Interface {
+/*
+class BodyReactor::Attacher : public Object::Functor {
 public:
-    typedef intrusive_ptr<Collidable::Observer> Ptr;
-
-    virtual void onCollisionMethod()=0;
-    virtual void onSolidity()=0;
-    virtual void onState()=0;
-    virtual void onMass()=0;
+    virtual void operator()(Camera*);
+    virtual void operator()(Cloud*);
+    virtual void operator()(Model*);
+    virtual void operator()(Quad*);
+    virtual void operator()(Speaker*);
 };
 
-}
+class BodyReactor::Detacher : public Object::Functor {
+public:
+    virtual void operator()(Camera*);
+    virtual void operator()(Cloud*);
+    virtual void operator()(Model*);
+    virtual void operator()(Quad*);
+    virtual void operator()(Speaker*);
+};
+*/
+
+}}}

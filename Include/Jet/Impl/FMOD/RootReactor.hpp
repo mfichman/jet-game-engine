@@ -37,20 +37,8 @@ public:
     RootReactor(Root::Ptr e);
     ~RootReactor();
     
-    void onActorNew(Actor::Ptr) {}
-    void onModelNew(Model::Ptr) {}
-    void onEntityNew(Entity::Ptr) {}
-    void onCameraNew(Camera::Ptr) {}
-    void onQuadNew(Quad::Ptr) {}
     void onSpeakerNew(Speaker::Ptr);
-    void onCloudNew(Cloud::Ptr) {}
-    void onTime() {}
     void onMasterVolume();
-    void onTextureNew(Texture::Ptr) {}
-    void onCubemapNew(Cubemap::Ptr) {}
-    void onMeshNew(Mesh::Ptr) {}
-    void onModuleNew(Module::Ptr) {}
-    void onShaderNew(Shader::Ptr) {}
     void onSoundNew(Sound::Ptr);
 
     inline FMOD_SYSTEM* system() const { return system_; }

@@ -31,7 +31,7 @@ using namespace std::tr1;
 
 class Loader;
 
-class Sound : public Resource {
+class JETAPI Sound : public Resource {
 public:
     friend class Loader;
     typedef intrusive_ptr<Sound> Ptr;

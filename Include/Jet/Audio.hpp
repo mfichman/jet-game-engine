@@ -29,7 +29,7 @@ namespace Jet {
 using namespace std;
 using namespace std::tr1;
 
-class Audio : public Interface {
+class JETAPI Audio : public Interface {
 public:
     class Observer;
     typedef intrusive_ptr<Audio> Ptr;

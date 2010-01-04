@@ -31,7 +31,7 @@ using namespace std::tr1;
 
 class Loader;
 
-class Cubemap : public Resource {
+class JETAPI Cubemap : public Resource {
 public:
     friend class Loader;
     typedef intrusive_ptr<Cubemap> Ptr;

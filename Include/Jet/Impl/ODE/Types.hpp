@@ -19,16 +19,31 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
+#pragma once
 
-#include <Jet/Anchor.hpp>
+namespace Jet { namespace Impl { namespace ODE {
+using namespace std;
+using namespace std::tr1;
 
-using namespace Jet;
-
-//------------------------------------------------------------------------------
-void
-Anchor::parent(Actor::Ptr o) {
-    if (o != parent_) {
-        parent_ = o;
-        publisher_.notify(&Observer::onParent);
-    }
+//-----------------------------------------------------------------------------
+inline dReal*
+convert(const Quaternion& q) {
+    static dReal out[4];
+    out[0] = q.w();
+    out[1] = q.x();
+    out[2] = q.y();
+    out[3] = q.z();
+    return out;
 }
+
+//-----------------------------------------------------------------------------
+inline dReal* 
+convert(const Vector& v) {
+    static dReal out[3];
+    out[0] = v.x();
+    out[1] = v.y();
+    out[2] = v.z();
+    return out;
+}
+
+}}}

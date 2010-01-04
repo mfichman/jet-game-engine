@@ -32,7 +32,7 @@ using namespace std::tr1;
 
 class Loader;
 
-class Texture : public Resource {
+class JETAPI Texture : public Resource {
 public:
     friend class Loader;
     typedef intrusive_ptr<Texture> Ptr;

@@ -22,11 +22,10 @@
 #pragma once
  
 #include <Jet/Types.hpp>
-#include <Jet/Anchor.hpp>
+#include <Jet/Object.hpp>
+#include <Jet/Publisher.hpp>
 #include <Jet/Iterator.hpp>
-#include <Jet/Collidable.hpp>
 #include <vector>
-#include <algorithm>
 
 namespace Jet {
 using namespace std;
@@ -34,31 +33,57 @@ using namespace std::tr1;
 using namespace boost;
 class Root;
 
-class Cloud : public Interface {
+class JETAPI Cloud : public Interface {
 public:
+    class Observer;
     friend class Root;
     typedef intrusive_ptr<Cloud> Ptr;
+    typedef Iterator<vector<Particle> > ParticleItr;
+    enum State { stateDisabled, stateEnabled };
 
-    inline Iterator<vector<Particle> > particleItr() { return Iterator<vector<Particle> >(particle_); }
-    Particle&                   topParticle() { return particle_.front(); }
-    void                        topParticleDel() { pop_heap(particle_.begin(), particle_.end()); }
+    inline ParticleItr          particleItr() { return ParticleItr(particle_); }
+    void                        particleDel();
     void                        particleNew(Particle& o);
-    inline const string&        particleMethod() { return particleMethod_; }
-    void                        particleMethod(const string& s);
-    
-    // Components
-    inline Object::Ptr          object() const { return object_; }
-    inline Anchor::Ptr          anchor() const { return anchor_; }
-    inline Collidable::Ptr      collidable() const { return collidable_; }
+    inline const string&        particleFn() { return particleFn_; }
+    void                        particleFn(const string& s);
+    inline const string& 	    texture() const { return texture_; }
+    void 		                texture(const string& t);
+    inline const Vector&        scale() const { return scale_; }
+    void                        scale(const Vector& s);
+    inline const string& 	    shader() const { return shader_; }
+    void 		                shader(const string& s);
+    inline State                state() const { return state_; }
+    void                        state(State v); 
+    inline const string&        collisionFn() const { return collisionFn_; }
+    void                        collisionFn(const string& o);
+    inline void                 operator()(Object::Functor& f) { f(this); } 
+
+    // Utility
+    inline Publisher<Observer>& publisher() const { return publisher_; }
 
 protected:
-    Cloud() : object_(new Object), anchor_(new Anchor), collidable_(new Collidable) {}
+    Cloud() {}
 
-    Object::Ptr object_;
-    Anchor::Ptr anchor_;
-    Collidable::Ptr collidable_;
-    string particleMethod_;
+    mutable Publisher<Observer> publisher_;
+    string particleFn_;
     vector<Particle> particle_;
+    string texture_;
+    Vector scale_;
+    string shader_;
+    State state_;
+    string collisionFn_;
+};
+
+class Cloud::Observer : public virtual Interface {
+public:
+    typedef intrusive_ptr<Cloud::Observer> Ptr;
+
+    virtual void onParticleNew(Particle& p) {}
+    virtual void onTexture() {}
+    virtual void onScale() {}
+    virtual void onShader() {}
+    virtual void onState() {}
+    virtual void onCollisionFn() {}
 };
 
 }

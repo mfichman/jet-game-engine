@@ -45,16 +45,17 @@ typename T::Ptr Root::objectNew(
 //------------------------------------------------------------------------------
 Root::Root() :
     registry_(new Registry), 
-    loader_(new Loader(this)),
     video_(new Video),
     audio_(new Audio),    
     window_(new Window)
-{}
+{
+    loader_ = new Loader(this);
+}
 
 //------------------------------------------------------------------------------
-Actor::Ptr
-Root::actorNew(const string& name) {
-    return objectNew<Actor>(name, actor_, &Observer::onActorNew);
+Body::Ptr
+Root::bodyNew(const string& name) {
+    return objectNew<Body>(name, body_, &Observer::onBodyNew);
 }
 
 //------------------------------------------------------------------------------

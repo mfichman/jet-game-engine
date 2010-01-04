@@ -26,7 +26,7 @@ using namespace Jet;
 
 //------------------------------------------------------------------------------
 void             
-Camera::target(Object::Ptr t) {
+Camera::target(const Vector& t) {
     target_ = t;
 }
 

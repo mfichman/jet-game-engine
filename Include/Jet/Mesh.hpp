@@ -31,7 +31,7 @@ using namespace std::tr1;
 
 class Loader;
 
-class Mesh : public Resource {
+class JETAPI Mesh : public Resource {
 public:
     friend class Loader;
     typedef intrusive_ptr<Mesh> Ptr;

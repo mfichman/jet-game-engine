@@ -22,7 +22,7 @@
 #pragma once
 
 #include <Jet/Registry.hpp>
-#include <Jet/Actor.hpp>
+#include <Jet/Body.hpp>
 #include <Jet/Camera.hpp>
 #include <Jet/Entity.hpp>
 #include <Jet/Model.hpp>
@@ -40,7 +40,7 @@ namespace Jet {
 using namespace std;
 using namespace std::tr1;
 
-class Root : public Interface {
+class JETAPI Root : public Interface {
 public:
     class Observer;
 	typedef intrusive_ptr<Root> Ptr;
@@ -54,7 +54,7 @@ public:
     inline Video::Ptr       video() const { return video_; }
     inline Audio::Ptr       audio() const { return audio_; }
 
-    Actor::Ptr              actorNew(const string& name="");
+    Body::Ptr               bodyNew(const string& name="");
     Model::Ptr              modelNew(const string& name="");
     Entity::Ptr             entityNew(const string& name="");
     Camera::Ptr             cameraNew(const string& name="");
@@ -62,6 +62,7 @@ public:
     Speaker::Ptr            speakerNew(const string& name="");
     Cloud::Ptr              cloudNew(const string& name="");
 
+    inline Body::Ptr        body(const string& name) { return body_[name]; }
     inline Model::Ptr       model(const string& name) { return model_[name]; }
     inline Entity::Ptr      entity(const string& name) { return entity_[name]; }
     inline Camera::Ptr      camera(const string& name) { return camera_[name]; }
@@ -93,7 +94,7 @@ private:
     Window::Ptr window_;
     Camera::Ptr activeCamera_;
     float time_;
-    map<string, Actor::Ptr> actor_;
+    map<string, Body::Ptr> body_;
     map<string, Model::Ptr> model_;
     map<string, Entity::Ptr> entity_;
     map<string, Camera::Ptr> camera_;
@@ -106,13 +107,13 @@ class Root::Observer : public virtual Interface {
 public:
     typedef intrusive_ptr<Root::Observer> Ptr;
 
-    virtual void onActorNew(Actor::Ptr)=0;
-    virtual void onModelNew(Model::Ptr)=0;
-    virtual void onEntityNew(Entity::Ptr)=0;
-    virtual void onCameraNew(Camera::Ptr)=0;
-    virtual void onQuadNew(Quad::Ptr)=0;
-    virtual void onSpeakerNew(Speaker::Ptr)=0;
-    virtual void onCloudNew(Cloud::Ptr)=0;
-    virtual void onTime()=0;
+    virtual void onBodyNew(Body::Ptr) {}
+    virtual void onModelNew(Model::Ptr) {}
+    virtual void onEntityNew(Entity::Ptr) {}
+    virtual void onCameraNew(Camera::Ptr) {}
+    virtual void onQuadNew(Quad::Ptr) {}
+    virtual void onSpeakerNew(Speaker::Ptr) {}
+    virtual void onCloudNew(Cloud::Ptr) {}
+    virtual void onTime() {}
 };
 }

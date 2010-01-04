@@ -7,25 +7,36 @@ using namespace std;
 using namespace std::tr1;
 using namespace std::tr1::placeholders;
 
+#include <direct.h>
 
 int main(int argc, char** argv) {
+	
+	_chdir("..");
 
-	Root::Ptr root = Root::make();
+	try {
 
-    Loader::Ptr loader = root->loader();
-    loader->moduleNew("./libODE.so");
-    loader->moduleNew("./libFMOD.so");
+		Root::Ptr root = Root::make();
 
-    Sphere sphere = {10.0f, 0.0f, 0.0f, 0.0f};
-    Mesh::Ptr mesh = loader->meshNew("test.x");
-    mesh->boundingSphere(sphere);
+		Loader::Ptr loader = root->loader();
+		loader->moduleNew("Binary\\ODE.dll");
+		loader->moduleNew("Binary\\FMOD.dll");
+		//loader->moduleNew("Binary\\libODE.so");
+		//loader->moduleNew("Binary\\libFMOD.so");
 
-    Actor::Ptr actor = root->actorNew();
+		Sphere sphere(Vector(0.0f, 0.0f, 0.0f), 10.0f);
+		Mesh::Ptr mesh = loader->meshNew("test.x");
+		mesh->boundingSphere(sphere);
 
-    Model::Ptr model = root->modelNew();
-    model->mesh(mesh);
-    model->anchor()->parent(actor);
-    model->collidable()->mass(10.0f);
+		Body::Ptr body = root->bodyNew();
+		body->mass(10.0f);
+
+		Model::Ptr model = root->modelNew();
+		model->mesh(mesh);
+		model->position(Vector(1.0f, 0.0, 0.0f));		
+
+	} catch (std::exception& e) {
+		cout << e.what() << endl;
+	}
 
 
 

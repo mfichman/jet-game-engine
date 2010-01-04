@@ -21,14 +21,15 @@
  */
 
 #include <Jet/Impl/ODE/RootReactor.hpp>
-#include <Jet/Impl/ODE/ModelReactor.hpp>
-#include <Jet/Impl/ODE/ActorReactor.hpp>
+#include <Jet/Impl/ODE/BodyReactor.hpp>
 
 using namespace Jet;
 using namespace Jet::Impl::ODE;
 
+#pragma warning(disable: 4190)
+
 //------------------------------------------------------------------------------
-extern "C" Interface::Ptr
+extern "C" JETAPI Interface::Ptr
 moduleLoad(Root* r) {  
     return new RootReactor(r);
 }
@@ -46,7 +47,6 @@ RootReactor::RootReactor(Root::Ptr e) :
 //------------------------------------------------------------------------------
 RootReactor::~RootReactor() {
     reactors_.clear();
-    actorReactor_.clear();
     dJointGroupDestroy(joints_);
     dSpaceDestroy(space_);
     dWorldDestroy(world_);
@@ -55,48 +55,11 @@ RootReactor::~RootReactor() {
  
 //------------------------------------------------------------------------------
 void
-RootReactor::onActorNew(Actor::Ptr a) {
-    actorReactor_[a] = new ActorReactor(a, this);
-}
-
-//------------------------------------------------------------------------------   
-void
-RootReactor::onModelNew(Model::Ptr m) {
-    reactors_.push_back(new ModelReactor(m, this));
-}
-
-//------------------------------------------------------------------------------
-void 
-RootReactor::onEntityNew(Entity::Ptr) {
-
-}
-
-//------------------------------------------------------------------------------
-void 
-RootReactor::onCameraNew(Camera::Ptr) {
-
-}
-
-//------------------------------------------------------------------------------
-void 
-RootReactor::onQuadNew(Quad::Ptr) {
-
-}
-
-//------------------------------------------------------------------------------
-void
-RootReactor::onSpeakerNew(Speaker::Ptr) {
-
-}
-
-//------------------------------------------------------------------------------
-void 
-RootReactor::onCloudNew(Cloud::Ptr) {
-
+RootReactor::onBodyNew(Body::Ptr a) {
+    reactors_.push_back(new BodyReactor(a, this));
 }
 
 //------------------------------------------------------------------------------
 void
 RootReactor::onTime() {
-
 }

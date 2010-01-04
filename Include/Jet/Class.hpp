@@ -27,6 +27,7 @@
 #include <map>
 #include <string>
 #include <iostream>
+#pragma warning(disable:4251)
 
 namespace Jet {
 using namespace std;
@@ -38,7 +39,7 @@ class Interface;
 class Source;
 class Sink;
 
-class Class {
+class JETAPI Class {
 public:
     typedef function<void (intrusive_ptr<Interface>, Source&)>  Mutator;
     typedef function<void (intrusive_ptr<Interface>, Sink&)>    Accessor;

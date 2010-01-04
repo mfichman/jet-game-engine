@@ -22,6 +22,7 @@
 #pragma once
 
 #include <Jet/Types.hpp>
+#include <Jet/Interface.hpp>
 #include <string>
 
 namespace Jet {
@@ -29,17 +30,16 @@ using namespace std;
 using namespace std::tr1;
 using namespace boost;
 
-class Resource : public Interface {
+class JETAPI Resource : public Interface {
 public:
     typedef intrusive_ptr<Resource> Ptr;
 
     const string&   name() const { return name_; }
-    ID              id() const { return id_; }
     
 protected:
     Resource(const string& name) : name_(name) {}
-    string          name_;
-    ID              id_;
+
+    string name_;
 };
 
 }

@@ -25,24 +25,6 @@
 using namespace Jet;
 
 //------------------------------------------------------------------------------
-void 
-Quad::scale(const Vector& s) {
-    if (s != scale_) {
-        scale_ = s;
-        publisher_.notify(&Observer::onScale);
-    }
-}
-
-//------------------------------------------------------------------------------
-void 		            
-Quad::texture(TextureIndex i, const string& t) {
-    if (t != texture_[i]) {
-        texture_[i] = t;
-        publisher_.notify(&Observer::onTexture, i);
-    }
-}
-
-//------------------------------------------------------------------------------
 void                    
 Quad::vertex(VertexIndex i, const Vertex& v) {
     if (v != vertex_[i]) {
@@ -53,10 +35,45 @@ Quad::vertex(VertexIndex i, const Vertex& v) {
 
 //------------------------------------------------------------------------------
 void                    
-Quad::texCoordScale(Coord c) {
+Quad::texCoordScale(TexCoord c) {
     if (c != texCoordScale_) {
         texCoordScale_ = c;
         publisher_.notify(&Observer::onTexCoordScale);
     }
+}
 
+//------------------------------------------------------------------------------
+void 
+Quad::texture(const string& t) {
+    if (texture_ != t) {
+        texture_ = t;
+        publisher_.notify(&Observer::onTexture);
+    }
+}
+
+//------------------------------------------------------------------------------
+void 
+Quad::scale(const Vector& s) {
+    if (scale_ != s) {
+        scale_ = s;
+        publisher_.notify(&Observer::onScale);
+    }
+}
+
+//------------------------------------------------------------------------------
+void 
+Quad::shader(const string& s) { 
+    if (shader_ != s) {
+        shader_ = s;    
+        publisher_.notify(&Observer::onShader);
+    }
+}
+
+//------------------------------------------------------------------------------
+void            
+Quad::state(State s) {
+    if (s != state_) {
+        state_ = s;
+        publisher_.notify(&Observer::onState);
+    }
 }

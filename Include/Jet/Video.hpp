@@ -29,7 +29,7 @@ namespace Jet {
 using namespace std;
 using namespace std::tr1;
 
-class Video : public Interface {
+class JETAPI Video : public Interface {
 public:
     class Observer;
     typedef intrusive_ptr<Video> Ptr;

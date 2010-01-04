@@ -29,7 +29,7 @@ using namespace std;
 using namespace std::tr1;
 using namespace boost;
 
-class Interface {
+class JETAPI Interface {
 public: 
 	typedef intrusive_ptr<Interface> Ptr;
     
@@ -42,6 +42,6 @@ protected:
 	Interface() : refCount_(0) {}
     
 private:
-    mutable int                 refCount_;
+    mutable int         refCount_;
 };
 }

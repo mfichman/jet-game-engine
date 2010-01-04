@@ -21,6 +21,7 @@
  */
 #pragma once
 
+#include <Jet/Export.hpp>
 #include <boost/intrusive_ptr.hpp>
 #ifdef WINDOWS
 #include <memory>
@@ -31,57 +32,44 @@
 #endif
 #include <limits>
 #include <stdexcept>
+#include <algorithm>
+
+#pragma warning(disable: 4251)
 
 namespace Jet {
 using namespace std;
+using namespace boost;
 
-template <typename B>
-class Null {};
+class Interface;
+JETAPI void intrusive_ptr_add_ref(Interface* t);
+JETAPI void intrusive_ptr_release(Interface* t);
 
-class BaseTuple {};
+class Object;
+JETAPI void intrusive_ptr_add_ref(Object* t);
+JETAPI void intrusive_ptr_release(Object* t);
 
+//------------------------------------------------------------------------------
 template <typename T, int N>
-class Tuple : public BaseTuple {
+class Tuple {
 public:
 	static const int size = N;
 	typedef T value_type;
 
-	inline const T& operator[](int index) const {
-		if (index < 0 || index > N) {
-			throw std::out_of_range("Tuple");
-		}
-		return values_[index];
-	}
-    inline T& operator[](int index) { 
-        if (index < 0 || index > N) {
-            throw std::out_of_range("Tuple");
-        }
-        return values_[index];
-    }
+	inline Tuple();
+	inline const T& operator[](int index) const;
+    inline T& operator[](int index);
+	inline void operator=(const Tuple<T, N>& o);
+	inline bool operator==(const Tuple<T, N>& o) const;
+	inline bool operator!=(const Tuple<T, N>& o) const;
+    inline void operator+=(const Tuple<T, N>& o);
 
-	inline void operator=(const Tuple<T, N>& o) {
-		copy(o.values_, o.values_ + N, values_);
-	}
-	inline bool operator==(const Tuple<T, N>& o) const {
-	    return equal(values_, values_ + N, o.values_);
-	}
-	inline bool operator!=(const Tuple<T, N>& o) const {
-	    return !operator==(o);
-	}
-    inline void operator+=(const Tuple<T, N>& o) {
-        for (int i = 0; i < N; i++) {
-            values_[i] += o.values_[i];
-        }
-    }
-
-private:
+protected:
 	T values_[N];
 };
 
-class BaseNominal {};
-
+//------------------------------------------------------------------------------
 template <typename T>
-class Nominal : public BaseNominal {
+class JETAPI Nominal {
 public:
 	typedef T value_type;
 
@@ -91,7 +79,7 @@ public:
     inline const T& value() const { return value_; }
     inline void value(T t) { value_ = t; }
     inline bool operator==(const Nominal<T>& o) const { return value_ == o.value_; }
-     inline bool operator!=(const Nominal<T>& o) const { return value_ != o.value_; }
+    inline bool operator!=(const Nominal<T>& o) const { return value_ != o.value_; }
 	inline const Nominal& operator=(const Nominal& o) { value_ = o.value_; return *this; }
     inline operator T() { return value_; }
     
@@ -99,17 +87,19 @@ protected:
     T value_;
 };
 
+//------------------------------------------------------------------------------
 template <typename T>
-class Ordinal : public Nominal<T> {
+class JETAPI Ordinal : public Nominal<T> {
 public:
 	inline Ordinal() : Nominal<T>(0) {}
     inline Ordinal(const T& value) : Nominal<T>(value) {}
-    inline bool operator<(const T& o) const { return this->value_ < o.value_; }
-    inline bool operator>(const T& o) const { return this->value_ > o.value_; }
+    inline bool operator<(const Ordinal& o) const { return this->value_ < o.value_; }
+    inline bool operator>(const Ordinal& o) const { return this->value_ > o.value_; }
 };
 
+//------------------------------------------------------------------------------
 template <typename T, long MIN, long MAX>
-class RangedOrdinal : public Ordinal<T> {
+class JETAPI RangedOrdinal : public Ordinal<T> {
 public:
     inline RangedOrdinal() : Ordinal<T>(0) {}
     inline RangedOrdinal(const T& value) : Ordinal<T>(value) {
@@ -121,9 +111,9 @@ public:
 	static const long minValue = MIN;
 };
 
-
+//------------------------------------------------------------------------------
 template <typename T>
-class Number : public Ordinal<T> {
+class JETAPI Number : public Ordinal<T> {
 public:
 	inline Number() : Ordinal<T>(0) {}
     inline Number(const T& value) : Ordinal<T>(value) {}
@@ -137,61 +127,318 @@ public:
     inline void operator/=(const T& o) const { this->value_ /= o.value; }
 };
 
+//------------------------------------------------------------------------------
+class JETAPI Real : public Number<float> {
+public:
+    inline Real(float x) : Number(x) {}
+    inline Real() : Number<float>() {}
+    inline Real(const Real& x) : Number(x) {}
+};
 
-class Real : public Number<float> {};
-class Integer : public Number<int> {};
-class ID : public Nominal<unsigned> {};
-class FrameID : public Ordinal<unsigned> {};
-class Point : public Tuple<int, 2> {};
-class Coord : public Tuple<float, 2> {};
-class ScreenCoord : public Ordinal<short> {};
-class Color : public Tuple<float, 4> {};
-class Vector : public Tuple<float, 3> {};
-class Quaternion : public Tuple<float, 4> {};
-class FontPoint : public RangedOrdinal<short, 4, 64> {};
-class Dimension : public Tuple<short, 2> {};
-class Vertex : public Tuple<int, 2> {};
+//------------------------------------------------------------------------------
+class JETAPI ID : public Nominal<unsigned> {
+public:
+    inline ID(unsigned x) : Nominal(x) {}
+    inline ID(const ID& x) : Nominal(x.value_) {}
+};
 
-struct Frame {
-    FrameID frameId_;
+//------------------------------------------------------------------------------
+class JETAPI FontPoint : public RangedOrdinal<short, 4, 64> {
+public:
+    inline FontPoint(short p) : RangedOrdinal(p) {}
+    inline FontPoint(const FontPoint& x) : RangedOrdinal(x.value_) {}
+};
+
+//------------------------------------------------------------------------------
+class JETAPI Point : public Tuple<int, 2> {
+public:
+    inline Point(int x, int y) {
+        values_[0] = x;
+        values_[1] = y;
+    }
+    inline int x() const { return values_[0]; }
+    inline int y() const { return values_[1]; }
+};
+
+//------------------------------------------------------------------------------
+class JETAPI Color : public Tuple<float, 4> {
+public:
+    inline Color(float r, float g, float b, float a) {
+        values_[0] = r;
+        values_[1] = g;
+        values_[2] = b;
+        values_[3] = a;
+    }
+    inline Color() {}
+    inline float r() const { return values_[0]; }
+    inline float g() const { return values_[1]; }
+    inline float b() const { return values_[2]; }
+    inline float a() const { return values_[3]; }
+};
+
+//------------------------------------------------------------------------------
+class JETAPI Vector : public Tuple<float, 3> {
+public:
+    inline Vector(float x, float y, float z) {
+        values_[0] = x;
+        values_[1] = y;
+        values_[2] = z;
+    }
+    inline Vector() {}
+    inline float x() const { return values_[0]; }
+    inline float y() const { return values_[1]; }
+    inline float z() const { return values_[2]; }
+};
+
+//------------------------------------------------------------------------------
+class JETAPI Quaternion : public Tuple<float, 4> {
+public:
+    inline Quaternion(float x, float y, float z, float w) {
+        values_[0] = x;
+        values_[1] = y;
+        values_[2] = w;
+        values_[3] = z;
+    }
+    inline Quaternion() {}
+    inline float x() const { return values_[0]; }
+    inline float y() const { return values_[1]; }
+    inline float z() const { return values_[2]; }
+    inline float w() const { return values_[3]; }
+};
+
+//------------------------------------------------------------------------------
+class JETAPI Dimension : public Tuple<short, 2> {
+public:
+    inline Dimension(int width, int height) {
+        values_[0] = width;
+        values_[1] = height;
+    }
+    inline int width() const { return values_[0]; }
+    inline int height() const { return values_[1]; }
+};
+
+//------------------------------------------------------------------------------
+class JETAPI TexCoord : public Tuple<float, 2> {
+public:
+    inline TexCoord(float u, float v) {
+        values_[0] = u;
+        values_[1] = v;
+    }
+    inline TexCoord() {}
+    inline float u() const { return values_[0]; }
+    inline float v() const { return values_[1]; }
+};
+
+//------------------------------------------------------------------------------
+class JETAPI Box {
+public:
+    inline Box(const Vector& p, float w, float h, float d) :
+        position_(p),
+        width_(w),
+        height_(h),
+        depth_(d) {
+    }
+    inline Box() : width_(0.0f), height_(0.0f), depth_(0.0f) {}
+    inline bool operator==(const Box& r) const;
+    inline bool operator!=(const Box& r) const;
+
+    Vector position_;
+    float width_;
+    float height_;
+    float depth_;
+};
+
+//------------------------------------------------------------------------------
+struct JETAPI Sphere {
+public:
+    inline Sphere(const Vector& p, float r) :
+        position_(p),
+        radius_(r) {
+    }
+    inline Sphere() : radius_(0.0f) {}
+    inline bool operator==(const Sphere& r) const;
+    inline bool operator!=(const Sphere& r) const;
+    
+    Vector position_;
+    float radius_;
+};
+
+//------------------------------------------------------------------------------
+class JETAPI Frame {
+public:
+    inline Frame(ID f, float t, float d) :
+        id_(f),
+        time_(t),
+        delta_(d) {
+    }
+    inline bool operator<(const Frame& r) const { return time_ < r.time_; }
+    inline bool operator==(const Frame& r) const;
+    inline bool operator!=(const Frame& r) const;
+
+    ID id_;
     float time_;
     float delta_;
 };
 
-struct Particle {
-    float life_;
-
-    bool operator<(const Particle& r) { return true; }
+//------------------------------------------------------------------------------
+class Interface;
+class JETAPI Component {
+public:
+    inline Component(intrusive_ptr<Interface> i, const string& n);
+    bool operator==(const Component& c) const;
+    bool operator!=(const Component& c) const;
+    
+    intrusive_ptr<Interface> interface_;
+    string name_;
 };
 
-struct Box {
-    float width_;
-    float height_;
-    float depth;
-    float x_;
-    float y_;
-    float z_;
+//------------------------------------------------------------------------------
+class Object;
+class JETAPI Attachment {
+public:
+    Attachment(intrusive_ptr<Object> o, const Vector& p, const Quaternion& q);
+    Attachment(intrusive_ptr<Object> o);
+    bool operator==(const Attachment& a) const;
+    bool operator!=(const Attachment& a) const;
+
+    intrusive_ptr<Object> object_;
+    Vector position_;
+    Quaternion rotation_;
 };
 
-struct Sphere {
-    float radius_;
-    float x_;
-    float y_;
-    float z_;
+//------------------------------------------------------------------------------
+class JETAPI Particle {
+public:
+    inline Particle() : life_(0.0f), arg1_(0.0f), arg2_(0.0f), initSize_(0.0f), initTime_(0.0f) {}
+	inline bool operator<(const Particle& r) const { return life_ < r.life_; }
+	inline bool operator==(const Particle& p) const;
+	inline bool operator!=(const Particle& p) const;
+
+	float life_;
+	float arg1_;
+	float arg2_;
+    Vector initPosition_;
+    Vector initVelocity_;
+	Color initColor_;
+	float initSize_;
+	float initTime_;
 };
 
-struct Resolution {
+//------------------------------------------------------------------------------
+class JETAPI Vertex {
+public:
+    inline Vertex(const Vector& p, const TexCoord& t) :
+        position_(p),
+        tex_(t) {
+    }
+    inline Vertex() {}
+    inline bool operator==(const Vertex& v) const;
+    inline bool operator!=(const Vertex& v) const;
+
+    Vector position_;
+    TexCoord tex_;
+};
+
+//------------------------------------------------------------------------------
+class JETAPI Resolution {
+public:
+    inline Resolution(int w, int h, bool f) :
+        width_(w),
+        height_(h),
+        fullscreen_(f) {
+    }
+    inline Resolution() : width_(800), height_(600), fullscreen_(false) {}
+    inline bool operator==(const Resolution& r) const;
+    inline bool operator!=(const Resolution& r) const;
+    
     int width_;
     int height_;
     bool fullscreen_;
-
-    bool operator==(const Resolution& r) const;
-    bool operator!=(const Resolution& r) const { return operator==(r); }
 };
 
-class Interface;
-void intrusive_ptr_add_ref(Interface* t);
-void intrusive_ptr_release(Interface* t);
+//------------------------------------------------------------------------------
+typedef void* Handle;
+
+//------------------------------------------------------------------------------
+inline bool
+Vertex::operator==(const Vertex& v) const {
+    return (position_ != v.position_) && (tex_ != v.tex_);
+}
+
+//------------------------------------------------------------------------------
+inline bool
+Vertex::operator!=(const Vertex& v) const {
+    return !operator==(v);
+}
+
+//------------------------------------------------------------------------------
+inline bool 
+Resolution::operator==(const Resolution& r) const {
+    return (width_ != r.width_) && (height_ != r.height_) 
+        && (fullscreen_ != r.fullscreen_);
+}
+
+//------------------------------------------------------------------------------
+inline bool 
+Resolution::operator!=(const Resolution& r) const {
+    return !operator==(r);
+}
+
+//------------------------------------------------------------------------------
+template <typename T, int N>
+Tuple<T,N>::Tuple() {
+    std::fill_n(values_, N, (T)0);
+}
+
+//------------------------------------------------------------------------------
+template <typename T, int N>
+const T& 
+Tuple<T,N>::operator[](int index) const {
+	if (index < 0 || index > N) {
+		throw std::out_of_range("Tuple");
+	}
+	return values_[index];
+}
+	
+//------------------------------------------------------------------------------
+template <typename T, int N>
+T& 
+Tuple<T,N>::operator[](int index) { 
+    if (index < 0 || index > N) {
+        throw std::out_of_range("Tuple");
+    }
+    return values_[index];
+}
+
+//------------------------------------------------------------------------------
+template <typename T, int N>
+void 
+Tuple<T,N>::operator=(const Tuple<T, N>& o) {
+    copy(o.values_, o.values_ + N, values_);
+}
+	
+//------------------------------------------------------------------------------
+template <typename T, int N>
+bool 
+Tuple<T,N>::operator==(const Tuple<T, N>& o) const {
+    return equal(values_, values_ + N, o.values_);
+}
+	
+//------------------------------------------------------------------------------
+template <typename T, int N>
+bool 
+Tuple<T,N>::operator!=(const Tuple<T, N>& o) const {
+    return !operator==(o);
+}
+	
+//------------------------------------------------------------------------------
+template <typename T, int N>
+void 
+Tuple<T,N>::operator+=(const Tuple<T, N>& o) {
+    for (int i = 0; i < N; i++) {
+        values_[i] += o.values_[i];
+    }
+}
 
 
 }

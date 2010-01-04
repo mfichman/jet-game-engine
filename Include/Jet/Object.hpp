@@ -32,43 +32,42 @@ using namespace std;
 using namespace std::tr1;
 using namespace boost;
 
-class Object : public Interface {
+class JETAPI Object : public Interface {
 public:
-    class Observer;
+    class Functor;
     typedef intrusive_ptr<Object> Ptr;
-    enum NetworkSync { disabled, enabled };
+    virtual ~Object() {}
 
     // Attributes    
     inline const Vector&        position() const { return position_; }
     void                        position(const Vector& v);
-    void                        positionUpdate(const Vector& v);
     inline const Quaternion&    rotation() const { return rotation_; }
     void                        rotation(const Quaternion& q);
-    void                        rotationUpdate(const Quaternion& q);
-    inline NetworkSync          networkSync() const { return networkSync_; }
-    void                        networkSync(NetworkSync s);
-
-    // Utility
-    inline Publisher<Observer>& publisher() const { return publisher_; }
+    inline Handle               geometry() const { return geometry_; }
+    void                        geometry(Handle h);
+    virtual void                operator()(Functor& f)=0;
 
 private:
-    mutable Publisher<Observer> publisher_;
-    NetworkSync networkSync_;
     Vector position_;
     Quaternion rotation_;
-    Vector linearVelocity_;
-    Vector angularVelocity_;
-    Vector force_;
-    Vector torque_;
+    Handle geometry_;
 };
 
-class Object::Observer : public virtual Interface {
+class Camera;
+class Cloud;
+class Model;
+class Quad;
+class Speaker;
+
+class Object::Functor {
 public:
-    typedef intrusive_ptr<Observer> Ptr;
+    virtual ~Functor() {}
     
-    virtual void onPosition()=0;
-    virtual void onRotation()=0;
-    virtual void onNetworkSync()=0;
+    virtual void operator()(Camera*) {}
+    virtual void operator()(Cloud*) {}
+    virtual void operator()(Model*) {}
+    virtual void operator()(Quad*) {}
+    virtual void operator()(Speaker*) {}
 };
 
 }

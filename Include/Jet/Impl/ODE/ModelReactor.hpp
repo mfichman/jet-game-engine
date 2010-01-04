@@ -22,10 +22,7 @@
 #pragma once
 
 #include <Jet/Model.hpp>
-#include <Jet/Root.hpp>
 #include <Jet/Impl/ODE/RootReactor.hpp>
-#include <Jet/Impl/ODE/ActorReactor.hpp>
-
 #include <ode/ode.h>
 
 namespace Jet { namespace Impl { namespace ODE {
@@ -33,39 +30,20 @@ using namespace std;
 using namespace std::tr1;
 using namespace boost;
 
-class ModelReactor : public Model::Observer, public Object::Observer, 
-    public Anchor::Observer, public Collidable::Observer {
-
+class ModelReactor : public Model::Observer {
 public:
     typedef intrusive_ptr<ModelReactor> Ptr;
 
-    ModelReactor(Model::Ptr m, RootReactor::Ptr e);
+    ModelReactor(Model::Ptr m, RootReactor::Ptr r);
     ~ModelReactor();
 
-    void onScale() {}
-    void onTexture(Model::TextureIndex i) {}
-    void onCubemap(Model::CubemapIndex i) {}
-    void onShader() {}
-    void onNetworkSync() {}
-    void onPosition();
-    void onRotation();
-    void onMesh();
-    void onParent();
-    void onCollisionMethod() {}
-    void onSolidity() {}
-    void onState();
-    void onMass();
-
-    inline dGeomID geom() { return geom_; }
-    void massDetach();
-    void massAttach();
+    virtual void onMesh();
 
 private:
-    RootReactor::Ptr rootReactor_;
-    ActorReactor::Ptr actorReactor_;
-    dGeomID geom_;
-    dMass mass_;
+    void resetMode();
+
     Model::Ptr model_;
+    dGeomID geom_;
 };
 
 }}}

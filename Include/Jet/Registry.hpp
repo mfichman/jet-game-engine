@@ -34,7 +34,7 @@ using namespace std::tr1::placeholders;
 
 class Root;
 
-class Registry {
+class JETAPI Registry {
 
 public:
     typedef shared_ptr<Registry> Ptr;

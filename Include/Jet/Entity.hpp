@@ -24,8 +24,8 @@
 #include <Jet/Types.hpp>
 #include <Jet/Interface.hpp>
 #include <Jet/Publisher.hpp>
-#include <iostream>
-#include <list>
+#include <Jet/Iterator.hpp>
+#include <vector>
 
 namespace Jet {
 using namespace std;
@@ -33,20 +33,28 @@ using namespace std::tr1;
 using namespace boost;
 class Root;
 
-class Entity : public Interface {
+class JETAPI Entity : public Interface {
 public:
     class Observer;
     friend class Root;
     typedef intrusive_ptr<Entity> Ptr;
+    typedef Iterator<vector<Component> > ComponentItr;
     enum NetworkSync { disabled, enabled };
     
     // Attributes
+    inline const string&    script() const { return script_; }
+    void                    script(const string& s);
+    inline const string&    data() const { return data_; }
+    void                    data(const string& d);
     inline NetworkSync      networkSync() const { return networkSync_; }
     void                    networkSync(NetworkSync s);
     inline const string&    updateMethod() const { return updateMethod_; }
     void                    updateMethod(const string& s);
     inline double           time() const { return time_; }
     void                    time(double time);
+    inline ComponentItr     componentItr() { return ComponentItr(component_); }
+    void                    componentAdd(const Component& c);
+    void                    componentDel(const Component& c);
 
     // Utility
     inline Publisher<Observer>& publisher() const { return publisher_; };
@@ -55,18 +63,23 @@ private:
     Entity() {}
 
     mutable Publisher<Observer> publisher_;
+    string script_;
+    string data_;
     NetworkSync networkSync_;
     string updateMethod_;
     double time_;
+    vector<Component> component_;
 };
 
 class Entity::Observer : public Interface {
 public:
     typedef intrusive_ptr<Entity::Observer> Ptr;
     
-    virtual void onNetworkSync()=0;
-    virtual void onUpdateMethod()=0;
-    virtual void onTime()=0;
+    virtual void onNetworkSync() {}
+    virtual void onUpdateMethod() {}
+    virtual void onTime() {}
+    virtual void onComponentAdd(const Component&) {}
+    virtual void onComponentDel(const Component&) {}
 };
 
 }

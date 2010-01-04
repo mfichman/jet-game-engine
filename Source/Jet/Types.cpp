@@ -22,6 +22,7 @@
  
 #include <Jet/Types.hpp>
 #include <Jet/Interface.hpp>
+#include <Jet/Object.hpp>
 
 using namespace Jet;
 
@@ -38,7 +39,55 @@ Jet::intrusive_ptr_release(Interface* t) {
 }
 
 //------------------------------------------------------------------------------
+void 
+Jet::intrusive_ptr_add_ref(Object* t) {
+    t->refCountInc();
+}
+
+//------------------------------------------------------------------------------
+void  
+Jet::intrusive_ptr_release(Object* t) {
+    t->refCountDec();
+}
+
+//------------------------------------------------------------------------------
+Attachment::Attachment(Object::Ptr o, const Vector& p, const Quaternion& q) :
+    object_(o),
+    position_(p),
+    rotation_(q) {
+}
+
+//------------------------------------------------------------------------------
+Attachment::Attachment(Object::Ptr o) :
+    object_(o) {
+}
+
+//------------------------------------------------------------------------------
+bool 
+Attachment::operator==(const Attachment& a) const {
+    return (object_ == a.object_);
+}
+
+//------------------------------------------------------------------------------
+bool 
+Attachment::operator!=(const Attachment& a) const {
+    return !operator==(a);
+}
+
+//------------------------------------------------------------------------------
+Component::Component(Interface::Ptr i, const string& n) :
+    interface_(i),
+    name_(n) {
+}
+
+//------------------------------------------------------------------------------
 bool
-Resolution::operator==(const Resolution& r) const {
-    return (width_ == r.width_) && (height_ == r.height_) && (fullscreen_ == r.fullscreen_);
+Component::operator==(const Component& c) const {
+    return (interface_ == c.interface_);
+}
+
+//------------------------------------------------------------------------------
+bool
+Component::operator!=(const Component& c) const {
+    return !operator==(c);
 }

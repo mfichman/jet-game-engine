@@ -24,6 +24,7 @@
 #include <Jet/Types.hpp>
 #include <list>
 #include <algorithm>
+#pragma warning(disable:4251)
 
 namespace Jet {
 using namespace std;

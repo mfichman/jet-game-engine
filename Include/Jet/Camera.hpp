@@ -23,39 +23,33 @@
 
 #include <Jet/Types.hpp>
 #include <Jet/Object.hpp>
-#include <Jet/Anchor.hpp>
 
 namespace Jet {
 using namespace std;
 using namespace std::tr1;
 class Root;
 
-class Camera : public Interface {
+class JETAPI Camera : public Object {
 public:  
     friend class Root; 
     typedef intrusive_ptr<Camera> Ptr;
     typedef RangedOrdinal<float, 0, 1> Tightness;
 
     // Attributes
-    inline Object::Ptr  target() const { return target_; }
-    void                target(Object::Ptr t);
-    inline Vector       up() const { return up_; }
-    void                up(const Vector& u);
-    inline Tightness    tightness() const { return tightness_; }
-    void                tightness(Tightness t);
-
-    // Components
-    inline Object::Ptr      object() const { return object_; }
-    inline Anchor::Ptr      anchor() const { return anchor_; }
+    inline const Vector&        target() const { return target_; }
+    void                        target(const Vector& t);
+    inline const Vector&        up() const { return up_; }
+    void                        up(const Vector& u);
+    inline Tightness            tightness() const { return tightness_; }
+    void                        tightness(Tightness t);
+    inline void                 operator()(Object::Functor& f) { f(this); }
 
 protected:
-    Camera() : object_(new Object), anchor_(new Anchor()) {}
+    Camera() {}
 
+    Vector target_;
     Vector up_;
-    Object::Ptr target_;
     Tightness tightness_;
-    Object::Ptr object_;
-    Anchor::Ptr anchor_;
 };
 
 }

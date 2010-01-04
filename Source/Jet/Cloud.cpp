@@ -29,10 +29,62 @@ void
 Cloud::particleNew(Particle& o) {
     particle_.push_back(o);
     push_heap(particle_.begin(), particle_.end());
+    publisher_.notify<Particle&>(&Observer::onParticleNew, o);
 }
 
 //------------------------------------------------------------------------------
 void
-Cloud::particleMethod(const string& s) {
-    particleMethod_ = s;
+Cloud::particleDel() { 
+    pop_heap(particle_.begin(), particle_.end()); 
+}
+
+//------------------------------------------------------------------------------
+void
+Cloud::particleFn(const string& s) {
+    particleFn_ = s;
+}
+
+//------------------------------------------------------------------------------
+void 
+Cloud::texture(const string& t) {
+    if (texture_ != t) {
+        texture_ = t;
+        publisher_.notify(&Observer::onTexture);
+    }
+}
+
+//------------------------------------------------------------------------------
+void 
+Cloud::scale(const Vector& s) {
+    if (scale_ != s) {
+        scale_ = s;
+        publisher_.notify(&Observer::onScale);
+    }
+}
+
+//------------------------------------------------------------------------------
+void 
+Cloud::shader(const string& s) { 
+    if (shader_ != s) {
+        shader_ = s;    
+        publisher_.notify(&Observer::onShader);
+    }
+}
+
+//------------------------------------------------------------------------------
+void            
+Cloud::state(State s) {
+    if (s != state_) {
+        state_ = s;
+        publisher_.notify(&Observer::onState);
+    }
+}
+
+//------------------------------------------------------------------------------
+void            
+Cloud::collisionFn(const string& o) {
+    if (o != collisionFn_) {
+        collisionFn_ = o;
+        publisher_.notify(&Observer::onCollisionFn);
+    }
 }

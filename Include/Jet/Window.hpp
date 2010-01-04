@@ -29,7 +29,7 @@ namespace Jet {
 using namespace std;
 using namespace std::tr1;
 
-class Window : public Interface {
+class JETAPI Window : public Interface {
 public:
     class Observer;
     typedef intrusive_ptr<Window> Ptr;

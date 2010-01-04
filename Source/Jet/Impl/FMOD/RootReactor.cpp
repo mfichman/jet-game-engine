@@ -28,6 +28,8 @@
 using namespace Jet;
 using namespace Jet::Impl::FMOD;
 
+#pragma warning(disable: 4190)
+
 //------------------------------------------------------------------------------
 #define CHECK(x) {															\
 	FMOD_RESULT result = x;													\
@@ -37,7 +39,7 @@ using namespace Jet::Impl::FMOD;
 }
 
 //------------------------------------------------------------------------------
-extern "C" Interface::Ptr
+extern "C" JETAPI Interface::Ptr
 moduleLoad(Root* r) {  
     return new RootReactor(r);
 }
@@ -75,6 +77,12 @@ RootReactor::~RootReactor() {
 void
 RootReactor::onSpeakerNew(Speaker::Ptr s) {
     reactors_.push_back(new SpeakerReactor(s, this));
+}
+
+//------------------------------------------------------------------------------
+void 
+RootReactor::onSoundNew(Sound::Ptr) {
+    
 }
 
 //------------------------------------------------------------------------------

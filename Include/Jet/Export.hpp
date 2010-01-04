@@ -19,43 +19,18 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
+#pragma once
 
-#include <Jet/Collidable.hpp>
+#ifdef WINDOWS
+#define JETIMPORT __declspec(dllimport)
+#define JETEXPORT __declspec(dllexport)
+#else
+#define JETIMPORT __attribute__ ((visibility ("default")))
+#define JETEXPORT __attribute__ ((visibility ("default")))
+#endif
 
-using namespace Jet;
-
-//------------------------------------------------------------------------------
-void            
-Collidable::collisionMethod(const string& o) {
-    if (o != collisionMethod_) {
-        collisionMethod_ = o;
-        publisher_.notify(&Observer::onCollisionMethod);
-    }
-}
-
-//------------------------------------------------------------------------------
-void            
-Collidable::solidity(Solidity s) {
-    if (s != solidity_) {
-        solidity_ = s;
-        publisher_.notify(&Observer::onSolidity);
-    }
-}
-
-//------------------------------------------------------------------------------
-void            
-Collidable::state(State s) {
-    if (s != state_) {
-        state_ = s;
-        publisher_.notify(&Observer::onState);
-    }
-}
-
-//------------------------------------------------------------------------------
-void
-Collidable::mass(float m) {
-    if (m != mass_) {
-        mass_ = m;
-        publisher_.notify(&Observer::onMass);
-    }
-}
+#ifdef JETDLL
+#define JETAPI JETEXPORT
+#else
+#define JETAPI JETIMPORT
+#endif

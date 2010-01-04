@@ -20,13 +20,13 @@
  * IN THE SOFTWARE.
  */
 
-#include <Jet/Actor.hpp>
+#include <Jet/Body.hpp>
 
 using namespace Jet;
 
 //------------------------------------------------------------------------------
 void
-Actor::linearVelocity(const Vector& v) {
+Body::linearVelocity(const Vector& v) {
     if (linearVelocity_ != v) {
         linearVelocity_ = v;
         publisher_.notify(&Observer::onLinearVelocity);
@@ -35,13 +35,13 @@ Actor::linearVelocity(const Vector& v) {
 
 //------------------------------------------------------------------------------
 void
-Actor::linearVelocityUpdate(const Vector& v) {
+Body::linearVelocityUpdate(const Vector& v) {
     linearVelocity_ = v;
 }   
 
 //------------------------------------------------------------------------------
 void                
-Actor::angularVelocity(const Vector& v) {
+Body::angularVelocity(const Vector& v) {
     if (angularVelocity_ != v) {
         angularVelocity_ = v;
         publisher_.notify(&Observer::onAngularVelocity);
@@ -50,13 +50,13 @@ Actor::angularVelocity(const Vector& v) {
 
 //------------------------------------------------------------------------------
 void
-Actor::angularVelocityUpdate(const Vector& v) {
+Body::angularVelocityUpdate(const Vector& v) {
     angularVelocity_ = v;
 }
 
 //------------------------------------------------------------------------------
 void                
-Actor::force(const Vector& v) {
+Body::force(const Vector& v) {
     if (force_ != v) {
         force_ = v;
         publisher_.notify(&Observer::onForce);
@@ -65,14 +65,14 @@ Actor::force(const Vector& v) {
 
 //------------------------------------------------------------------------------
 void                
-Actor::forceAdd(const Vector& v) {
+Body::forceAdd(const Vector& v) {
     force_ += v;
     publisher_.notify(&Observer::onForce);
 }
 
 //------------------------------------------------------------------------------
 void                
-Actor::torque(const Vector& v) {
+Body::torque(const Vector& v) {
     if (torque_ != v) {
         torque_ = v;
         publisher_.notify(&Observer::onTorque);
@@ -81,7 +81,55 @@ Actor::torque(const Vector& v) {
 
 //------------------------------------------------------------------------------
 void                
-Actor::torqueAdd(const Vector& v) {
+Body::torqueAdd(const Vector& v) {
     torque_ += v;
     publisher_.notify(&Observer::onTorque);
+}
+
+//------------------------------------------------------------------------------
+void
+Body::mass(Real f) {
+    if (f != mass_) {
+        mass_ = f;
+        publisher_.notify(&Observer::onMass);
+    }
+}
+
+//------------------------------------------------------------------------------
+void
+Body::radius(Real f) {
+    if (f != radius_) {
+        radius_ = f;
+        publisher_.notify(&Observer::onRadius);
+    }
+}
+
+//------------------------------------------------------------------------------
+void
+Body::position(const Vector& v) {
+    if (position_ != v) {
+        position_ = v;
+        publisher_.notify(&Observer::onPosition);
+    }
+}
+
+//------------------------------------------------------------------------------
+void
+Body::positionUpdate(const Vector& v) {
+    position_ = v;
+}
+
+//------------------------------------------------------------------------------
+void
+Body::rotation(const Quaternion& q) {
+    if (rotation_ != q) {
+        rotation_ = q;
+        publisher_.notify(&Observer::onRotation);
+    }
+}
+
+//------------------------------------------------------------------------------
+void
+Body::rotationUpdate(const Quaternion& q) {
+    rotation_ = q;
 }
