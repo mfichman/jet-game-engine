@@ -44,9 +44,6 @@ private:
     RootReactor* rootReactor_;
     Texture::Ptr texture_;
     IDirect3DTexture9* handle_;
-    HANDLE file_;
-    HANDLE mapping_;
-    void* data_;
 };
 
 

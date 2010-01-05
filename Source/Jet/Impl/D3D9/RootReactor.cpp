@@ -345,9 +345,9 @@ RootReactor::onVideoLoadStatus() {
     
         loader->videoLoadStatus(Loader::statusLoaded);
     } else if (Loader::statusUnloading == loader->videoLoadStatus()) {
-        for (Loader::TextureItr i = loader->textureItr(); i; i++) {
-            (*i)->loadStatus(Resource::statusUnloading);
-        }
+        //for (Loader::TextureItr i = loader->textureItr(); i; i++) {
+        //    (*i)->loadStatus(Resource::statusUnloading);
+        //}
     
     
         loader->videoLoadStatus(Loader::statusUnloaded);
