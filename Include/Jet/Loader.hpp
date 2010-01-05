@@ -29,6 +29,7 @@
 #include <Jet/Shader.hpp>
 #include <Jet/Module.hpp>
 #include <Jet/Sound.hpp>
+#include <Jet/Iterator.hpp>
 #include <map>
 
 namespace Jet {
@@ -42,30 +43,39 @@ public:
     class Observer;
     friend class Root;
 	typedef intrusive_ptr<Loader> Ptr;  
-    typedef Interface::Ptr (*ModuleLoadFn)(Root*);
+    typedef Interface* (*ModuleLoadFn)(Root*);
+    typedef Iterator<map<string, Texture::Ptr> > TextureItr;
+    enum Status { statusUnloading, statusUnloaded, statusLoading, statusLoaded };
 
     // Attributes
-    Texture::Ptr    textureNew(const string& o);
-    Cubemap::Ptr    cubemapNew(const string& o);
-    Mesh::Ptr       meshNew(const string& o);
-    Shader::Ptr     shaderNew(const string& o);
-    Module::Ptr     moduleNew(const string& o);
-    Sound::Ptr      soundNew(const string& o);
+    Texture::Ptr        textureNew(const string& o);
+    Cubemap::Ptr        cubemapNew(const string& o);
+    Mesh::Ptr           meshNew(const string& o);
+    Shader::Ptr         shaderNew(const string& o);
+    Module::Ptr         moduleNew(const string& o);
+    Sound::Ptr          soundNew(const string& o);
+    void                moduleDel(const string& o);
 
-    void            moduleDel(const string& o);
-
-    Texture::Ptr    texture(const string& o) { return texture_[o]; }
-    Cubemap::Ptr    cubemap(const string& o) { return cubemap_[o]; }
-    Mesh::Ptr       mesh(const string& o) { return mesh_[o]; }
-    Shader::Ptr     shader(const string& o) { return shader_[o]; }
-    Module::Ptr     module(const string& o) { return module_[o]; }
-    Sound::Ptr      sound(const string& o) { return sound_[o]; };
+    Texture::Ptr        texture(const string& o) { return texture_[o]; }
+    Cubemap::Ptr        cubemap(const string& o) { return cubemap_[o]; }
+    Mesh::Ptr           mesh(const string& o) { return mesh_[o]; }
+    Shader::Ptr         shader(const string& o) { return shader_[o]; }
+    Module::Ptr         module(const string& o) { return module_[o]; }
+    Sound::Ptr          sound(const string& o) { return sound_[o]; };
+    
+    inline TextureItr   textureItr() { return TextureItr(texture_); }
+    
+    inline Status       videoLoadStatus() const { return videoLoadStatus_; }
+    void                videoLoadStatus(Status s);
+    inline Status       audioLoadStatus() const { return audioLoadStatus_; }
+    void                audioLoadStatus(Status s);
+    
 
     // Utility
     Publisher<Observer>& publisher() const { return publisher_; }
 
 private:
-    Loader(Root* r) : root_(r) {}
+    Loader(Root* r);
 
     template <typename T>
     inline typename T::Ptr objectNew(
@@ -81,6 +91,8 @@ private:
     map<string, Module::Ptr> module_;
     map<string, Sound::Ptr> sound_;
     Root* root_;
+    Status videoLoadStatus_;
+    Status audioLoadStatus_;
 };
 
 class Loader::Observer : public virtual Interface {
@@ -93,6 +105,8 @@ public:
     virtual void onShaderNew(Shader::Ptr o) {}
     virtual void onModuleNew(Module::Ptr o) {}
     virtual void onSoundNew(Sound::Ptr o) {}
+    virtual void onVideoLoadStatus() {}
+    virtual void onAudioLoadStatus() {}
 };
 
 }

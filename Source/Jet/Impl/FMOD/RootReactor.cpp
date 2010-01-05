@@ -39,7 +39,7 @@ using namespace Jet::Impl::FMOD;
 }
 
 //------------------------------------------------------------------------------
-extern "C" JETAPI Interface::Ptr
+extern "C" JETAPI Interface*
 moduleLoad(Root* r) {  
     return new RootReactor(r);
 }

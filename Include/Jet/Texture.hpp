@@ -37,8 +37,13 @@ public:
     friend class Loader;
     typedef intrusive_ptr<Texture> Ptr;
     
+    inline const Dimensions&    size() const { return size_; }
+    void                        size(const Dimensions& s) { size_ = s; }
+    
 private:
-    Texture(const std::string& name) : Resource(name) {}
+    Texture(const std::string& name) : Resource(name), size_(0, 0) {}
+    
+    Dimensions size_;
 };
 
 }

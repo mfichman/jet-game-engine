@@ -32,7 +32,6 @@
 #include <Jet/Publisher.hpp>
 #include <Jet/Loader.hpp>
 #include <Jet/Options.hpp>
-#include <Jet/Window.hpp>
 #include <map>
 
 namespace Jet {
@@ -50,7 +49,6 @@ public:
 	inline Registry::Ptr    registry() const { return registry_; }
     inline Loader::Ptr      loader() const { return loader_; }  
     inline Options::Ptr     options() const { return options_; }  
-    inline Window::Ptr      window() const { return window_; }
 
     Body::Ptr               bodyNew(const string& name="");
     Model::Ptr              modelNew(const string& name="");
@@ -73,6 +71,8 @@ public:
     void                    iterationInc(); 
     inline const Step&      step() const { return step_; }
     void                    stepInc(float remainder, Step::Type t);
+    inline const Frame&     frame() const { return frame_; }
+    void                    frameInc();
 
     // Utility
     Publisher<Observer>&    publisher() const { return publisher_; }
@@ -90,10 +90,10 @@ private:
 	Registry::Ptr registry_;
     Loader::Ptr loader_;
     Options::Ptr options_;  
-    Window::Ptr window_;
     Camera::Ptr activeCamera_;
     ID iteration_;
     Step step_;
+    Frame frame_;
     map<string, Body::Ptr> body_;
     map<string, Model::Ptr> model_;
     map<string, Entity::Ptr> entity_;
@@ -116,5 +116,6 @@ public:
     virtual void onCloudNew(Cloud::Ptr) {}
     virtual void onIteration() {}
     virtual void onStep() {}
+    virtual void onFrame() {}
 };
 }

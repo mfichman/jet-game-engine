@@ -19,16 +19,35 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
+#pragma once
 
-#include <Jet/Window.hpp>
+#include <Jet/Texture.hpp>
+#include <Jet/Impl/D3D9/Types.hpp>
 
-using namespace Jet;
+namespace Jet { namespace Impl { namespace D3D9 {
+using namespace std;
+using namespace std::tr1;
+using namespace boost;
 
-//------------------------------------------------------------------------------
-void
-Window::resolution(const Resolution& r) {
-    if (r != resolution_) {
-        resolution_ = r;
-        publisher_.notify(&Observer::onResolution);
-    }
-}
+class RootReactor;
+
+class TextureReactor : public Resource::Observer {
+public:
+    typedef intrusive_ptr<TextureReactor> Ptr;
+
+    TextureReactor(Texture::Ptr m, RootReactor* r);
+    ~TextureReactor();
+
+    virtual void onLoadStatus();
+
+private:
+    RootReactor* rootReactor_;
+    Texture::Ptr texture_;
+    IDirect3DTexture9* handle_;
+    HANDLE file_;
+    HANDLE mapping_;
+    void* data_;
+};
+
+
+}}}

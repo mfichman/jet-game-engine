@@ -46,8 +46,9 @@ typename T::Ptr Root::objectNew(
 Root::Root() :
     registry_(new Registry), 
     options_(new Options),
-    window_(new Window),
-    iteration_(0)
+    iteration_(0),
+    step_(0, 0.0f, Step::typeNormal),
+    frame_(0)
     
 {
     loader_ = new Loader(this);
@@ -108,4 +109,11 @@ void
 Root::stepInc(float remainder, Step::Type t) {
     step_ = Step(step_.id_.value() + 1, remainder, t);
     publisher_.notify(&Observer::onStep);
+}
+
+//------------------------------------------------------------------------------
+void
+Root::frameInc() {
+    frame_ = Frame(frame_.id_.value() + 1);
+    publisher_.notify(&Observer::onFrame);
 }

@@ -27,11 +27,16 @@ using namespace Jet;
 //------------------------------------------------------------------------------
 Options::Options() :
     masterVolume_(0.5f),
-    quality_(qualityHigh),
-    antialiasing_(antialiasEnabled),
-    bloom_(bloomEnabled),
     physicsDelta_(0.01f),
     renderDelta_(0.02f) {
+    
+    videoMode_.width_ = 800;
+    videoMode_.height_ = 600;
+    videoMode_.windowMode_ = VideoMode::modeWindowed;
+    videoMode_.antialiasing_ = VideoMode::antialiasEnabled;
+    videoMode_.quality_ = VideoMode::qualityHigh;
+    videoMode_.bloom_ = VideoMode::bloomEnabled;
+    videoMode_.shaderMode_ = VideoMode::shadersEnabled;
     
 }
 
@@ -45,28 +50,10 @@ Options::masterVolume(Volume v) {
 }
 
 //------------------------------------------------------------------------------
-void                        
-Options::quality(Quality q) {
-    if (q != quality_) {
-        quality_ = q;
-        publisher_.notify(&Observer::onQuality);
-    }
-}
-
-//------------------------------------------------------------------------------
 void
-Options::antialiasing(Antialiasing a) {
-    if (a != antialiasing_) {
-        antialiasing_ = a;
-        publisher_.notify(&Observer::onAntialiasing);
-    }
-}
-
-//------------------------------------------------------------------------------
-void
-Options::bloom(Bloom b) {
-    if (b != bloom_) {
-        bloom_ = b;
-        publisher_.notify(&Observer::onBloom);
+Options::videoMode(const VideoMode& r) {
+    if (r != videoMode_) {
+        videoMode_ = r;
+        publisher_.notify(&Observer::onVideoMode);
     }
 }

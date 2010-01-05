@@ -43,7 +43,7 @@ class JETAPI Class {
 public:
     typedef function<void (intrusive_ptr<Interface>, Source&)>  Mutator;
     typedef function<void (intrusive_ptr<Interface>, Sink&)>    Accessor;
-    typedef shared_ptr<Class> Ptr;
+    typedef std::tr1::shared_ptr<Class> Ptr;
 
 
     inline void             mutator(const string& n, Mutator m) { mutator_[n] = m; }

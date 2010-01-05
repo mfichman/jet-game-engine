@@ -22,6 +22,8 @@
 #pragma once
 
 #include <Jet/Root.hpp>
+#include <Jet/Impl/D3D9/Types.hpp>
+#include <Jet/Impl/D3D9/EffectPool.hpp>
 #include <vector>
 
 #ifndef WINDOWS
@@ -33,36 +35,46 @@ using namespace std;
 using namespace std::tr1;
 using namespace boost;
 
-class RootReactor : public Root::Observer, public Video::Observer {
+class RootReactor : public Root::Observer, public Loader::Observer, public Options::Observer {
 public:
     typedef intrusive_ptr<RootReactor> Ptr; 
     RootReactor(Root::Ptr e);
     ~RootReactor();
     
-    void onActorNew(Actor::Ptr) {}
-    void onModelNew(Model::Ptr);
-    void onEntityNew(Entity::Ptr) {}
-    void onCameraNew(Camera::Ptr) {}
-    void onQuadNew(Quad::Ptr);
-    void onListenerNew(Listener::Ptr) {}
-    void onSpeakerNew(Speaker::Ptr) {}
-    void onCloudNew(Cloud::Ptr);
-    void onTime();
-    void onQuality();
-    void onAntialiasing();
-    void onBloom();
-    void onState();
-
+    virtual void onVideoMode();
+    virtual void onModelNew(Model::Ptr);
+    virtual void onQuadNew(Quad::Ptr);
+    virtual void onCloudNew(Cloud::Ptr);
+    virtual void onFrame();
+    virtual void onTextureNew(Texture::Ptr o);
+    virtual void onCubemapNew(Cubemap::Ptr o);
+    virtual void onMeshNew(Mesh::Ptr o);
+    virtual void onShaderNew(Shader::Ptr o);
+    virtual void onVideoLoadStatus();
+    
+    static LRESULT CALLBACK onMessage(HWND, UINT, WPARAM, LPARAM);
+    
     inline const D3DXMATRIX& viewMatrix() const { return viewMatrix_; }
     inline const D3DXMATRIX& projectionMatrix() const { return projectionMatrix_; }
-    inline const DevicePtr device() const { return device_; }
+    inline IDirect3DDevice9* device() const { return device_; }
+    inline HWND window() const { return window_; }
 
 private:
-    Root::Ptr root_;
+    void initWindow();
+    void initDevice();
+    void checkOptions();
+    void checkFormat();
+    void checkAntialiasing();
+    void checkShaderModel();
+    void resetWindow();
 
-    Direct3DPtr direct3d_;
-    DeviePtr device_;
-    D3DPRESENT_PARAMS presentParams;
+    Root::Ptr root_;
+    IDirect3D9* direct3d_;
+    IDirect3DDevice9* device_;
+    HWND window_;
+    EffectPool::Ptr effectPool_;
+    D3DPRESENT_PARAMETERS presentParams_;
+    vector<Interface::Ptr> reactors_;
     
 		//DWORD									m_multisample_quality;
 		//D3DMULTISAMPLE_TYPE						m_multisample_type

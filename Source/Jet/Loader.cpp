@@ -52,6 +52,13 @@ typename T::Ptr Loader::objectNew(
 }
 
 //------------------------------------------------------------------------------
+Loader::Loader(Root* r) : 
+    root_(r),
+    videoLoadStatus_(statusUnloaded),
+    audioLoadStatus_(statusUnloaded) {
+}
+
+//------------------------------------------------------------------------------
 Texture::Ptr 
 Loader::textureNew(const string& o) {
     return objectNew<Texture>(o, texture_, &Observer::onTextureNew);
@@ -90,20 +97,20 @@ Loader::moduleNew(const string& o) {
 #ifdef WINDOWS
         HMODULE handle = LoadLibrary(o.c_str());
         if (!handle) {
-            throw std::range_error("Could not load module " + o);
+            throw range_error("Could not load module " + o);
         }
         ModuleLoadFn load = (ModuleLoadFn)GetProcAddress(handle, "moduleLoad");
         if (!load) {
-            throw std::range_error("Could not load module " + o + ": no 'moduleLoad' symbol");
+            throw range_error("Could not load module " + o + ": no 'moduleLoad' symbol");
         }
 #else
         void *handle = dlopen(o.c_str(), RTLD_LAZY);
         if (!handle) {
-            throw std::range_error("Could not load module " + o + ": " + dlerror());
+            throw range_error("Could not load module " + o + ": " + dlerror());
         } 
         ModuleLoadFn load = (ModuleLoadFn)dlsym(handle, "moduleLoad");
         if (!handle) {
-            throw std::range_error("Could not load module " + o + ": " + dlerror());
+            throw range_error("Could not load module " + o + ": " + dlerror());
         }
 #endif
         Module::Ptr module = new Module(o, load(root_), (void*)handle);
@@ -126,15 +133,35 @@ Loader::moduleDel(const string& o) {
         HMODULE handle = (HMODULE)i->second->handle();
         module_.erase(i);
         if (!FreeLibrary(handle)) {
-            throw std::range_error("Could not unload module " + o);
+            throw range_error("Could not unload module " + o);
         }
 #else   
         void* handle = i->second->handle();
         module_.erase(i);
         if (dlclose(handle)) {
-            throw std::range_error(dlerror());
+            throw range_error(dlerror());
         }        
 #endif
+    } else {
+        throw range_error("Module is not loaded");
     }
 
+}
+
+//------------------------------------------------------------------------------
+void
+Loader::videoLoadStatus(Status s) {
+    if (s != videoLoadStatus_) {
+        videoLoadStatus_ = s;
+        publisher_.notify(&Observer::onVideoLoadStatus);
+    }
+}
+
+//------------------------------------------------------------------------------
+void
+Loader::audioLoadStatus(Status s) {
+    if (s != audioLoadStatus_) {
+        audioLoadStatus_ = s;
+        publisher_.notify(&Observer::onAudioLoadStatus);
+    }
 }

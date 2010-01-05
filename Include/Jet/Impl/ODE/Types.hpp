@@ -21,6 +21,8 @@
  */
 #pragma once
 
+#include <ode/ode.h>
+
 namespace Jet { namespace Impl { namespace ODE {
 using namespace std;
 using namespace std::tr1;

@@ -18,14 +18,43 @@ int main(int argc, char** argv) {
 	_chdir("..");
 
 	try {
-
 		Root::Ptr root = Root::make();
+		
+		Options::Ptr options = root->options();
+		VideoMode mode = options->videoMode();
+		mode.width_ = 600;
+		mode.height_ = 600;
+		mode.windowMode_ = VideoMode::modeWindowed;
+		//options->videoMode(mode);
 
 		Loader::Ptr loader = root->loader();
-		loader->moduleNew("Binary\\ODE.dll");
-		loader->moduleNew("Binary\\FMOD.dll");
-		//loader->moduleNew("Binary\\libODE.so");
-		//loader->moduleNew("Binary\\libFMOD.so");
+
+#ifdef WINDOWS
+		loader->moduleNew("Binary\\Physics_ODE.dll");
+		loader->moduleNew("Binary\\Audio_FMOD.dll");
+		loader->moduleNew("Binary\\Renderer_D3D9.dll");
+#endif
+#ifdef LINUX
+		loader->moduleNew("Binary\\libPhysics_ODE.so");
+		loader->moduleNew("Binary\\libAudio_FMOD.so");
+		loader->moduleNew("Binary\\libRenderer_OpenGL.so");
+#endif
+#ifdef DARWIN
+        loader->moduleNew("Binary\\libPhysics_ODE.dylib");
+        loader->moduleNew("Binary\\libAudio_FMOD.so");
+		loader->moduleNew("Binary\\libRenderer_OpenGL.so");
+#endif
+
+        loader->textureNew("test1.dds");
+        loader->textureNew("test2.dds");
+        loader->textureNew("test3.dds");
+        loader->textureNew("test4.dds");
+        loader->textureNew("test5.dds");
+        loader->textureNew("test6.dds");
+        loader->textureNew("test7.dds");
+        loader->textureNew("test8.dds");
+        loader->textureNew("test9.dds");
+        loader->videoLoadStatus(Loader::statusLoading);
 
 		Mesh::Ptr mesh = loader->meshNew("test.x");
 		mesh->boundingSphere(Sphere(Vector(0.0f, 0.0f, 0.0f), 10.0f));
@@ -38,6 +67,9 @@ int main(int argc, char** argv) {
 		body->radius(10.0f);
 		body->linearVelocity(Vector(10.0f, 0.0f, 0.0f));
 		body->attachmentAdd(Attachment(model, Vector(1.0f, 0.0f, 0.0f), Quaternion()));
+		
+		//loader->moduleDel("Binary\\Renderer_D3D9.dll");
+		options->videoMode(mode);
 		
 		do {
 		    root->stepInc(0.0f, Step::typeRender);

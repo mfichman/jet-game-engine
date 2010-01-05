@@ -22,22 +22,24 @@
 #pragma once
 
 #include <Jet/Model.hpp>
-#include <Jet/Impl/ODE/RootReactor.hpp>
-#include <ode/ode.h>
+#include <Jet/Impl/ODE/Types.hpp>
 
 namespace Jet { namespace Impl { namespace ODE {
 using namespace std;
 using namespace std::tr1;
 using namespace boost;
 
-class ModelReactor : public Model::Observer {
+class RootReactor;
+
+class ModelReactor : public Model::Observer, public Resource::Observer {
 public:
     typedef intrusive_ptr<ModelReactor> Ptr;
 
-    ModelReactor(Model::Ptr m, RootReactor::Ptr r);
+    ModelReactor(Model::Ptr m, RootReactor* r);
     ~ModelReactor();
 
     virtual void onMesh();
+    virtual void onLoadStatus();
 
 private:
     void resetMode();

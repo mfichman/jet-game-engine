@@ -45,7 +45,7 @@ template <typename K, typename V>
 class Iterator<map<K,V> > {
 public:
     Iterator(map<K,V>& m) : iter_(m.begin()), end_(m.end()) {}
-    void operator++() { iter_++; }
+    void operator++(int) { iter_++; }
     V& operator*() { return iter_->second; }
     V& operator->() { return iter_->second; }
     operator bool() { return iter_ != end_; }

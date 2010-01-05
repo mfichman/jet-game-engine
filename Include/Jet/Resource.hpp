@@ -23,6 +23,7 @@
 
 #include <Jet/Types.hpp>
 #include <Jet/Interface.hpp>
+#include <Jet/Publisher.hpp>
 #include <string>
 
 namespace Jet {
@@ -32,14 +33,34 @@ using namespace boost;
 
 class JETAPI Resource : public Interface {
 public:
+    class Observer;
     typedef intrusive_ptr<Resource> Ptr;
-
-    const string&   name() const { return name_; }
+    enum Status { statusUnloading, statusUnloaded, statusLoading, statusLoaded };
+    
+    // Attributes
+    inline const string&    name() const { return name_; }
+    inline Status           loadStatus() const { return loadStatus_; }
+    void                    loadStatus(Status s); 
+    inline Handle           handle() const { return handle_; }
+    void                    handle(Handle h);  
+    
+    // Utility
+    inline Publisher<Observer>& publisher() const { return publisher_; };
     
 protected:
-    Resource(const string& name) : name_(name) {}
+    Resource(const string& name);
 
+    mutable Publisher<Observer> publisher_;
     string name_;
+    Status loadStatus_;
+    Handle handle_;
+};
+
+class Resource::Observer : public virtual Interface {
+public:
+    typedef intrusive_ptr<Resource::Observer> Ptr;
+    
+    virtual void onLoadStatus() {}
 };
 
 }

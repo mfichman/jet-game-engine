@@ -19,41 +19,28 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#pragma once
 
-#include <Jet/Types.hpp>
-#include <Jet/Interface.hpp>
-#include <Jet/Publisher.hpp>
+#include <Jet/Resource.hpp>
 
-namespace Jet {
-using namespace std;
-using namespace std::tr1;
+using namespace Jet;
 
-class JETAPI Window : public Interface {
-public:
-    class Observer;
-    typedef intrusive_ptr<Window> Ptr;
-    enum Antialiasing { antialiasDisabled, antialiasEnabled };
-    enum Quality { qualityLow, qualityHigh };
-    enum Bloom { bloomDisabled, bloomEnabled };
+//------------------------------------------------------------------------------
+Resource::Resource(const string& n) : 
+    name_(n), 
+    loadStatus_(statusUnloaded) {
+}
 
-    // Attributes
-    inline const Resolution&    resolution() const { return resolution_; }
-    void                        resolution(const Resolution& r);
+//------------------------------------------------------------------------------
+void
+Resource::loadStatus(Status s) {
+    if (s != loadStatus_) {
+        loadStatus_ = s;
+        publisher_.notify(&Observer::onLoadStatus);
+    }
+}
 
-    // Utility
-    inline Publisher<Observer>& publisher() const { return publisher_; }
-
-private:
-    mutable Publisher<Observer> publisher_;
-    Resolution resolution_;
-};
-
-class Window::Observer : public virtual Interface {
-public:
-    typedef intrusive_ptr<Window::Observer> Ptr;
-    
-    virtual void onResolution()=0;
-};
-
+//------------------------------------------------------------------------------
+void
+Resource::handle(Handle h) {
+    handle_ = h;
 }

@@ -22,20 +22,22 @@
 #pragma once
 
 #include <Jet/Impl/D3D9/Types.hpp>
-#include <Jet/Impl/D3D9/RootReactor.hpp>
 
-namespace Jet { Impl { D3D9 {
+namespace Jet { namespace Impl { namespace D3D9 {
 using namespace std;
 using namespace std::tr1;
 using namespace boost;
 
+class RootReactor;
 
-class EffectPool {
+class EffectPool : public Interface {
 public:
-    EffectPool(RootReactor::Ptr e);
-    inline FrameParams& frameParams() const { return frameParams_; }
-    inline EffectPtr basicEffect() const { return basicEffect_; }
-    inline EffectPtr postProcessingEffect() const { return postProcessEffect_; }
+    typedef intrusive_ptr<EffectPool> Ptr;
+
+    EffectPool(RootReactor* e);
+    inline FrameParameters& frameParams() { return frameParams_; }
+    inline ID3DXEffect* basicEffect() const { return basicEffect_; }
+    inline ID3DXEffect* postProcessingEffect() const { return postProcessEffect_; }
 
     inline D3DXHANDLE objectParamsHandle() const { return objectParamsHandle_; }
     inline D3DXHANDLE materialHandle() const { return materialHandle_; }
@@ -43,11 +45,11 @@ public:
     inline D3DXHANDLE extraDataHandle() const { return extraDataHandle_; }
 
 private:
-    RootReactor::Ptr rootReactor_;
+    RootReactor* rootReactor_;
 	FrameParameters	frameParams_;
-    EffectPoolPtr effectPool_;
-    EffectPtr basicEffect_;
-    EffectPtr postProcessEffect_;
+    ID3DXEffectPool* effectPool_;
+    ID3DXEffect* basicEffect_;
+    ID3DXEffect* postProcessEffect_;
     D3DXHANDLE frameParamsHandle_;
     D3DXHANDLE objectParamsHandle_;
     D3DXHANDLE materialHandle_;

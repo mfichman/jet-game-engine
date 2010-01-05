@@ -21,26 +21,28 @@
  */
 #pragma once
 
-#include <Jet/Impl/FMOD/RootReactor.hpp>
 #include <Jet/Speaker.hpp>
+#include <Jet/Impl/FMOD/Types.hpp>
 
 namespace Jet { namespace Impl { namespace FMOD {
 using namespace std;
 using namespace std::tr1;
 using namespace boost;
 
+class RootReactor;
+
 class SpeakerReactor : public Speaker::Observer {
 public:
     typedef intrusive_ptr<SpeakerReactor> Ptr;    
 
-    SpeakerReactor(Speaker::Ptr s, RootReactor::Ptr r);
+    SpeakerReactor(Speaker::Ptr s, RootReactor* r);
     ~SpeakerReactor();
 
     void onVolume();
     void onState();
 
 private:
-    RootReactor::Ptr rootReactor_;
+    RootReactor* rootReactor_;
     Speaker::Ptr speaker_;
     SoundPtr sound_;
     FMOD_CHANNEL* channel_;

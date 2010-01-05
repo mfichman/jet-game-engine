@@ -26,7 +26,6 @@
 #include <map>
 #include <iostream>
 
-
 namespace Jet {
 using namespace std;
 using namespace std::tr1;
@@ -37,7 +36,7 @@ class Root;
 class JETAPI Registry {
 
 public:
-    typedef shared_ptr<Registry> Ptr;
+    typedef std::tr1::shared_ptr<Registry> Ptr;
     friend class Root;
     
     template <typename T>

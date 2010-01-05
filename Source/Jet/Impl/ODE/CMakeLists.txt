@@ -1,3 +1,3 @@
 file(GLOB files "*.cpp")
-add_library(ODE SHARED ${files})
-target_link_libraries(ODE Jet ode)
+add_library(Physics_ODE SHARED ${files})
+target_link_libraries(Physics_ODE Jet ode)

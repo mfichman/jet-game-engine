@@ -22,7 +22,7 @@
 #pragma once
 
 #include <Jet/Root.hpp>
-#include <ode/ode.h>
+#include <Jet/Impl/ODE/Types.hpp>
 #include <vector>
 
 namespace Jet { namespace Impl { namespace ODE {

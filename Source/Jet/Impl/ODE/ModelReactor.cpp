@@ -21,12 +21,13 @@
  */
 
 #include <Jet/Impl/ODE/ModelReactor.hpp>
+#include <Jet/Impl/ODE/RootReactor.hpp>
 
 using namespace Jet;
 using namespace Jet::Impl::ODE;
 
 //------------------------------------------------------------------------------
-ModelReactor::ModelReactor(Model::Ptr m, RootReactor::Ptr r) : 
+ModelReactor::ModelReactor(Model::Ptr m, RootReactor* r) : 
     model_(m), 
     geom_(dCreateSphere(r->space(), 0.0f)) {
     
@@ -43,10 +44,25 @@ ModelReactor::~ModelReactor() {
 }
 
 //------------------------------------------------------------------------------
+void
+ModelReactor::onLoadStatus() {
+    if (model_->mesh()->loadStatus() == Resource::statusLoaded) {
+        dGeomSphereSetRadius(geom_, model_->mesh()->boundingSphere().radius_);
+        dGeomEnable(geom_);
+    } else {
+        dGeomDisable(geom_);
+    }
+}
+
+//------------------------------------------------------------------------------
 void 
 ModelReactor::onMesh() {
-    if (model_->mesh()) {
+    
+    if (model_->mesh() && model_->mesh()->loadStatus() == Resource::statusLoaded) {
         dGeomSphereSetRadius(geom_, model_->mesh()->boundingSphere().radius_);
+        dGeomEnable(geom_);
+    } else {
+        dGeomDisable(geom_);
     }
     resetMode();
 }

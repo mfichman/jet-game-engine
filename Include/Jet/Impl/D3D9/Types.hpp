@@ -28,19 +28,17 @@
 #include <d3d9.h>
 #include <d3dx9.h>
 #include <dxerr.h>
+#include <sstream>
 
-namespace Jet { Impl { D3D9 {
+namespace Jet { namespace Impl { namespace D3D9 {
 using namespace std;
 using namespace std::tr1;
 
-typedef intrusive_ptr<IDirect3D> Direct3DPtr;;
-typedef intrusive_ptr<IDirect3DDevice9> DevicePtr;
-typedef intrusive_ptr<IDirect3DSurface9> SurfacePtr;
-typedef intrusive_ptr<IDirect3DTexture9> TexturePtr;
-typedef intrusive_ptr<IDirect3DCubeTexture9> CubemapPtr;
-typedef intrusive_ptr<ID3DXMesh> MeshPtr;
-typedef intrusive_ptr<ID3DXEffect> EffectPtr;
-typedef intrusive_ptr<ID3DXEffectPool> EffectPoolPtr;
+//typedef intrusive_ptr<IDirect3DSurface9> SurfacePtr;
+//typedef intrusive_ptr<IDirect3DTexture9> TexturePtr;
+//typedef intrusive_ptr<IDirect3DCubeTexture9> CubemapPtr;
+//typedef intrusive_ptr<ID3DXMesh> MeshPtr;
+//typedef intrusive_ptr<ID3DXEffect> EffectPtr;
 
 struct FrameParameters {
 	D3DXCOLOR diffuseLight_;
@@ -67,5 +65,23 @@ struct TextureRect {
 	float rightu;
 	float bottomv;
 };
+
+//------------------------------------------------------------------------------
+#define HR(x) {														\
+	HRESULT hr = x;													\
+	if (FAILED(hr)) {												\
+		std::ostringstream os;									    \
+		os << DXGetErrorDescription(hr) << ": ";          			\
+		os << __FILE__ << ":" << __LINE__;							\
+		throw domain_error(os.str());								\
+	}																\
+}
+
+//------------------------------------------------------------------------------
+#define RELEASE(x)                                                  \
+    if (x) {                                                        \
+        x->Release();                                               \
+        x = 0;                                                      \
+    }
 
 }}}

@@ -22,7 +22,7 @@
 #pragma once
 
 #include <Jet/Body.hpp>
-#include <Jet/Impl/ODE/RootReactor.hpp>
+#include <Jet/Root.hpp>
 #include <ode/ode.h>
 
 namespace Jet { namespace Impl { namespace ODE {
@@ -30,11 +30,13 @@ using namespace std;
 using namespace std::tr1;
 using namespace boost;
 
+class RootReactor;
+
 class BodyReactor : public Body::Observer {
 public:
     typedef intrusive_ptr<BodyReactor> Ptr;
 
-    BodyReactor(Body::Ptr a, RootReactor::Ptr e);
+    BodyReactor(Body::Ptr a, RootReactor* e);
     ~BodyReactor();
 
     static void onBodyMoved(dBodyID);    

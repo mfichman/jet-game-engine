@@ -51,6 +51,36 @@ Jet::intrusive_ptr_release(Object* t) {
 }
 
 //------------------------------------------------------------------------------
+bool
+Vertex::operator==(const Vertex& v) const {
+    return (position_ != v.position_) && (tex_ != v.tex_);
+}
+
+//------------------------------------------------------------------------------
+bool
+Vertex::operator!=(const Vertex& v) const {
+    return !operator==(v);
+}
+
+//------------------------------------------------------------------------------
+bool 
+VideoMode::operator==(const VideoMode& r) const {
+    return (width_ != r.width_) 
+        && (height_ != r.height_) 
+        && (windowMode_ != r.windowMode_)
+        && (antialiasing_ != r.antialiasing_)
+        && (quality_ != r.quality_)
+        && (bloom_ != r.bloom_)
+        && (shaderMode_ != r.shaderMode_);
+}
+
+//------------------------------------------------------------------------------
+bool 
+VideoMode::operator!=(const VideoMode& r) const {
+    return !operator==(r);
+}
+
+//------------------------------------------------------------------------------
 Attachment::Attachment(Object::Ptr o, const Vector& p, const Quaternion& q) :
     object_(o),
     position_(p),

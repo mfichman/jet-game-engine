@@ -27,10 +27,8 @@
 using namespace Jet;
 using namespace Jet::Impl::ODE;
 
-#pragma warning(disable: 4190)
-
 //------------------------------------------------------------------------------
-extern "C" JETAPI Interface::Ptr
+extern "C" JETAPI Interface*
 moduleLoad(Root* r) {  
     return new RootReactor(r);
 }

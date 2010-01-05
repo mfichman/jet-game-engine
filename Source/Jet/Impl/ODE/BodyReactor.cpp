@@ -21,13 +21,14 @@
  */
 
 #include <Jet/Impl/ODE/BodyReactor.hpp>
+#include <Jet/Impl/ODE/RootReactor.hpp>
 #include <Jet/Impl/ODE/Types.hpp>
 
 using namespace Jet;
 using namespace Jet::Impl::ODE;
 
 //------------------------------------------------------------------------------
-BodyReactor::BodyReactor(Body::Ptr a, RootReactor::Ptr e) :
+BodyReactor::BodyReactor(Body::Ptr a, RootReactor* e) :
     id_(dBodyCreate(e->world())),
     body_(a),
     root_(e->root()) {
@@ -148,8 +149,6 @@ BodyReactor::onAttachmentAdd(const Attachment& a) {
         dGeomSetBody(geom_, id_);
         dGeomSetOffsetPosition(geom_, a.position_.x(), a.position_.y(), a.position_.z());
         dGeomSetOffsetQuaternion(geom_, fromQuaternion(a.rotation_));
-        
-        cout << "here" << endl;
     }
 }
 

@@ -207,9 +207,9 @@ public:
 };
 
 //------------------------------------------------------------------------------
-class JETAPI Dimension : public Tuple<short, 2> {
+class JETAPI Dimensions : public Tuple<short, 2> {
 public:
-    inline Dimension(int width, int height) {
+    inline Dimensions(int width, int height) {
         values_[0] = width;
         values_[1] = height;
     }
@@ -264,29 +264,28 @@ public:
 };
 
 //------------------------------------------------------------------------------
-/*class JETAPI Frame {
+class JETAPI Frame {
 public:
-    inline Frame(ID f, float t, float d) :
-        id_(f),
-        delta_(d) {
+    inline Frame(ID f) :
+        id_(f) {
     }
-    inline bool operator<(const Frame& r) const { return time_ < r.time_; }
+    inline bool operator<(const Frame& r) const { return id_.value() < r.id_.value(); }
     inline bool operator==(const Frame& r) const;
     inline bool operator!=(const Frame& r) const;
 
     ID id_;
-    float delta_;
-};*/
+};
+
+//------------------------------------------------------------------------------
 class JETAPI Step {
 public:
     enum Type { typeNormal, typeRender };
 
-    inline Step(ID f, Real r, Type l) :
-        id_(f),
-        remainder_(r),
-        type_(l) {
+    inline Step(ID frame, Real remainder, Type type) :
+        id_(frame),
+        remainder_(remainder),
+        type_(type) {
     }
-    inline Step() : id_(0), remainder_(0.0f), type_(typeNormal) {}
     inline bool operator<(const Step& s) const { return id_.value() < s.id_.value(); }
     inline bool operator==(const Step& s) const;
     inline bool operator!=(const Step& s) const;
@@ -357,49 +356,29 @@ public:
 };
 
 //------------------------------------------------------------------------------
-class JETAPI Resolution {
+class JETAPI VideoMode {
 public:
-    inline Resolution(int w, int h, bool f) :
-        width_(w),
-        height_(h),
-        fullscreen_(f) {
-    }
-    inline Resolution() : width_(800), height_(600), fullscreen_(false) {}
-    inline bool operator==(const Resolution& r) const;
-    inline bool operator!=(const Resolution& r) const;
+    enum WindowMode { modeWindowed, modeFullscreen };
+    enum Antialiasing { antialiasDisabled, antialiasEnabled };
+    enum Quality { qualityLow, qualityHigh };
+    enum Bloom { bloomDisabled, bloomEnabled };
+    enum ShaderMode { shadersDisabled, shadersEnabled };
+
+    inline VideoMode() {}
+    inline bool operator==(const VideoMode& r) const;
+    inline bool operator!=(const VideoMode& r) const;
     
     int width_;
     int height_;
-    bool fullscreen_;
+    WindowMode windowMode_;
+    Antialiasing antialiasing_;
+    Quality quality_;
+    Bloom bloom_;
+    ShaderMode shaderMode_;
 };
 
 //------------------------------------------------------------------------------
 typedef void* Handle;
-
-//------------------------------------------------------------------------------
-inline bool
-Vertex::operator==(const Vertex& v) const {
-    return (position_ != v.position_) && (tex_ != v.tex_);
-}
-
-//------------------------------------------------------------------------------
-inline bool
-Vertex::operator!=(const Vertex& v) const {
-    return !operator==(v);
-}
-
-//------------------------------------------------------------------------------
-inline bool 
-Resolution::operator==(const Resolution& r) const {
-    return (width_ != r.width_) && (height_ != r.height_) 
-        && (fullscreen_ != r.fullscreen_);
-}
-
-//------------------------------------------------------------------------------
-inline bool 
-Resolution::operator!=(const Resolution& r) const {
-    return !operator==(r);
-}
 
 //------------------------------------------------------------------------------
 template <typename T, int N>

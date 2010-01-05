@@ -43,18 +43,14 @@ public:
     enum Bloom { bloomDisabled, bloomEnabled };
 
     // Attributes
-    inline Volume           masterVolume() const { return masterVolume_; }
-    void                    masterVolume(Volume v);
-    inline Quality          quality() const { return quality_; }
-    void                    quality(Quality q);
-    inline Antialiasing     antialiasing() const { return antialiasing_; }
-    void                    antialiasing(Antialiasing a);
-    inline Bloom            bloom() const { return bloom_; }
-    void                    bloom(Bloom b);
-    inline float            physicsDelta() const { return physicsDelta_; }
-    void                    physicsDelta(float t);
-    inline float            renderDelta() const { return renderDelta_; }
-    void                    renderDelta(float t);
+    inline Volume               masterVolume() const { return masterVolume_; }
+    void                        masterVolume(Volume v);
+    inline float                physicsDelta() const { return physicsDelta_; }
+    void                        physicsDelta(float t);
+    inline float                renderDelta() const { return renderDelta_; }
+    void                        renderDelta(float t);
+    inline const VideoMode&     videoMode() const { return videoMode_; }
+    void                        videoMode(const VideoMode& r);
 
     // Utility
     inline Publisher<Observer>& publisher() const { return publisher_; }
@@ -64,11 +60,9 @@ private:
 
     mutable Publisher<Observer> publisher_;
     Volume masterVolume_;
-    Quality quality_;
-    Antialiasing antialiasing_;
-    Bloom bloom_;
     float physicsDelta_;
     float renderDelta_;
+    VideoMode videoMode_;
     
 };
 
@@ -77,11 +71,9 @@ public:
     typedef intrusive_ptr<Options::Observer> Ptr;
     
     virtual void onMasterVolume() {}
-    virtual void onQuality() {}
-    virtual void onAntialiasing() {}
-    virtual void onBloom() {}
     virtual void onPhysicsDelta() {}
     virtual void onRenderDelta() {}
+    virtual void onVideoMode() {}
 };
 
 }

@@ -21,6 +21,7 @@
  */
 
 #include <Jet/Impl/FMOD/SpeakerReactor.hpp>
+#include <Jet/Impl/FMOD/RootReactor.hpp>
 #include <stdexcept>
 #include <fmodex/fmod_errors.h>
 
@@ -34,7 +35,7 @@ using namespace Jet::Impl::FMOD;
 	}																		\
 }
 //------------------------------------------------------------------------------
-SpeakerReactor::SpeakerReactor(Speaker::Ptr s, RootReactor::Ptr r) :
+SpeakerReactor::SpeakerReactor(Speaker::Ptr s, RootReactor* r) :
     rootReactor_(r),
     speaker_(s),
     channel_(0) {
