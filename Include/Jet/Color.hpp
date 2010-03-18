@@ -22,22 +22,49 @@
 #pragma once
 
 #include <Jet/Jet.hpp>
+#include <iostream>
+
+std::ostream& operator<<(std::ostream& out, const Jet::Color& color);
+std::istream& operator>>(std::istream& in, Jet::Color& color);
 
 namespace Jet {
 
-//! Modules expose features to the main engine.  The most important modules
-//! are physics, audio, and graphics, but other can be created and added
-//! to the engine as plugins.
-//! @class Modules
-//! @brief Exposes features to the main engine.
-class Module {
+//! Represents a 4-component RGBA color value.
+//! @class Color
+//! @brief RGBA color value.
+class JETAPI Color {
 public:
-    
-    virtual void on_pre_render()=0;
+    //! Creates a new color.
+    //! @param red red component
+    //! @param blue blue component
+    //! @param green green component
+    //! @param alpha alpha component
+    Color(real_t red, real_t blue, real_t green, real_t alpha);
 
-    virtual void on_render()=0;
+    //! Returns the red component
+    real_t get_red() const { return red; }
 
-    virtual void on_post_render()=0;
+    //! Returns the blue component
+    real_t get_blue() const { return blue; }
+
+    //! Returns the green component
+    real_t get_green() const { return green; }
+
+    //! Returns the alpha component
+    real_t get_alpha() const { return alpha; }
+
+    //! Stream operator.
+    friend std::ostream& ::operator<<(std::ostream& out, const Color& color);
+
+    //! Stream operator.
+    friend std::istream& ::operator>>(std::istream& in, Color& color);
+
+private:
+    real_t red;
+    real_t blue;
+    real_t green;
+    real_t alpha;
 };
 
 }
+

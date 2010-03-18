@@ -19,25 +19,49 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */  
-#pragma once
 
 #include <Jet/Jet.hpp>
 
 namespace Jet {
 
-//! Modules expose features to the main engine.  The most important modules
-//! are physics, audio, and graphics, but other can be created and added
-//! to the engine as plugins.
-//! @class Modules
-//! @brief Exposes features to the main engine.
-class Module {
+//! This is the main engine class.  This object is the parent of all other
+//! objects in the game engine.
+//! @class Engine
+//! @brief Main engine class.
+class JETAPI Engine {
 public:
     
-    virtual void on_pre_render()=0;
+    //! Creates a new engine.
+    Engine();
 
-    virtual void on_render()=0;
+    //! Returns the root scene node.  This node can be used to add 
+    //! other objects to the scene.
+    SceneNode* get_root() { return root; }
 
-    virtual void on_post_render()=0;
+    //! Adds an audio module to the engine.
+    //! @param module the audio module
+    void set_audio(AudioModule* module);
+
+    //! Adds a graphics module to the engine.
+    //! @param module the graphics module
+    void set_graphics(GraphicsModule* module);
+
+    //! Adds a physics module to the engine.
+    //! @param module the physics module
+    void set_physics(PhysicsModule* module);
+    
+    //! Adds a network module to the engine
+    //! @param network module the network module
+    void set_network(NetworkModule* module);
+
+    //! Adds a logic module to the engine
+    //! @param module the logic module
+    void add_logic(LogicModule* module);
+
+private:
+    friend class SceneNode;
+
+    SceneNode* root;
 };
 
 }

@@ -22,22 +22,14 @@
 #pragma once
 
 #include <Jet/Jet.hpp>
+#include <Jet/SceneComponent.hpp>
 
 namespace Jet {
 
-//! Modules expose features to the main engine.  The most important modules
-//! are physics, audio, and graphics, but other can be created and added
-//! to the engine as plugins.
-//! @class Modules
-//! @brief Exposes features to the main engine.
-class Module {
-public:
-    
-    virtual void on_pre_render()=0;
+//! Manages network synchronization for the parent scene node.
+//! @class NetworkMonitor
+//! @brief Manages network synchronization.
+class JETAPI NetworkMonitor : public SceneComponent {
 
-    virtual void on_render()=0;
-
-    virtual void on_post_render()=0;
 };
-
 }

@@ -19,25 +19,23 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */  
-#pragma once
 
-#include <Jet/Jet.hpp>
+#include <Jet/Color.hpp>
 
-namespace Jet {
+using namespace Jet;
+using namespace std;
 
-//! Modules expose features to the main engine.  The most important modules
-//! are physics, audio, and graphics, but other can be created and added
-//! to the engine as plugins.
-//! @class Modules
-//! @brief Exposes features to the main engine.
-class Module {
-public:
-    
-    virtual void on_pre_render()=0;
+Color::Color(real_t red, real_t blue, real_t green, real_t alpha) :
+    red(red),
+    blue(blue),
+    green(green),
+    alpha(alpha) {
+}
 
-    virtual void on_render()=0;
+ostream& operator<<(ostream& out, const Color& color) {
+    return out << color.red << " " << color.blue << " " << color.green << " " << color.alpha;
+}
 
-    virtual void on_post_render()=0;
-};
-
+istream& operator>>(istream& in, Color& color) {
+    return in >> color.red >> color.blue >> color.green >> color.alpha;
 }

@@ -4,8 +4,6 @@ if(WIN32 AND NOT UNIX)
 add_definitions(/DJETDLL)
 endif()
 
-add_subdirectory("Impl\\Lua")
-
 include_directories("D:\\Include\\Lua")
-add_library(Jet SHARED ${files})
-target_link_libraries(Jet lua_d luabind_d)
+add_library(Plugin.Lua SHARED ${files})
+target_link_libraries(Plugin.Lua Jet lua_d luabind_d)

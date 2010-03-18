@@ -22,22 +22,32 @@
 #pragma once
 
 #include <Jet/Jet.hpp>
+#include <Jet/SceneComponent.hpp>
+#include <Jet/Vector.hpp>
+#include <Jet/Quaternion.hpp>
+#include <string>
+#include <memory>
+#include <map>
 
 namespace Jet {
 
-//! Modules expose features to the main engine.  The most important modules
-//! are physics, audio, and graphics, but other can be created and added
-//! to the engine as plugins.
-//! @class Modules
-//! @brief Exposes features to the main engine.
-class Module {
+//! This class is the base class for all objects in the scene.  Objects of
+//! this type can be attached to a SceneNode, and control the appearance,
+//! behavior, and sound of a SceneNode.
+//! @class SceneComponent
+//! @brief Base class for objects in the scene.
+class JETAPI SceneComponent {
 public:
     
-    virtual void on_pre_render()=0;
-
-    virtual void on_render()=0;
-
-    virtual void on_post_render()=0;
+    //! Destructor
+    virtual ~SceneComponent() {}
+    
+    //! Returns the parent scene node
+    virtual SceneNode* parent() const=0;
 };
 
+
 }
+
+
+

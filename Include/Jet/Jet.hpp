@@ -21,23 +21,52 @@
  */  
 #pragma once
 
-#include <Jet/Jet.hpp>
+#include <cstdint>
+#include <string>
+#include <map>
+
+#ifdef WINDOWS
+#define JETIMPORT							__declspec(dllimport)
+#define JETEXPORT                			__declspec(dllexport)
+#else
+#define JETIMPORT __attribute__ ((visibility ("default")))
+#define JETEXPORT __attribute__ ((visibility ("default")))
+#endif
+
+#ifdef JETDLL
+#define JETAPI JETEXPORT
+#pragma warning (disable:4251)
+#else
+#define JETAPI JETIMPORT
+#endif
 
 namespace Jet {
+    class AudioSource;
+    class AudioModule;
+    class Color;
+    class Controller;
+    class GraphicsModule;
+    class LogicModule;
+    class Material;
+    class MeshObject;
+    class Mesh;
+    class NetworkMonitor;
+    class NetworkModule;
+    class ParticleSystem;
+    class PhysicsModule;
+    class Quad;
+    class Quaternion;
+    class RigidBody;
+    class SceneComponent;
+    class SceneNode;
+    class Vector;
 
-//! Modules expose features to the main engine.  The most important modules
-//! are physics, audio, and graphics, but other can be created and added
-//! to the engine as plugins.
-//! @class Modules
-//! @brief Exposes features to the main engine.
-class Module {
-public:
+    typedef float real_t;
+    typedef std::pair<real_t, real_t> range_t;
+    typedef std::map<std::string, std::string> table_t;
     
-    virtual void on_pre_render()=0;
-
-    virtual void on_render()=0;
-
-    virtual void on_post_render()=0;
+    enum CollisionMode { CM_BOX, CM_SPHERE, CM_MESH };
+    enum EmitterType { ET_ELLIPSOID, ET_POINT, ET_BOX };
+    enum CoordSystem { CT_WORLD, CT_LOCAL };
 };
 
-}

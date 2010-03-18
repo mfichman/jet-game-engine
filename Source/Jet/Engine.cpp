@@ -19,25 +19,14 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */  
-#pragma once
 
-#include <Jet/Jet.hpp>
+#include <Jet/Engine.hpp>
+#include <Jet/SceneNode.hpp>
 
-namespace Jet {
+using namespace Jet;
+using namespace std;
 
-//! Modules expose features to the main engine.  The most important modules
-//! are physics, audio, and graphics, but other can be created and added
-//! to the engine as plugins.
-//! @class Modules
-//! @brief Exposes features to the main engine.
-class Module {
-public:
-    
-    virtual void on_pre_render()=0;
-
-    virtual void on_render()=0;
-
-    virtual void on_post_render()=0;
-};
+Engine::Engine() {//:
+    //root(new SceneNode(0, "jet")) {
 
 }

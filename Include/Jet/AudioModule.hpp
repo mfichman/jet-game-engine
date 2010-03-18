@@ -19,25 +19,14 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */  
-#pragma once
 
 #include <Jet/Jet.hpp>
 
 namespace Jet {
 
-//! Modules expose features to the main engine.  The most important modules
-//! are physics, audio, and graphics, but other can be created and added
-//! to the engine as plugins.
-//! @class Modules
-//! @brief Exposes features to the main engine.
-class Module {
+class JETPI LogicModule {
 public:
     
-    virtual void on_pre_render()=0;
-
-    virtual void on_render()=0;
-
-    virtual void on_post_render()=0;
-};
-
+    //! Destroys the logic module
+    ~LogicModule()=0;
 }

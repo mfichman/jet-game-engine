@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009 Matt Fichman
+ * Copyright (c) 2010 Matt Fichman
  *
  * Permission is hereby granted, free of charge, to any person obtaining a 
  * copy of this software and associated documentation files (the "Software"),
@@ -18,67 +18,54 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- */
+ */  
 #pragma once
- 
-#include <Jet/Types.hpp>
-#include <Jet/Object.hpp>
-#include <Jet/Publisher.hpp>
+
+#include <Jet/Jet.hpp>
+#include <Jet/SceneComponent.hpp>
+#include <string>
 
 namespace Jet {
-using namespace std;
-using namespace std::tr1;
-class Root;
 
-class JETAPI Quad : public Interface {
+//! Displays a rectangular quad using a material.  This can be used for 
+//! various effects, including billboarding if the proper vertex shader is
+//! used.  All quads with the same material are automatically grouped into
+//! batches for maximum performance.
+//! @class Quad
+//! @brief Displays a solid quad.
+class JETAPI Quad : public SceneComponent {
 public:
-    class Observer;
-    friend class Root;
-    typedef RangedOrdinal<int, 0, 3> VertexIndex;
-    typedef intrusive_ptr<Quad> Ptr;
-    enum State { stateDisabled, stateEnabled };
+    //! Destroys the quad.
+    virtual ~Quad() {}
 
-    // Attributes
-    inline Vertex               vertex(VertexIndex i) { return vertex_[i]; }
-    void                        vertex(VertexIndex i, const Vertex& v);
-    inline TexCoord             texCoordScale() const { return texCoordScale_; }
-    void                        texCoordScale(TexCoord c);
-    inline const string& 	    texture() const { return texture_; }
-    void 		                texture(const string& t);
-    inline const Vector&        scale() const { return scale_; }
-    void                        scale(const Vector& s);
-    inline const string& 	    shader() const { return shader_; }
-    void 		                shader(const string& s);
-    inline State                state() const { return state_; }
-    void                        state(State v);
-    inline void                 operator()(Object::Functor& f) { f(this); }
+    //! Returns the name of the material used to render this quad.
+    const std::string& get_material() const { return material; }
 
-    // Utility
-    inline Publisher<Observer>& publisher() const { return publisher_; }
+    //! Returns the width of this quad in world coordinates.
+    real_t get_width() const { return width; }
+
+    //! Returns the height of this quad in world coordinates.
+    real_t get_height() const { return height; }
+
+    //! Sets the material used to render this quad.  See the documentation 
+    //! regarding materials for more information.
+    void set_material(const std::string& s) { material = s; }
+
+    //! Sets the width of this quad in world coordinates.
+    //! @param f the new width of the quad
+    void set_width(real_t f) { width = f; }
+
+    //! Sets the height of this quad in world coordinates.
+    //! @param f the new height of this quad
+    void set_height(real_t f) { height = f; }
 
 private:
-    Quad() {}
+    Quad(SceneNode* parent, const std::string& name);
+    friend class SceneNode;
 
-    mutable Publisher<Observer> publisher_;
-
-    Vertex vertex_[VertexIndex::maxValue];
-    TexCoord texCoordScale_; 
-    string texture_;
-    Vector scale_;
-    string shader_; 
-    State state_;
-};
-
-class Quad::Observer : public Interface {
-public:
-    typedef intrusive_ptr<Quad::Observer> Ptr;
-
-    virtual void onVertex(VertexIndex i) {}
-    virtual void onTexCoordScale() {}
-    virtual void onTexture() {}
-    virtual void onScale() {}
-    virtual void onShader() {}
-    virtual void onState() {}   
+    std::string material;
+    real_t width;
+    real_t height;
 };
 
 }

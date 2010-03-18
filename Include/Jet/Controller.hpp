@@ -22,22 +22,31 @@
 #pragma once
 
 #include <Jet/Jet.hpp>
+#include <Jet/SceneComponent.hpp>
+#include <string>
 
 namespace Jet {
 
-//! Modules expose features to the main engine.  The most important modules
-//! are physics, audio, and graphics, but other can be created and added
-//! to the engine as plugins.
-//! @class Modules
-//! @brief Exposes features to the main engine.
-class Module {
+//! Used to embed logic in a scene node.
+//! @class ControlScript
+//! @brief Embeds logic in a scene node
+class JETAPI Controller : public SceneComponent {
 public:
+    //! Called when the control script is attached to the scene component  
+    virtual void on_attach()=0;
     
-    virtual void on_pre_render()=0;
+    //! Called when the parent scene node is created
+    virtual void on_create()=0;
 
-    virtual void on_render()=0;
+    //! Called when the rigid body belogning to the parent scene node
+    //! collides with another rigid body
+    virtual void on_collision()=0;
 
-    virtual void on_post_render()=0;
+    //! Called when the scene node is updated
+    virtual void on_network_update()=0;
+
+private:
+    Controller(SceneNode* parent, const std::string& name, const std::string& path);
 };
 
 }

@@ -22,22 +22,26 @@
 #pragma once
 
 #include <Jet/Jet.hpp>
+#include <iostream>
+
+std::ostream& operator<<(std::ostream& out, const Jet::Particle& particle);
+std::istream& operator>>(std::istream& in, Jet::Particle& particle);
 
 namespace Jet {
 
-//! Modules expose features to the main engine.  The most important modules
-//! are physics, audio, and graphics, but other can be created and added
-//! to the engine as plugins.
-//! @class Modules
-//! @brief Exposes features to the main engine.
-class Module {
+//! Represents a particle.
+//! @class Particle
+//! @brief Represents a particle.
+class JETAPI Particle {
 public:
-    
-    virtual void on_pre_render()=0;
-
-    virtual void on_render()=0;
-
-    virtual void on_post_render()=0;
+    real_t acceleration;
+    real_t velocity;
+    real_t rotation_rate;
+    real_t scale_rate;
+    real_t initial_position;
+    real_t initial_rotation;
+    real_t initial_size;
+    real_t life; // Remaining life
 };
 
 }
