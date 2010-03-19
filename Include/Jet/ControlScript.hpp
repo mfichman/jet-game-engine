@@ -22,7 +22,8 @@
 #pragma once
 
 #include <Jet/Jet.hpp>
-#include <Jet/SceneComponent.hpp>
+#include <Jet/Object.hpp>
+#include <Jet/Vector.hpp>
 #include <string>
 
 namespace Jet {
@@ -30,23 +31,41 @@ namespace Jet {
 //! Used to embed logic in a scene node.
 //! @class ControlScript
 //! @brief Embeds logic in a scene node
-class JETAPI Controller : public SceneComponent {
+class ControlScript : public Object {
 public:
     //! Called when the control script is attached to the scene component  
-    virtual void on_attach()=0;
+    virtual void on_attach(const AttachmentEvent& evt)=0;
     
-    //! Called when the parent scene node is created
-    virtual void on_create()=0;
-
     //! Called when the rigid body belogning to the parent scene node
     //! collides with another rigid body
-    virtual void on_collision()=0;
+    virtual void on_collision(const CollisionEvent& evt)=0;
 
-    //! Called when the scene node is updated
-    virtual void on_network_update()=0;
+    //! Called during a game update
+    virtual void on_tick(const TickEvent& evt)=0;
+};
 
-private:
-    Controller(SceneNode* parent, const std::string& name, const std::string& path);
+struct AttachmentEvent {
+    //! The node the controlscript is attached to.
+    SceneNode* node; 
+};
+
+struct CollisionEvent {
+    //! The node that this node collided with.
+    SceneNode* other;
+
+    //! The position at which the two nodes are touching.
+    Vector contact_position;
+
+    //! The normal at the contact point.
+    Vector contact_normal;
+};
+
+struct TickEvent {
+    //! The time since the last tick.  This is always fixed.
+    real_t delta;
+
+    //! The tick number.  Starts at zero and increments with teach tick.
+    uint32_t tick;
 };
 
 }

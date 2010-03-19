@@ -22,7 +22,7 @@
 #pragma once
 
 #include <Jet/Jet.hpp>
-#include <Jet/SceneComponent.hpp>
+#include <Jet/Object.hpp>
 #include <Jet/Vector.hpp>
 #include <Jet/Quaternion.hpp>
 #include <string>
@@ -35,8 +35,9 @@ namespace Jet {
 //! are using.
 //! @class RigidBody
 //! @brief Physical simulation with collisions.
-class JETAPI RigidBody : public SceneComponent {
+class RigidBody : public Object {
 public:
+    //! Destructor.
     virtual ~RigidBody() {}
     // 1/2 at^2 + vt + x
 
@@ -85,10 +86,6 @@ public:
     //! coordinates.
     //! @param v the torque to apply
     virtual void apply_local_torque(const Vector& v)=0;
-
-
-private:
-    RigidBody(SceneNode* parent, const std::string& name);
 };
 
 }

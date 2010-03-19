@@ -22,7 +22,7 @@
 #pragma once
 
 #include <Jet/Jet.hpp>
-#include <Jet/SceneComponent.hpp>
+#include <Jet/Object.hpp>
 #include <string>
 
 namespace Jet {
@@ -33,39 +33,38 @@ namespace Jet {
 //! batches for maximum performance.
 //! @class Quad
 //! @brief Displays a solid quad.
-class JETAPI Quad : public SceneComponent {
+class Quad : public Object {
 public:
     //! Destroys the quad.
     virtual ~Quad() {}
 
     //! Returns the name of the material used to render this quad.
-    const std::string& get_material() const { return material; }
+    virtual const std::string& material_name() const=0;
+
+    //! Returns the material used to render this quad.
+    virtual Material* material() const=0;
 
     //! Returns the width of this quad in world coordinates.
-    real_t get_width() const { return width; }
+    virtual real_t width() const=0;
 
     //! Returns the height of this quad in world coordinates.
-    real_t get_height() const { return height; }
+    virtual real_t height() const=0;
 
     //! Sets the material used to render this quad.  See the documentation 
     //! regarding materials for more information.
-    void set_material(const std::string& s) { material = s; }
+    virtual void material_name(const std::string& s)=0;
+
+    //! Sets the material used to render this quad.
+    //! @param material the material
+    virtual void material(Material* material)=0;
 
     //! Sets the width of this quad in world coordinates.
     //! @param f the new width of the quad
-    void set_width(real_t f) { width = f; }
+    virtual void width(real_t f)=0;
 
     //! Sets the height of this quad in world coordinates.
     //! @param f the new height of this quad
-    void set_height(real_t f) { height = f; }
-
-private:
-    Quad(SceneNode* parent, const std::string& name);
-    friend class SceneNode;
-
-    std::string material;
-    real_t width;
-    real_t height;
+    virtual void height(real_t f)=0;
 };
 
 }

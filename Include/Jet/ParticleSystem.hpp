@@ -22,7 +22,7 @@
 #pragma once
 
 #include <Jet/Jet.hpp>
-#include <Jet/SceneComponent.hpp>
+#include <Jet/Object.hpp>
 #include <string>
 
 namespace Jet {
@@ -32,7 +32,7 @@ namespace Jet {
 //! configured via the particle script callback.
 //! @class ParticleSystem
 //! @brief Displays particle effects.
-class ParticleSystem {
+class ParticleSystem : public Object {
 public:
 
     //! Destroys the scene component

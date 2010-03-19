@@ -24,9 +24,12 @@
 
 namespace Jet {
 
-class JETPI LogicModule {
+class AudioModule : public Module {
 public:
     
     //! Destroys the logic module
-    ~LogicModule()=0;
+    ~AudioModule()=0;
+
+    //! Creates a new audio source
+    AudioSource* create_audio_source(const std::string& type)=0;
 }

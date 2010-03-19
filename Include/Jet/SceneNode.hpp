@@ -22,16 +22,13 @@
 #pragma once
 
 #include <Jet/Jet.hpp>
-#include <Jet/SceneComponent.hpp>
+#include <Jet/Object.hpp>
 #include <Jet/Vector.hpp>
 #include <Jet/Quaternion.hpp>
-#include <any_iterator/any_iterator.hpp>
+#include <Jet/Iterator.hpp>
 #include <string>
-#include <memory>
-#include <map>
 
 namespace Jet {
-    using namespace IteratorTypeErasure;
 
 //! This class manages dynamic objects in the scene.  Many different objects
 //! may be created through this class in a hierarchical fashion.  The positions
@@ -43,14 +40,14 @@ namespace Jet {
 //! must have a name unique to this scene node, regardless of type.
 //! @class SceneNode
 //! @brief Represents a node in the scene graph.
-class JETAPI SceneNode : public SceneComponent {
+class SceneNode : public Object {
 public:
-    
     //! Destructor.
     virtual ~SceneNode() {}
     
     //! Returns the parent scene node
     virtual SceneNode* parent() const=0;
+    
     //! Returns a particle system that is a child of this scene node
     //! @param the name of the particle system
     virtual ParticleSystem* particle_system(const std::string& name)=0;
@@ -72,7 +69,7 @@ public:
 
     //! Returns the controller with the given name.
     //! @param name the name of the controller
-    virtual Controller* controller(const std::string& name)=0;
+    virtual ControlScript* control_script(const std::string& name)=0;
     
     //! Returns the rigid body that is a child of this scene node.
     virtual RigidBody* rigid_body(const std::string& type="")=0;
@@ -81,22 +78,22 @@ public:
     virtual NetworkMonitor* network_monitor(const std::string& type="")=0;
     
     //! Returns all particle systems attached to this scene node.
-    virtual any_iterator<ParticleSystem*> particle_systems() const=0;
+    virtual Iterator<ParticleSystem> particle_systems() const=0;
     
     //! Returns all mesh objects attached to this scene node.
-    virtual any_iterator<MeshObject*> mesh_objects() const=0;
+    virtual Iterator<MeshObject> mesh_objects() const=0;
     
     //! Returns all quads attached to this scene node.
-    virtual any_iterator<Quad*> quads() const=0;
+    virtual Iterator<Quad> quads() const=0;
     
     //! Returns all audio sources attached to this scene node.
-    virtual any_iterator<AudioSource*> audio_sources() const=0;
+    virtual Iterator<AudioSource> audio_sources() const=0;
 
     //! Returns the set of all scene nodes attached to this scene node.
-    virtual any_iterator<SceneNode*> scene_nodes() const=0;
+    virtual Iterator<SceneNode> scene_nodes() const=0;
 
     //! Returns the set of all controllers attached to this scene node.
-    virtual any_iterator<Controller*> controllers() const=0;
+    virtual Iterator<ControlScript> control_scripts() const=0;
     
     //! Adds a particle system to this scene node.
     //! @param name the name of the system
@@ -125,7 +122,7 @@ public:
     //! Adds a controller to this node.
     //! @param name the name the controller will have
     //! @param type the type of controller to add
-    virtual Controller* add_controller(const std::string& name, const std::string& type)=0;
+    virtual ControlScript* add_control_script(const std::string& name, const std::string& type)=0;
 
     //! Returns the current position of this scene node relative to its parent.
     virtual const Vector& position() const=0;

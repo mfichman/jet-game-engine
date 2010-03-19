@@ -22,14 +22,14 @@
 #pragma once
 
 #include <Jet/Jet.hpp>
-#include <Jet/SceneComponent.hpp>
+#include <Jet/Object.hpp>
 
 namespace Jet {
 
 //! Manages network synchronization for the parent scene node.
 //! @class NetworkMonitor
 //! @brief Manages network synchronization.
-class JETAPI NetworkMonitor : public SceneComponent {
+class NetworkMonitor : public Object {
 
 };
 }

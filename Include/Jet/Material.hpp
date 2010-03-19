@@ -31,7 +31,7 @@ namespace Jet {
 //! Set of parameters used for rendering objects.
 //! @class Material
 //! @brief Parameters used for rendering objects.
-class Material /*: public Resource*/ {
+class Material : public Object {
 public:
     
     //! Destructor

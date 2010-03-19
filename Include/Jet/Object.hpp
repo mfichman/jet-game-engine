@@ -25,19 +25,37 @@
 
 namespace Jet {
 
-//! Modules expose features to the main engine.  The most important modules
-//! are physics, audio, and graphics, but other can be created and added
-//! to the engine as plugins.
-//! @class Modules
-//! @brief Exposes features to the main engine.
-class Module {
+//! This is the base class for all Jet Engine objects.  It is used for 
+//! reflection and smart pointer reference counting.
+class Object {
 public:
-    
-    virtual void on_pre_render()=0;
 
-    virtual void on_render()=0;
+    //! Constructor.
+    Object() : refcount_(0) {}
 
-    virtual void on_post_render()=0;
+    //! Destructor
+    virtual ~Object() {}
+
+    //! Returns the number of references held on this object.
+    inline size_t refcount() { 
+        return refcount_; 
+    }
+
+    //! Increments the reference count on this object.
+    inline size_t refcount_inc() { 
+        refcount_++; 
+    }
+
+    //! Decrements the reference count on this object.
+    inline size_t refcount_dec() { 
+        refcount_--; 
+        if (refcount_ < 0) {
+            delete this;
+        } 
+    }
+
+private:
+    size_t refcount_;
 };
 
 }

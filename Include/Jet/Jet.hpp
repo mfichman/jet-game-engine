@@ -24,6 +24,7 @@
 #include <cstdint>
 #include <string>
 #include <map>
+#include <utility>
 
 #ifdef WINDOWS
 #define JETIMPORT							__declspec(dllimport)
@@ -44,7 +45,7 @@ namespace Jet {
     class AudioSource;
     class AudioModule;
     class Color;
-    class Controller;
+    class ControlScript;
     class GraphicsModule;
     class LogicModule;
     class Material;
@@ -52,12 +53,12 @@ namespace Jet {
     class Mesh;
     class NetworkMonitor;
     class NetworkModule;
+    class Object;
     class ParticleSystem;
     class PhysicsModule;
     class Quad;
     class Quaternion;
     class RigidBody;
-    class SceneComponent;
     class SceneNode;
     class Vector;
 
@@ -68,5 +69,7 @@ namespace Jet {
     enum CollisionMode { CM_BOX, CM_SPHERE, CM_MESH };
     enum EmitterType { ET_ELLIPSOID, ET_POINT, ET_BOX };
     enum CoordSystem { CT_WORLD, CT_LOCAL };
+    enum PlaybackMode { PM_LOOP, PM_ONCE };
+    enum PlaybackState { PS_PLAYING, PS_PAUSED, PS_STOPPED };
 };
 

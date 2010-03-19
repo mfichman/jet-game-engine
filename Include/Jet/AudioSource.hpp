@@ -22,48 +22,53 @@
 #pragma once
 
 #include <Jet/Jet.hpp>
-#include <Jet/SceneComponent.hpp>
+#include <Jet/Object.hpp>
 #include <string>
 
 namespace Jet {
 
 //! This class plays sound effects.  If 3D sound is enabled, the origin of 
 //! the sound will be equal to the position of the parent scene node.  To play
-//! non-position audio, like music, use a ambient sounds.
+//! non-positional audio, like music, use a ambient sounds.
 //! @class AudioSource
 //! @brief Plays sound effects.
-class JETAPI AudioSource : public SceneComponent {
+class AudioSource : public Object {
 public:
 
+    //! Returns the parent scene node
+    virtual SceneNode* parent() const=0;
+
     //! Name of the sound currently playing.
-    virtual const std::string& get_sound() const=0;
+    virtual const std::string& sound() const=0;
 
     //! Returns the gain or volume of the sound.  Note that this is the volume
     //! of the sound if the listener is right next to the parent scene node;
     //! if the listener is farther away the perceived volume will be less.
-    virtual real_t get_gain() const=0;
+    virtual real_t gain() const=0;
 
-    //! Returns true if the sound should be looped.
-    virtual bool is_looping_enabled() const=0;
+    //! Returns the playback mode of the sound.
+    virtual PlaybackMode playback_mode() const=0;
 
-    //! Returns true if the sound is playing
-    virtual bool is_playing() const=0;
+    //! Returns whether or not the audio clip is stopped/playing/paused.
+    virtual PlaybackState playback_state() const=0;
     
     //! Sets the sound currently playing.
     //! @param sound the name of the new sound
-    virtual void set_sound(const std::string& s)=0;
+    virtual void sound(const std::string& s)=0;
 
     //! Sets the gain or volume of the sound.
     //! @param f the gain of the sound
-    virtual void set_gain(real_t f)=0;
+    virtual void gain(real_t f)=0;
 
-    //! Sets looping for sounds.
-    //! @param b true to enable looping
-    virtual void set_looping_enabled(bool b)=0;
+    //! Sets looping for sounds.  The options are PM_LOOP for looping playback, 
+    //! or PM_ONCE to play the sound once, then stop.
+    //! @param b playback mode
+    virtual void playback_mode(PlaybackMode b)=0;
 
-    //! Plays/stops the sound.
-    //! @param b true to start the sound
-    virtual void set_playing(bool b)=0;
+    //! Plays/stops the sound.  PS_PLAYING starts playing the sound, 
+    //! PS_STOPPED stops the sound, and PS_PAUSED pasues the sound.
+    //! @param b the playback state
+    virtual void playback_state(PlaybackState b)=0;
 
 private:
     AudioSource(SceneNode* parent, const std::string& name);

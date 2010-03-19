@@ -21,6 +21,7 @@
  */  
 
 #include <Jet/Jet.hpp>
+#include <Jet/Object.hpp>
 
 namespace Jet {
 
@@ -28,7 +29,7 @@ namespace Jet {
 //! objects in the game engine.
 //! @class Engine
 //! @brief Main engine class.
-class JETAPI Engine {
+class Engine : public Object {
 public:
     
     //! Creates a new engine.
@@ -36,27 +37,27 @@ public:
 
     //! Returns the root scene node.  This node can be used to add 
     //! other objects to the scene.
-    SceneNode* get_root() { return root; }
+    SceneNode* root() { return root; }
 
     //! Adds an audio module to the engine.
     //! @param module the audio module
-    void set_audio(AudioModule* module);
+    void audio(AudioModule* module);
 
     //! Adds a graphics module to the engine.
     //! @param module the graphics module
-    void set_graphics(GraphicsModule* module);
+    void graphics(GraphicsModule* module);
 
     //! Adds a physics module to the engine.
     //! @param module the physics module
-    void set_physics(PhysicsModule* module);
+    void physics(PhysicsModule* module);
     
     //! Adds a network module to the engine
     //! @param network module the network module
-    void set_network(NetworkModule* module);
+    void network(NetworkModule* module);
 
     //! Adds a logic module to the engine
     //! @param module the logic module
-    void add_logic(LogicModule* module);
+    void logic(LogicModule* module);
 
 private:
     friend class SceneNode;

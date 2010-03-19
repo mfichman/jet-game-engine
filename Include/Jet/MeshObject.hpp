@@ -22,7 +22,7 @@
 #pragma once
 
 #include <Jet/Jet.hpp>
-#include <Jet/SceneComponent.hpp>
+#include <Jet/Object.hpp>
 #include <string>
 
 namespace Jet {
@@ -31,7 +31,7 @@ namespace Jet {
 //! entities by other game engines).  
 //! @class MeshObject
 //! @brief Displays a solid object.
-class MeshObject : public SceneComponent {
+class MeshObject : public Object {
 public:    
     //! Destroys the mesh object
     virtual ~MeshObject();
