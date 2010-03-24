@@ -21,7 +21,7 @@
  */  
 #pragma once
 
-#include <Jet/Jet.hpp>
+#include <Jet/Types.hpp>
 #include <Jet/Object.hpp>
 
 namespace Jet {

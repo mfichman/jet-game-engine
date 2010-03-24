@@ -21,7 +21,7 @@
  */  
 #pragma once
 
-#include <Jet/Jet.hpp>
+#include <Jet/Types.hpp>
 
 namespace Jet {
 
@@ -53,6 +53,9 @@ public:
             delete this;
         } 
     }
+
+    //! Clones this object
+    virtual Object* clone() { return 0; }
 
 private:
     size_t refcount_;

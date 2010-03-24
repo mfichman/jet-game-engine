@@ -20,7 +20,7 @@
  * IN THE SOFTWARE.
  */  
 
-#include <Jet/Jet.hpp>
+#include <Jet/Types.hpp>
 #include <Jet/Object.hpp>
 #include <Jet/Vertex.hpp>
 

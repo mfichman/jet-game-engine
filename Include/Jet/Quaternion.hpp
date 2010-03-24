@@ -21,7 +21,7 @@
  */  
 #pragma once
 
-#include <Jet/Jet.hpp>
+#include <Jet/Types.hpp>
 #include <iostream>
 
 std::ostream& operator<<(std::ostream& out, const Jet::Quaternion& quaternion);

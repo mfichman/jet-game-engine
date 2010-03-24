@@ -19,12 +19,26 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */  
-#pragma once
 
-namespace Jet { namespace OpenGL {
-    class GraphicsModule;
-    class Mesh;
-    class Shader;
-    class Texture;
-    class Cubemap;
-}}
+#include <Jet/Types.hpp>
+#include <Jet/Object.hpp>
+
+namespace Jet {
+
+//! This class is used to load objects from a plugin.  Plugins generally
+//! consist of several factories registered to the main engine class.
+//! @class Factory
+//! @brief Loads objects from a plugin
+class Factory : public Object {
+public:
+    //! Destructor
+    virtual ~Factory() {}
+
+    //! Creates a new object of the given type.  The object must match the
+    //! type specification parameter, or an exception will be thrown by the
+    //! engine and the object will be discarded.
+    virtual Object* create_object()=0;
+
+    //! Returns the type of object that this factory can build.
+    virtual const std::string& object_type()=0;
+};

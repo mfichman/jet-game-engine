@@ -19,20 +19,25 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */  
+#pragma once
 
-#include <Jet/OpenGL/OpenGL.hpp>
-#include <Jet/GraphicsModule.hpp>
+#include <Jet/Engine.hpp>
+#include <Jet/Engine/Types.hpp>
+#include <map>
 
-namespace Jet { namespace OpenGL {
+namespace Jet { namespace Engine {
 
-class GraphicsModule : public Jet::GraphicsModule {
+class Engine : public Jet::Engine {
 public:
 
-    //! Creates a display module
-    GraphicsModule();
-    
-    //! Destroys the module
-    virtual ~GraphicsModule();
+    Engine();
+    virtual ~Engine();
+    virtual SceneNode* root();
+    virtual void factory(Factory* factory);
+
+private:
+    SceneNode* root_;
+    std::map<std::string, Factory> factory_;
 };
 
 }}

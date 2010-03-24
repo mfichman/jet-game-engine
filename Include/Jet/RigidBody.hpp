@@ -21,7 +21,7 @@
  */  
 #pragma once
 
-#include <Jet/Jet.hpp>
+#include <Jet/Types.hpp>
 #include <Jet/Object.hpp>
 #include <Jet/Vector.hpp>
 #include <Jet/Quaternion.hpp>
@@ -89,6 +89,11 @@ public:
 
     //! Clears all accumulated torques on this object.
     virtual void torque_clear();
+
+protected:
+    //! Clones this object
+    virtual RigidBody* clone() const=0;
+
 };
 
 }

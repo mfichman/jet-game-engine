@@ -21,7 +21,7 @@
  */  
 #pragma once
 
-#include <Jet/Jet.hpp>
+#include <Jet/Types.hpp>
 #include <Jet/Object.hpp>
 #include <string>
 
@@ -38,9 +38,6 @@ public:
     //! Destroys the quad.
     virtual ~Quad() {}
 
-    //! Returns the name of the material used to render this quad.
-    virtual const std::string& material_name() const=0;
-
     //! Returns the material used to render this quad.
     virtual Material* material() const=0;
 
@@ -52,11 +49,7 @@ public:
 
     //! Sets the material used to render this quad.  See the documentation 
     //! regarding materials for more information.
-    virtual void material_name(const std::string& s)=0;
-
-    //! Sets the material used to render this quad.
-    //! @param material the material
-    virtual void material(Material* material)=0;
+    virtual void material(const std::string& s)=0;
 
     //! Sets the width of this quad in world coordinates.
     //! @param f the new width of the quad
@@ -68,7 +61,7 @@ public:
 
 protected:
     //! Clones this quad
-    virtual void clone()=0;
+    virtual Quad* clone()=0;
 };
 
 }

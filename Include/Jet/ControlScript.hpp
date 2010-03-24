@@ -21,12 +21,16 @@
  */  
 #pragma once
 
-#include <Jet/Jet.hpp>
+#include <Jet/Types.hpp>
 #include <Jet/Object.hpp>
 #include <Jet/Vector.hpp>
 #include <string>
 
 namespace Jet {
+
+struct AttachmentEvent;
+struct CollisionEvent;
+struct TickEvent;
 
 //! Used to embed logic in a scene node.
 //! @class ControlScript

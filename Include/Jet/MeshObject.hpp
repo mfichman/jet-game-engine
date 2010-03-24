@@ -19,8 +19,10 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */  
+#pragma once
 
-#include <Jet/Jet.hpp>
+#include <Jet/Types.hpp>
+#include <Jet/Object.hpp>
 #include <Jet/Vertex.hpp>
 
 namespace Jet {
@@ -37,21 +39,25 @@ public:
     virtual ~MeshObject() {}
 
     //! Gets the parent scene node.
-    virtual SceneNode* get_parent() const=0;
+    virtual SceneNode* parent() const=0;
 
     //! Gets the name of the current mesh.
-    virtual const std::string& get_mesh() const=0;
+    virtual Mesh* mesh() const=0;
 
     //! Gets the material name.
-    virtual const std::string& get_material() const=0;
+    virtual Material* material() const=0;
 
     //! Sets the mesh.
     //! @param mesh the mesh to set for this object
-    virtual void get_mesh(const std::string& name)=0;
+    virtual void mesh(const std::string& name)=0;
     
     //! Sets the material for this mesh object.
     //! @param name the name of the material
-    virtual void get_material(const std::string& name)=0;
+    virtual void material(const std::string& name)=0;
+
+protected:
+    //! Clones this mesh object
+    virtual MeshObject* clone()=0;
 };
 
 }

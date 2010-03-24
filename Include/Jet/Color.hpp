@@ -21,11 +21,11 @@
  */  
 #pragma once
 
-#include <Jet/Jet.hpp>
+#include <Jet/Types.hpp>
 #include <iostream>
 
-std::ostream& operator<<(std::ostream& out, const Jet::Color& color);
-std::istream& operator>>(std::istream& in, Jet::Color& color);
+JETAPI std::ostream& operator<<(std::ostream& out, const Jet::Color& color);
+JETAPI std::istream& operator>>(std::istream& in, Jet::Color& color);
 
 namespace Jet {
 
@@ -40,19 +40,7 @@ public:
     //! @param green green component
     //! @param alpha alpha component
     Color(real_t red, real_t blue, real_t green, real_t alpha);
-
-    //! Returns the red component
-    real_t get_red() const { return red; }
-
-    //! Returns the blue component
-    real_t get_blue() const { return blue; }
-
-    //! Returns the green component
-    real_t get_green() const { return green; }
-
-    //! Returns the alpha component
-    real_t get_alpha() const { return alpha; }
-
+    
     //! Stream operator.
     friend std::ostream& ::operator<<(std::ostream& out, const Color& color);
 

@@ -20,7 +20,7 @@
  * IN THE SOFTWARE.
  */  
 
-#include <Jet/Jet.hpp>
+#include <Jet/Types.hpp>
 #include <Jet/Object.hpp>
 
 namespace Jet {
@@ -37,8 +37,10 @@ public:
 
     //! Returns the root scene node.  This node can be used to add 
     //! other objects to the scene.
-    virtual SceneNode* get_root()=0;
+    virtual SceneNode* root()=0;
 
+    //! Adds a factory to the engine
+    virtual void factory(Factory* factory)=0;
 };
 
 }

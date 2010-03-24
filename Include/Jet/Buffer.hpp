@@ -22,21 +22,26 @@
 #pragma once
 
 #include <Jet/Types.hpp>
-#include <Jet/Texcoord.hpp>
-#include <iostream>
+#include <Jet/Object.hpp>
 
-std::ostream& operator<<(std::ostream& out, const Jet::Texcoord& vertex);
-std::istream& operator>>(std::istream& in, Jet::Texcoord& vertex);
+std::ostream& operator<<(std::ostream& out, const Jet::Color& color);
+std::istream& operator>>(std::istream& in, Jet::Color& color);
 
 namespace Jet {
 
-//! Represents a texture mapping coordinate.
-//! @class Texcoord
-//! @brief Represents a texture mapping coordinate.
-class JETAPI Texcoord {
-public:
-    real_t u;
-    real_t v;
+//! Class that stores binary data loaded from the disk and cached in memory.
+//! @class Buffer
+//! @brief Stores binary data loaded from the disk.
+class Buffer : public Object {
+public: 
+    //! Destructor
+    virtual ~Buffer() {}
+
+    //! Returns the data stored in this buffer
+    virtual const char* data() const=0;
+
+    //! Returns the size of the buffer
+    virtual size_t size() const=0;
 };
 
 }

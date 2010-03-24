@@ -19,33 +19,32 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */  
+#pragma once
 
-#include <Jet/OpenGL/OpenGL.hpp>
+#include <Jet/MeshObject.hpp>
+#include <Jet/Engine/Types.hpp>
 
-namespace Jet { namespace OpenGL {
+namespace Jet { namespace Engine {
 
-//! Allows loading and unloading of a texture.
-//! @class Texture
-//! @brief Class for loading and manipulating a texture.
-class Texture : public Jet::Texture {
+class MeshObject : public Jet::MeshObject {
 public:
 
-    //! Destructor
-    virtual ~Texture() {}
+    MeshObject(Engine* engine, SceneNode* parent);
+    virtual ~MeshObject();
+    virtual SceneNode* parent() const;
+    virtual Mesh* mesh() const;
+    virtual Material* material() const;
+    virtual void mesh(const std::string& name);
+    virtual void material(const std::string& name);
 
-    //! Returns the texture's name
-    virtual const std::string& name() const;
+protected:
+    virtual MeshObject* clone();
 
-    //! Gets the texture's source file
-    virtual const std::string& source() const; 
-
-    //! Sets the shader's name.
-    //! @param name the name of the shader
-    virtual void name(const std::string& name);
-
-    //! Sets the shader's source file name.
-    //! @param source the path to the shader's source file
-    virtual void source(const std::string& source);
+private:
+    Engine* engine_;
+    SceneNode* parent_;
+    Mesh* mesh_;
+    Material* material_;
 };
 
 }}
