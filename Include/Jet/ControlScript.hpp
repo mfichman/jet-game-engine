@@ -33,6 +33,7 @@ namespace Jet {
 //! @brief Embeds logic in a scene node
 class ControlScript : public Object {
 public:
+
     //! Called when the control script is attached to the scene component  
     virtual void on_attach(const AttachmentEvent& evt)=0;
     
@@ -42,6 +43,10 @@ public:
 
     //! Called during a game update
     virtual void on_tick(const TickEvent& evt)=0;
+
+protected:
+    //! Clones this control script
+    virtual ControlScript* clone()=0;
 };
 
 struct AttachmentEvent {
@@ -50,6 +55,9 @@ struct AttachmentEvent {
 };
 
 struct CollisionEvent {
+    //! The scene node involved in the collision
+    SceneNode* node;
+
     //! The node that this node collided with.
     SceneNode* other;
 
@@ -61,6 +69,9 @@ struct CollisionEvent {
 };
 
 struct TickEvent {
+    //! Scene node that is the source of this event
+    SceneNode* node;
+
     //! The time since the last tick.  This is always fixed.
     real_t delta;
 

@@ -46,7 +46,7 @@ public:
 
     //! Allows the iterator to be used in an if statement.  If the result of
     //! this function is true, the iterator has not reached the end.
-    bool bool() {
+    operator bool() {
         return begin_ != end_;
     }
 

@@ -112,6 +112,10 @@ public:
     //! system will run forever.
     //! @param range of new life of the particle system
     virtual void life(real_t range)=0;
+
+protected:
+    //! Clones this particle system.
+    virtual void clone()=0;
 };
 
 }

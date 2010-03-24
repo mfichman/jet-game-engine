@@ -65,6 +65,10 @@ public:
     //! Sets the height of this quad in world coordinates.
     //! @param f the new height of this quad
     virtual void height(real_t f)=0;
+
+protected:
+    //! Clones this quad
+    virtual void clone()=0;
 };
 
 }

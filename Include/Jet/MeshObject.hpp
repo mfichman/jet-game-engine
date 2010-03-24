@@ -19,63 +19,39 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */  
-#pragma once
 
 #include <Jet/Jet.hpp>
-#include <Jet/Object.hpp>
-#include <string>
+#include <Jet/Vertex.hpp>
 
 namespace Jet {
 
-//! Displays a solid object using a mesh and a material (also called actors and
-//! entities by other game engines).  
-//! @class MeshObject
-//! @brief Displays a solid object.
+//! Allows modification of a hardware mesh buffer, used in physics and 
+//! rendering.  Changes to the buffer are stored in application memory, and
+//! they are not pushed to the hardware until the flush() method is called.
+//! @class Mesh
+//! @brief Class for modifing a mesh, or building a new mesh.
 class MeshObject : public Object {
-public:    
-    //! Destroys the mesh object
-    virtual ~MeshObject();
+public:
 
-    //! Returns the material used to render this object.
-    virtual const std::string& material_name() const=0;
+    //! Destructor
+    virtual ~MeshObject() {}
 
-    //! Returns the name of the mesh associated with this object.
-    virtual const std::string& mesh_name() const=0;
-    
-    //! Returns the mesh object attached to this scene component
-    virtual Material* material() const=0;
-    
-    //! Returns the mesh attached to this scene component
-    virtual Mesh* mesh() const=0;
-    
-    //! Returns true if the mesh is used in collision detection.  Note that
-    //! the mesh must be attached to a node with a RigidBody also attached.
-    virtual CollisionMode collision_mode() const=0;
+    //! Gets the parent scene node.
+    virtual SceneNode* get_parent() const=0;
 
-    //! Sets the material used to render this object.  See the documentation
-    //! about materials for more information.
-    //! @param s the name of the material.
-    virtual void material_name(const std::string& s)=0;
+    //! Gets the name of the current mesh.
+    virtual const std::string& get_mesh() const=0;
 
-    //! Sets the name of the mesh to be used.
-    //! @param s the name of the mesh
-    virtual void mesh_name(const std::string& s)=0;
+    //! Gets the material name.
+    virtual const std::string& get_material() const=0;
+
+    //! Sets the mesh.
+    //! @param mesh the mesh to set for this object
+    virtual void get_mesh(const std::string& name)=0;
     
-    //! Sets the material for this mesh.
-    //! @param material the material
-    virtual void material(Material* material)=0;
-    
-    //! Sets the mesh attached to this object.
-    //! @param mesh the new mesh
-    virtual void mesh(Mesh* mesh)=0;
-    
-    //! Sets whether or not this object will be used in collision detection.
-    //! @param cm the current collision mode.  The values of the CollisionMode
-    //! enum are as follows: CM_BOX, use bounding-box collision; CM_SPHERE, use
-    //! bounding-sphere collision; and CM_MESH, use triangle mesh collision.
-    //! If triangle mesh collision is not available, CM_MESH will default to
-    //! CM_SPHERE.
-    virtual void collision_mode(CollisionMode cm) const=0;
+    //! Sets the material for this mesh object.
+    //! @param name the name of the material
+    virtual void get_material(const std::string& name)=0;
 };
 
 }

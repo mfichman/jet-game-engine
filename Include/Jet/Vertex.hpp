@@ -19,17 +19,29 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */  
+#pragma once
 
 #include <Jet/Jet.hpp>
+#include <Jet/Vector.hpp>
+#include <Jet/Vertex.hpp>
+#include <Jet/Texcoord.hpp>
+#include <iostream>
+
+std::ostream& operator<<(std::ostream& out, const Jet::Vertex& vertex);
+std::istream& operator>>(std::istream& in, Jet::Vertex& vertex);
 
 namespace Jet {
 
-class AudioModule : public Module {
+//! Represents a vertex.  Vertices are used to build meshes and other visible
+//! objects (except ParticleSystems).
+//! @class Vertex
+//! @brief Represents a vertex.
+class JETAPI Vertex {
 public:
-    
-    //! Destroys the logic module
-    ~AudioModule()=0;
+    Vector position;
+    Vector normal;
+    Vector binormal;
+    Texcoord tex;
+};
 
-    //! Creates a new audio source
-    AudioSource* create_audio_source(const std::string& type)=0;
 }

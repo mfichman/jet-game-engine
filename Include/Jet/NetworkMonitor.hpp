@@ -31,5 +31,8 @@ namespace Jet {
 //! @brief Manages network synchronization.
 class NetworkMonitor : public Object {
 
+protected:
+    //! Clones this network monitor
+    virtual NetworkMonitor* clone()=0;
 };
 }

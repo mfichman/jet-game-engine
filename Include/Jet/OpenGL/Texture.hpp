@@ -20,25 +20,32 @@
  * IN THE SOFTWARE.
  */  
 
-#include <Jet/Jet.hpp>
-#include <Jet/Object.hpp>
+#include <Jet/OpenGL/OpenGL.hpp>
 
-namespace Jet {
+namespace Jet { namespace OpenGL {
 
-//! This is the main engine class.  This object is the parent of all other
-//! objects in the game engine.
-//! @class Engine
-//! @brief Main engine class.
-class Engine : public Object {
+//! Allows loading and unloading of a texture.
+//! @class Texture
+//! @brief Class for loading and manipulating a texture.
+class Texture : public Jet::Texture {
 public:
-    
+
     //! Destructor
-    virtual ~Engine() {}
+    virtual ~Texture() {}
 
-    //! Returns the root scene node.  This node can be used to add 
-    //! other objects to the scene.
-    virtual SceneNode* get_root()=0;
+    //! Returns the texture's name
+    virtual const std::string& name() const;
 
+    //! Gets the texture's source file
+    virtual const std::string& source() const; 
+
+    //! Sets the shader's name.
+    //! @param name the name of the shader
+    virtual void name(const std::string& name);
+
+    //! Sets the shader's source file name.
+    //! @param source the path to the shader's source file
+    virtual void source(const std::string& source);
 };
 
-}
+}}

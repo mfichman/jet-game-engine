@@ -10,32 +10,27 @@
 
 #include <iostream>
 
-#include <luabind/luabind.hpp>
-#include <luabind/iterator_policy.hpp>
-#include <lua/lua.hpp>
+//#include <luabind/luabind.hpp>
+//#include <luabind/iterator_policy.hpp>
+//#include <lua/lua.hpp>
 
 #include <stdexcept>
 using namespace Jet;
 using namespace std;
 
-void create_bindings(lua_State* env);
+//void create_bindings(lua_State* env);
 
-
-Engine* engine() {
-    static Engine engine;
-    return &engine;
-}
 
 void main() {
-    lua_State* env = lua_open();
+    /*lua_State* env = lua_open();
     try {
         luaL_openlibs(env);
         luabind::open(env);
         create_bindings(env);
 
-        luabind::module(env) [
-            luabind::def("engine", &engine)
-        ];
+        // luabind::module(env) [
+        //    luabind::def("engine", &engine)
+        //];
         
         if (luaL_dostring(env, 
             "engine().root:add_scene_node(\"bob\", \"bob\")\n"
@@ -49,13 +44,13 @@ void main() {
         cout << ex.what() << endl;
     }
 
-    lua_close(env);    
+    lua_close(env);    */
 }
-
+/*
 void create_bindings(lua_State* env) {
    luabind::module(env) [
         luabind::class_<Engine>("Engine")
-            .property("root", &Engine::get_root)
+            .property("root", &Engine::root)
     ];
 
     luabind::module(env) [
@@ -160,5 +155,5 @@ void create_bindings(lua_State* env) {
             //.def("remove_controller", &SceneNode::remove_controller)
             .property("position", &SceneNode::get_position, &SceneNode::set_position)
             .property("rotation", &SceneNode::get_rotation, &SceneNode::set_position)
-    ];*/
-}
+    ];
+}  */

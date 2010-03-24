@@ -23,6 +23,7 @@
 
 #include <Jet/Jet.hpp>
 #include <Jet/Color.hpp>
+#include <Jet/Object.hpp>
 #include <string>
 #include <vector>
 
@@ -38,82 +39,61 @@ public:
     virtual ~Material() {}
     
     //! Returns the shader used by this material.
-    virtual const std::string& shader_name() const=0;
-
-    //! Returns a texture used by this material.  Materials may have more
-    //! than one texture, and this function returns the texture at the given
-    //! index.
-    //! @param index the texture index
-    virtual const std::string& texture_name(size_t index) const=0;
-    
-    //! Returns a cubemap used by this material.  Materials may have more
-    //! than one cubemap, and this function returns the cubemap at the given
-    //! index.
-    //! @param index the cubemap index
-    virtual const std::string& cubemap_name(size_t index) const=0;
+    virtual const std::string& get_shader() const=0;
     
     //! Returns the normal map for this object
-    virtual const std::string& normal_map_name() const=0;
+    virtual const std::string& get_normal_map() const=0;
     
     //! Returns the environment map for this object
-    virtual const std::string& environment_map_name() const=0;
+    virtual const std::string& get_environment_map() const=0;
     
     //! Returns the specular map for this object
-    virtual const std::string& specular_map_name() const=0;
+    virtual const std::string& get_specular_map() const=0;
     
     //! Returns the glow map for this object
-    virtual const std::string& glow_map_name() const=0;
+    virtual const std::string& get_glow_map() const=0;
 
     //! Returns the ambient color of the material.
-    virtual const Color& ambient_color() const=0;
+    virtual const Color& get_ambient_color() const=0;
 
     //! Returns the diffuse color of the material.
-    virtual const Color& diffuse_color() const=0;
+    virtual const Color& get_diffuse_color() const=0;
 
     //! Returns the specular color of the material.
-    virtual const Color& specular_color() const=0;
+    virtual const Color& get_specular_color() const=0;
 
     //! Returns the specular power, or shininess of the material.  This
     //! controls the size of the specular highlights.
-    virtual real_t shininess() const=0;
+    virtual real_t get_shininess() const=0;
 
     //! Returns the reflectivity of the material.  This parameter has no effect
     //! unless a reflective shader is enabled.
-    virtual real_t reflectivity() const=0;
+    virtual real_t get_reflectivity() const=0;
 
     //! Returns the transparency of the material.  This determines the order
     //! in which the geometry is rendered.
-    virtual real_t transparent() const=0;
+    virtual real_t get_transparency() const=0;
+
+    //! Returns the glow power of this material.
+    virtual real_t get_glow() const=0;
 
     //! Sets the shader used by this material.  For DirectX, the shader 
     //! corresponds to <name>.fx; for GLSL it corresponds to the shaders
     //! <name>.vertex.glsl and <name>.fragment.glsl if available.
     //! @param name the name of the shader
-    virtual void shader_name(const std::string& name) const=0;
-
-    //! Sets the texture used by this material.  Materials may have more than 
-    //! one texture, and this function sets the texture at the given index.
-    //! @param index the index of the cubemap
-    //! @param name the name of the cubemap
-    virtual void texture_name(size_t index, const std::string& name) const=0;
-
-    //! Sets the cubemap used by this material.  Materials may have more than 
-    //! one cubemap, and this function sets the cubemap at the given index.
-    //! @param index the index of the cubemap
-    //! @param name the name of the cubemap
-    virtual void cubemap_name(size_t index, const std::string& name) const=0;
+    virtual void shader(const std::string& name) const=0;
     
      //! Returns the normal map for this object
-    virtual void normal_map_name(const std::string& name) const=0;
+    virtual void normal_map(const std::string& name) const=0;
     
     //! Returns the environment map for this object
-    virtual void environment_map_name(const std::string& name) const=0;
+    virtual void environment_map(const std::string& name) const=0;
     
     //! Returns the specular map for this object
-    virtual void specular_map_name(const std::string& name) const=0;
+    virtual void specular_map(const std::string& name) const=0;
     
     //! Returns the glow map for this object
-    virtual void glow_map_name(const std::string& name) const=0;
+    virtual void glow_map(const std::string& name) const=0;
 
     //! Sets the ambient color used by this material. 
     //! @param c the color
@@ -139,8 +119,16 @@ public:
 
     //! Enables/disables the transparency of the material.  This determines the 
     //! order in which the geometry is rendered.
-    //! @param b true if the object is transparent
-    virtual void transparent(bool b)=0;
+    //! @param f the transparency of the material
+    virtual void transparency(real_t f)=0;
+
+    //! Sets the glow of the material.  This determines how much the material
+    //! will glow (i.e., scaling of the glow map).
+    virtual void glow(real_t f)=0;
+
+protected:
+    //! clones this material
+    virtual Material* clone()=0;
 };
 
 }

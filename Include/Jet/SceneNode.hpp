@@ -42,6 +42,7 @@ namespace Jet {
 //! @brief Represents a node in the scene graph.
 class SceneNode : public Object {
 public:
+
     //! Destructor.
     virtual ~SceneNode() {}
     
@@ -72,10 +73,10 @@ public:
     virtual ControlScript* control_script(const std::string& name)=0;
     
     //! Returns the rigid body that is a child of this scene node.
-    virtual RigidBody* rigid_body(const std::string& type="")=0;
+    virtual RigidBody* rigid_body()=0;
 
     //! Returns the network monitor that is a child of this scene node.
-    virtual NetworkMonitor* network_monitor(const std::string& type="")=0;
+    virtual NetworkMonitor* network_monitor()=0;
     
     //! Returns all particle systems attached to this scene node.
     virtual Iterator<ParticleSystem> particle_systems() const=0;
@@ -124,11 +125,19 @@ public:
     //! @param type the type of controller to add
     virtual ControlScript* add_control_script(const std::string& name, const std::string& type)=0;
 
+    //! Adds a controller to this node.
+    //! @param name the name of the controller
+    //! @param controller a pointer to the controler object
+    virtual ControlScript* control_script(const std::string& name, ControlScript* script)=0;
+
     //! Returns the current position of this scene node relative to its parent.
     virtual const Vector& position() const=0;
 
     //! Returns the current rotation of this scene node relative to its parent.
     virtual const Quaternion& rotation() const=0;
+
+    //! Gets the coordinate space for this object.
+    virtual CoordinateSpace coordinate_space() const=0;
 
     //! Sets the current position of this scene node relative to its parent.
     //! @param v the new position
@@ -137,7 +146,13 @@ public:
     //! Sets the current rotation of this scene node relative to its parent.
     //! @param v the new rotation
     virtual void rotation(const Quaternion& v)=0;
+    
+    //! Sets the coordinate space for this object.  This can be either 
+    //! CS_EYE for the coordinates to be interpreted in eye space, 
+    //! CS_WORLD for the coordinates to be interpreted in world space, or
+    //! CS_LOCAL for the coordinates to be interpreted in world space, 
+    //! but relative to the parent scene node.  The default is CS_LOCAL.
+    virtual void coordinate_space(CoordinateSpace cs)=0;
 };
-
 
 }

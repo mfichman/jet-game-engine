@@ -20,13 +20,19 @@
  * IN THE SOFTWARE.
  */  
 
-#include <Jet/Engine.hpp>
-#include <Jet/SceneNode.hpp>
+#include <Jet/OpenGL/OpenGL.hpp>
+#include <Jet/GraphicsModule.hpp>
 
-using namespace Jet;
-using namespace std;
+namespace Jet { namespace OpenGL {
 
-Engine::Engine() {//:
-    //root(new SceneNode(0, "jet")) {
+class GraphicsModule : public Jet::GraphicsModule {
+public:
 
-}
+    //! Creates a display module
+    GraphicsModule();
+    
+    //! Destroys the module
+    virtual ~GraphicsModule();
+};
+
+}}

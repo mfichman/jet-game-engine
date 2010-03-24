@@ -19,26 +19,24 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */  
+#pragma once
 
 #include <Jet/Jet.hpp>
-#include <Jet/Object.hpp>
+#include <Jet/Texcoord.hpp>
+#include <iostream>
+
+std::ostream& operator<<(std::ostream& out, const Jet::Texcoord& vertex);
+std::istream& operator>>(std::istream& in, Jet::Texcoord& vertex);
 
 namespace Jet {
 
-//! This is the main engine class.  This object is the parent of all other
-//! objects in the game engine.
-//! @class Engine
-//! @brief Main engine class.
-class Engine : public Object {
+//! Represents a texture mapping coordinate.
+//! @class Texcoord
+//! @brief Represents a texture mapping coordinate.
+class JETAPI Texcoord {
 public:
-    
-    //! Destructor
-    virtual ~Engine() {}
-
-    //! Returns the root scene node.  This node can be used to add 
-    //! other objects to the scene.
-    virtual SceneNode* get_root()=0;
-
+    real_t u;
+    real_t v;
 };
 
 }

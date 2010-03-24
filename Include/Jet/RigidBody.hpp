@@ -41,17 +41,22 @@ public:
     virtual ~RigidBody() {}
     // 1/2 at^2 + vt + x
 
+    //! Returns the parent of this rigid body.
+    virtual SceneNode* parent() const=0;
+
     //! Returns the linear velocity of the object.
     virtual const Vector& linear_velocity() const=0;
 
     //! Returns the angular velocity of the object.
     virtual const Vector& angular_velocity() const=0;
 
-    //! Returns the current position of this scene node relative to its parent.
-    virtual const Vector& position() const=0;
+    //! Returns the total accumulated force on this object relative to the
+    //! world coordinates.
+    virtual const Vector& force()=0;
 
-    //! Returns the current rotation of this scene node relative to its parent.
-    virtual const Quaternion& rotation() const=0;
+    //! Returns the total accumulated torque on this object relative to the
+    //! world coordinates.
+    virtual const Vector& torque()=0;
 
     //! Sets the linear velocity of the object.
     //! @param v the new linear velocity
@@ -61,31 +66,29 @@ public:
     //! @param v the new angular velocity
     virtual void angular_velocity(const Vector& v)=0;
 
-    //! Sets the current position of this scene node relative to its parent.
-    //! @param v the new position
-    virtual void position(const Vector& v)=0;
-
-    //! Sets the current rotation of this scene node relative to its parent.
-    //! @param v the new rotation
-    virtual void rotation(const Quaternion& v)=0;
-
     //! Applies a force to the object, relative to the world coordinates.
     //! @param v the force to apply
-    virtual void apply_force(const Vector& v)=0;
+    virtual void force_add(const Vector& v)=0;
 
     //! Applies a torque to the object, relative to the world coordinates.
     //! @param v the torque to apply
-    virtual void apply_torque(const Vector& v)=0;
+    virtual void torque_add(const Vector& v)=0;
 
     //! Applies a force to the object, relative to the parent scene node's
     //! coordinates.
     //! @param v the force to apply
-    virtual void apply_local_force(const Vector& v)=0;
+    virtual void local_force_add(const Vector& v)=0;
 
     //! Applies a torque to the object, relative to the parent scene node's
     //! coordinates.
     //! @param v the torque to apply
-    virtual void apply_local_torque(const Vector& v)=0;
+    virtual void local_torque_add(const Vector& v)=0;
+
+    //! Clears all accumulated forces on this object.
+    virtual void force_clear();
+
+    //! Clears all accumulated torques on this object.
+    virtual void torque_clear();
 };
 
 }

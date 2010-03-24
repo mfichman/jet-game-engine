@@ -21,54 +21,10 @@
  */  
 #pragma once
 
-#include <cstdint>
-#include <utility>
-#include <string>
-
-#ifdef WINDOWS
-#define JETIMPORT __declspec(dllimport)
-#define JETEXPORT __declspec(dllexport)
-#else
-#define JETIMPORT __attribute__ ((visibility ("default")))
-#define JETEXPORT __attribute__ ((visibility ("default")))
-#endif
-
-#ifdef JETDLL
-#define JETAPI JETEXPORT
-#else
-#define JETAPI JETIMPORT
-#endif
-
-namespace Jet {
-    class AudioSource;
-    class Color;
-    class ControlScript;
-    class ScriptModule;
-    class Material;
-    class MeshObject;
+namespace Jet { namespace OpenGL {
+    class GraphicsModule;
     class Mesh;
-    class NetworkMonitor;
-    class Object;
-    class ParticleSystem;
-    class Quad;
-    class Quaternion;
-    class RigidBody;
-    class SceneNode;
-    class Texcoord;
-    class Vector;
-    class Vertex;
-
-    struct DisplayOptions;
-    struct FrameEvent;
-
-    typedef float real_t;
-    typedef std::pair<real_t, real_t> range_t;
-
-    enum CoordinateSpace { CS_EYE, CS_WORLD, CS_LOCAL };
-    enum CollisionMode { CM_BOX, CM_SPHERE, CM_MESH };
-    enum EmitterType { ET_ELLIPSOID, ET_POINT, ET_BOX };
-    enum CoordSystem { CT_WORLD, CT_LOCAL };
-    enum PlaybackMode { PM_LOOP, PM_ONCE };
-    enum PlaybackState { PS_PLAYING, PS_PAUSED, PS_STOPPED };
-};
-
+    class Shader;
+    class Texture;
+    class Cubemap;
+}}
