@@ -21,11 +21,27 @@
  */  
 #pragma once
 
+#include <Jet/Types.hpp>
+#include <iostream>
+
+std::ostream& operator<<(std::ostream& out, const Jet::Range& range);
+std::istream& operator>>(std::istream& in, Jet::Range& range);
+
 namespace Jet {
-    class Engine;
-    class MeshObject;
-    class ParticleSystem;
-    class Quad;
-    class SceneNode;
+
+//! Represents a range of values (begin, end)
+//! @class Range
+//! @brief Represents a range of values
+class JETAPI Range {
+public:
+    real_t begin;
+    real_t end;
+
+    //! Stream operator.
+    friend std::ostream& ::operator<<(std::ostream& out, const Range& range);
+
+    //! Stream operator.
+    friend std::istream& ::operator>>(std::istream& in, Range& range);
 };
 
+}

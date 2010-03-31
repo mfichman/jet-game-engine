@@ -21,33 +21,40 @@
  */  
 #pragma once
 
-#include <Jet/Types.hpp>
-#include <Jet/Object.hpp>
-#include <vector>
+#include <Jet/Factory.hpp>
+#include <map>
+#include <iostream>
 
-namespace Jet {
+namespace Jet { namespace Core {
 
-//! Class that stores binary data loaded from the disk and cached in memory.
-//! @class Buffer
-//! @brief Stores binary data loaded from the disk.
-class JETAPI Buffer : public Object {
-public: 
-    //! Destructor
-    virtual ~Buffer() {}
+//! This class loads a material using the Wavefront .MTL file format.
+//! @class MatFactory
+//! @brief Loads .OBJ files
+class MTLFactory : public Factory {
+public:
+    //! Constructor.
+    MTLFactory(Engine* engine);
 
-    //! Returns the data stored in this buffer
-    inline const char* data() const {
-        return data_.empty() ? 0 : &data_.front();
+    //! Destructor.
+    virtual ~MTLFactory() {}
 
-    //! Returns the size of the buffer
-    inline size_t size() const= {
-        return data_.size();
-    }
+    //! Creates a new material from the given file.
+    //! @param file the .MTL file
+    virtual void create(const std::string& file);
 
 private:
-#pragma warning(disable:4251)
-    std::vector<char> data_;
-#pragma warning(default:4251)
+    void newmtl(std::istream& in);
+    void ambient(std::istream& in);
+    void diffuse(std::istream& in);
+    void specular(std::istream& in);
+    void transparency(std::istream& in);
+    void reflectivity(std::istream& in);
+    void texture_map(std::istream& in);
+    void specular_map(std::istream& in);
+    void normal_map(std::istream& in);
+
+    ComponentPtr material_;
+    std::map<std::string, void (MTLFactory::*)(std::istream&)> command_;
 };
 
-}
+}}

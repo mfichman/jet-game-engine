@@ -23,31 +23,32 @@
 
 #include <Jet/Types.hpp>
 #include <Jet/Object.hpp>
+#include <Jet/Iterator.hpp>
+#include <Jet/Value.hpp>
 #include <vector>
 
 namespace Jet {
 
-//! Class that stores binary data loaded from the disk and cached in memory.
-//! @class Buffer
-//! @brief Stores binary data loaded from the disk.
-class JETAPI Buffer : public Object {
-public: 
-    //! Destructor
-    virtual ~Buffer() {}
+//! A list of parameters for a dynamic function call.
+//! @class Params
+//! @brief Holds a list of parameters.
+class JETAPI Params {
+public:
 
-    //! Returns the data stored in this buffer
-    inline const char* data() const {
-        return data_.empty() ? 0 : &data_.front();
+    //! Adds a new parameter to the list
+    Params& operator%(const Value& value);
 
-    //! Returns the size of the buffer
-    inline size_t size() const= {
-        return data_.size();
-    }
+    //! Returns the parameter iterator.
+    operator Iterator<const Value>() const;
+
+    //! Returns the ith parameter
+    const Value& operator[](size_t index) const;
 
 private:
 #pragma warning(disable:4251)
-    std::vector<char> data_;
+    std::vector<Value> params_;
 #pragma warning(default:4251)
 };
+
 
 }

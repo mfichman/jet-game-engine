@@ -27,7 +27,7 @@ namespace Jet {
 
 //! This is the base class for all Jet Engine objects.  It is used for 
 //! reflection and smart pointer reference counting.
-class Object {
+class JETAPI Object {
 public:
 
     //! Constructor.
@@ -37,17 +37,17 @@ public:
     virtual ~Object() {}
 
     //! Returns the number of references held on this object.
-    inline size_t refcount() { 
+    inline size_t refcount() const { 
         return refcount_; 
     }
 
     //! Increments the reference count on this object.
-    inline size_t refcount_inc() { 
+    inline void refcount_inc() const { 
         refcount_++; 
     }
 
     //! Decrements the reference count on this object.
-    inline size_t refcount_dec() { 
+    inline void refcount_dec() const { 
         refcount_--; 
         if (refcount_ < 0) {
             delete this;
@@ -58,7 +58,15 @@ public:
     virtual Object* clone() { return 0; }
 
 private:
-    size_t refcount_;
+    mutable size_t refcount_;
 };
 
+}
+
+inline void intrusive_ptr_add_ref(Jet::Object* object) {
+    object->refcount_inc();
+}
+
+inline void intrusive_ptr_release(Jet::Object* object) {
+    object->refcount_dec();
 }

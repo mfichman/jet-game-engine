@@ -11,38 +11,30 @@
  * The above copyright notice and this permission notice shall be included in 
  * all copies or substantial portions of the Software.
  * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOVT WARRANTY OF ANY KIND, EXPRESS OR 
+ * IMPLIED, INCLUDING BVT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+ * AVTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * FROM, OVT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */  
-
-#include <Jet/Color.hpp>
+ 
+#include <Jet/OpenGL/Renderer.hpp>
+#include <Jet/Types.hpp>
+#include <Jet/Engine.hpp>
 
 using namespace Jet;
-using namespace std;
+using namespace Jet::OpenGL;
 
-Color::Color() :
-    red(0.0f),
-    blue(0.0f),
-    green(0.0f),
-    alpha(1.0f) {
+
+extern "C" {
+    JETAPI void load(Engine* engine);
 }
 
-Color::Color(real_t red, real_t blue, real_t green, real_t alpha) :
-    red(red),
-    blue(blue),
-    green(green),
-    alpha(alpha) {
-}
-
-ostream& operator<<(ostream& out, const Color& color) {
-    return out << color.red << " " << color.blue << " " << color.green << " " << color.alpha;
-}
-
-istream& operator>>(istream& in, Color& color) {
-    return in >> color.red >> color.blue >> color.green >> color.alpha;
+void load(Engine* engine) {
+    HandlerPtr renderer(new Renderer(engine));
+    engine->handler(EE_PRE_RENDER, renderer.get());
+    engine->handler(EE_POST_RENDER, renderer.get());
+    engine->handler(EE_RENDER, renderer.get());
 }

@@ -19,92 +19,79 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */  
+#pragma once
 
 #include <Jet/Types.hpp>
+#include <Jet/Vertex.hpp> 
 #include <Jet/Object.hpp>
-#include <Jet/Vertex.hpp>
+#include <vector>
 
 namespace Jet {
 
-//! Allows modification of a hardware mesh buffer, used in physics and 
-//! rendering.  Changes to the buffer are stored in application memory, and
-//! they are not pushed to the hardware until the flush() method is called.
+//! Class to hold mesh geometry for rendering.  Meshes are always stored as
+//! triangle lists (not triangle strips).
 //! @class Mesh
-//! @brief Class for modifing a mesh, or building a new mesh.
-class Mesh : public Object {
+//! @brief Class to hold mesh geometry for rendering.
+class JETAPI Mesh : public Object {
 public:
-
-    //! Destructor
+    //! Destructor.
     virtual ~Mesh() {}
 
-    //! Returns the source file for this mesh
-    virtual const std::string& source() const=0;
+    //! Returns a vertex that is part of this mesh
+    //! @param i the index of the vertex in the vertex buffer
+    inline const Vertex& vertex(size_t i) const {
+        return vertex_[i];
+    }
 
-    //! Returns the vertex at this index.
-    virtual const Vertex& vertex(size_t index) const=0;
+    //! Returns a vertex that is part of this mesh
+    //! @param i the index of the vertex in the vertex buffer
+    inline Vertex& vertex(size_t i) {
+        return vertex_[i];
+    }
 
-    //! Returns the normal at the index.  If the index is larger than the size
-    //! of the buffer, the zero vector will be returned.
-    //! @param index the normal at the given index.
-    virtual const Vector& normal(size_t index) const=0;
+    //! Returns an index that is part of this mesh.
+    //! @param i the index of the index in the index buffer
+    inline uint32_t index(size_t i) const {
+        return index_[i];
+    }
 
-    //! Returns the binormal at the given index.  If the index is larger than
-    //! the size of the buffer, the zero vector will be returned.
-    //! @param index the binormal at the given index.
-    virtual const Vector& binormal(size_t index) const=0;
+    //! Sets a vertex that is part of this mesh.  This method dynamically
+    //! resizes the buffer as needed.
+    //! @param i the index of the vertex
+    //! @param vertex the vertex to add.
+    void vertex(size_t i, const Vertex& vertex);
 
-    //! Returns the position at the given index.  If the index is larger than
-    //! the size of the buffer, the zero vector will be returned.
-    //! @param index the position at the given index.
-    virtual const Vector& position(size_t index) const=0;
+    //! Sets an index that is part of this mesh.  This method dynamically
+    //! resizes the buffer as needed.
+    //! @param i the index of the index.
+    //! @param index the index to add
+    void index(size_t i, uint32_t index);
 
-    //! Return the texture coordinate at the given index.  If the index is
-    //! larger than the size of the buffer, the zero vector will be returned.
-    //! @param index the texcoord at the given index
-    virtual const Texcoord& texcoord(size_t index) const=0;
+    //! Returns a pointer to the beginning of the vertex buffer.
+    inline const Vertex* vertex_data() const {
+        return vertex_.size() ? &vertex_.front() : 0;
+    }
 
-    //! Return the index from the index buffer at the given index.  If the
-    //! index is larger than the size of the buffer, zero will be returned.
-    virtual uint32_t index(size_t index) const=0;
+    //! Returns a pointer to the beginning of the index buffer.
+    inline const uint32_t* index_data() const {
+        return index_.size() ? &index_.front() : 0;
+    }
 
-    //! Sets or resets the data in this mesh to the contents of the given 
-    //! source file
-    virtual void source(const std::string& source)=0;
+    //! Returns the number of vertices.
+    inline size_t vertex_count() const {
+        return vertex_.size();
+    }
 
-    //! Sets the normal at the given index.  If the index is larger than the
-    //! size of the buffer, zero vectors are filled up to the given index.
-    //! The buffer will be resized.
-    virtual void normal(size_t index, const Vector& normal)=0;
-
-    //! Sets the binormal at the given index.  If the index is larger than the
-    //! size of the buffer, zero vectors are filled in up to the given index.
-    //! The buffer will be resized.
-    virtual void binormal(size_t index, const Vector& binormal)=0;
-
-    //! Sets the position at the given index.  If the index is larger than the
-    //! size of the buffer, zero vectors are filled in up to the given index.
-    virtual void position(size_t index, const Vector& position)=0; 
-
-    //! Sets the texture coordinate at the given index.  If the index is larger
-    //! than the size of the buffer, zero is filled in up to the given index.
-    virtual void texcoord(size_t index, const Texcoord& texcoord)=0;
-
-    //! Sets the index in the index buffer.  If the index is larger than the
-    //! size of the buffer, zero vectors are filled up to the given index.
-    virtual void index(size_t index, uint32_t ind)=0; 
-
-    //! Sets the vertex at the given index.  If the index is larger than the
-    //! size of the buffer, zero is filled in up to the given index.
-    virtual void vertex(size_t index, const Vertex& vertex)=0;
-
-    //! Flushes changes to the graphics card/physics engine.  Note that when
-    //! manipulating a Mesh, the changes are done in application memory, and 
-    //! so flush must be called before the update takes place.
-    virtual void flush()=0; 
-
-protected:
-    //! Clones this mesh object
-    virtual Mesh* clone() const=0;
+    //! Returns the number of indices.
+    inline size_t index_count() const {
+        return index_.size();
+    }
+    
+private:
+#pragma warning(disable:4251)
+    std::vector<Vertex> vertex_;
+    std::vector<uint32_t> index_;
+#pragma warning(default:4251)    
 };
 
 }

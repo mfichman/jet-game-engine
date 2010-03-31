@@ -27,27 +27,19 @@
 
 namespace Jet {
 
-//! Class that stores binary data loaded from the disk and cached in memory.
-//! @class Buffer
-//! @brief Stores binary data loaded from the disk.
-class JETAPI Buffer : public Object {
+//! Listens for engine events.  Examples include EE_PRE_RENDER (called before
+//! rendering), EE_POST_RENDER (called after rendering), EE_RENDER (called
+//! during rendering), and EE_UPDATE (called with each tick of the physics
+//! engine.
+//! @class Handler
+//! @brief Interface for handling engine events.
+class JETAPI Handler : public Object {
 public: 
-    //! Destructor
-    virtual ~Buffer() {}
+    //! Destructor.
+    virtual ~Handler() {}
 
-    //! Returns the data stored in this buffer
-    inline const char* data() const {
-        return data_.empty() ? 0 : &data_.front();
-
-    //! Returns the size of the buffer
-    inline size_t size() const= {
-        return data_.size();
-    }
-
-private:
-#pragma warning(disable:4251)
-    std::vector<char> data_;
-#pragma warning(default:4251)
+    //! Called when an event occurs.
+    inline void on_event(EngineEvent event);
 };
 
 }

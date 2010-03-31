@@ -34,6 +34,9 @@ namespace Jet {
 //! @brief RGBA color value.
 class JETAPI Color {
 public:
+    //! Creates a new color, initialized to black.
+    Color();
+
     //! Creates a new color.
     //! @param red red component
     //! @param blue blue component

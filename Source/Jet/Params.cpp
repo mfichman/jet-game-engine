@@ -18,36 +18,27 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- */  
-#pragma once
+ */
 
-#include <Jet/Types.hpp>
-#include <Jet/Object.hpp>
-#include <vector>
+#include <Jet/Params.hpp>
+#include <Jet/Value.hpp>
 
-namespace Jet {
+using namespace Jet;
+using namespace std;
 
-//! Class that stores binary data loaded from the disk and cached in memory.
-//! @class Buffer
-//! @brief Stores binary data loaded from the disk.
-class JETAPI Buffer : public Object {
-public: 
-    //! Destructor
-    virtual ~Buffer() {}
+Params& Params::operator%(const Value& value) {
+    params_.push_back(value);
+    return *this;
+}
 
-    //! Returns the data stored in this buffer
-    inline const char* data() const {
-        return data_.empty() ? 0 : &data_.front();
+Params::operator Iterator<const Value>() const {
+    return Iterator<const Value>(params_.begin(), params_.end());
+}
 
-    //! Returns the size of the buffer
-    inline size_t size() const= {
-        return data_.size();
+const Value& Params::operator[](size_t index) const {
+    if (index >= params_.size()) {
+        return Value::NIL;
+    } else {
+        return params_[index];
     }
-
-private:
-#pragma warning(disable:4251)
-    std::vector<char> data_;
-#pragma warning(default:4251)
-};
-
 }

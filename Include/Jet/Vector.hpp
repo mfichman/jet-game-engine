@@ -21,11 +21,11 @@
  */  
 #pragma once
 
-#include <Jet/Jet.hpp>
+#include <Jet/Types.hpp>
 #include <iostream>
 
-std::ostream& operator<<(std::ostream& out, const Jet::Vector& vector);
-std::istream& operator>>(std::istream& in, Jet::Vector& vector);
+JETAPI std::ostream& operator<<(std::ostream& out, const Jet::Vector& vector);
+JETAPI std::istream& operator>>(std::istream& in, Jet::Vector& vector);
 
 namespace Jet {
 
@@ -94,11 +94,19 @@ public:
     //! Returns an arbitrary vector perpindicular to this one.
     Vector orthogonal() const;
 
-    //! Stream operator
+    //! Stream operator.
     friend std::ostream& ::operator<<(std::ostream& out, const Vector& vector);
 
-    //! Stream operator
+    //! Stream operator.
     friend std::istream& ::operator>>(std::istream& in, Vector& vector);
+
+    //! Comparison operator.
+    bool operator<(const Vector& other) const {
+        if (x < other.x) return true;
+        if (y < other.y) return true;
+        return z < other.z;
+    }
+    
 
     static Vector ZERO;
     static Vector UNIT_X;

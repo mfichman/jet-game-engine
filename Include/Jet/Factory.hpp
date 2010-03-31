@@ -19,6 +19,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */  
+#pragma once
 
 #include <Jet/Types.hpp>
 #include <Jet/Object.hpp>
@@ -31,14 +32,22 @@ namespace Jet {
 //! @brief Loads objects from a plugin
 class Factory : public Object {
 public:
+    //! Creates a new factory.
+    Factory(Engine* engine) : 
+        engine_(engine) {
+    }
+
     //! Destructor
     virtual ~Factory() {}
 
     //! Creates a new object of the given type.  The object must match the
     //! type specification parameter, or an exception will be thrown by the
     //! engine and the object will be discarded.
-    virtual Object* create_object()=0;
+    //! @param source the source to load the object from
+    virtual void create(const std::string& source)=0;
 
-    //! Returns the type of object that this factory can build.
-    virtual const std::string& object_type()=0;
+protected:
+    Engine* engine_;
 };
+
+}

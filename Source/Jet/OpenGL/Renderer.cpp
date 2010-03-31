@@ -19,35 +19,21 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */  
-#pragma once
 
-#include <Jet/Types.hpp>
-#include <Jet/Object.hpp>
-#include <vector>
+#include <Jet/OpenGL/Renderer.hpp>
 
-namespace Jet {
+using namespace Jet::OpenGL;
 
-//! Class that stores binary data loaded from the disk and cached in memory.
-//! @class Buffer
-//! @brief Stores binary data loaded from the disk.
-class JETAPI Buffer : public Object {
-public: 
-    //! Destructor
-    virtual ~Buffer() {}
+Renderer::Renderer(Jet::Engine* engine) {
+    GLint argc = 0;
 
-    //! Returns the data stored in this buffer
-    inline const char* data() const {
-        return data_.empty() ? 0 : &data_.front();
+    glewInit();
+    glutInit(&argc, 0);
+    glutInitWindowSize(800, 600);
+    glutCreateWindow("Jet Engine");
+    
+}
 
-    //! Returns the size of the buffer
-    inline size_t size() const= {
-        return data_.size();
-    }
-
-private:
-#pragma warning(disable:4251)
-    std::vector<char> data_;
-#pragma warning(default:4251)
-};
+void Renderer::on_event(Jet::EngineEvent event) {
 
 }

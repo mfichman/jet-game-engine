@@ -1,11 +1,13 @@
 file(GLOB files "*.cpp")
 
-if(WIN32 AND NOT UNIX)
-add_definitions(/DJETDLL)
-endif()
 
+add_subdirectory("Test")
+
+add_definitions(/DJETDLL)
+add_subdirectory("Core")
 #add_subdirectory("Lua")
-#add_subdirectory("OpenGL")
+add_subdirectory("OpenGL")
 
 include_directories("D:\\Include\\Lua")
 add_library(Jet SHARED ${files})
+#add_executable(Jet ${files})

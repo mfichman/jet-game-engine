@@ -21,33 +21,27 @@
  */  
 #pragma once
 
-#include <Jet/Types.hpp>
-#include <Jet/Object.hpp>
+#include <Jet/Factory.hpp>
+#include <iostream>
 #include <vector>
+#include <map>
 
-namespace Jet {
+namespace Jet { namespace Core {
 
-//! Class that stores binary data loaded from the disk and cached in memory.
-//! @class Buffer
-//! @brief Stores binary data loaded from the disk.
-class JETAPI Buffer : public Object {
-public: 
+//! This class loads a mesh using the Wavefront .OBJ file format.
+//! @class ObjFactory
+//! @brief Loads .OBJ files
+class TextureFactory : public Factory {
+public:
+    //! Constructor
+    TextureFactory(Engine* engine);
+
     //! Destructor
-    virtual ~Buffer() {}
+    virtual ~TextureFactory() {}
 
-    //! Returns the data stored in this buffer
-    inline const char* data() const {
-        return data_.empty() ? 0 : &data_.front();
-
-    //! Returns the size of the buffer
-    inline size_t size() const= {
-        return data_.size();
-    }
-
-private:
-#pragma warning(disable:4251)
-    std::vector<char> data_;
-#pragma warning(default:4251)
+    //! Creates a new mesh from the given file.
+    //! @param file the .OBJ file
+    virtual void create(const std::string& file);
 };
 
-}
+}}

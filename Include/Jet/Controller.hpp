@@ -1,3 +1,5 @@
+
+
 /*
  * Copyright (c) 2010 Matt Fichman
  *
@@ -23,31 +25,38 @@
 
 #include <Jet/Types.hpp>
 #include <Jet/Object.hpp>
-#include <vector>
+#include <Jet/Params.hpp>
 
 namespace Jet {
 
-//! Class that stores binary data loaded from the disk and cached in memory.
-//! @class Buffer
-//! @brief Stores binary data loaded from the disk.
-class JETAPI Buffer : public Object {
-public: 
+//! Controller that can control the behavior of a node.
+//! @class Controller
+//! @brief Controller that can be attached to a scene node.
+class JETAPI Controller : public Object {
+public:
+    
     //! Destructor
-    virtual ~Buffer() {}
+    virtual ~Controller() {}
 
-    //! Returns the data stored in this buffer
-    inline const char* data() const {
-        return data_.empty() ? 0 : &data_.front();
-
-    //! Returns the size of the buffer
-    inline size_t size() const= {
-        return data_.size();
+    //! Returns the parent node.
+    inline Node* parent() const {
+        return parent_;
     }
 
+    //! Called when an event occurs regarding the current node.
+    //! @param name the name of the event.
+    //! @param params the parameters for the event.
+    virtual void on_event(const std::string& name, const Params& params=Params())=0;
+    
 private:
+    //! Clones this controller.
+    virtual Controller* clone() const=0;
+
 #pragma warning(disable:4251)
-    std::vector<char> data_;
+    Node* parent_;
 #pragma warning(default:4251)
+
+    friend class Node;
 };
 
 }

@@ -19,35 +19,26 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */  
-#pragma once
 
-#include <Jet/Types.hpp>
-#include <Jet/Object.hpp>
-#include <vector>
+#include <Jet/Texcoord.hpp>
 
-namespace Jet {
+using namespace Jet;
+using namespace std;
 
-//! Class that stores binary data loaded from the disk and cached in memory.
-//! @class Buffer
-//! @brief Stores binary data loaded from the disk.
-class JETAPI Buffer : public Object {
-public: 
-    //! Destructor
-    virtual ~Buffer() {}
+Texcoord::Texcoord(real_t u, real_t v) : 
+    u(u),
+    v(v) {
+}
 
-    //! Returns the data stored in this buffer
-    inline const char* data() const {
-        return data_.empty() ? 0 : &data_.front();
+Texcoord::Texcoord() :
+    u(0),
+    v(0) {
+}
 
-    //! Returns the size of the buffer
-    inline size_t size() const= {
-        return data_.size();
-    }
+ostream& operator<<(ostream& out, const Texcoord& tex) {
+    return out << tex.u << " " << tex.v;
+}
 
-private:
-#pragma warning(disable:4251)
-    std::vector<char> data_;
-#pragma warning(default:4251)
-};
-
+istream& operator>>(istream& in, Texcoord& tex) {
+    return in >> tex.u >> tex.v;
 }

@@ -21,27 +21,31 @@
  */  
 #pragma once
 
-#include <Jet/Jet.hpp>
+#include <Jet/Types.hpp>
 #include <Jet/Vector.hpp>
-#include <Jet/Vertex.hpp>
 #include <Jet/Texcoord.hpp>
 #include <iostream>
 
-std::ostream& operator<<(std::ostream& out, const Jet::Vertex& vertex);
-std::istream& operator>>(std::istream& in, Jet::Vertex& vertex);
-
 namespace Jet {
 
-//! Represents a vertex.  Vertices are used to build meshes and other visible
-//! objects (except ParticleSystems).
+//! Represents a vertex.
 //! @class Vertex
-//! @brief Represents a vertex.
+//! @brief Vertex class.
 class JETAPI Vertex {
 public:
+
+    //! Comparison operator.
+    inline bool operator<(const Vertex& other) const {
+        if (position < other.position) return true;
+        if (normal < other.normal) return true;
+        if (binormal < other.binormal) return true;
+        return texcoord < other.texcoord;
+    }
+    
     Vector position;
     Vector normal;
     Vector binormal;
-    Texcoord tex;
+    Texcoord texcoord;
 };
 
 }

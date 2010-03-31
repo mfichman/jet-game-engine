@@ -21,43 +21,46 @@
  */  
 #pragma once
 
-#include <Jet/Types.hpp>
-#include <Jet/Object.hpp>
-#include <Jet/Vertex.hpp>
+#include <Jet/Factory.hpp>
+#include <iostream>
+#include <vector>
+#include <map>
 
-namespace Jet {
+namespace Jet { namespace Core {
 
-//! Allows modification of a hardware mesh buffer, used in physics and 
-//! rendering.  Changes to the buffer are stored in application memory, and
-//! they are not pushed to the hardware until the flush() method is called.
-//! @class Mesh
-//! @brief Class for modifing a mesh, or building a new mesh.
-class MeshObject : public Object {
+//! This class loads a mesh using the Wavefront .OBJ file format.
+//! @class OBJFactory
+//! @brief Loads .OBJ files
+class OBJFactory : public Factory {
 public:
+    //! Constructor
+    OBJFactory(Engine* engine);
 
     //! Destructor
-    virtual ~MeshObject() {}
+    virtual ~OBJFactory() {}
 
-    //! Gets the parent scene node.
-    virtual SceneNode* parent() const=0;
+    //! Creates a new mesh from the given file.
+    //! @param file the .OBJ file
+    virtual void create(const std::string& file);
 
-    //! Gets the name of the current mesh.
-    virtual Mesh* mesh() const=0;
+private:
+    void face(std::istream& in);
+    void vertex(std::istream& in);
+    void normal(std::istream& in);
+    void texcoord(std::istream& in);
+    void mtllib(std::istream& in);
+    void usemtl(std::istream& in);
+    void binormal(Vertex face[3], size_t j);
 
-    //! Gets the material name.
-    virtual Material* material() const=0;
+    std::vector<Vector> position_;
+    std::vector<Vector> normal_;
+    std::vector<Texcoord> texcoord_;
+    std::map<Vertex, uint32_t> vertex_;
+    std::vector<uint32_t> index_;
+    uint32_t cur_index_;
+    std::string material_;
+    std::map<std::string, void (OBJFactory::*)(std::istream&)> command_;
 
-    //! Sets the mesh.
-    //! @param mesh the mesh to set for this object
-    virtual void mesh(const std::string& name)=0;
-    
-    //! Sets the material for this mesh object.
-    //! @param name the name of the material
-    virtual void material(const std::string& name)=0;
-
-protected:
-    //! Clones this mesh object
-    virtual MeshObject* clone()=0;
 };
 
-}
+}}

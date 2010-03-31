@@ -11,12 +11,12 @@
  * The above copyright notice and this permission notice shall be included in 
  * all copies or substantial portions of the Software.
  * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOVT WARRANTY OF ANY KIND, EXPRESS OR 
+ * IMPLIED, INCLUDING BVT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+ * AVTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * FROM, OVT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */  
 #pragma once
@@ -24,6 +24,7 @@
 #include <cstdint>
 #include <utility>
 #include <string>
+#include <boost/intrusive_ptr.hpp>
 
 #ifdef WINDOWS
 #define JETIMPORT __declspec(dllimport)
@@ -40,43 +41,40 @@
 #endif
 
 namespace Jet {
-    class AudioSource;
+    class Buffer;
     class Color;
-    class ControlScript;
+    class Component;
+    class Controller;
+    class Engine;
     class Factory;
+    class Handler;
     class Material;
     class Mesh;
-    class MeshObject;
-    class NetworkMonitor;
+    class Node;
     class Object;
-    class ParticleSystem;
-    class Quad;
+    class Params;
     class Quaternion;
-    class RigidBody;
-    class SceneNode;
+    class Range;
     class Texcoord;
+    class Texture;
+    class Value;
     class Vector;
     class Vertex;
 
-    struct DisplayOptions;
-    struct FrameEvent;
+    typedef boost::intrusive_ptr<Buffer> BufferPtr;
+    typedef boost::intrusive_ptr<Component> ComponentPtr;
+    typedef boost::intrusive_ptr<Controller> ControllerPtr;
+    typedef boost::intrusive_ptr<Engine> EnginePtr;
+    typedef boost::intrusive_ptr<Factory> FactoryPtr;
+    typedef boost::intrusive_ptr<Mesh> MeshPtr;
+    typedef boost::intrusive_ptr<Node> NodePtr;
+    typedef boost::intrusive_ptr<Object> ObjectPtr;
+    typedef boost::intrusive_ptr<Texture> TexturePtr;
+    typedef boost::intrusive_ptr<Handler> HandlerPtr;
 
     typedef float real_t;
-    typedef std::pair<real_t, real_t> range_t;
-
-    enum CoordinateSpace { CS_EYE, CS_WORLD, CS_LOCAL };
-    enum CollisionMode { CM_BOX, CM_SPHERE, CM_MESH };
-    enum EmitterType { ET_ELLIPSOID, ET_POINT, ET_BOX };
-    enum CoordSystem { CT_WORLD, CT_LOCAL };
-    enum PlaybackMode { PM_LOOP, PM_ONCE };
-    enum PlaybackState { PS_PLAYING, PS_PAUSED, PS_STOPPED };
-
-    extern const std::string OT_AUDIO_SOURCE;
-    extern const std::string OT_CONTROL_SCRIPT;
-    extern const std::string OT_MESH_OBJECT;
-    extern const std::string OT_PARTICLE_SYSTEM;
-    extern const std::string OT_NETWORK_MONITOR;
-    extern const std::string OT_QUAD;
-    extern const std::string OT_RIGID_BODY;
-};
-
+    typedef double number_t;
+    typedef void (*load_function_t)(Engine* engine);
+    enum ValueType { VT_NIL, VT_STRING, VT_COLOR, VT_NUMBER, VT_QUATERNION, VT_VECTOR, VT_RANGE };
+    enum EngineEvent { EE_PRE_RENDER, EE_POST_RENDER, EE_RENDER, EE_UPDATE };
+}

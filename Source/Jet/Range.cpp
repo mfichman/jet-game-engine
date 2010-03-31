@@ -19,29 +19,16 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */  
-#pragma once
 
-#include <Jet/Types.hpp>
-#include <iostream>
+#include <Jet/Range.hpp>
 
-std::ostream& operator<<(std::ostream& out, const Jet::Particle& particle);
-std::istream& operator>>(std::istream& in, Jet::Particle& particle);
+using namespace Jet;
+using namespace std;
 
-namespace Jet {
+ostream& operator<<(ostream& out, const Range& range) {
+    return out << range.begin << " " << range.end;
+}
 
-//! Represents a particle.
-//! @class Particle
-//! @brief Represents a particle.
-class JETAPI Particle {
-public:
-    real_t acceleration;
-    real_t velocity;
-    real_t rotation_rate;
-    real_t scale_rate;
-    real_t initial_position;
-    real_t initial_rotation;
-    real_t initial_size;
-    real_t life; // Remaining life
-};
-
+istream& operator>>(istream& in, Range& range) {
+    return in >> range.begin >> range.end;
 }

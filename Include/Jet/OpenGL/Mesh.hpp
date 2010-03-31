@@ -23,31 +23,34 @@
 
 #include <Jet/Types.hpp>
 #include <Jet/Object.hpp>
-#include <vector>
 
-namespace Jet {
+#ifdef WINDOWS
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#endif
+#include <GL/glew.h>
+#include <GL/gl.h>
 
-//! Class that stores binary data loaded from the disk and cached in memory.
-//! @class Buffer
-//! @brief Stores binary data loaded from the disk.
-class JETAPI Buffer : public Object {
-public: 
-    //! Destructor
-    virtual ~Buffer() {}
+namespace Jet { namespace OpenGL {
 
-    //! Returns the data stored in this buffer
-    inline const char* data() const {
-        return data_.empty() ? 0 : &data_.front();
+//! This class holds the vertex and index buffers for a triangle mesh.
+//! @class Mesh
+//! @brief Vertex and index buffers for a triangle mesh.
+class Mesh : public Object {
+public:
+    //! Constructor.
+    Mesh(Jet::Mesh* mesh);
 
-    //! Returns the size of the buffer
-    inline size_t size() const= {
-        return data_.size();
-    }
+    //! Destructor.
+    virtual ~Mesh();
+
+    //! Renders this mesh.
+    void render() const;
 
 private:
-#pragma warning(disable:4251)
-    std::vector<char> data_;
-#pragma warning(default:4251)
+    GLuint nvertices_;
+    GLuint vbuffer_;
+    GLuint ibuffer_;
 };
 
-}
+}}

@@ -19,32 +19,23 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */  
-#pragma once
 
-#include <Jet/MeshObject.hpp>
-#include <Jet/Engine/Types.hpp>
+#include <Jet/Mesh.hpp>
+#include <Jet/Vertex.hpp>
 
-namespace Jet { namespace Engine {
+using namespace Jet;
+using namespace std;
 
-class MeshObject : public Jet::MeshObject {
-public:
+void Mesh::vertex(size_t i, const Vertex& vertex) {
+    if (i >= vertex_.size()) {
+        vertex_.resize(i + 1);
+    }
+    vertex_[i] = vertex;
+}
 
-    MeshObject(Engine* engine, SceneNode* parent);
-    virtual ~MeshObject();
-    virtual SceneNode* parent() const;
-    virtual Mesh* mesh() const;
-    virtual Material* material() const;
-    virtual void mesh(const std::string& name);
-    virtual void material(const std::string& name);
-
-protected:
-    virtual MeshObject* clone();
-
-private:
-    Engine* engine_;
-    SceneNode* parent_;
-    Mesh* mesh_;
-    Material* material_;
-};
-
-}}
+void Mesh::index(size_t i, uint32_t index) {
+    if (i >= index_.size()) {
+        index_.resize(i + 1);
+    }
+    index_[i] = index;
+}

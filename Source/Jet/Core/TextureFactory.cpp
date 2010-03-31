@@ -19,25 +19,38 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */  
-#pragma once
-
+ 
+#include <Jet/Core/TextureFactory.hpp>
+#include <Jet/Texture.hpp>
 #include <Jet/Engine.hpp>
-#include <Jet/Engine/Types.hpp>
-#include <map>
+#include <IL/IL.h>
+#include <stdexcept>
 
-namespace Jet { namespace Engine {
+using namespace Jet;
+using namespace Jet::Core;
+using namespace std;
 
-class Engine : public Jet::Engine {
-public:
+TextureFactory::TextureFactory(Engine* engine) :
+    Factory(engine) {
 
-    Engine();
-    virtual ~Engine();
-    virtual SceneNode* root();
-    virtual void factory(Factory* factory);
+    if (ilGetInteger(IL_VERSION_NUM) < IL_VERSION) {
+        throw runtime_error("IL library version mismatch");
+    }
 
-private:
-    SceneNode* root_;
-    std::map<std::string, Factory> factory_;
-};
+    ilInit();
+}
 
-}}
+void TextureFactory::create(const std::string& file) {
+    ILuint image;
+    ilGenImages(1, &image);
+    ilBindImage(image);
+    ilLoadImage(file.c_str());
+    //ilGetError()
+
+    TexturePtr texture(new Texture);
+    texture->width(ilGetInteger(IL_IMAGE_WIDTH));
+    texture->height(ilGetInteger(IL_IMAGE_HEIGHT));
+    ilCopyPixels(0, 0, 0, texture->width(), texture->height(), 1, IL_RGBA, IL_UNSIGNED_BYTE, texture->data());
+
+    engine_->texture(file, texture.get());
+}

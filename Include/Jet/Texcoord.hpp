@@ -22,19 +22,37 @@
 #pragma once
 
 #include <Jet/Types.hpp>
-#include <Jet/Texcoord.hpp>
 #include <iostream>
 
-std::ostream& operator<<(std::ostream& out, const Jet::Texcoord& vertex);
-std::istream& operator>>(std::istream& in, Jet::Texcoord& vertex);
+JETAPI std::ostream& operator<<(std::ostream& out, const Jet::Texcoord& texcoord);
+JETAPI std::istream& operator>>(std::istream& in, Jet::Texcoord& texcoord);
 
 namespace Jet {
 
-//! Represents a texture mapping coordinate.
+//! Represents a 3-component texcoord.
 //! @class Texcoord
-//! @brief Represents a texture mapping coordinate.
+//! @brief 3-component texcoord.
 class JETAPI Texcoord {
 public:
+    //! Creates a new texcoord with the given components.
+    //! @param u u component
+    //! @param v v component
+    Texcoord(real_t u, real_t v);
+
+    //! Creates a new vector.
+    Texcoord();
+    
+    //! Stream operator.
+    friend std::ostream& ::operator<<(std::ostream& out, const Texcoord& texcoord);
+
+    //! Stream operator.
+    friend std::istream& ::operator>>(std::istream& in, Texcoord& texcoord);
+
+    bool operator<(const Texcoord& other) const {
+        if (u < other.u) return true;
+        return v < other.v;       
+    }
+
     real_t u;
     real_t v;
 };

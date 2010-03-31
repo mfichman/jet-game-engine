@@ -23,31 +23,45 @@
 
 #include <Jet/Types.hpp>
 #include <Jet/Object.hpp>
-#include <vector>
 
-namespace Jet {
+#ifdef WINDOWS
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#endif
+#include <GL/glew.h>
+#include <GL/gl.h>
 
-//! Class that stores binary data loaded from the disk and cached in memory.
-//! @class Buffer
-//! @brief Stores binary data loaded from the disk.
-class JETAPI Buffer : public Object {
-public: 
-    //! Destructor
-    virtual ~Buffer() {}
+namespace Jet { namespace OpenGL {
 
-    //! Returns the data stored in this buffer
-    inline const char* data() const {
-        return data_.empty() ? 0 : &data_.front();
+//! This class loads and manipulates a GPU shader ().
+//! @class Shader
+//! @brief Loads and manipulates a  shader.
+class Shader : public Object {
+public:
+    //! Constructor.
+    Shader(const std::string& path);
 
-    //! Returns the size of the buffer
-    inline size_t size() const= {
-        return data_.size();
-    }
+    //! Destructor.
+    virtual ~Shader();
+
+    //! Enables this shader.
+    void begin();
+
+    //! Disables this shader.
+    void end();
 
 private:
-#pragma warning(disable:4251)
-    std::vector<char> data_;
-#pragma warning(default:4251)
+    void source(GLuint shader, const std::string& path);
+
+    GLuint vertex_;
+    GLuint fragment_;
+    GLuint shader_;
+    GLuint program_;
+    GLuint texture_map_;
+    GLuint specular_map_;
+    GLuint normal_map_;
+    GLuint environment_map_;
+    GLuint binormal_;
 };
 
-}
+}}

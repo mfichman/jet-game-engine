@@ -23,45 +23,52 @@
 
 #include <Jet/Types.hpp>
 #include <Jet/Object.hpp>
-#include <string>
+#include <vector>
 
 namespace Jet {
 
-//! Displays a rectangular quad using a material.  This can be used for 
-//! various effects, including billboarding if the proper vertex shader is
-//! used.  All quads with the same material are automatically grouped into
-//! batches for maximum performance.
-//! @class Quad
-//! @brief Displays a solid quad.
-class Quad : public Object {
+//! Class to hold a texture data for rendering.
+//! @class Texture
+//! @brief Class to hold texture data.
+class JETAPI Texture : public Object {
 public:
-    //! Destroys the quad.
-    virtual ~Quad() {}
+    //! Destructor.
+    virtual ~Texture() {}
 
-    //! Returns the material used to render this quad.
-    virtual Material* material() const=0;
+    //! Returns the width of this texture in pixels.
+    inline size_t width() const {
+        return width_;
+    }
 
-    //! Returns the width of this quad in world coordinates.
-    virtual real_t width() const=0;
+    //! Returns the height of this texture in pixels.
+    inline size_t height() const {
+        return height_;
+    }
 
-    //! Returns the height of this quad in world coordinates.
-    virtual real_t height() const=0;
+    //! Returns a pointer to the texture data.
+    inline const uint8_t* data() const {
+        return &data_.front();
+    }
 
-    //! Sets the material used to render this quad.  See the documentation 
-    //! regarding materials for more information.
-    virtual void material(const std::string& s)=0;
+    //! Returns a pointer to the texture data.
+    inline uint8_t* data() {
+        return &data_.front();
+    }
 
-    //! Sets the width of this quad in world coordinates.
-    //! @param f the new width of the quad
-    virtual void width(real_t f)=0;
+    //! Sets the width of the texture in pixels.
+    //! @param width the new width
+    void width(size_t width);
 
-    //! Sets the height of this quad in world coordinates.
-    //! @param f the new height of this quad
-    virtual void height(real_t f)=0;
-
-protected:
-    //! Clones this quad
-    virtual Quad* clone()=0;
+    //! Sets the height of the texture in pixels.
+    //! @param height the new height
+    void height(size_t height);
+    
+private:
+#pragma warning(disable:4251)
+    std::vector<uint8_t> data_;
+    size_t width_;
+    size_t height_;
+#pragma warning(default:4251)    
 };
 
 }

@@ -19,20 +19,17 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */  
-#pragma once
 
-#include <Jet/Types.hpp>
-#include <Jet/Object.hpp>
+#include <Jet/Texture.hpp>
 
-namespace Jet {
+using namespace Jet;
 
-//! Manages network synchronization for the parent scene node.
-//! @class NetworkMonitor
-//! @brief Manages network synchronization.
-class NetworkMonitor : public Object {
+void Texture::width(size_t width) {
+    width_ = width;
+    data_.resize(width_ * height_ * 4);
+}
 
-protected:
-    //! Clones this network monitor
-    virtual NetworkMonitor* clone()=0;
-};
+void Texture::height(size_t height) {
+    height_ = height;
+    data_.resize(width_ * height_ * 4);
 }
