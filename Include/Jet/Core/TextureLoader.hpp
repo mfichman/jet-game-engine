@@ -21,40 +21,27 @@
  */  
 #pragma once
 
-#include <Jet/Factory.hpp>
-#include <map>
+#include <Jet/Loader.hpp>
 #include <iostream>
+#include <vector>
+#include <map>
 
 namespace Jet { namespace Core {
 
-//! This class loads a material using the Wavefront .MTL file format.
-//! @class MatFactory
+//! This class loads a mesh using the Wavefront .OBJ file format.
+//! @class ObjFactory
 //! @brief Loads .OBJ files
-class MTLFactory : public Factory {
+class TextureLoader : public Loader {
 public:
-    //! Constructor.
-    MTLFactory(Engine* engine);
+    //! Constructor
+    TextureLoader(Engine* engine);
 
-    //! Destructor.
-    virtual ~MTLFactory() {}
+    //! Destructor
+    virtual ~TextureLoader() {}
 
-    //! Creates a new material from the given file.
-    //! @param file the .MTL file
+    //! Creates a new mesh from the given file.
+    //! @param file the .OBJ file
     virtual void create(const std::string& file);
-
-private:
-    void newmtl(std::istream& in);
-    void ambient(std::istream& in);
-    void diffuse(std::istream& in);
-    void specular(std::istream& in);
-    void transparency(std::istream& in);
-    void reflectivity(std::istream& in);
-    void texture_map(std::istream& in);
-    void specular_map(std::istream& in);
-    void normal_map(std::istream& in);
-
-    ComponentPtr material_;
-    std::map<std::string, void (MTLFactory::*)(std::istream&)> command_;
 };
 
 }}

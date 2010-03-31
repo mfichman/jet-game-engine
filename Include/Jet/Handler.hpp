@@ -27,9 +27,9 @@
 
 namespace Jet {
 
-//! Listens for engine events.  Examples include EE_PRE_RENDER (called before
-//! rendering), EE_POST_RENDER (called after rendering), EE_RENDER (called
-//! during rendering), and EE_UPDATE (called with each tick of the physics
+//! Listens for engine events.  Examples include on_pre_render (called before
+//! rendering), on_post_render (called after rendering), on_render (called
+//! during rendering), and on_update (called with each tick of the physics
 //! engine.
 //! @class Handler
 //! @brief Interface for handling engine events.
@@ -38,8 +38,17 @@ public:
     //! Destructor.
     virtual ~Handler() {}
 
-    //! Called when an event occurs.
-    inline void on_event(EngineEvent event);
+    //! Called for each physics update.
+    virtual void on_update() {}
+    
+    //! Called before each frame.
+    virtual void on_pre_render() {}
+    
+    //! Called during each frame.
+    virtual void on_render() {}
+    
+    //! Called after each frame.
+    virtual void on_post_render() {}
 };
 
 }

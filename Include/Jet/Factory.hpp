@@ -29,10 +29,10 @@ namespace Jet {
 //! This class is used to load objects from a plugin.  Plugins generally
 //! consist of several factories registered to the main engine class.
 //! @class Factory
-//! @brief Loads objects from a plugin
+//! @brief Loads objects from a plugin.
 class Factory : public Object {
 public:
-    //! Creates a new factory.
+    //! Creates a new loader.
     Factory(Engine* engine) : 
         engine_(engine) {
     }
@@ -41,10 +41,10 @@ public:
     virtual ~Factory() {}
 
     //! Creates a new object of the given type.  The object must match the
-    //! type specification parameter, or an exception will be thrown by the
-    //! engine and the object will be discarded.
-    //! @param source the source to load the object from
-    virtual void create(const std::string& source)=0;
+    //! requested type, or a runtime_error will be thrown from within the
+    //! engine.
+    //! @param type the type of controller to create
+    virtual Object* create(const std::string& type)=0;
 
 protected:
     Engine* engine_;

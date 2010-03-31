@@ -28,9 +28,10 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
+#define FREEGLUT_LIB_PRAGMAS 0
 #include <GL/glew.h>
 #include <GL/gl.h>
-#include <GL/glut.h>
+#include <GL/freeglut.h>
 
 namespace Jet { namespace OpenGL {
 
@@ -49,7 +50,7 @@ public:
 
     //! Called when an event occurs.
     //! @param event the event code
-    virtual void on_event(EngineEvent event);
+    virtual void on_render();
 
 private:  
 };

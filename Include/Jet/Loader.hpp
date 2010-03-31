@@ -19,22 +19,35 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */  
+#pragma once
 
-#include <Jet/OpenGL/Renderer.hpp>
+#include <Jet/Types.hpp>
+#include <Jet/Object.hpp>
 
-using namespace Jet::OpenGL;
+namespace Jet {
 
-Renderer::Renderer(Jet::Engine* engine) {
-    GLint argc = 0;
+//! This class is used to load objects from a plugin.  Plugins generally
+//! consist of several factories registered to the main engine class.
+//! @class Loader
+//! @brief Loads objects from a plugin
+class Loader : public Object {
+public:
+    //! Creates a new loader.
+    Loader(Engine* engine) : 
+        engine_(engine) {
+    }
 
-    glewInit();
-    glutInit(&argc, 0);
-    glutInitWindowSize(800, 600);
-    glutCreateWindow("Jet Engine");
-    glutMainLoopEvent();
-    
-}
+    //! Destructor
+    virtual ~Loader() {}
 
-void Renderer::on_render() {
+    //! Creates a new object of the given type.  The object must match the
+    //! type specification parameter, or an exception will be thrown by the
+    //! engine and the object will be discarded.
+    //! @param source the source to load the object from
+    virtual void create(const std::string& source)=0;
+
+protected:
+    Engine* engine_;
+};
 
 }

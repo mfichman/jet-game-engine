@@ -20,7 +20,7 @@
  * IN THE SOFTWARE.
  */
 
-#include <Jet/Core/OBJFactory.hpp>
+#include <Jet/Core/OBJLoader.hpp>
 #include <Jet/Engine.hpp>
 #include <Jet/Vector.hpp>
 #include <Jet/Texcoord.hpp>
@@ -35,47 +35,47 @@ using namespace std;
 using namespace boost;
 
 
-OBJFactory::OBJFactory(Engine* engine) :
-    Factory(engine) {
+OBJLoader::OBJLoader(Engine* engine) :
+    Loader(engine) {
     
-    command_["mtllib"] = &OBJFactory::mtllib;
-    command_["usemtl"] = &OBJFactory::usemtl;
-    command_["v"] = &OBJFactory::vertex;
-    command_["vt"] = &OBJFactory::texcoord;
-    command_["vn"] = &OBJFactory::normal;
-    command_["f"] = &OBJFactory::face;
+    command_["mtllib"] = &OBJLoader::mtllib;
+    command_["usemtl"] = &OBJLoader::usemtl;
+    command_["v"] = &OBJLoader::vertex;
+    command_["vt"] = &OBJLoader::texcoord;
+    command_["vn"] = &OBJLoader::normal;
+    command_["f"] = &OBJLoader::face;
 }
 
-void OBJFactory::mtllib(istream& in) {
+void OBJLoader::mtllib(istream& in) {
     string mttlib;
     in >> mttlib;
     // load material TODO
 }
 
-void OBJFactory::usemtl(istream& in) {
+void OBJLoader::usemtl(istream& in) {
     in >> material_;
 }
 
-void OBJFactory::vertex(istream& in) {
+void OBJLoader::vertex(istream& in) {
     Vector position;
     in >> position;
     position_.push_back(position);
 }
 
-void OBJFactory::texcoord(istream& in) {
+void OBJLoader::texcoord(istream& in) {
     // Read in a texture coordinate
     Texcoord texcoord;
     in >> texcoord;
     texcoord_.push_back(texcoord);
 }
 
-void OBJFactory::normal(istream& in) {
+void OBJLoader::normal(istream& in) {
     Vector normal;
     in >> normal;
     normal_.push_back(normal);
 }
 
-void OBJFactory::face(istream& in) {    
+void OBJLoader::face(istream& in) {    
     // Read in a face for the mesh
     Vertex face[3];
     for (int i = 0; i < 3; i++) {
@@ -119,7 +119,7 @@ void OBJFactory::face(istream& in) {
     getline(in, line);
 }
 
-void OBJFactory::binormal(Vertex face[3], size_t j) {
+void OBJLoader::binormal(Vertex face[3], size_t j) {
     // Calculate binormals
     Vector d1 = face[(j+1)%3].position - face[j].position;
     Vector d2 = face[(j+2)%3].position - face[j].position;
@@ -138,7 +138,7 @@ void OBJFactory::binormal(Vertex face[3], size_t j) {
 
 // .OBJ (Wavefront) and .MTL loader.  Loads linked materials specified in the
 // .OBJ file.  
-void OBJFactory::create(const std::string& file) {
+void OBJLoader::create(const std::string& file) {
     static const std::string& ext = ".obj";
     if (file.rfind(ext) != ext.length()) {
         throw runtime_error("Invalid file extension");
@@ -158,7 +158,7 @@ void OBJFactory::create(const std::string& file) {
             string line;
             getline(in, line);
         } else {
-            map<string, void (OBJFactory::*)(istream&)>::iterator i = command_.find(command);
+            map<string, void (OBJLoader::*)(istream&)>::iterator i = command_.find(command);
             if (i != command_.end()) {
                 ((this)->*(i->second))(in);
             }

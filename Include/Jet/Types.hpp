@@ -47,6 +47,7 @@ namespace Jet {
     class Controller;
     class Engine;
     class Factory;
+    class Loader;
     class Handler;
     class Material;
     class Mesh;
@@ -66,15 +67,15 @@ namespace Jet {
     typedef boost::intrusive_ptr<Controller> ControllerPtr;
     typedef boost::intrusive_ptr<Engine> EnginePtr;
     typedef boost::intrusive_ptr<Factory> FactoryPtr;
+    typedef boost::intrusive_ptr<Handler> HandlerPtr;
+    typedef boost::intrusive_ptr<Loader> LoaderPtr;
     typedef boost::intrusive_ptr<Mesh> MeshPtr;
     typedef boost::intrusive_ptr<Node> NodePtr;
     typedef boost::intrusive_ptr<Object> ObjectPtr;
     typedef boost::intrusive_ptr<Texture> TexturePtr;
-    typedef boost::intrusive_ptr<Handler> HandlerPtr;
 
     typedef float real_t;
     typedef double number_t;
     typedef void (*load_function_t)(Engine* engine);
     enum ValueType { VT_NIL, VT_STRING, VT_COLOR, VT_NUMBER, VT_QUATERNION, VT_VECTOR, VT_RANGE };
-    enum EngineEvent { EE_PRE_RENDER, EE_POST_RENDER, EE_RENDER, EE_UPDATE };
 }

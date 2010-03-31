@@ -20,7 +20,7 @@
  * IN THE SOFTWARE.
  */
 
-#include <Jet/Core/MTLFactory.hpp>
+#include <Jet/Core/MTLLoader.hpp>
 #include <Jet/Engine.hpp>
 #include <fstream>
 
@@ -29,78 +29,78 @@ using namespace Jet;
 using namespace std;
 using namespace boost;
 
-MTLFactory::MTLFactory(Engine* engine) :
-    Factory(engine) {
+MTLLoader::MTLLoader(Engine* engine) :
+    Loader(engine) {
 
-    command_["Ka"] = &MTLFactory::ambient;
-    command_["Kd"] = &MTLFactory::diffuse;
-    command_["Ks"] = &MTLFactory::specular;
-    command_["d"] = &MTLFactory::transparency;
-    command_["tr"] = &MTLFactory::transparency;
-    command_["r"] = &MTLFactory::reflectivity;
-    command_["map_Ka"] = &MTLFactory::texture_map;
-    command_["map_Kd"] = &MTLFactory::texture_map;
-    command_["map_Ks"] = &MTLFactory::specular_map;
-    command_["map_bump"] = &MTLFactory::normal_map;
+    command_["Ka"] = &MTLLoader::ambient;
+    command_["Kd"] = &MTLLoader::diffuse;
+    command_["Ks"] = &MTLLoader::specular;
+    command_["d"] = &MTLLoader::transparency;
+    command_["tr"] = &MTLLoader::transparency;
+    command_["r"] = &MTLLoader::reflectivity;
+    command_["map_Ka"] = &MTLLoader::texture_map;
+    command_["map_Kd"] = &MTLLoader::texture_map;
+    command_["map_Ks"] = &MTLLoader::specular_map;
+    command_["map_bump"] = &MTLLoader::normal_map;
 }
 
-void MTLFactory::newmtl(istream& in) {
+void MTLLoader::newmtl(istream& in) {
     string value;
     in >> value;
     material_.reset(new Component("Material"));
     engine_->component(value, material_.get());
 }
 
-void MTLFactory::ambient(istream& in) {
+void MTLLoader::ambient(istream& in) {
     real_t red, blue, green;
     in >> red >> blue >> green;
     material_->value("ambient", Color(red, blue, green, 1.0f));  
 }
 
-void MTLFactory::diffuse(istream& in) {
+void MTLLoader::diffuse(istream& in) {
     real_t red, blue, green;
     in >> red >> blue >> green;
     material_->value("diffuse", Color(red, blue, green, 1.0f)); 
 }
 
-void MTLFactory::specular(istream& in) {
+void MTLLoader::specular(istream& in) {
     real_t red, blue, green;
     in >> red >> blue >> green;
     material_->value("specular", Color(red, blue, green, 1.0f)); 
 }
 
-void MTLFactory::transparency(istream& in) {
+void MTLLoader::transparency(istream& in) {
     real_t value;
     in >> value;
     material_->value("transparency", value);
 }
 
-void MTLFactory::reflectivity(istream& in) {
+void MTLLoader::reflectivity(istream& in) {
     real_t value;
     in >> value;
     material_->value("reflectivity", value);
 
 }
 
-void MTLFactory::texture_map(istream& in) {
+void MTLLoader::texture_map(istream& in) {
     string value;
     in >> value;
     material_->value("texture_map", value);
 }
 
-void MTLFactory::specular_map(istream& in) {
+void MTLLoader::specular_map(istream& in) {
     string value;
     in >> value;
     material_->value("specular_map", value);
 }
 
-void MTLFactory::normal_map(istream& in) {
+void MTLLoader::normal_map(istream& in) {
     string value;
     in >> value;
     material_->value("normal_map", value);
 }
   
-void MTLFactory::create(const std::string& file) {
+void MTLLoader::create(const std::string& file) {
     static const std::string& ext = ".mtl";
     if (file.rfind(ext) != ext.length()) {
         throw runtime_error("Invalid file extension");
@@ -117,7 +117,7 @@ void MTLFactory::create(const std::string& file) {
             string line;
             getline(in, line);
         } else {
-            map<string, void (MTLFactory::*)(istream&)>::iterator i = command_.find(command);
+            map<string, void (MTLLoader::*)(istream&)>::iterator i = command_.find(command);
             if (i != command_.end()) {
                 ((this)->*(i->second))(in);
             }

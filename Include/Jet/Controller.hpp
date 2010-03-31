@@ -38,24 +38,30 @@ public:
     //! Destructor
     virtual ~Controller() {}
 
-    //! Returns the parent node.
-    inline Node* parent() const {
-        return parent_;
-    }
-
     //! Called when an event occurs regarding the current node.
+    //! @param node the node that generated the event
     //! @param name the name of the event.
     //! @param params the parameters for the event.
-    virtual void on_event(const std::string& name, const Params& params=Params())=0;
+    virtual void on_event(Node* node, const std::string& name, const Params& params=Params())=0;
+    
+    //! Called during each physics update.  Note: this function is called
+    //! once per game tick, which is a regular interval fixed by default to
+    //! 60 Hz.
+    //! @param node the node that generated the event
+    virtual void on_update(Node* node)=0;
+    
+    //! Called during each frame.  Note: this function is NOT called once per
+    //! game tick.  It is called whenever the frame is rendered, and may not
+    //! be called at 60 Hz.  Place all time-dependent code in on_update
+    //! instead.  Also note that if the object is culled from the scene, this
+    //! method will not be called.
+    //! @param node the node that generated the event
+    virtual void on_render(Node* node)=0;
     
 private:
     //! Clones this controller.
     virtual Controller* clone() const=0;
-
-#pragma warning(disable:4251)
-    Node* parent_;
-#pragma warning(default:4251)
-
+    
     friend class Node;
 };
 

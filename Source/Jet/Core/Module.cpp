@@ -20,9 +20,9 @@
  * IN THE SOFTWARE.
  */  
 
-#include <Jet/Core/MTLFactory.hpp>
-#include <Jet/Core/OBJFactory.hpp>
-#include <Jet/Core/TextureFactory.hpp>
+#include <Jet/Core/MTLLoader.hpp>
+#include <Jet/Core/OBJLoader.hpp>
+#include <Jet/Core/TextureLoader.hpp>
 #include <Jet/Types.hpp>
 #include <Jet/Engine.hpp>
 
@@ -34,16 +34,16 @@ extern "C" {
 }
 
 void load(Engine* engine) {
-    FactoryPtr mtl_factory(new MTLFactory(engine));
-    FactoryPtr obj_factory(new OBJFactory(engine));
-    FactoryPtr texture_factory(new TextureFactory(engine));
+    LoaderPtr mtl_loader(new MTLLoader(engine));
+    LoaderPtr obj_loader(new OBJLoader(engine));
+    LoaderPtr texture_loader(new TextureLoader(engine));
 
-    engine->factory(".mtl", mtl_factory.get());
-    engine->factory(".MTL", mtl_factory.get());
-    engine->factory(".obj", obj_factory.get());
-    engine->factory(".OBJ", obj_factory.get());
-    engine->factory(".png", texture_factory.get());
-    engine->factory(".tga", texture_factory.get());
-    engine->factory(".jpg", texture_factory.get());
-    engine->factory(".bmp", texture_factory.get());
+    engine->loader(".mtl", mtl_loader.get());
+    engine->loader(".MTL", mtl_loader.get());
+    engine->loader(".obj", obj_loader.get());
+    engine->loader(".OBJ", obj_loader.get());
+    engine->loader(".png", texture_loader.get());
+    engine->loader(".tga", texture_loader.get());
+    engine->loader(".jpg", texture_loader.get());
+    engine->loader(".bmp", texture_loader.get());
 }

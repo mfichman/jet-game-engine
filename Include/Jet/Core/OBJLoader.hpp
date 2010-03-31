@@ -19,38 +19,48 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */  
- 
-#include <Jet/Core/TextureFactory.hpp>
-#include <Jet/Texture.hpp>
-#include <Jet/Engine.hpp>
-#include <IL/IL.h>
-#include <stdexcept>
+#pragma once
 
-using namespace Jet;
-using namespace Jet::Core;
-using namespace std;
+#include <Jet/Loader.hpp>
+#include <iostream>
+#include <vector>
+#include <map>
 
-TextureFactory::TextureFactory(Engine* engine) :
-    Factory(engine) {
+namespace Jet { namespace Core {
 
-    if (ilGetInteger(IL_VERSION_NUM) < IL_VERSION) {
-        throw runtime_error("IL library version mismatch");
-    }
+//! This class loads a mesh using the Wavefront .OBJ file format.
+//! @class OBJLoader
+//! @brief Loads .OBJ files
+class OBJLoader : public Loader {
+public:
+    //! Constructor
+    OBJLoader(Engine* engine);
 
-    ilInit();
-}
+    //! Destructor
+    virtual ~OBJLoader() {}
 
-void TextureFactory::create(const std::string& file) {
-    ILuint image;
-    ilGenImages(1, &image);
-    ilBindImage(image);
-    ilLoadImage(file.c_str());
-    //ilGetError()
+    //! Creates a new mesh from the given file.
+    //! @param file the .OBJ file
+    virtual void create(const std::string& file);
 
-    TexturePtr texture(new Texture);
-    texture->width(ilGetInteger(IL_IMAGE_WIDTH));
-    texture->height(ilGetInteger(IL_IMAGE_HEIGHT));
-    ilCopyPixels(0, 0, 0, texture->width(), texture->height(), 1, IL_RGBA, IL_UNSIGNED_BYTE, texture->data());
+private:
+    void face(std::istream& in);
+    void vertex(std::istream& in);
+    void normal(std::istream& in);
+    void texcoord(std::istream& in);
+    void mtllib(std::istream& in);
+    void usemtl(std::istream& in);
+    void binormal(Vertex face[3], size_t j);
 
-    engine_->texture(file, texture.get());
-}
+    std::vector<Vector> position_;
+    std::vector<Vector> normal_;
+    std::vector<Texcoord> texcoord_;
+    std::map<Vertex, uint32_t> vertex_;
+    std::vector<uint32_t> index_;
+    uint32_t cur_index_;
+    std::string material_;
+    std::map<std::string, void (OBJLoader::*)(std::istream&)> command_;
+
+};
+
+}}

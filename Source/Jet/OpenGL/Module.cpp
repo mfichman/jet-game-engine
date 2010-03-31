@@ -34,7 +34,5 @@ extern "C" {
 
 void load(Engine* engine) {
     HandlerPtr renderer(new Renderer(engine));
-    engine->handler(EE_PRE_RENDER, renderer.get());
-    engine->handler(EE_POST_RENDER, renderer.get());
-    engine->handler(EE_RENDER, renderer.get());
+    engine->handler(renderer.get());
 }

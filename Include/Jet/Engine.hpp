@@ -23,6 +23,7 @@
 #include <Jet/Types.hpp>
 #include <Jet/Object.hpp>
 #include <Jet/Node.hpp>
+#include <Jet/Loader.hpp>
 #include <Jet/Factory.hpp>
 #include <Jet/Mesh.hpp>
 #include <Jet/Texture.hpp>
@@ -66,6 +67,10 @@ public:
     //! Returns the given texture object.
     //! @param name the name of the texture
     Texture* texture(const std::string& name) const;
+    
+     //! Loads an object into the engine using the factory for the given type.
+    //! @param type the object type to load
+    Object* object(const std::string& type);
 
     //! Returns a list of visible nodes (after BVH culling).  These are the 
     //! nodes that will be displayed by the renderer.  Node that this list only 
@@ -110,18 +115,27 @@ public:
     //! @param path the path to the resource
     void resource(const std::string& path);
 
-    //! Adds a factory to the engine.
-    //! @param factory the new factory
+    //! Adds a loader to the engine.  Loaders are used to load resources
+    //! needed by the engine.  They can be registered to handle a specific
+    //! type of file.
+    //! @param loader the new loader
+    void loader(const std::string& type, Loader* loader);
+    
+    //! Adds a factory to the engine.  Factories are used to load objects
+    //! needed by the engine.  Usually, objects loaded are controllers for
+    //! scene nodes, although other types of objects can be requested and
+    //! loaded if the plugin registering the factory can handle that type of
+    //! object.
     void factory(const std::string& type, Factory* factory);
 
     //! Adds a handler to the engine.
-    //! @param event the type of event to listen for
-    //! @param handler the handler to add
-    void handler(EngineEvent event, Handler* handler);
+    //! @param handler the handler, which listens for engine events.
+    void handler(Handler* handler);
 
 private:
 #pragma warning(disable:4251)
     NodePtr root_;
+    std::map<std::string, LoaderPtr> loader_;
     std::map<std::string, FactoryPtr> factory_;
     std::map<std::string, NodePtr> node_;
     std::map<std::string, ComponentPtr> component_;
@@ -129,7 +143,7 @@ private:
     std::map<std::string, TexturePtr> texture_;
     std::set<std::string> resource_;
     std::list<ObjectPtr> module_;
-    std::multimap<EngineEvent, HandlerPtr> handler_;
+    std::list<HandlerPtr> handler_;
 #pragma warning(default:4251)
 };
 

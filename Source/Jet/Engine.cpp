@@ -21,7 +21,6 @@
  */  
 
 #include <Jet/Engine.hpp>
-#include <Jet/Factory.hpp>
 #ifdef WINDOWS
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -72,8 +71,12 @@ Texture* Engine::texture(const std::string& name) const {
     return i->second.get();
 }
 
+void Engine::loader(const std::string& type, Loader* loader) {
+    loader_[type] = loader;
+}
+
 void Engine::factory(const std::string& type, Factory* factory) {
-    factory_[type] = factory;
+    factory_[type] = factory;    
 }
 
 void Engine::node(const std::string& type, Node* node) {
@@ -94,13 +97,23 @@ void Engine::texture(const std::string& name, Texture* texture) {
 
 void Engine::resource(const std::string& name) {
     std::string ext = name.substr(name.rfind("."), string::npos);
-    map<string, FactoryPtr>::iterator i = factory_.find(ext);
-    if (i != factory_.end()) {
+    map<string, LoaderPtr>::iterator i = loader_.find(ext);
+    if (i != loader_.end()) {
         i->second->create(name);
     } else {
         throw runtime_error(string("No loader for: ") + name); 
     }
 }
+
+ Object* Engine::object(const std::string& type) {
+    std::string ext = type.substr(type.rfind("."), string::npos);
+    map<string, FactoryPtr>::iterator i = factory_.find(ext);
+    if (i != factory_.end()) {
+        return i->second->create(type);
+    } else {
+        throw runtime_error(string("No factory for: ") + type);
+    }
+ }
 
 void Engine::module(Object* module) {
     module_.push_back(module);
@@ -135,6 +148,6 @@ void Engine::module(const std::string& path) {
 	load(this);
 }
 
-void Engine::handler(EngineEvent event, Handler* handler) {
-    handler_.insert(make_pair(event, handler));
+void Engine::handler(Handler* handler) {
+    handler_.push_back(handler);
 }

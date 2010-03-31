@@ -30,6 +30,7 @@
 #include <Jet/Controller.hpp>
 #include <string>
 #include <map>
+#include <list>
 
 namespace Jet {
 
@@ -79,16 +80,6 @@ public:
     //! Returns an iterator to all nodes connected to this scene node.
     Iterator<const NodePtr> nodes() const;
 
-    //! Returns an iterator to all controllers connected to this scene node
-    //! that have the given type.
-    //! @param type the type of controllers to retrieve
-    Iterator<ControllerPtr> controllers(const std::string& type);
-
-    //! Returns an iterator to all controllers connected to this scene node
-    //! that have the given type.
-    //! @param type the type of controllers to retrieve
-    Iterator<const ControllerPtr> controllers(const std::string& type) const;
-
     //! Returns an iterator to all components connected to this scene node that
     //! have the given type
     //! @param type the type of components to retrieve
@@ -133,12 +124,12 @@ public:
     //! Attaches a controller using the given blueprint component.  Note that 
     //! each controller may have only one parent, so adding a controller that
     //! already has a parent is illegal.
-    //! @param blueprint the blueprint node
-    Controller* controller(const std::string& blueprint);
-
-    //! Attaches a new controller to this node.
-    //! @param name the name of the new controller
-    //! @param controller new controller
+    //! @param type the type of controller to load, e.g., Spaceship.lua,
+    //! Spaceship.py, or Spaceship.cpp.
+    void controller(const std::string& type);
+    
+    //! Adds a new controller to this node.
+    //! @param controller the new controller
     void controller(Controller* controller);
     
     //! Sets the current position of this scene node relative to its parent.
@@ -157,6 +148,11 @@ public:
     //! be freed until all references to this node are broken.
     void destroy();
     
+    //! Called to send an event to all controllers attached to this node.
+    //! @param name the name of the event
+    //! @param params list of parameters for the event
+    void event(const std::string& name, const Params& params);
+    
 private:
     //! Clones this scene node
     virtual Node* clone() const;
@@ -164,6 +160,15 @@ private:
     //! Removes the child from the parent
     //! @param child the child node
     void remove_child(Node* node);
+ 
+    //! Called to send an update event to all controllers attached to this
+    //! node.  This is called by the engine class once per physics update.
+    void update();
+    
+    //! Called to send a render event to all controllers attached to this
+    //! node.  Called by the engine class when the node is sent to the
+    //! renderer.
+    void render();
     
     Engine* engine_;
     Node* parent_;
@@ -171,7 +176,7 @@ private:
     std::string name_;
     std::map<std::string, NodePtr> node_;
     std::map<std::string, ComponentPtr> component_;
-    std::multimap<std::string, ControllerPtr> controller_;
+    std::list<ControllerPtr> controller_;
     std::multimap<std::string, ComponentPtr> component_type_;
 #pragma warning(default:4251)
     Vector position_;

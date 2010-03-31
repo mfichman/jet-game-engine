@@ -22,6 +22,7 @@
 
 #include <Jet/Node.hpp>
 #include <Jet/Engine.hpp>
+#include <Jet/Controller.hpp>
 #include <stdexcept>
 #include <boost/iterator/transform_iterator.hpp>
 #include <boost/function.hpp>
@@ -78,6 +79,19 @@ void Node::component(const std::string& name, Component* component) {
     component_type_.insert(make_pair(component->type(), component));
 }
 
+void Node::controller(const std::string& type) {
+    ControllerPtr controller = dynamic_cast<Controller*>(engine_->object(type));
+    if (!controller) {
+        throw runtime_error("Expected an instance of Jet::Controller");
+    } else {
+        controller_.push_back(controller);
+    }
+}
+
+void Node::controller(Controller* controller) {
+    controller_.push_back(controller);
+}
+
 Iterator<NodePtr> Node::nodes() {
     typedef map<string, NodePtr> map_t;
     typedef function<map_t::mapped_type& (const map_t::value_type&)> fun_t;
@@ -100,32 +114,6 @@ Iterator<const NodePtr> Node::nodes() const {
     itr_t end = make_transform_iterator(node_.end(), &get_value<string, NodePtr>);
 
     return Iterator<const NodePtr>(begin, end);
-}
-
-Iterator<ControllerPtr> Node::controllers(const string& type) {
-    typedef multimap<string, ControllerPtr> map_t;
-    typedef function<map_t::mapped_type& (const map_t::value_type&)> fun_t;
-    typedef transform_iterator<fun_t, map_t::iterator> itr_t;
-    typedef pair<map_t::iterator, map_t::iterator> pair_t;
-
-    pair_t range = controller_.equal_range(type);
-    itr_t begin = make_transform_iterator(range.first, &get_value<string, ControllerPtr>);
-    itr_t end = make_transform_iterator(range.second, &get_value<string, ControllerPtr>);
-
-    return Iterator<ControllerPtr>(begin, end);
-}
-
-Iterator<const ControllerPtr> Node::controllers(const string& type) const {
-    typedef multimap<string, ControllerPtr> map_t;
-    typedef function<const map_t::mapped_type& (const map_t::value_type&)> fun_t;
-    typedef transform_iterator<fun_t, map_t::const_iterator> itr_t;
-    typedef pair<map_t::const_iterator, map_t::const_iterator> pair_t;
-
-    pair_t range = controller_.equal_range(type);
-    itr_t begin = make_transform_iterator(range.first, &get_value<string, const ControllerPtr>);
-    itr_t end = make_transform_iterator(range.second, &get_value<string, const ControllerPtr>);
-
-    return Iterator<const ControllerPtr>(begin, end);
 }
 
 Iterator<ComponentPtr> Node::components(const string& type) {
@@ -154,18 +142,28 @@ Iterator<const ComponentPtr> Node::components(const string& type) const {
     return Iterator<const ComponentPtr>(begin, end);
 }
 
-void Node::controller(Controller* controller) {
-    if (controller->parent()) {
-        throw runtime_error("Controller already has a parent");
-    }
-    controller->parent_ = this;
-    controller_.insert(make_pair(controller->type(), controller));
-}
-
 void Node::destroy() {
     if (parent_) {
         parent_->remove_child(this);
         parent_ = 0;
+    }
+}
+
+void Node::event(const std::string& name, const Params& params) {
+     for (list<ControllerPtr>::iterator i = controller_.begin(); i != controller_.end(); i++) {
+        (*i)->on_event(this, name, params);  
+     }
+}
+
+void Node::update() {
+    for (list<ControllerPtr>::iterator i = controller_.begin(); i != controller_.end(); i++) {
+         (*i)->on_update(this);
+    }
+}
+
+void Node::render() {
+    for (list<ControllerPtr>::iterator i = controller_.begin(); i != controller_.end(); i++) {
+        (*i)->on_render(this);
     }
 }
 
@@ -189,12 +187,12 @@ Node* Node::clone() const {
         clone->component_.insert(make_pair(i->first, component));
         clone->component_type_.insert(make_pair(component->type(), component));
     }
-    // Clone all controllers attached to this node
-    for (multimap<string, ControllerPtr>::const_iterator i = controller_.begin(); i != controller_.end(); i++) {
-        ControllerPtr controller(i->second->clone());
-        controller->parent_ = parent_;
-        clone->controller_.insert(make_pair(i->first, controller));
+    // TODO: Clone all controllers attached to this node
+    for (list<ControllerPtr>::const_iterator i = controller_.begin(); i != controller_.end(); i++) {
+        ControllerPtr controller = (*i)->clone();
+        clone->controller_.push_back(controller);        
     }
+    
     clone->engine_ = engine_;
     clone->parent_ = parent_;
     return clone;

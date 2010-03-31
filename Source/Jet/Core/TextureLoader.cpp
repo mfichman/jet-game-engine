@@ -19,29 +19,38 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */  
-#pragma once
+ 
+#include <Jet/Core/TextureLoader.hpp>
+#include <Jet/Texture.hpp>
+#include <Jet/Engine.hpp>
+#include <IL/IL.h>
+#include <stdexcept>
 
-#include <Jet/Factory.hpp>
-#include <iostream>
-#include <vector>
-#include <map>
+using namespace Jet;
+using namespace Jet::Core;
+using namespace std;
 
-namespace Jet { namespace Core {
+TextureLoader::TextureLoader(Engine* engine) :
+    Loader(engine) {
 
-//! This class loads a mesh using the Wavefront .OBJ file format.
-//! @class ObjFactory
-//! @brief Loads .OBJ files
-class TextureFactory : public Factory {
-public:
-    //! Constructor
-    TextureFactory(Engine* engine);
+    if (ilGetInteger(IL_VERSION_NUM) < IL_VERSION) {
+        throw runtime_error("IL library version mismatch");
+    }
 
-    //! Destructor
-    virtual ~TextureFactory() {}
+    ilInit();
+}
 
-    //! Creates a new mesh from the given file.
-    //! @param file the .OBJ file
-    virtual void create(const std::string& file);
-};
+void TextureLoader::create(const std::string& file) {
+    ILuint image;
+    ilGenImages(1, &image);
+    ilBindImage(image);
+    ilLoadImage(file.c_str());
+    //ilGetError()
 
-}}
+    TexturePtr texture(new Texture);
+    texture->width(ilGetInteger(IL_IMAGE_WIDTH));
+    texture->height(ilGetInteger(IL_IMAGE_HEIGHT));
+    ilCopyPixels(0, 0, 0, texture->width(), texture->height(), 1, IL_RGBA, IL_UNSIGNED_BYTE, texture->data());
+
+    engine_->texture(file, texture.get());
+}

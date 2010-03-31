@@ -21,46 +21,40 @@
  */  
 #pragma once
 
-#include <Jet/Factory.hpp>
-#include <iostream>
-#include <vector>
+#include <Jet/Loader.hpp>
 #include <map>
+#include <iostream>
 
 namespace Jet { namespace Core {
 
-//! This class loads a mesh using the Wavefront .OBJ file format.
-//! @class OBJFactory
+//! This class loads a material using the Wavefront .MTL file format.
+//! @class MatFactory
 //! @brief Loads .OBJ files
-class OBJFactory : public Factory {
+class MTLLoader : public Loader {
 public:
-    //! Constructor
-    OBJFactory(Engine* engine);
+    //! Constructor.
+    MTLLoader(Engine* engine);
 
-    //! Destructor
-    virtual ~OBJFactory() {}
+    //! Destructor.
+    virtual ~MTLLoader() {}
 
-    //! Creates a new mesh from the given file.
-    //! @param file the .OBJ file
+    //! Creates a new material from the given file.
+    //! @param file the .MTL file
     virtual void create(const std::string& file);
 
 private:
-    void face(std::istream& in);
-    void vertex(std::istream& in);
-    void normal(std::istream& in);
-    void texcoord(std::istream& in);
-    void mtllib(std::istream& in);
-    void usemtl(std::istream& in);
-    void binormal(Vertex face[3], size_t j);
+    void newmtl(std::istream& in);
+    void ambient(std::istream& in);
+    void diffuse(std::istream& in);
+    void specular(std::istream& in);
+    void transparency(std::istream& in);
+    void reflectivity(std::istream& in);
+    void texture_map(std::istream& in);
+    void specular_map(std::istream& in);
+    void normal_map(std::istream& in);
 
-    std::vector<Vector> position_;
-    std::vector<Vector> normal_;
-    std::vector<Texcoord> texcoord_;
-    std::map<Vertex, uint32_t> vertex_;
-    std::vector<uint32_t> index_;
-    uint32_t cur_index_;
-    std::string material_;
-    std::map<std::string, void (OBJFactory::*)(std::istream&)> command_;
-
+    ComponentPtr material_;
+    std::map<std::string, void (MTLLoader::*)(std::istream&)> command_;
 };
 
 }}

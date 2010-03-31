@@ -6,6 +6,7 @@ set(EXECUTABLE_OUTPUT_PATH ${Jet_SOURCE_DIR}/../Binary)
 set(LIBRARY_OUTPUT_PATH ${Jet_SOURCE_DIR}/../Binary)
 set(Jet_INCLUDE_DIR ${Jet_SOURCE_DIR}/../Include)
 
+
 include_directories(${Jet_INCLUDE_DIR})
 
 if(WIN32 AND NOT UNIX)
