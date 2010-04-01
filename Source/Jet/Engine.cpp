@@ -27,12 +27,20 @@
 #else
 #include <dlfcn.h>
 #endif
+#include <boost/filesystem/operations.hpp>
+
+#define JET_MAX_TIME_LAG 0.5f
+#define JET_TIME_STEP 1.0f/60.0f 
 
 using namespace Jet;
 using namespace std;
+using namespace boost;
+using namespace boost::filesystem;
 
-Engine::Engine() {
-    root_.reset(new Node());
+Engine::Engine() :
+    root_(new Node()),
+    running_(true) {
+        
     root_->engine_ = this;
 }
 
@@ -71,6 +79,10 @@ Texture* Engine::texture(const std::string& name) const {
     return i->second.get();
 }
 
+Iterator<const std::string> Engine::folders() const {
+    return Iterator<const std::string>(folder_.begin(), folder_.end());
+}
+
 void Engine::loader(const std::string& type, Loader* loader) {
     loader_[type] = loader;
 }
@@ -99,7 +111,7 @@ void Engine::resource(const std::string& name) {
     std::string ext = name.substr(name.rfind("."), string::npos);
     map<string, LoaderPtr>::iterator i = loader_.find(ext);
     if (i != loader_.end()) {
-        i->second->create(name);
+        i->second->resource(name);
     } else {
         throw runtime_error(string("No loader for: ") + name); 
     }
@@ -109,7 +121,7 @@ void Engine::resource(const std::string& name) {
     std::string ext = type.substr(type.rfind("."), string::npos);
     map<string, FactoryPtr>::iterator i = factory_.find(ext);
     if (i != factory_.end()) {
-        return i->second->create(type);
+        return i->second->object(type);
     } else {
         throw runtime_error(string("No factory for: ") + type);
     }
@@ -150,4 +162,60 @@ void Engine::module(const std::string& path) {
 
 void Engine::handler(Handler* handler) {
     handler_.push_back(handler);
+}
+
+void Engine::folder(const std::string& dir) {
+    set<string>::iterator i = folder_.find(dir);
+    if (i != folder_.end()) {
+        folder_.insert(dir);
+    
+        path folder(dir);
+        directory_iterator end;
+        for (directory_iterator i(folder); i != end; ++i) {
+            if (!is_directory(*i)) {
+                
+                // Get the extension and use the appropriate loader to loader
+                // the resource from the file
+                string ext = i->filename().substr(0, i->filename().rfind("."));
+                map<string, LoaderPtr>::iterator j = loader_.find(ext);
+                if (j != loader_.end()) {
+                    j->second->resource(i->path().file_string());
+                }
+            }
+        }
+    }
+}
+
+void Engine::tick() {
+    accumulator_ += delta();
+    accumulator_ = min(accumulator_, JET_MAX_TIME_LAG);
+    while (accumulator_ >= JET_TIME_STEP) {
+        // capture input
+        for (list<HandlerPtr>::iterator i = handler_.begin(); i != handler_.end(); i++) {
+            (*i)->on_update();
+        }
+    }
+    
+    // Fire pre-render event
+    for (list<HandlerPtr>::iterator i = handler_.begin(); i != handler_.end(); i++) {
+        (*i)->on_pre_render();
+    }
+    
+    // Fire render event
+    for (list<HandlerPtr>::iterator i = handler_.begin(); i != handler_.end(); i++) {
+        (*i)->on_render();
+    }
+    
+     // Fire post-render event
+    for (list<HandlerPtr>::iterator i = handler_.begin(); i != handler_.end(); i++) {
+        (*i)->on_post_render();
+    }
+}
+
+real_t Engine::delta() {
+#ifdef WINDOWS
+
+#else
+#error "Not implemented"
+#endif
 }

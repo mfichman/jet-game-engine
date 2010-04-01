@@ -30,7 +30,7 @@ using namespace std;
 using namespace boost;
 
 MTLLoader::MTLLoader(Engine* engine) :
-    Loader(engine) {
+    engine_(engine) {
 
     command_["Ka"] = &MTLLoader::ambient;
     command_["Kd"] = &MTLLoader::diffuse;
@@ -100,7 +100,7 @@ void MTLLoader::normal_map(istream& in) {
     material_->value("normal_map", value);
 }
   
-void MTLLoader::create(const std::string& file) {
+void MTLLoader::resource(const std::string& file) {
     static const std::string& ext = ".mtl";
     if (file.rfind(ext) != ext.length()) {
         throw runtime_error("Invalid file extension");

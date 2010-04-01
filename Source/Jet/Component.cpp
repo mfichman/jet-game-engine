@@ -61,9 +61,13 @@ Iterator<ValueEntry> Component::values() {
 
 Component* Component::clone() const {
     Component* clone = new Component(type_);
+    
+    // Copy values stored in this component
     for (map<string, Value>::const_iterator i = value_.begin(); i != value_.end(); i++) {
         clone->value_[i->first] = i->second;
     }
+    
+    // Copy sub-components
     for (map<string, ComponentPtr>::const_iterator i = component_.begin(); i != component_.end(); i++) {
         clone->component_[i->first] = i->second->clone();
     }

@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright (c) 2010 Matt Fichman
  *
@@ -23,32 +21,38 @@
  */  
 #pragma once
 
-#include <Jet/Types.hpp>
-#include <Jet/Object.hpp>
-#include <Jet/Params.hpp>
+#include <Jet/Controller.hpp>
+#include <lua/lua.hpp>
+#include <luabind/luabind.hpp>
 
-namespace Jet {
+namespace Jet { namespace Lua {
 
-//! Controller that can control the behavior of a node.
-//! @class Controller
-//! @brief Controller that can be attached to a scene node.
-class JETAPI Controller : public Object {
+//! ScriptController that can control the behavior of a node.
+//! @class ScriptController
+//! @brief ScriptController that can be attached to a scene node.
+class ScriptController : public Controller {
 public:
     
-    //! Destructor
-    virtual ~Controller() {}
+    //! Creates a new script controller using the given Lua environment.
+    //! The Lua table is actually lazily loaded once bound to a node.
+    //! @param env the lua state
+    //! @param type the class to load
+    ScriptController(lua_State* env, const std::string& type);
+    
+    //! Destructor.
+    virtual ~ScriptController();
 
     //! Called when an event occurs regarding the current node.
     //! @param node the node that generated the event
     //! @param name the name of the event.
     //! @param params the parameters for the event.
-    virtual void on_event(Node* node, const std::string& name, const Params& params=Params())=0;
+    virtual void on_event(Node* node, const std::string& name, const Params& params=Params());
     
     //! Called during each physics update.  Note: this function is called
     //! once per game tick, which is a regular interval fixed by default to
     //! 60 Hz.
     //! @param node the node that generated the event
-    virtual void on_update(Node* node)=0;
+    virtual void on_update(Node* node);
     
     //! Called during each frame.  Note: this function is NOT called once per
     //! game tick.  It is called whenever the frame is rendered, and may not
@@ -56,17 +60,31 @@ public:
     //! instead.  Also note that if the object is culled from the scene, this
     //! method will not be called.
     //! @param node the node that generated the event
-    virtual void on_render(Node* node)=0;
+    virtual void on_render(Node* node);
     
     //! Called when the node this controller is attached to is destroyed.
     //! @param node the node that was destroyed.
-    virtual void on_destroy(Node* node)=0;
+    virtual void on_destroy(Node* node);
     
 private:
-    //! Clones this controller.
-    virtual Controller* clone() const=0;
+    //! Clones this ScriptController.
+    virtual ScriptController* clone() const;
+    
+    void init();
+    
+    // Lua callbacks
+    static int ScriptController::index(lua_State* env);
+    static int ScriptController::newindex(lua_State* env);
+    static int ScriptController::component_index(lua_State* env);
+    static int ScriptController::component_newindex(lua_State* env);
+    
+    const std::string type_;
+    lua_State* const env_;
+    int ref_;
+    luabind::object table_;
+    Node* node_;
     
     friend class Node;
 };
 
-}
+}}

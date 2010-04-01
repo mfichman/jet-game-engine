@@ -21,45 +21,36 @@
  */  
 #pragma once
 
-#include <Jet/Types.hpp>
-#include <iostream>
+#include <Jet/Lua/Types.hpp>
+#include <Jet/Factory.hpp>
+#include <lua/lua.hpp>
 
-JETAPI std::ostream& operator<<(std::ostream& out, const Jet::Color& color);
-JETAPI std::istream& operator>>(std::istream& in, Jet::Color& color);
+namespace Jet { namespace Lua {
 
-namespace Jet {
-
-//! Represents a 4-component RGBA color value.
-//! @class Color
-//! @brief RGBA color value.
-class JETAPI Color {
+//! This class loads controllers from Lua script files.
+//! @class ScriptFactory
+//! @brief Loads controllers from Lua script files.
+class ScriptFactory : public Factory {
 public:
-    //! Creates a new color, initialized to black.
-    Color();
+    //! Creates a new loader.
+    //! @param interpreter the parent interpreter
+    ScriptFactory(Interpreter* interpreter);
 
-    //! Creates a new color.
-    //! @param red red component
-    //! @param blue blue component
-    //! @param green green component
-    //! @param alpha alpha component
-    Color(real_t red, real_t blue, real_t green, real_t alpha);
+    //! Destructor.
+    virtual ~ScriptFactory() {}
+
+    //! Creates a new controller representing a Lua script.
+    //! @param type the type of controller to create
+    virtual Object* object(const std::string& type);
     
-    //! Returns the type of avector.
-    ValueType type() const {
-        return VT_COLOR; 
+    //! Returns the Lua environment.
+    lua_State* interpreter() const {
+        return env_;
     }
-    
-    //! Stream operator.
-    friend std::ostream& ::operator<<(std::ostream& out, const Color& color);
 
-    //! Stream operator.
-    friend std::istream& ::operator>>(std::istream& in, Color& color);
-
-    real_t red;
-    real_t blue;
-    real_t green;
-    real_t alpha;
+private:
+    InterpreterPtr interpreter_;
+    lua_State* env_;
 };
 
-}
-
+}}

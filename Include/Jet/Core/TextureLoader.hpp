@@ -41,7 +41,10 @@ public:
 
     //! Creates a new mesh from the given file.
     //! @param file the .OBJ file
-    virtual void create(const std::string& file);
+    virtual void resource(const std::string& file);
+
+private:
+    Engine* engine_;
 };
 
 }}

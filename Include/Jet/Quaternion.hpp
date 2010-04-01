@@ -24,8 +24,8 @@
 #include <Jet/Types.hpp>
 #include <iostream>
 
-std::ostream& operator<<(std::ostream& out, const Jet::Quaternion& quaternion);
-std::istream& operator>>(std::istream& in, Jet::Quaternion& quaternion);
+JETAPI std::ostream& operator<<(std::ostream& out, const Jet::Quaternion& quaternion);
+JETAPI std::istream& operator>>(std::istream& in, Jet::Quaternion& quaternion);
 
 namespace Jet {
 
@@ -93,6 +93,11 @@ public:
 
     //! Returns the normalized copy of this quaternion
     Quaternion unit() const;
+    
+    //! Returns the type of avector.
+    ValueType type() const {
+        return VT_QUATERNION; 
+    }
 
     //! Stream operator
     friend std::ostream& ::operator<<(std::ostream& out, const Quaternion& quaternion);

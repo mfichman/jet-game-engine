@@ -30,12 +30,8 @@ namespace Jet {
 //! consist of several factories registered to the main engine class.
 //! @class Factory
 //! @brief Loads objects from a plugin.
-class Factory : public Object {
+class JETAPI Factory : public Object {
 public:
-    //! Creates a new loader.
-    Factory(Engine* engine) : 
-        engine_(engine) {
-    }
 
     //! Destructor
     virtual ~Factory() {}
@@ -44,10 +40,7 @@ public:
     //! requested type, or a runtime_error will be thrown from within the
     //! engine.
     //! @param type the type of controller to create
-    virtual Object* create(const std::string& type)=0;
-
-protected:
-    Engine* engine_;
+    virtual Object* object(const std::string& type)=0;
 };
 
 }

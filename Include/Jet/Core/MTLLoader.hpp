@@ -40,7 +40,7 @@ public:
 
     //! Creates a new material from the given file.
     //! @param file the .MTL file
-    virtual void create(const std::string& file);
+    virtual void resource(const std::string& file);
 
 private:
     void newmtl(std::istream& in);
@@ -53,6 +53,7 @@ private:
     void specular_map(std::istream& in);
     void normal_map(std::istream& in);
 
+    Engine* engine_;
     ComponentPtr material_;
     std::map<std::string, void (MTLLoader::*)(std::istream&)> command_;
 };

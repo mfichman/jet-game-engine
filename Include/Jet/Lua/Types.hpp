@@ -11,37 +11,26 @@
  * The above copyright notice and this permission notice shall be included in 
  * all copies or substantial portions of the Software.
  * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOVT WARRANTY OF ANY KIND, EXPRESS OR 
+ * IMPLIED, INCLUDING BVT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+ * AVTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * FROM, OVT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */  
+#pragma once
 
-#include <Jet/Range.hpp>
+#include <boost/intrusive_ptr.hpp>
 
-using namespace Jet;
-using namespace std;
+namespace Jet { namespace Lua {
+    class Interpreter;
+    class ScriptController;
+    class ScriptFactory;
+    class ScriptLoader;
 
-ostream& operator<<(ostream& out, const Range& range) {
-    return out << range.begin << " " << range.end;
-}
-
-istream& operator>>(istream& in, Range& range) {
-    return in >> range.begin >> range.end;
-}
-
-
-Range::Range() :
-    begin(0),
-    end(0) {
-        
-}
-
-Range::Range(real_t begin, real_t end) :
-    begin(begin),
-    end(end) {
-        
-}
+    typedef boost::intrusive_ptr<Interpreter> InterpreterPtr;
+    typedef boost::intrusive_ptr<ScriptController> ScriptControllerPtr;
+    typedef boost::intrusive_ptr<ScriptFactory> ScriptFactoryPtr;
+    typedef boost::intrusive_ptr<ScriptLoader> ScriptLoaderPtr;
+}}

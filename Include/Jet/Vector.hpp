@@ -93,6 +93,11 @@ public:
     
     //! Returns an arbitrary vector perpindicular to this one.
     Vector orthogonal() const;
+    
+    //! Returns the type of avector.
+    ValueType type() const {
+        return VT_VECTOR; 
+    }
 
     //! Stream operator.
     friend std::ostream& ::operator<<(std::ostream& out, const Vector& vector);

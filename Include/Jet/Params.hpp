@@ -43,6 +43,11 @@ public:
 
     //! Returns the ith parameter
     const Value& operator[](size_t index) const;
+    
+    //! Returns the number of parameters
+    inline size_t size() const {
+        return params_.size();
+    }
 
 private:
 #pragma warning(disable:4251)

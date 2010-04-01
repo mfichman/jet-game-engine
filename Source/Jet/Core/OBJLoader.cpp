@@ -36,7 +36,7 @@ using namespace boost;
 
 
 OBJLoader::OBJLoader(Engine* engine) :
-    Loader(engine) {
+    engine_(engine) {
     
     command_["mtllib"] = &OBJLoader::mtllib;
     command_["usemtl"] = &OBJLoader::usemtl;
@@ -138,7 +138,7 @@ void OBJLoader::binormal(Vertex face[3], size_t j) {
 
 // .OBJ (Wavefront) and .MTL loader.  Loads linked materials specified in the
 // .OBJ file.  
-void OBJLoader::create(const std::string& file) {
+void OBJLoader::resource(const std::string& file) {
     static const std::string& ext = ".obj";
     if (file.rfind(ext) != ext.length()) {
         throw runtime_error("Invalid file extension");

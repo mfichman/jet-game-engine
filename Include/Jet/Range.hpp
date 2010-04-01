@@ -24,8 +24,8 @@
 #include <Jet/Types.hpp>
 #include <iostream>
 
-std::ostream& operator<<(std::ostream& out, const Jet::Range& range);
-std::istream& operator>>(std::istream& in, Jet::Range& range);
+JETAPI std::ostream& operator<<(std::ostream& out, const Jet::Range& range);
+JETAPI std::istream& operator>>(std::istream& in, Jet::Range& range);
 
 namespace Jet {
 
@@ -34,14 +34,28 @@ namespace Jet {
 //! @brief Represents a range of values
 class JETAPI Range {
 public:
-    real_t begin;
-    real_t end;
+    
+    //! Creates a new range
+    Range();
+    
+    //! Creates a new range from the given components.
+    //! @param begin the start of the range
+    //! @param end the end of the range
+    Range(real_t begin, real_t end);
+    
+    //! Returns the type of avector.
+    ValueType type() const {
+        return VT_RANGE; 
+    }
 
     //! Stream operator.
     friend std::ostream& ::operator<<(std::ostream& out, const Range& range);
 
     //! Stream operator.
     friend std::istream& ::operator>>(std::istream& in, Range& range);
+    
+    real_t begin;
+    real_t end;
 };
 
 }

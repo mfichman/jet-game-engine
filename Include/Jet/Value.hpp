@@ -57,12 +57,17 @@ public:
     Value& operator=(const Quaternion& quaternion);
     Value& operator=(const Range& range);
     
-    operator std::string();
-    operator number_t();
-    operator Color();
-    operator Vector();
-    operator Quaternion();
-    operator Range();
+    operator std::string() const;
+    operator number_t() const;
+    operator Color() const;
+    operator Vector() const;
+    operator Quaternion() const;
+    operator Range() const;
+    
+    inline ValueType type() const {
+        return type_;
+    }
+    
 
     static const Value NIL;
     

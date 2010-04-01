@@ -51,6 +51,11 @@ public:
     inline Node* root() const { 
         return root_.get(); 
     }
+        
+    //! Returns true if the engine is running
+    inline bool running() const {
+        return running_;
+    }
 
     //! Returns a blueprint node.
     //! @param type the type identifier
@@ -76,12 +81,16 @@ public:
     //! nodes that will be displayed by the renderer.  Node that this list only 
     //! includes the list of parent nodes, not all nodes in the tree.  Thus, 
     //! the renderer should check for children of each node in this list.
-    Iterator<NodePtr> renderables() const;
+    Iterator<const NodePtr> renderables() const;
 
     //! Returns a list of nodes with lighting information.  Note that light
     //! nodes may be culled depending on their distance from the viewer and
     //! potentially an obstacles.
-    Iterator<NodePtr> lights() const;
+    Iterator<const NodePtr> lights() const;
+    
+    //! Returns a list of folders representing the search path for loading
+    //! resources.
+    Iterator<const std::string> folders() const;
 
     //! Adds a new template node to the engine
     //! @param type the name of the template
@@ -131,6 +140,22 @@ public:
     //! Adds a handler to the engine.
     //! @param handler the handler, which listens for engine events.
     void handler(Handler* handler);
+    
+    //! Adds a folder to the search path for loading resources.  Resources
+    //! will be loaded automatically.
+    //! @param folder the folder to add
+    void folder(const std::string& path);
+    
+    //! Sets whether or not the engine is running.
+    //! @param running false to stop the engine
+    inline void running(bool running) {
+        running_ = running;
+    }
+    
+    //! Runs the engine through one complete loop.  Note that the engine may
+    //! or may not actually do anything on a given loop, depending on the
+    //! elapsed time.
+    void tick();
 
 private:
 #pragma warning(disable:4251)
@@ -144,6 +169,14 @@ private:
     std::set<std::string> resource_;
     std::list<ObjectPtr> module_;
     std::list<HandlerPtr> handler_;
+    std::set<std::string> folder_;
+    bool running_;
+    real_t accumulator_;
+#ifdef WINDOWS
+    float secs_per_count_;
+    int64_t prev_time_;
+#endif
+    
 #pragma warning(default:4251)
 };
 

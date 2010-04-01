@@ -17,7 +17,7 @@ include_directories(C:\\Include\\lua)
 link_directories(C:\\Libraries)
 link_directories(D:\\Libraries)
 add_definitions(/D_SCL_SECURE_NO_WARNINGS)
-add_definitions(/DBOOST_ALL_NO_LIB)
+#add_definitions(/DBOOST_ALL_NO_LIB)
 #add_definitions(/O2)
 endif()
 

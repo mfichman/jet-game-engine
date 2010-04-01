@@ -18,48 +18,32 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- */  
-#pragma once
+ */
 
-#include <Jet/Types.hpp>
-#include <iostream>
 
-JETAPI std::ostream& operator<<(std::ostream& out, const Jet::Color& color);
-JETAPI std::istream& operator>>(std::istream& in, Jet::Color& color);
+#include <Jet/Lua/ScriptFactory.hpp>
+#include <Jet/Lua/Interpreter.hpp>
+#include <Jet/Lua/ScriptController.hpp>
+#include <luabind/luabind.hpp>
+#include <luabind/operator.hpp>
 
-namespace Jet {
+using namespace Jet::Lua;
+using namespace Jet;
+using namespace std;
 
-//! Represents a 4-component RGBA color value.
-//! @class Color
-//! @brief RGBA color value.
-class JETAPI Color {
-public:
-    //! Creates a new color, initialized to black.
-    Color();
-
-    //! Creates a new color.
-    //! @param red red component
-    //! @param blue blue component
-    //! @param green green component
-    //! @param alpha alpha component
-    Color(real_t red, real_t blue, real_t green, real_t alpha);
+ScriptFactory::ScriptFactory(Interpreter* interpreter) :
+    interpreter_(interpreter),
+    env_(interpreter->env()) {
     
-    //! Returns the type of avector.
-    ValueType type() const {
-        return VT_COLOR; 
-    }
-    
-    //! Stream operator.
-    friend std::ostream& ::operator<<(std::ostream& out, const Color& color);
-
-    //! Stream operator.
-    friend std::istream& ::operator>>(std::istream& in, Color& color);
-
-    real_t red;
-    real_t blue;
-    real_t green;
-    real_t alpha;
-};
-
 }
 
+Object* ScriptFactory::object(const std::string& path) {
+    if (path.empty()) {
+        throw runtime_error("Empty controller type name");
+    }
+    
+    string type = path.substr(0, path.rfind("."));
+    
+    // Create the controller
+    return new ScriptController(env_, type);
+}

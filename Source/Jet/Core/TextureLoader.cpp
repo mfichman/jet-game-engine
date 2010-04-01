@@ -31,7 +31,7 @@ using namespace Jet::Core;
 using namespace std;
 
 TextureLoader::TextureLoader(Engine* engine) :
-    Loader(engine) {
+    engine_(engine) {
 
     if (ilGetInteger(IL_VERSION_NUM) < IL_VERSION) {
         throw runtime_error("IL library version mismatch");
@@ -40,7 +40,7 @@ TextureLoader::TextureLoader(Engine* engine) :
     ilInit();
 }
 
-void TextureLoader::create(const std::string& file) {
+void TextureLoader::resource(const std::string& file) {
     ILuint image;
     ilGenImages(1, &image);
     ilBindImage(image);

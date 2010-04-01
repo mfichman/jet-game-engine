@@ -41,7 +41,7 @@ public:
 
     //! Creates a new mesh from the given file.
     //! @param file the .OBJ file
-    virtual void create(const std::string& file);
+    virtual void resource(const std::string& file);
 
 private:
     void face(std::istream& in);
@@ -52,6 +52,7 @@ private:
     void usemtl(std::istream& in);
     void binormal(Vertex face[3], size_t j);
 
+    Engine* engine_;
     std::vector<Vector> position_;
     std::vector<Vector> normal_;
     std::vector<Texcoord> texcoord_;

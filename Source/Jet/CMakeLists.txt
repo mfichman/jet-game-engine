@@ -5,7 +5,7 @@ add_subdirectory("Test")
 
 add_definitions(/DJETDLL)
 add_subdirectory("Core")
-#add_subdirectory("Lua")
+add_subdirectory("Lua")
 add_subdirectory("OpenGL")
 
 include_directories("D:\\Include\\Lua")

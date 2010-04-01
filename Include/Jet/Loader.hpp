@@ -32,10 +32,6 @@ namespace Jet {
 //! @brief Loads objects from a plugin
 class Loader : public Object {
 public:
-    //! Creates a new loader.
-    Loader(Engine* engine) : 
-        engine_(engine) {
-    }
 
     //! Destructor
     virtual ~Loader() {}
@@ -44,10 +40,7 @@ public:
     //! type specification parameter, or an exception will be thrown by the
     //! engine and the object will be discarded.
     //! @param source the source to load the object from
-    virtual void create(const std::string& source)=0;
-
-protected:
-    Engine* engine_;
+    virtual void resource(const std::string& source)=0;
 };
 
 }

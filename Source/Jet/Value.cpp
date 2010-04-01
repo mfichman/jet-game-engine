@@ -141,7 +141,7 @@ Value& Value::operator=(const Range& range) {
     return *this;
 }
 
-Value::operator std::string() {
+Value::operator std::string() const {
     switch(type_) {
         case VT_STRING: return *string_;
         case VT_NUMBER: return lexical_cast<string>(*number_);
@@ -154,48 +154,47 @@ Value::operator std::string() {
     }
 }
 
-Value::operator number_t() {
+Value::operator number_t() const {
     switch (type_) {
-        case VT_STRING: *this = lexical_cast<number_t>(*string_); // fallthrough
+        case VT_STRING: *const_cast<Value*>(this) = lexical_cast<number_t>(*string_); // fallthrough
         case VT_NUMBER: return *number_;
         default: throw runtime_error("Invalid type conversion");
     }   
 }
 
-Value::operator Color() {
+Value::operator Color() const {
     switch (type_) {
-        case VT_STRING: *this = lexical_cast<Color>(*string_); // fallthrough
+        case VT_STRING: *const_cast<Value*>(this) = lexical_cast<Color>(*string_); // fallthrough
         case VT_COLOR: return *color_;
         default: throw runtime_error("Invalid type conversion");
     }
 }
 
-Value::operator Vector() {
+Value::operator Vector() const {
     switch (type_) {
-        case VT_STRING: *this = lexical_cast<Vector>(*string_); // fallthrough
+        case VT_STRING: *const_cast<Value*>(this) = lexical_cast<Vector>(*string_); // fallthrough
         case VT_VECTOR: return *vector_;
         default: throw runtime_error("Invalid type conversion");
     }
 }
 
-Value::operator Quaternion() {
+Value::operator Quaternion() const {
     switch (type_) {
-        case VT_STRING: *this = lexical_cast<Quaternion>(*string_); // fallthrough
+        case VT_STRING: *const_cast<Value*>(this) = lexical_cast<Quaternion>(*string_); // fallthrough
         case VT_QUATERNION: return *quaternion_;
         default: throw runtime_error("Invalid type conversion");
     }
 }
 
-Value::operator Range() {
+Value::operator Range() const {
     switch (type_) {
-        case VT_STRING: *this = lexical_cast<Range>(*string_); // fallthrough
+        case VT_STRING: *const_cast<Value*>(this) = lexical_cast<Range>(*string_); // fallthrough
         case VT_RANGE: return *range_;
         default: throw runtime_error("Invalid type conversion");
     }
 }
 
 void Value::clear() {
-    cout << "clear" << endl;
     switch (type_) {
         case VT_STRING: delete string_; break;
         case VT_NUMBER: delete number_; break;
