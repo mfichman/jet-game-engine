@@ -18,51 +18,16 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- */  
-#pragma once
+ */
 
-#include <Jet/Types.hpp>
-#include <Jet/Object.hpp>
+varying vec3 normal;
+varying vec3 view;
 
-#ifdef WINDOWS
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#endif
-#include <GL/glew.h>
-#include <GL/gl.h>
-
-namespace Jet { namespace OpenGL {
-
-//! This class loads and manipulates a GPU shader ().
-//! @class Shader
-//! @brief Loads and manipulates a  shader.
-class Shader : public Object {
-public:
-    //! Constructor.
-    Shader(const std::string& path);
-
-    //! Destructor.
-    virtual ~Shader();
-
-    //! Enables this shader.
-    void begin();
-
-    //! Disables this shader.
-    void end();
-
-private:
-    void source(GLuint shader, const std::string& path);
-
-    GLuint vertex_;
-    GLuint fragment_;
-    GLuint shader_;
-    GLuint program_;
-    GLuint texture_map_;
-    GLuint specular_map_;
-    GLuint normal_map_;
-    GLuint environment_map_;
-    GLuint shadow_map_;
-    GLuint binormal_;
-};
-
-}}
+void main() {
+    // Transform to homogeneous coordinates
+    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+    normal = gl_NormalMatrix * gl_Normal;
+    view = vec3(gl_ModelViewMatrix * gl_Vertex);
+    gl_TexCoord[0] = gl_MultiTexCoord0;
+    gl_TexCoord[1] = gl_TextureMatrix[4] * gl_Vertex;
+}

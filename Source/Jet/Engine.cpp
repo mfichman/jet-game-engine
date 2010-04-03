@@ -28,13 +28,13 @@
 #include <dlfcn.h>
 #endif
 #include <boost/filesystem/operations.hpp>
+#include <cstdint>
 
 #define JET_MAX_TIME_LAG 0.5f
 #define JET_TIME_STEP 1.0f/60.0f 
 
 using namespace Jet;
 using namespace std;
-using namespace boost;
 using namespace boost::filesystem;
 
 Engine::Engine() :
@@ -42,6 +42,13 @@ Engine::Engine() :
     running_(true) {
         
     root_->engine_ = this;
+    
+#ifdef WINDOWS
+    int64_t counts_per_sec = 0;
+    QueryPerformanceFrequency((LARGE_INTEGER*)&counts_per_sec);
+    secs_per_count_ = 1.0f/(float)counts_per_sec;
+    prev_time_ = 0;
+#endif
 }
 
 Engine::~Engine() {
@@ -50,7 +57,7 @@ Engine::~Engine() {
 Node* Engine::node(const std::string& type) const {
     map<string, NodePtr>::const_iterator i = node_.find(type);
     if (i == node_.end()) {
-        throw runtime_error("Blueprint not found");
+        throw runtime_error("Node not found: " + type);
     }
     return i->second.get();
 }
@@ -58,7 +65,7 @@ Node* Engine::node(const std::string& type) const {
 Component* Engine::component(const std::string& type) const {
     map<string, ComponentPtr>::const_iterator i = component_.find(type);
     if (i == component_.end()) {
-        throw runtime_error("Blueprint not found");
+        throw runtime_error("Component not found: " + type);
     }
     return i->second.get();
 }
@@ -66,7 +73,7 @@ Component* Engine::component(const std::string& type) const {
 Mesh* Engine::mesh(const std::string& type) const {
     map<string, MeshPtr>::const_iterator i = mesh_.find(type);
     if (i != mesh_.end()) {
-        throw runtime_error("Mesh not found");
+        throw runtime_error("Mesh not found: " + type);
     }
     return i->second.get();
 }
@@ -74,7 +81,7 @@ Mesh* Engine::mesh(const std::string& type) const {
 Texture* Engine::texture(const std::string& name) const {
     map<string, TexturePtr>::const_iterator i = texture_.find(name);
     if (i != texture_.end()) {
-        throw runtime_error(string("Texture not found: ") + name);
+        throw runtime_error("Texture not found: " + name);
     }
     return i->second.get();
 }
@@ -165,11 +172,15 @@ void Engine::handler(Handler* handler) {
 }
 
 void Engine::folder(const std::string& dir) {
-    set<string>::iterator i = folder_.find(dir);
-    if (i != folder_.end()) {
-        folder_.insert(dir);
+    //string path = resolve_path(dir);
+    folder_.insert(resolve_path(dir));
+    //set<string>::iterator i = folder_.find(path);
     
-        path folder(dir);
+   // if (i == folder_.end()) {
+    //    cout << resolve_path(dir) << endl;
+    //    folder_.insert(path);
+    
+        /*path folder(dir);
         directory_iterator end;
         for (directory_iterator i(folder); i != end; ++i) {
             if (!is_directory(*i)) {
@@ -182,12 +193,36 @@ void Engine::folder(const std::string& dir) {
                     j->second->resource(i->path().file_string());
                 }
             }
+        }*/
+    //}
+}
+
+std::string Engine::resolve_path(const std::string& name) {
+    path file =  initial_path() / name;
+    path result;
+    for (path::iterator i = file.begin(); i != file.end(); i++) {
+        if (*i == "..") {
+            if (is_symlink(result)) {
+                result /= *i;
+            } else if (result.filename() == "..") {
+                result /= *i;
+            } else {
+                result = result.parent_path();
+            }
+        } else if (*i == ".") {
+            // ignore
+        } else {
+            result /= *i;
         }
     }
+    return result.string();
 }
 
 void Engine::tick() {
-    accumulator_ += delta();
+    float d = delta();
+    cout << 1.0f/d << endl;
+    
+    accumulator_ +=d;
     accumulator_ = min(accumulator_, JET_MAX_TIME_LAG);
     while (accumulator_ >= JET_TIME_STEP) {
         // capture input
@@ -214,7 +249,15 @@ void Engine::tick() {
 
 real_t Engine::delta() {
 #ifdef WINDOWS
-
+    int64_t current_time = 0;
+    QueryPerformanceCounter((LARGE_INTEGER*)&current_time);
+    if (!prev_time_) {
+        prev_time_ = current_time;
+    }
+    real_t delta = (current_time - prev_time_) * secs_per_count_;
+    prev_time_ = current_time;
+    
+    return delta;
 #else
 #error "Not implemented"
 #endif

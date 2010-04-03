@@ -56,7 +56,7 @@ public:
     inline bool running() const {
         return running_;
     }
-
+    
     //! Returns a blueprint node.
     //! @param type the type identifier
     Node* node(const std::string& type) const;
@@ -158,6 +158,9 @@ public:
     void tick();
 
 private:
+    real_t delta();
+    std::string resolve_path(const std::string& path);
+    
 #pragma warning(disable:4251)
     NodePtr root_;
     std::map<std::string, LoaderPtr> loader_;

@@ -49,7 +49,7 @@ namespace Jet {
     class Factory;
     class Loader;
     class Handler;
-    class Material;
+    class Matrix;
     class Mesh;
     class Node;
     class Object;

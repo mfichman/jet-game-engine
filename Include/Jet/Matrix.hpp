@@ -18,51 +18,50 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- */  
+ */
 #pragma once
 
 #include <Jet/Types.hpp>
-#include <Jet/Object.hpp>
 
-#ifdef WINDOWS
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#endif
-#include <GL/glew.h>
-#include <GL/gl.h>
+namespace Jet {
 
-namespace Jet { namespace OpenGL {
-
-//! This class loads and manipulates a GPU shader ().
-//! @class Shader
-//! @brief Loads and manipulates a  shader.
-class Shader : public Object {
+//! This class represents a 4x4 matrix for transforming homogeneous
+//! coordinates.
+//! @class Matrix
+//! @brief 4x4 matrix representation
+class JETAPI Matrix {
 public:
-    //! Constructor.
-    Shader(const std::string& path);
-
-    //! Destructor.
-    virtual ~Shader();
-
-    //! Enables this shader.
-    void begin();
-
-    //! Disables this shader.
-    void end();
-
-private:
-    void source(GLuint shader, const std::string& path);
-
-    GLuint vertex_;
-    GLuint fragment_;
-    GLuint shader_;
-    GLuint program_;
-    GLuint texture_map_;
-    GLuint specular_map_;
-    GLuint normal_map_;
-    GLuint environment_map_;
-    GLuint shadow_map_;
-    GLuint binormal_;
+    
+    //! Creates a new matrix using the given array of floats in row-major
+    //! order (same as OpenGL).
+    //! @param data the array
+    Matrix(const real_t data[16]);
+    
+    //! Creates a new empty matrix, with all entries initialized to zero.
+    Matrix();
+    
+    //! Returns the inverse of this matrix.
+    Matrix inverse() const;
+    
+    //! Returns a pointer to the matrix data.
+    inline operator const real_t*() const {
+        return data;
+    }
+    
+    //! Returns a pointer to the matrix data.
+    inline operator real_t*() {
+        return data;
+    }
+    
+    //! Returns an element of the data array
+    inline real_t& operator[](const size_t& i) {
+        return data[i];
+    }
+    
+    //! Multiplies two matrices.
+    Matrix operator*(const Matrix& other) const;
+    
+    real_t data[16];
 };
-
-}}
+    
+}

@@ -49,6 +49,7 @@ public:
 
 private:
     GLuint nvertices_;
+    GLuint nindices_;
     GLuint vbuffer_;
     GLuint ibuffer_;
 };

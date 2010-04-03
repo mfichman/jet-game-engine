@@ -21,6 +21,7 @@
  */  
 
 #include <Jet/OpenGL/Shader.hpp>
+#include <iostream>
 #include <fstream>
 #include <vector>
 
@@ -43,6 +44,7 @@ Shader::Shader(const std::string& path) {
     specular_map_ = glGetUniformLocation(program_, "specular_map");
     normal_map_ = glGetUniformLocation(program_, "normal_map");
     environment_map_ = glGetUniformLocation(program_, "environment_map");
+    shadow_map_ = glGetUniformLocation(program_, "shadow_map");
 
     binormal_ = glGetAttribLocation(program_, "binormal");
 
@@ -69,10 +71,19 @@ void Shader::source(GLuint shader, const std::string& path) {
     const GLchar* source;
 
     ifstream in(path.c_str());
+    if (in.fail()) {
+        throw range_error("Shader not found: " + path);
+    }
+    
     in.seekg(0, ios::end);
     buffer.reserve(1 + in.tellg());
     buffer.resize(in.tellg());
     in.seekg(0, ios::beg);
+    
+    if (!buffer.size()) {
+        throw runtime_error("Empty shader file: " + path);
+    }
+    
     in.read(&buffer.front(), buffer.size());
     in.close();
     buffer.push_back(0); // Null terminate the string
@@ -88,6 +99,7 @@ void Shader::begin() {
     glUniform1i(specular_map_, 1);
     glUniform1i(normal_map_, 2);
     glUniform1i(environment_map_, 3);
+    glUniform1i(shadow_map_, 4);
 }
 
 void Shader::end() {

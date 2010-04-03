@@ -21,6 +21,8 @@
  */  
 #pragma once
 
+#include <Jet/OpenGL/Types.hpp>
+#include <Jet/OpenGL/Shader.hpp>
 #include <Jet/Types.hpp>
 #include <Jet/Handler.hpp>
 
@@ -31,7 +33,9 @@
 #define FREEGLUT_LIB_PRAGMAS 0
 #include <GL/glew.h>
 #include <GL/gl.h>
+#include <GL/glu.h>
 #include <GL/freeglut.h>
+#include <map>
 
 namespace Jet { namespace OpenGL {
 
@@ -51,8 +55,38 @@ public:
     //! Called when an event occurs.
     //! @param event the event code
     virtual void on_render();
+    
+    //! Retrieves the given shader.
+    //! @param name the shader's name
+    Shader* shader(const std::string& name);
 
-private:  
+private:
+    
+    void init_default_states();
+    void init_window();
+    void init_matrices();
+    
+    void begin_shadow_mapping();
+    void end_shadow_mapping();
+    
+    void render_teapots();
+    
+    void generate_shadow_map();
+    void render_final();
+    void render_shadow_casters();
+    void render_visible_objects();
+    
+    Engine* engine_;
+    
+    // Shadow-mapping variables
+    ComponentPtr shadow_vars_;
+    GLuint shadow_map_;
+    GLuint shadow_buffer_;
+    
+    ComponentPtr window_vars_;
+    
+    // Shader variables
+    std::map<std::string, ShaderPtr> shader_;
 };
 
 }}
