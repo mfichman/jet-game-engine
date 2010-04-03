@@ -24,6 +24,7 @@
 #include <Jet/Engine.hpp>
 #include <Jet/Matrix.hpp>
 #include <iostream>
+#include <sstream>
 #include <stdexcept>
 #include <cmath>
 
@@ -65,7 +66,16 @@ void Renderer::init_window() {
     // Initialize the window
     glutInitWindowSize(width, height);
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_STENCIL);
-    glutCreateWindow(title.c_str());
+    
+    
+    if (window_vars_->value("fullscreen")) {
+        stringstream ss;
+        ss << width << "x" << height << ":32@60" << endl;
+        glutGameModeString(ss.str().c_str());
+        glutEnterGameMode();
+    } else {
+        glutCreateWindow(title.c_str());
+    }
 }
 
 void Renderer::init_default_states() {
@@ -308,8 +318,8 @@ void Renderer::render_teapots() {
     
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
-    glTranslatef(4.0f, 0.0f, 0.0f);
-    glutSolidTeapot(0.5f);
+    glTranslatef(5.0f, 0.0f, 0.0f);
+    glutSolidTeapot(1.0f);
     glPopMatrix();
     
     glMatrixMode(GL_TEXTURE);

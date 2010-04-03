@@ -220,7 +220,6 @@ std::string Engine::resolve_path(const std::string& name) {
 
 void Engine::tick() {
     float d = delta();
-    cout << 1.0f/d << endl;
     
     accumulator_ +=d;
     accumulator_ = min(accumulator_, JET_MAX_TIME_LAG);

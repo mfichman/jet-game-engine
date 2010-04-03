@@ -6,13 +6,14 @@
 void main() {
     try {
         Jet::ComponentPtr shadow(new Jet::Component("Config"));
-        shadow->value("texture_size", 2048);
+        shadow->value("texture_size", 1024);
         shadow->value("enabled", true);
         
         Jet::ComponentPtr window(new Jet::Component("Config"));
-        window->value("width", 800);
-        window->value("height", 600);
+        window->value("width", 1680);
+        window->value("height",1050);
         window->value("title", "Extreme Asteroids");
+        window->value("fullscreen", true);
         
         Jet::EnginePtr engine(new Jet::Engine);
         engine->component("shadows", shadow.get());
