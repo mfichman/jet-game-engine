@@ -47,10 +47,8 @@ void TextureLoader::resource(const std::string& file) {
     ilLoadImage(file.c_str());
     //ilGetError()
 
-    TexturePtr texture(new Texture);
+    TexturePtr texture(engine_->texture(file));
     texture->width(ilGetInteger(IL_IMAGE_WIDTH));
     texture->height(ilGetInteger(IL_IMAGE_HEIGHT));
     ilCopyPixels(0, 0, 0, texture->width(), texture->height(), 1, IL_RGBA, IL_UNSIGNED_BYTE, texture->data());
-
-    engine_->texture(file, texture.get());
 }

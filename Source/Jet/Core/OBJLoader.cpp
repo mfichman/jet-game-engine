@@ -177,25 +177,23 @@ void OBJLoader::resource(const std::string& file) {
         }
 
     }
+    
+    std::string name = file.substr(file.rfind("/") + 1, string::npos);
 
     // Build the mesh data
-    MeshPtr mesh(new Mesh());
+    MeshPtr mesh(engine_->mesh(name));
     for (map<Vertex, uint32_t>::iterator i = vertex_.begin(); i != vertex_.end(); i++) {
         mesh->vertex(i->second, i->first);
     }
     for (size_t i = 0; i < index_.size(); i++) {
         mesh->index(i, index_[i]);
     }
-	std::string name = file.substr(file.rfind("/") + 1, string::npos);
 
     //! Build a component that is a template meshobject
-    ComponentPtr component(new Component("MeshObject"));
+    ComponentPtr component(engine_->component(name));
     component->value("mesh", name);
 	component->value("renderable", true);
     component->component("material", engine_->component(material_));
-
-    engine_->mesh(name, mesh.get());   
-	engine_->component(name, component.get());
 
     position_.clear();
     normal_.clear();

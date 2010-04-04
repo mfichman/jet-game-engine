@@ -48,8 +48,8 @@ MTLLoader::MTLLoader(Engine* engine) :
 void MTLLoader::newmtl(istream& in) {
     string value;
     in >> value;
-    material_.reset(new Component("Material"));
-    engine_->component(value, material_.get());
+    material_ = engine_->component(value);
+    material_->type("Material");
 }
 
 void MTLLoader::ambient(istream& in) {

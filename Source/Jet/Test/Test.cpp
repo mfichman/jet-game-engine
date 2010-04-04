@@ -4,20 +4,20 @@
 #include <stdexcept>
 
 void main() {
-    try {
-        Jet::ComponentPtr shadow(new Jet::Component("Config"));
-        shadow->value("texture_size", 2048);
-        shadow->value("enabled", true);
+    try {        
+        Jet::EnginePtr engine(new Jet::Engine);
+        Jet::ComponentPtr shadows(engine->component("shadows"));
+        shadows->type("Config");
+        shadows->value("texture_size", 2048);
+        shadows->value("enabled", true);
         
-        Jet::ComponentPtr window(new Jet::Component("Config"));
+        Jet::ComponentPtr window(engine->component("window"));
+        window->type("Config");
         window->value("width", 800);
         window->value("height", 600);
         window->value("title", "Extreme Asteroids");
         window->value("fullscreen", 0.0);
         
-        Jet::EnginePtr engine(new Jet::Engine);
-        engine->component("shadows", shadow.get());
-        engine->component("window", window.get());
         engine->folder("../Textures");
         engine->folder("../Meshes");
         engine->folder("../Shaders");
@@ -33,14 +33,14 @@ void main() {
         Jet::NodePtr box_node(engine->root()->node("box"));
         box_node->component("box", "Box.obj");
         
-        Jet::ComponentPtr light(new Jet::Component("PointLight"));
+        Jet::NodePtr light_node(engine->root()->node("light"));
+        light_node->position(Jet::Vector(10.0f, 0.0f, 0.0f));
+        
+        Jet::ComponentPtr light(light_node->component("light"));
+        light->type("PointLight");
         light->value("ambient", Jet::Color(0.0f, 0.0f, 0.0f, 1.0f));
         light->value("diffuse", Jet::Color(1.0f, 1.0f, 1.0f, 1.0f));
         light->value("specular", Jet::Color(0.0f, 0.0f, 1.0f, 1.0f));
-        
-        Jet::NodePtr light_node(engine->root()->node("light"));
-        light_node->component("light", light.get());
-        light_node->position(Jet::Vector(10.0f, 0.0f, 0.0f));
         
 
         //engine->module("Jet.Direct3D9");

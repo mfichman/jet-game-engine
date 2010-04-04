@@ -88,10 +88,14 @@ public:
     }
     
 private:
+    Mesh() {}
+    
 #pragma warning(disable:4251)
     std::vector<Vertex> vertex_;
     std::vector<uint32_t> index_;
-#pragma warning(default:4251)    
+#pragma warning(default:4251)
+
+    friend class Engine;
 };
 
 }

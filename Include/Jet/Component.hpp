@@ -86,6 +86,7 @@ private:
 #pragma warning(default:4251)
 
     friend class Node;
+    friend class Engine;
 };
 
 /*

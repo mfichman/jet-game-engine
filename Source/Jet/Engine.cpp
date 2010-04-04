@@ -75,10 +75,13 @@ Component* Engine::component(const std::string& name) const {
     return i->second.get();
 }
 
-Mesh* Engine::mesh(const std::string& type) const {
-    map<string, MeshPtr>::const_iterator i = mesh_.find(type);
+Mesh* Engine::mesh(const std::string& name) const {
+    map<string, MeshPtr>::const_iterator i = mesh_.find(name);
     if (i == mesh_.end()) {
-        throw runtime_error("Mesh not found: " + type);
+        Engine* self = const_cast<Engine*>(this);
+        MeshPtr mesh(new Mesh());
+        self->mesh_.insert(make_pair(name, mesh));
+        return mesh.get();
     }
     return i->second.get();
 }
@@ -86,7 +89,10 @@ Mesh* Engine::mesh(const std::string& type) const {
 Texture* Engine::texture(const std::string& name) const {
     map<string, TexturePtr>::const_iterator i = texture_.find(name);
     if (i == texture_.end()) {
-        throw runtime_error("Texture not found: " + name);
+        Engine* self = const_cast<Engine*>(this);
+        TexturePtr texture(new Texture());
+        self->texture_.insert(make_pair(name, texture));
+        return texture.get();
     }
     return i->second.get();
 }
@@ -109,22 +115,6 @@ void Engine::loader(const std::string& type, Loader* loader) {
 
 void Engine::factory(const std::string& type, Factory* factory) {
     factory_[type] = factory;    
-}
-
-void Engine::node(const std::string& type, Node* node) {
-    node_[type] = node;
-}
-
-void Engine::component(const std::string& type, Component* component) {
-    component_[type] = component;
-}
-
-void Engine::mesh(const std::string& name, Mesh* mesh) {
-    mesh_[name] = mesh;
-}
-
-void Engine::texture(const std::string& name, Texture* texture) {
-    texture_[name] = texture;
 }
 
 void Engine::resource(const std::string& name) {

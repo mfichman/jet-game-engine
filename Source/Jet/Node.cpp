@@ -65,14 +65,6 @@ Component* Node::component(const std::string& name, const std::string& blueprint
     return component.get();
 }
 
-void Node::component(const std::string& name, Component* component) {
-    component_.insert(make_pair(name, component));
-
-    // Add the component to a second map so that it can be looked 
-    // up by type easily
-    component_type_.insert(make_pair(component->type(), component));
-}
-
 void Node::controller(const std::string& type) {
     ControllerPtr controller = dynamic_cast<Controller*>(engine_->object(type));
     if (!controller) {

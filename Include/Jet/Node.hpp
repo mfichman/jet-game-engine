@@ -75,7 +75,14 @@ public:
     //! @param name the name of the component
     inline Component* component(const std::string& name) const {
         std::map<std::string, ComponentPtr>::const_iterator i = component_.find(name);
-        return (i == component_.end()) ? 0 : i->second.get();
+        if (i == component_.end()) {
+            Node* self = const_cast<Node*>(this);
+            ComponentPtr component(new Component());
+            self->component_.insert(make_pair(name, component));
+            return component.get();
+        } else {
+            return i->second.get();
+        }
     }
 
     //! Returns an iterator to all nodes connected to this scene node.
@@ -117,11 +124,6 @@ public:
     //! @param name the name of the new component
     //! @param blueprint the name of the blueprint
     Component* component(const std::string& name, const std::string& blueprint);
-
-    //! Attaches a new component to this node.
-    //! @param name the name of the new component
-    //! @param component the new component
-    void component(const std::string& name, Component* component);
 
     //! Attaches a controller using the given blueprint component.  Note that 
     //! each controller may have only one parent, so adding a controller that

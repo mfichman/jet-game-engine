@@ -36,7 +36,6 @@ extern "C" {
 
 void load(Engine* engine) {
     InterpreterPtr interpreter(new Interpreter());
-    engine->module(interpreter.get());
     
     FactoryPtr script_factory(new ScriptFactory(interpreter.get()));
     engine->factory(".lua", script_factory.get());

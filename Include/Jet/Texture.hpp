@@ -64,11 +64,15 @@ public:
     void height(size_t height);
     
 private:
+    Texture() {}
+    
 #pragma warning(disable:4251)
     std::vector<uint8_t> data_;
     size_t width_;
     size_t height_;
-#pragma warning(default:4251)    
+#pragma warning(default:4251)
+
+    friend class Engine;
 };
 
 }

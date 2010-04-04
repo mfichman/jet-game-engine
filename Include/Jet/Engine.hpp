@@ -92,16 +92,6 @@ public:
     //! resources.
     Iterator<const std::string> folders() const;
 
-    //! Adds a new mesh to the engine.
-    //! @param name the name of the mesh
-    //! @param mesh the mesh object
-    void mesh(const std::string& name, Mesh* mesh);
-
-    //! Adds a new texture to the engine.
-    //! @param name the name of the texture
-    //! @param texture the texture object
-    void texture(const std::string& name, Texture* texture);
-
     //! Loads a module into the engine.
     //! @param path the path to the module
     void module(const std::string& path);
