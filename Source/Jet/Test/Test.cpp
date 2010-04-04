@@ -29,6 +29,7 @@ void main() {
         engine->module("Jet.OpenGL");
         engine->module("Jet.Lua");
         engine->resource("Box.obj");
+        //engine->resource("Whatever.xml");
         
         Jet::NodePtr box_node(engine->root()->node("box"));
         box_node->component("box", "Box.obj");
