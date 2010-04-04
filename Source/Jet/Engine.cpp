@@ -53,18 +53,24 @@ Engine::Engine() :
 Engine::~Engine() {
 }
 
-Node* Engine::node(const std::string& type) const {
-    map<string, NodePtr>::const_iterator i = node_.find(type);
+Node* Engine::node(const std::string& name) const {
+    map<string, NodePtr>::const_iterator i = node_.find(name);
     if (i == node_.end()) {
-        throw runtime_error("Node not found: " + type);
+        Engine* self = const_cast<Engine*>(this);
+        NodePtr node(new Node(self));
+        self->node_.insert(make_pair(name, node));
+        return node.get();
     }
     return i->second.get();
 }
 
-Component* Engine::component(const std::string& type) const {
-    map<string, ComponentPtr>::const_iterator i = component_.find(type);
+Component* Engine::component(const std::string& name) const {
+    map<string, ComponentPtr>::const_iterator i = component_.find(name);
     if (i == component_.end()) {
-        throw runtime_error("Component not found: " + type);
+        Engine* self = const_cast<Engine*>(this);
+        ComponentPtr component(new Component());
+        self->component_.insert(make_pair(name, component));
+        return component.get();
     }
     return i->second.get();
 }
@@ -148,11 +154,8 @@ Object* Engine::object(const std::string& type) {
     } else {
         throw runtime_error("No factory for: " + type);
     }
- }
-
-void Engine::module(Object* module) {
-    module_.push_back(module);
 }
+
 
 void Engine::module(const std::string& path) {
 #ifdef WINDOWS

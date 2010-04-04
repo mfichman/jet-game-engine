@@ -92,16 +92,6 @@ public:
     //! resources.
     Iterator<const std::string> folders() const;
 
-    //! Adds a new template node to the engine
-    //! @param type the name of the template
-    //! @param node the template node
-    void node(const std::string& type, Node* node);
-
-    //! Adds a new template component to the engine
-    //! @param type the name of the template
-    //! @param component the template component
-    void component(const std::string& type, Component* component);
-
     //! Adds a new mesh to the engine.
     //! @param name the name of the mesh
     //! @param mesh the mesh object
@@ -111,10 +101,6 @@ public:
     //! @param name the name of the texture
     //! @param texture the texture object
     void texture(const std::string& name, Texture* texture);
-
-    //! Loads a module into the engine.
-    //! @param module the module object
-    void module(Object* module);
 
     //! Loads a module into the engine.
     //! @param path the path to the module
@@ -171,7 +157,6 @@ private:
     std::map<std::string, MeshPtr> mesh_;
     std::map<std::string, TexturePtr> texture_;
     std::set<std::string> resource_;
-    std::list<ObjectPtr> module_;
     std::list<HandlerPtr> handler_;
     std::set<std::string> folder_;
     std::list<std::pair<NodePtr, ComponentPtr>> renderables_;

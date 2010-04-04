@@ -34,10 +34,6 @@ namespace Jet {
 class JETAPI Component : public Object {
 public:
     class Listener;
-
-    //! Creates a new component.
-    //! @param type the type of component
-    Component(const std::string& type);
     
     //! Destructor.
     virtual ~Component() {}
@@ -45,6 +41,10 @@ public:
     //! Returns the type of this component.
     inline const std::string& type() const {
         return type_;
+    }
+    
+    inline void type(const std::string& type) {
+        type_ = type;
     }
 
     //! Method for reading a value from the component.
@@ -72,6 +72,10 @@ public:
     Iterator<ValueEntry> values();
 
 private:
+    //! Creates a new component.
+    //! @param type the type of component
+    Component();
+    
     //! Clones this component
     virtual Component* clone() const;
 

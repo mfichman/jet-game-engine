@@ -25,8 +25,7 @@
 using namespace Jet;
 using namespace std;
 
-Component::Component(const std::string& type) : 
-    type_(type) {
+Component::Component() {
 }
 
 const Value& Component::value(const std::string& name) const {
@@ -64,7 +63,8 @@ Iterator<ValueEntry> Component::values() {
 }
 
 Component* Component::clone() const {
-    Component* clone = new Component(type_);
+    Component* clone = new Component();
+    clone->type_ = type_;
     
     // Copy values stored in this component
     for (map<string, Value>::const_iterator i = value_.begin(); i != value_.end(); i++) {
