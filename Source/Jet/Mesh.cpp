@@ -26,6 +26,11 @@
 using namespace Jet;
 using namespace std;
 
+Mesh::Mesh() :
+    loaded_(false) {
+    
+}
+
 void Mesh::vertex(size_t i, const Vertex& vertex) {
     if (i >= vertex_.size()) {
         vertex_.resize(i + 1);

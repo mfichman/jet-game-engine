@@ -28,27 +28,28 @@ void main() {
         engine->module("Jet.Core");
         engine->module("Jet.OpenGL");
         engine->module("Jet.Lua");
-        engine->resource("Box.obj");
-        //engine->resource("Whatever.xml");
-        
-        Jet::NodePtr box_node(engine->root()->node("box"));
-        box_node->component("box", "Box.obj");
-        
-        Jet::NodePtr light_node(engine->root()->node("light"));
-        light_node->position(Jet::Vector(10.0f, 0.0f, 0.0f));
-        
-        Jet::ComponentPtr light(light_node->component("light"));
-        light->type("PointLight");
-        light->value("ambient", Jet::Color(0.0f, 0.0f, 0.0f, 1.0f));
-        light->value("diffuse", Jet::Color(1.0f, 1.0f, 1.0f, 1.0f));
-        light->value("specular", Jet::Color(0.0f, 0.0f, 1.0f, 1.0f));
-        
-
         //engine->module("Jet.Direct3D9");
         //engine->module("Jet.FMOD");
         //engine->module("Jet.Lua");
         //engine->module("Jet.Python");
         //enigne->module("Jet.XML");
+        
+        //engine->resource("Box.obj");
+        //engine->resource("Whatever.xml");
+        
+        Jet::NodePtr box_node(engine->root()->node("box"));
+        Jet::ComponentPtr box = box_node->component("box");
+        box->type("MeshObject");
+        box->value("renderable", true);
+        box->value("mesh", "Box.obj");
+        
+        Jet::NodePtr light_node(engine->root()->node("light"));
+        light_node->position(Jet::Vector(10.0f, 0.0f, 0.0f));
+        Jet::ComponentPtr light(light_node->component("light"));
+        light->type("PointLight");
+        light->value("ambient", Jet::Color(0.0f, 0.0f, 0.0f, 1.0f));
+        light->value("diffuse", Jet::Color(1.0f, 1.0f, 1.0f, 1.0f));
+        light->value("specular", Jet::Color(0.0f, 0.0f, 1.0f, 1.0f));
     
         while (engine->running()) {
             engine->tick();

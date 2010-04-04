@@ -24,6 +24,11 @@
 
 using namespace Jet;
 
+Texture::Texture() :
+    loaded_(false) {
+        
+}
+
 void Texture::width(size_t width) {
     width_ = width;
     data_.resize(width_ * height_ * 4);

@@ -48,7 +48,7 @@ Node::Node(Engine* engine) :
 }
 
 Node* Node::node(const std::string& name, const std::string& blueprint) {
-    NodePtr node(engine_->node(blueprint)->clone());
+    NodePtr node(engine_->node(blueprint, false)->clone());
     node->parent_ = this;
     node->name_ = name;
     node_.insert(make_pair(name, node));
@@ -56,7 +56,7 @@ Node* Node::node(const std::string& name, const std::string& blueprint) {
 }
 
 Component* Node::component(const std::string& name, const std::string& blueprint) {
-    ComponentPtr component(engine_->component(blueprint)->clone());
+    ComponentPtr component(engine_->component(blueprint, false)->clone());
     component_.insert(make_pair(name, component));
 
     // Add the component to a second map so that it can be looked up by type

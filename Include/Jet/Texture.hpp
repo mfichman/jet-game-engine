@@ -54,6 +54,11 @@ public:
     inline uint8_t* data() {
         return &data_.front();
     }
+    
+    //! Returns true if the texture is loaded.
+    inline bool loaded() const {
+        return loaded_;
+    }
 
     //! Sets the width of the texture in pixels.
     //! @param width the new width
@@ -63,9 +68,15 @@ public:
     //! @param height the new height
     void height(size_t height);
     
-private:
-    Texture() {}
+    //! Marks this texture as loaded.
+    inline void loaded(bool loaded) {
+        loaded_ = loaded;
+    }
     
+private:
+    Texture();
+    
+    bool loaded_;
 #pragma warning(disable:4251)
     std::vector<uint8_t> data_;
     size_t width_;

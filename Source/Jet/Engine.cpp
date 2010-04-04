@@ -53,46 +53,67 @@ Engine::Engine() :
 Engine::~Engine() {
 }
 
-Node* Engine::node(const std::string& name) const {
+Node* Engine::node(const std::string& name, bool create) const {
     map<string, NodePtr>::const_iterator i = node_.find(name);
     if (i == node_.end()) {
-        Engine* self = const_cast<Engine*>(this);
-        NodePtr node(new Node(self));
-        self->node_.insert(make_pair(name, node));
-        return node.get();
+        if (create) {
+            Engine* self = const_cast<Engine*>(this);
+            NodePtr node(new Node(self));
+            self->node_.insert(make_pair(name, node));
+            return node.get();
+        } else {
+            throw runtime_error("Node not found: " + name);
+        }
     }
     return i->second.get();
 }
 
-Component* Engine::component(const std::string& name) const {
+Component* Engine::component(const std::string& name, bool create) const {
     map<string, ComponentPtr>::const_iterator i = component_.find(name);
     if (i == component_.end()) {
-        Engine* self = const_cast<Engine*>(this);
-        ComponentPtr component(new Component());
-        self->component_.insert(make_pair(name, component));
-        return component.get();
+        if (create) {
+            Engine* self = const_cast<Engine*>(this);
+            ComponentPtr component(new Component());
+            self->component_.insert(make_pair(name, component));
+            return component.get();
+        } else {
+            throw runtime_error("Component not found: " + name);
+        }
     }
     return i->second.get();
 }
 
-Mesh* Engine::mesh(const std::string& name) const {
+Mesh* Engine::mesh(const std::string& name, bool load) const {
     map<string, MeshPtr>::const_iterator i = mesh_.find(name);
+    Engine* self = const_cast<Engine*>(this);
     if (i == mesh_.end()) {
-        Engine* self = const_cast<Engine*>(this);
+       
         MeshPtr mesh(new Mesh());
         self->mesh_.insert(make_pair(name, mesh));
+        if (load) {
+            self->resource(name);
+        }
         return mesh.get();
+    }
+    if (load && !i->second->loaded()) {
+        self->resource(name);
     }
     return i->second.get();
 }
 
-Texture* Engine::texture(const std::string& name) const {
+Texture* Engine::texture(const std::string& name, bool load) const {
     map<string, TexturePtr>::const_iterator i = texture_.find(name);
+    Engine* self = const_cast<Engine*>(this);
     if (i == texture_.end()) {
-        Engine* self = const_cast<Engine*>(this);
         TexturePtr texture(new Texture());
         self->texture_.insert(make_pair(name, texture));
+        if (load) {
+            self->resource(name);
+        }
         return texture.get();
+    }
+    if (load && !i->second->loaded()) {
+        self->resource(name);
     }
     return i->second.get();
 }

@@ -66,6 +66,11 @@ public:
     //! @param i the index of the index.
     //! @param index the index to add
     void index(size_t i, uint32_t index);
+    
+    //! Marks the mesh as loaded.
+    inline void loaded(bool loaded) {
+        loaded_ = loaded;
+    }
 
     //! Returns a pointer to the beginning of the vertex buffer.
     inline const Vertex* vertex_data() const {
@@ -87,9 +92,15 @@ public:
         return index_.size();
     }
     
-private:
-    Mesh() {}
+    //! Returns true if the mesh data is loaded
+    inline bool loaded() const {
+        return loaded_;
+    }
     
+private:
+    Mesh();
+    
+    bool loaded_;
 #pragma warning(disable:4251)
     std::vector<Vertex> vertex_;
     std::vector<uint32_t> index_;

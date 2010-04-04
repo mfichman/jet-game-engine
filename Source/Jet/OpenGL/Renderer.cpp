@@ -290,9 +290,6 @@ MeshBuffer* Renderer::mesh(const std::string& name) {
     if (i == mesh_.end()) {
         engine_->resource(name);
         MeshPtr mesh(engine_->mesh(name));
-        if (!mesh) {
-            throw runtime_error("Mesh not found: " + name);
-        }
         MeshBufferPtr mesh_buffer(new MeshBuffer(mesh.get()));
         mesh_.insert(make_pair(name, mesh_buffer));
         return mesh_buffer.get();

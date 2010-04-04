@@ -59,19 +59,21 @@ public:
     
     //! Returns a blueprint node.
     //! @param type the type identifier
-    Node* node(const std::string& type) const;
+    Node* node(const std::string& type, bool create=true) const;
 
     //! Returns the blueprint component.
     //! @param type the type identifier
-    Component* component(const std::string& type) const;
+    Component* component(const std::string& type, bool create=true) const;
 
     //! Returns the given mesh object.
-    //! @param name the name of the mesh
-    Mesh* mesh(const std::string& name) const;
+    //! @param name the name of the mesh.
+    //! @param load whether or not to load the resource, if it is not loaded.
+    Mesh* mesh(const std::string& name, bool load=true) const;
 
     //! Returns the given texture object.
     //! @param name the name of the texture
-    Texture* texture(const std::string& name) const;
+    //! @param load whether or not to load the resource, if it is not loaded.
+    Texture* texture(const std::string& name, bool load=true) const;
     
      //! Loads an object into the engine using the factory for the given type.
     //! @param type the object type to load
