@@ -34,15 +34,15 @@
 namespace Jet { namespace OpenGL {
 
 //! This class holds the vertex and index buffers for a triangle mesh.
-//! @class Mesh
+//! @class MeshBuffer
 //! @brief Vertex and index buffers for a triangle mesh.
-class Mesh : public Object {
+class MeshBuffer : public Object {
 public:
     //! Constructor.
-    Mesh(Jet::Mesh* mesh);
+    MeshBuffer(Mesh* mesh);
 
     //! Destructor.
-    virtual ~Mesh();
+    virtual ~MeshBuffer();
 
     //! Renders this mesh.
     void render() const;

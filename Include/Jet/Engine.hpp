@@ -81,12 +81,12 @@ public:
     //! nodes that will be displayed by the renderer.  Node that this list only 
     //! includes the list of parent nodes, not all nodes in the tree.  Thus, 
     //! the renderer should check for children of each node in this list.
-    Iterator<const NodePtr> renderables() const;
+    Iterator<const std::pair<NodePtr, ComponentPtr>> renderables() const;
 
     //! Returns a list of nodes with lighting information.  Note that light
     //! nodes may be culled depending on their distance from the viewer and
     //! potentially an obstacles.
-    Iterator<const NodePtr> lights() const;
+    Iterator<const std::pair<NodePtr, ComponentPtr>> lights() const;
     
     //! Returns a list of folders representing the search path for loading
     //! resources.
@@ -160,6 +160,7 @@ public:
 private:
     real_t delta();
     std::string resolve_path(const std::string& path);
+    void generate_render_list(NodePtr node);
     
 #pragma warning(disable:4251)
     NodePtr root_;
@@ -173,6 +174,8 @@ private:
     std::list<ObjectPtr> module_;
     std::list<HandlerPtr> handler_;
     std::set<std::string> folder_;
+    std::list<std::pair<NodePtr, ComponentPtr>> renderables_;
+    std::list<std::pair<NodePtr, ComponentPtr>> lights_;
     bool running_;
     real_t accumulator_;
 #ifdef WINDOWS

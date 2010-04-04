@@ -50,6 +50,7 @@ void OBJLoader::mtllib(istream& in) {
     string mttlib;
     in >> mttlib;
     // load material TODO
+	engine_->resource(mttlib);
 }
 
 void OBJLoader::usemtl(istream& in) {
@@ -79,14 +80,20 @@ void OBJLoader::face(istream& in) {
     // Read in a face for the mesh
     Vertex face[3];
     for (int i = 0; i < 3; i++) {
+		string line;
+		in >> line;
+
+		istringstream ss(line);
         string i1, i2, i3;
-        getline(in, i1, '/');
-        getline(in, i2, '/');
-        getline(in, i3, ' ');
+        getline(ss, i1, '/');
+        getline(ss, i2, '/');
+        getline(ss, i3, ' ');
         
         if (!i1.empty()) {
             face[i].position = position_[lexical_cast<size_t>(i1)-1];
-        }
+		} else {
+			throw runtime_error("Malformed file");
+		}
         if (!i2.empty()) {
             face[i].texcoord = texcoord_[lexical_cast<size_t>(i2)-1];
         }
@@ -98,7 +105,7 @@ void OBJLoader::face(istream& in) {
     // Add vertices to the buffer
     for (int j = 0; j < 3; j++) {  
         // Calculate binormals          
-        binormal(face, j);
+        //binormal(face, j);
         
         map<Vertex, uint32_t>::iterator i = vertex_.find(face[j]);
         if (i == vertex_.end()) {
@@ -140,7 +147,7 @@ void OBJLoader::binormal(Vertex face[3], size_t j) {
 // .OBJ file.  
 void OBJLoader::resource(const std::string& file) {
     static const std::string& ext = ".obj";
-    if (file.rfind(ext) != ext.length()) {
+    if ((file.length() - file.rfind(ext)) != ext.length()) {
         throw runtime_error("Invalid file extension");
     }
 
@@ -150,8 +157,10 @@ void OBJLoader::resource(const std::string& file) {
     string command;
     cur_index_ = 0;
     
-    while (in.good()) {
+    while (in.good() && !in.eof()) {
         in >> command;
+
+		if (!in.good()) break;
         
         if (command.find("#") == 0) {
             // Skip the comment line
@@ -161,7 +170,10 @@ void OBJLoader::resource(const std::string& file) {
             map<string, void (OBJLoader::*)(istream&)>::iterator i = command_.find(command);
             if (i != command_.end()) {
                 ((this)->*(i->second))(in);
-            }
+			} else {
+				string line;
+				getline(in, line);
+			}
         }
 
     }
@@ -174,13 +186,16 @@ void OBJLoader::resource(const std::string& file) {
     for (size_t i = 0; i < index_.size(); i++) {
         mesh->index(i, index_[i]);
     }
-    engine_->mesh(file, mesh.get());
+	std::string name = file.substr(file.rfind("/") + 1, string::npos);
 
     //! Build a component that is a template meshobject
-    ComponentPtr object(new Component("MeshObject"));
-    object->value("mesh", file);
-    object->component("material", engine_->component(material_));
-    engine_->mesh(file, mesh.get());   
+    ComponentPtr component(new Component("MeshObject"));
+    component->value("mesh", name);
+	component->value("renderable", true);
+    component->component("material", engine_->component(material_));
+
+    engine_->mesh(name, mesh.get());   
+	engine_->component(name, component.get());
 
     position_.clear();
     normal_.clear();

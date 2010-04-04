@@ -38,10 +38,9 @@ using namespace std;
 using namespace boost::filesystem;
 
 Engine::Engine() :
-    root_(new Node()),
     running_(true) {
         
-    root_->engine_ = this;
+    root_.reset(new Node(this));
     
 #ifdef WINDOWS
     int64_t counts_per_sec = 0;
@@ -72,7 +71,7 @@ Component* Engine::component(const std::string& type) const {
 
 Mesh* Engine::mesh(const std::string& type) const {
     map<string, MeshPtr>::const_iterator i = mesh_.find(type);
-    if (i != mesh_.end()) {
+    if (i == mesh_.end()) {
         throw runtime_error("Mesh not found: " + type);
     }
     return i->second.get();
@@ -80,7 +79,7 @@ Mesh* Engine::mesh(const std::string& type) const {
 
 Texture* Engine::texture(const std::string& name) const {
     map<string, TexturePtr>::const_iterator i = texture_.find(name);
-    if (i != texture_.end()) {
+    if (i == texture_.end()) {
         throw runtime_error("Texture not found: " + name);
     }
     return i->second.get();
@@ -88,6 +87,14 @@ Texture* Engine::texture(const std::string& name) const {
 
 Iterator<const std::string> Engine::folders() const {
     return Iterator<const std::string>(folder_.begin(), folder_.end());
+}
+
+Iterator<const pair<NodePtr, ComponentPtr>> Engine::renderables() const {
+    return Iterator<const pair<NodePtr, ComponentPtr>>(renderables_.begin(), renderables_.end());
+}
+
+Iterator<const pair<NodePtr, ComponentPtr>> Engine::lights() const {
+    return Iterator<const pair<NodePtr, ComponentPtr>>(lights_.begin(), lights_.end());
 }
 
 void Engine::loader(const std::string& type, Loader* loader) {
@@ -118,19 +125,28 @@ void Engine::resource(const std::string& name) {
     std::string ext = name.substr(name.rfind("."), string::npos);
     map<string, LoaderPtr>::iterator i = loader_.find(ext);
     if (i != loader_.end()) {
-        i->second->resource(name);
+        
+        for (Iterator<const string> j = folders(); j; j++) {
+			string path = *j + "/" + name;
+			ifstream in(path.c_str());
+			if (in.good()) {
+				i->second->resource(path);
+				return;
+			}
+        }
+        throw range_error("Resource not found: " + name);
     } else {
-        throw runtime_error(string("No loader for: ") + name); 
+        throw runtime_error("No loader for: " + name); 
     }
 }
 
- Object* Engine::object(const std::string& type) {
+Object* Engine::object(const std::string& type) {
     std::string ext = type.substr(type.rfind("."), string::npos);
     map<string, FactoryPtr>::iterator i = factory_.find(ext);
     if (i != factory_.end()) {
         return i->second->object(type);
     } else {
-        throw runtime_error(string("No factory for: ") + type);
+        throw runtime_error("No factory for: " + type);
     }
  }
 
@@ -219,9 +235,21 @@ std::string Engine::resolve_path(const std::string& name) {
 }
 
 void Engine::tick() {
+    static int frames = 0;
+    static float elapsed = 0.0f;
+    
+    
     float d = delta();
     
-    accumulator_ +=d;
+    elapsed += d;
+    frames++;
+    if (elapsed > 1.0f) {
+        cout << frames/elapsed << endl;
+        frames = 0;
+        elapsed = 0.0f;
+    }
+    
+    accumulator_ += d;
     accumulator_ = min(accumulator_, JET_MAX_TIME_LAG);
     while (accumulator_ >= JET_TIME_STEP) {
         // capture input
@@ -229,6 +257,10 @@ void Engine::tick() {
             (*i)->on_update();
         }
     }
+    
+    renderables_.clear();
+    generate_render_list(root_);
+    
     
     // Fire pre-render event
     for (list<HandlerPtr>::iterator i = handler_.begin(); i != handler_.end(); i++) {
@@ -244,6 +276,23 @@ void Engine::tick() {
     for (list<HandlerPtr>::iterator i = handler_.begin(); i != handler_.end(); i++) {
         (*i)->on_post_render();
     }
+}
+
+void Engine::generate_render_list(NodePtr node) {
+    
+    for (Iterator<const ComponentPtr> i = node->components(); i; i++) {
+        if ((*i)->value("renderable")) {
+            renderables_.push_back(make_pair(node, *i));;
+        } else if ((*i)->type() == "DirectionalLight") {
+            lights_.push_back(make_pair(node, *i));
+        } else if ((*i)->type() == "PointLight") {
+            lights_.push_back(make_pair(node, *i));
+        }
+    }
+    for (Iterator<NodePtr> i = node->nodes(); i; i++) {
+        generate_render_list(*i);
+    }
+    
 }
 
 real_t Engine::delta() {

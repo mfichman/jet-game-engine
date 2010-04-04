@@ -22,15 +22,27 @@
 
 #include <Jet/Matrix.hpp>
 #include <cstring>
+#include <algorithm>
 
 using namespace Jet;
 
 Matrix::Matrix(const real_t data[16]) {
-    memcpy((void*)data, (void*)this->data, sizeof(this->data));
+    std::copy(data, data+16, this->data);
+}
+
+Matrix::Matrix(real_t m00, real_t m01, real_t m02, real_t m03,
+    real_t m10, real_t m11, real_t m12, real_t m13,
+    real_t m20, real_t m21, real_t m22, real_t m23,
+    real_t m30, real_t m31, real_t m32, real_t m33) {
+    
+    data[0] = m00; data[1] = m01; data[2] = m02; data[3] = m03;
+    data[4] = m10; data[5] = m11; data[6] = m12; data[7] = m13;
+    data[8] = m20; data[9] = m21; data[10] = m22; data[11] = m23;
+    data[12] = m30; data[13] = m31; data[14] = m32; data[15] = m33;
 }
 
 Matrix::Matrix() {
-    memset((void*)this->data, 0, sizeof(this->data));
+   std::fill_n(data, 16, 0.0f);
 }
 
 Matrix Matrix::operator*(const Matrix& other) const {
@@ -43,25 +55,25 @@ Matrix Matrix::operator*(const Matrix& other) const {
     12 13 14 15
     */
     
-    out.data[0] = data[0]*other.data[0] + data[1]*other.data[4] + data[2]*other.data[8] + data[3]*other.data[12];
-    out.data[1] = data[0]*other.data[1] + data[1]*other.data[5] + data[2]*other.data[9] + data[3]*other.data[13];
-    out.data[2] = data[0]*other.data[2] + data[1]*other.data[6] + data[2]*other.data[10] + data[3]*other.data[14];
-    out.data[3] = data[0]*other.data[3] + data[1]*other.data[7] + data[2]*other.data[11] + data[3]*other.data[15];
+    out.data[0] = other.data[0]*data[0] + other.data[1]*data[4] + other.data[2]*data[8] + other.data[3]*data[12];
+    out.data[1] = other.data[0]*data[1] + other.data[1]*data[5] + other.data[2]*data[9] + other.data[3]*data[13];
+    out.data[2] = other.data[0]*data[2] + other.data[1]*data[6] + other.data[2]*data[10] + other.data[3]*data[14];
+    out.data[3] = other.data[0]*data[3] + other.data[1]*data[7] + other.data[2]*data[11] + other.data[3]*data[15];
     
-    out.data[4] = data[4]*other.data[0] + data[5]*other.data[4] + data[6]*other.data[8] + data[7]*other.data[12];
-    out.data[5] = data[4]*other.data[1] + data[5]*other.data[5] + data[6]*other.data[9] + data[7]*other.data[13];
-    out.data[6] = data[4]*other.data[2] + data[5]*other.data[6] + data[6]*other.data[10] + data[7]*other.data[14];
-    out.data[7] = data[4]*other.data[3] + data[5]*other.data[7] + data[6]*other.data[11] + data[7]*other.data[15];
+    out.data[4] = other.data[4]*data[0] + other.data[5]*data[4] + other.data[6]*data[8] + other.data[7]*data[12];
+    out.data[5] = other.data[4]*data[1] + other.data[5]*data[5] + other.data[6]*data[9] + other.data[7]*data[13];
+    out.data[6] = other.data[4]*data[2] + other.data[5]*data[6] + other.data[6]*data[10] + other.data[7]*data[14];
+    out.data[7] = other.data[4]*data[3] + other.data[5]*data[7] + other.data[6]*data[11] + other.data[7]*data[15];
     
-    out.data[8] = data[8]*other.data[0] + data[9]*other.data[4] + data[10]*other.data[8] + data[11]*other.data[12];
-    out.data[9] = data[8]*other.data[1] + data[9]*other.data[5] + data[10]*other.data[9] + data[11]*other.data[13];
-    out.data[10] = data[8]*other.data[2] + data[9]*other.data[6] + data[10]*other.data[10] + data[11]*other.data[14];
-    out.data[11] = data[8]*other.data[3] + data[9]*other.data[7] + data[10]*other.data[11] + data[11]*other.data[15];
+    out.data[8] = other.data[8]*data[0] + other.data[9]*data[4] + other.data[10]*data[8] + other.data[11]*data[12];
+    out.data[9] = other.data[8]*data[1] + other.data[9]*data[5] + other.data[10]*data[9] + other.data[11]*data[13];
+    out.data[10] = other.data[8]*data[2] + other.data[9]*data[6] + other.data[10]*data[10] + other.data[11]*data[14];
+    out.data[11] = other.data[8]*data[3] + other.data[9]*data[7] + other.data[10]*data[11] + other.data[11]*data[15];
     
-    out.data[12] = data[12]*other.data[0] + data[13]*other.data[4] + data[14]*other.data[8] + data[15]*other.data[12];
-    out.data[13] = data[12]*other.data[1] + data[13]*other.data[5] + data[14]*other.data[9] + data[15]*other.data[13];
-    out.data[14] = data[12]*other.data[2] + data[13]*other.data[6] + data[14]*other.data[10] + data[15]*other.data[14];
-    out.data[15] = data[12]*other.data[3] + data[13]*other.data[7] + data[14]*other.data[11] + data[15]*other.data[15];
+    out.data[12] = other.data[12]*data[0] + other.data[13]*data[4] + other.data[14]*data[8] + other.data[15]*data[12];
+    out.data[13] = other.data[12]*data[1] + other.data[13]*data[5] + other.data[14]*data[9] + other.data[15]*data[13];
+    out.data[14] = other.data[12]*data[2] + other.data[13]*data[6] + other.data[14]*data[10] + other.data[15]*data[14];
+    out.data[15] = other.data[12]*data[3] + other.data[13]*data[7] + other.data[14]*data[11] + other.data[15]*data[15];
 
     return out;
 }

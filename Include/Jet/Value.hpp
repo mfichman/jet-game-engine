@@ -59,10 +59,15 @@ public:
     
     operator std::string() const;
     operator number_t() const;
+    operator real_t() const;
+    operator int32_t() const;
+    operator uint32_t() const;
     operator Color() const;
     operator Vector() const;
     operator Quaternion() const;
     operator Range() const;
+    operator bool() const;
+    
     
     inline ValueType type() const {
         return type_;

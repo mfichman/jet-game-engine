@@ -44,12 +44,9 @@ namespace Jet {
 //! must have a name unique to this scene node, regardless of type.
 //! @class Node
 //! @brief Represents a node in the scene graph.
-class Node : public Object {
+class JETAPI Node : public Object {
 public:
     class Listener;
-
-    //! Constructor
-    Node();
 
     //! Destructor.
     virtual ~Node() {}
@@ -63,7 +60,14 @@ public:
     //! @param name the name of the node attached to this node
     inline Node* node(const std::string& name) const {
         std::map<std::string, NodePtr>::const_iterator i = node_.find(name);
-        return (i == node_.end()) ? 0 : i->second.get();
+        if (i == node_.end()) {
+            Node* self = const_cast<Node*>(this);
+            NodePtr node(new Node(engine_, self));
+            self->node_.insert(make_pair(name, node));
+            return node.get();
+        } else {
+            return i->second.get();
+        }
     }
 
     //! Returns the object with the given name that is attached to this scene
@@ -79,6 +83,10 @@ public:
 
     //! Returns an iterator to all nodes connected to this scene node.
     Iterator<const NodePtr> nodes() const;
+    
+    //! Returns an iterator to all components connected to this scene node that
+    //! have the given type
+    Iterator<const ComponentPtr> components() const;
 
     //! Returns an iterator to all components connected to this scene node that
     //! have the given type
@@ -104,12 +112,6 @@ public:
     //! @param name the name of the new node
     //! @param blueprint the name of the blueprint node
     Node* node(const std::string& name, const std::string& blueprint);
-
-    //! Attaches a new node to this node.  Note that each node may have only
-    //! one parent, so adding a node with a parent is illegal.
-    //! @param name the name of the new node
-    //! @param node the new node
-    void node(const std::string& name, Node* node);
 
     //! Attaches a component using the given blueprint component.
     //! @param name the name of the new component
@@ -154,6 +156,12 @@ public:
     void event(const std::string& name, const Params& params);
     
 private:
+    //! Private onstructor
+    Node(Engine* engine, Node* parent);
+    
+    //! Private constructor.
+    Node(Engine* engine);
+    
     //! Clones this scene node
     virtual Node* clone() const;
 
@@ -170,7 +178,7 @@ private:
     //! renderer.
     void render();
     
-    Engine* engine_;
+    Engine* const engine_;
     Node* parent_;
 #pragma warning(disable:4251)
     std::string name_;

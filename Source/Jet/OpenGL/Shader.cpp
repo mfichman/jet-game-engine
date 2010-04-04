@@ -21,11 +21,13 @@
  */  
 
 #include <Jet/OpenGL/Shader.hpp>
+#include <Jet/Matrix.hpp>
 #include <iostream>
 #include <fstream>
 #include <vector>
 
 using namespace Jet::OpenGL;
+using namespace Jet;
 using namespace std;
 
 Shader::Shader(const std::string& path) {
@@ -39,12 +41,6 @@ Shader::Shader(const std::string& path) {
     glAttachShader(program_, fragment_);
     glAttachShader(program_, vertex_);
     glLinkProgram(program_);
-
-    texture_map_ = glGetUniformLocation(program_, "texture_map");
-    specular_map_ = glGetUniformLocation(program_, "specular_map");
-    normal_map_ = glGetUniformLocation(program_, "normal_map");
-    environment_map_ = glGetUniformLocation(program_, "environment_map");
-    shadow_map_ = glGetUniformLocation(program_, "shadow_map");
 
     binormal_ = glGetAttribLocation(program_, "binormal");
 
@@ -68,7 +64,6 @@ Shader::~Shader() {
 
 void Shader::source(GLuint shader, const std::string& path) {
     vector<GLchar> buffer;
-    const GLchar* source;
 
     ifstream in(path.c_str());
     if (in.fail()) {
@@ -87,22 +82,68 @@ void Shader::source(GLuint shader, const std::string& path) {
     in.read(&buffer.front(), buffer.size());
     in.close();
     buffer.push_back(0); // Null terminate the string
-    source = &buffer.front();
 
-    glShaderSource(shader, 1, &source, 0);
+    vector<const GLchar*> source;
+    source.push_back("#define LIGHT_POINT\n");
+    source.push_back("#define SHADOW_MAP\n");
+    source.push_back(&buffer.front());
+    glShaderSource(shader, source.size(), &source.front(), 0);
     glCompileShader(shader);
 }
 
+void Shader::texture(const std::string& name, GLuint texture) {    
+    GLuint location = glGetUniformLocation(program_, name.c_str());
+    if (texture) {
+        texture_.insert(make_pair(location, texture));
+    } else {
+        texture_.erase(location);
+    }
+}
+
+void Shader::texture_matrix(const std::string& name, const Matrix& matrix) {
+    GLuint location = glGetUniformLocation(program_, name.c_str());
+    texture_matrix_.insert(make_pair(location, matrix));
+}
+
 void Shader::begin() {
+    
     glUseProgram(program_);
-    glUniform1i(texture_map_, 0);
-    glUniform1i(specular_map_, 1);
-    glUniform1i(normal_map_, 2);
-    glUniform1i(environment_map_, 3);
-    glUniform1i(shadow_map_, 4);
+        
+    GLuint sampler = 0;
+    for (map<GLuint, GLuint>::iterator i = texture_.begin(); i != texture_.end(); i++) {
+        glActiveTexture(GL_TEXTURE0 + sampler);
+        glBindTexture(GL_TEXTURE_2D, i->second);
+        glUniform1i(i->first, sampler);
+        
+        map<GLuint, Matrix>::iterator j = texture_matrix_.find(i->first);
+        if (j != texture_matrix_.end()) {
+            glMatrixMode(GL_TEXTURE);
+            glPushMatrix();
+            glLoadMatrixf(j->second);
+            glMatrixMode(GL_MODELVIEW);
+        }
+
+        sampler++;
+    }
+    
 }
 
 void Shader::end() {
     glUseProgram(0);
+    
+    GLuint sampler = 0;
+    for (map<GLuint, GLuint>::iterator i = texture_.begin(); i != texture_.end(); i++) {
+        glActiveTexture(GL_TEXTURE0 + sampler);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        
+        map<GLuint, Matrix>::iterator j = texture_matrix_.find(i->first);
+        if (j != texture_matrix_.end()) {
+            glMatrixMode(GL_TEXTURE);
+            glPopMatrix();
+            glMatrixMode(GL_MODELVIEW);
+        }
+        
+        sampler++;
+    }
 }
 

@@ -23,6 +23,8 @@
 
 #include <Jet/OpenGL/Types.hpp>
 #include <Jet/OpenGL/Shader.hpp>
+#include <Jet/OpenGL/RenderTarget.hpp>
+#include <Jet/OpenGL/MeshBuffer.hpp>
 #include <Jet/Types.hpp>
 #include <Jet/Handler.hpp>
 
@@ -59,20 +61,20 @@ public:
     //! Retrieves the given shader.
     //! @param name the shader's name
     Shader* shader(const std::string& name);
+    
+    //! Retrieves the given mesh
+    //! @param name the mesh's name
+    MeshBuffer* mesh(const std::string& name);
 
 private:
     
     void init_default_states();
     void init_window();
-    void init_matrices();
-    
-    void begin_shadow_mapping();
-    void end_shadow_mapping();
     
     void render_teapots();
     
-    void generate_shadow_map();
-    void render_final();
+    void generate_shadow_map(const std::pair<NodePtr, ComponentPtr>& light);
+    void render_final(const std::pair<NodePtr, ComponentPtr>& light);
     void render_shadow_casters();
     void render_visible_objects();
     
@@ -80,13 +82,13 @@ private:
     
     // Shadow-mapping variables
     ComponentPtr shadow_vars_;
-    GLuint shadow_map_;
-    GLuint shadow_buffer_;
-    
+    RenderTargetPtr shadow_target_;
+
     ComponentPtr window_vars_;
     
     // Shader variables
     std::map<std::string, ShaderPtr> shader_;
+    std::map<std::string, MeshBufferPtr> mesh_;
 };
 
 }}

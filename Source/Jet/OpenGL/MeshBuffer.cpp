@@ -20,12 +20,13 @@
  * IN THE SOFTWARE.
  */  
 
-#include <Jet/OpenGL/Mesh.hpp>
+#include <Jet/OpenGL/MeshBuffer.hpp>
 #include <Jet/Mesh.hpp>
 
 using namespace Jet::OpenGL;
+using namespace Jet;
 
-Mesh::Mesh(Jet::Mesh* mesh) :
+MeshBuffer::MeshBuffer(Mesh* mesh) :
     nvertices_(mesh->vertex_count()),
     nindices_(mesh->index_count()) {
     
@@ -38,11 +39,11 @@ Mesh::Mesh(Jet::Mesh* mesh) :
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, nindices_*sizeof(uint32_t), mesh->index_data(), GL_STATIC_DRAW);
 }
 
-Mesh::~Mesh() {
+MeshBuffer::~MeshBuffer() {
     glDeleteBuffers(1, &vbuffer_);
 }
 
-void Mesh::render() const {
+void MeshBuffer::render() const {
     // GLuint b = getBinormalLoc
 
     glBindBuffer(GL_ARRAY_BUFFER, vbuffer_);

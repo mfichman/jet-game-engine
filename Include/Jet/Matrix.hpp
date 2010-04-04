@@ -37,6 +37,13 @@ public:
     //! @param data the array
     Matrix(const real_t data[16]);
     
+    //! Creates a new matrix from a list of floats.
+    //! @param floats
+    Matrix(real_t m00, real_t m01, real_t m02, real_t m03,
+           real_t m10, real_t m11, real_t m12, real_t m13,
+           real_t m20, real_t m21, real_t m22, real_t m23,
+           real_t m30, real_t m31, real_t m32, real_t m33);
+    
     //! Creates a new empty matrix, with all entries initialized to zero.
     Matrix();
     

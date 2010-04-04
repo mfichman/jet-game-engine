@@ -36,29 +36,23 @@ V& get_value(const std::pair<K, V>& p) {
     return const_cast<V&>(p.second); 
 }
 
-Node::Node() :
-    engine_(0),
-    parent_(0) {
+Node::Node(Engine* engine, Node* parent) :
+    engine_(engine),
+    parent_(parent) {
 
+}
+
+Node::Node(Engine* engine) :
+    engine_(engine),
+    parent_(0) {
 }
 
 Node* Node::node(const std::string& name, const std::string& blueprint) {
     NodePtr node(engine_->node(blueprint)->clone());
     node->parent_ = this;
-    node->engine_ = engine_;
     node->name_ = name;
     node_.insert(make_pair(name, node));
     return node.get();
-}
-
-void Node::node(const std::string& name, Node* node) {
-    if (node->parent()) {
-        throw runtime_error("Node already has a parent");
-    }
-    node->parent_ = this;
-    node->engine_ = engine_;
-    node->name_ = name;
-    node_.insert(make_pair(name, node));
 }
 
 Component* Node::component(const std::string& name, const std::string& blueprint) {
@@ -114,6 +108,18 @@ Iterator<const NodePtr> Node::nodes() const {
     itr_t end = make_transform_iterator(node_.end(), &get_value<string, NodePtr>);
 
     return Iterator<const NodePtr>(begin, end);
+}
+
+Iterator<const ComponentPtr> Node::components() const {
+    typedef map<string, ComponentPtr> map_t;
+    typedef function<const map_t::mapped_type& (const map_t::value_type&)> fun_t;
+    typedef transform_iterator<fun_t, map_t::const_iterator> itr_t;
+    typedef pair<map_t::const_iterator, map_t::const_iterator> pair_t;
+
+    itr_t begin = make_transform_iterator(component_.begin(), &get_value<string, const ComponentPtr>);
+    itr_t end = make_transform_iterator(component_.end(), &get_value<string, const ComponentPtr>);
+
+    return Iterator<const ComponentPtr>(begin, end); 
 }
 
 Iterator<ComponentPtr> Node::components(const string& type) {
@@ -172,13 +178,12 @@ void Node::remove_child(Node* node) {
 }
 
 Node* Node::clone() const {
-    Node* clone = new Node();
+    Node* clone = new Node(engine_, parent_);
 
     // Clone all nodes attached to this node, recursively
     for (map<string, NodePtr>::const_iterator i = node_.begin(); i != node_.end(); i++) {
         NodePtr node(i->second->clone());
         node->parent_ = parent_;
-        node->engine_ = engine_;
         node->node_.insert(make_pair(i->first, node));
     }
     // Clone all components attached to this node
@@ -192,8 +197,6 @@ Node* Node::clone() const {
         ControllerPtr controller = (*i)->clone();
         clone->controller_.push_back(controller);        
     }
-    
-    clone->engine_ = engine_;
-    clone->parent_ = parent_;
+
     return clone;
 }

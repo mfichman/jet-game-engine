@@ -48,10 +48,19 @@ public:
     //! Stream operator.
     friend std::istream& ::operator>>(std::istream& in, Texcoord& texcoord);
 
-    bool operator<(const Texcoord& other) const {
-        if (u < other.u) return true;
+    inline bool operator<(const Texcoord& other) const {
+        if (u != other.u) return u < other.u;
         return v < other.v;       
     }
+
+    inline bool operator==(const Texcoord& other) const {
+        return u == other.u && v == other.v;
+    }
+    
+    inline bool operator!=(const Texcoord& other) const {
+        return !this->operator==(other);
+    }
+
 
     real_t u;
     real_t v;

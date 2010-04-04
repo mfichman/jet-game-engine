@@ -30,6 +30,7 @@
 #endif
 #include <GL/glew.h>
 #include <GL/gl.h>
+#include <map>
 
 namespace Jet { namespace OpenGL {
 
@@ -49,19 +50,28 @@ public:
 
     //! Disables this shader.
     void end();
+    
+    //! Attaches a texture sampler to this shader.
+    //! @param name the name of the texture sampler in the shader source
+    //! @param texture the texture handle
+    void texture(const std::string& name, GLuint texture);
+    
+    //! Attaches a texture matrix to be used with the given
+    //! texture.
+    //! @param name the name of the texture sampler in the shader source
+    //! @param matrix the texture matrix
+    void texture_matrix(const std::string& name, const Matrix& matrix);
 
 private:
     void source(GLuint shader, const std::string& path);
+    
+    std::map<GLuint, GLuint> texture_;
+    std::map<GLuint, Matrix> texture_matrix_;
 
     GLuint vertex_;
     GLuint fragment_;
     GLuint shader_;
     GLuint program_;
-    GLuint texture_map_;
-    GLuint specular_map_;
-    GLuint normal_map_;
-    GLuint environment_map_;
-    GLuint shadow_map_;
     GLuint binormal_;
 };
 

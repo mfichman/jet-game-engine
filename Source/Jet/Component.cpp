@@ -38,6 +38,10 @@ const Value& Component::value(const std::string& name) const {
     }
 }
 
+const Value& Component::value(const std::string& name) {
+    return value_[name];
+}
+
 Component* Component::component(const std::string& name) const {
     map<string, ComponentPtr>::const_iterator i = component_.find(name);
     if (i == component_.end()) {

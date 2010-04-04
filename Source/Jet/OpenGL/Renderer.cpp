@@ -35,13 +35,12 @@ using namespace std;
 Renderer::Renderer(Engine* engine) :
     engine_(engine),
     shadow_vars_(engine->component("shadows")),
-    window_vars_(engine->component("window")),
-    shadow_map_(0),
-    shadow_buffer_(0) {
+    window_vars_(engine->component("window")) {
         
     GLint argc = 0;
     glutInit(&argc, 0);
     init_window();
+    init_default_states();
     
     if (GLEW_OK != glewInit()) {
         throw runtime_error("GLEW initialization failed");
@@ -50,10 +49,8 @@ Renderer::Renderer(Engine* engine) :
         throw runtime_error("OpenGL 2.0 not supported");
     }
     
-    
-    init_default_states();
-    init_matrices();
-    begin_shadow_mapping();
+    GLsizei size = (GLsizei)shadow_vars_->value("texture_size");
+    shadow_target_.reset(new RenderTarget(size, size, GL_DEPTH_COMPONENT));
     
     shader("Basic");
 }
@@ -96,136 +93,65 @@ void Renderer::init_default_states() {
     glSwapInterval(0);
 }
 
-void Renderer::init_matrices() {
-    // Projection matrix setup
-
-
-}
-
-void Renderer::begin_shadow_mapping() {
-    if (!shadow_vars_->value("enabled")) {
-        return;
-    }
-    
-    assert(!shadow_map_);
-    assert(!shadow_buffer_);
-    
-    GLsizei texture_size = (GLsizei)shadow_vars_->value("texture_size");
-    
-    // Initialize the shadow map texture
-    glGenTextures(1, &shadow_map_);
-    glBindTexture(GL_TEXTURE_2D, shadow_map_);
-    
-    // GL_LINEAR does not make sense for depth textures
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    
-    // Clamp to edge to remove artifacts on the edges of the shadow map
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-    
-    // GL_DEPTH_COMPONENT gives you the max precision available    
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, texture_size, texture_size, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, 0);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    // Generate the frame buffer objects
-	glGenFramebuffers(1, &shadow_buffer_);
-    glBindFramebuffer(GL_FRAMEBUFFER, shadow_buffer_);
-    glDrawBuffer(GL_NONE);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadow_map_, 0);
-    
-    // Check for support
-    GLuint status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    if (GL_FRAMEBUFFER_COMPLETE != status) {
-        throw runtime_error("Frame buffer configuration failed");
-    }
-    
-    // Switch to the back buffer
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    glDrawBuffer(GL_BACK);
-}
-
-void Renderer::end_shadow_mapping() {
-    if (shadow_map_) {
-        glActiveTexture(GL_TEXTURE4);
-        glBindTexture(GL_TEXTURE_2D, 0);
-        glDeleteTextures(1, &shadow_map_);
-    }
-    if (shadow_buffer_) {
-        glDeleteFramebuffers(1, &shadow_buffer_);
-    }
-    shadow_map_ = 0;
-    shadow_buffer_ = 0;
-}
-
-
 static GLfloat angle = 0.0f;
 
 void Renderer::on_render() {
     
     glutMainLoopEvent();
-    angle += 0.005f;
+    angle += 0.0005f;
     
-    generate_shadow_map();    
-    render_final();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    for (Iterator<const pair<NodePtr, ComponentPtr>> i = engine_->lights(); i; i++) {
+        generate_shadow_map(*i);
+        render_final(*i);
+        break;
+    }
     
     glutSwapBuffers();
 }
 
 
-void Renderer::generate_shadow_map() {
-    GLsizei texture_size = (GLsizei)shadow_vars_->value("texture_size");
-    
+void Renderer::generate_shadow_map(const std::pair<NodePtr, ComponentPtr>& light) {    
     // Set up the projection matrix for the light
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(65.0f, 1.0f, 0.01f, 100.0f);
-    glViewport(0, 0, texture_size, texture_size);
     
     // Set up the view matrix for the light
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(10.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+    const Vector& light_pos = light.first->position();
+    gluLookAt(light_pos.x, light_pos.y, light_pos.z, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
     
-    // Set light parameters
-    static GLfloat lambient[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lambient);
-    glDisable(GL_LIGHT0);
-    
+    // Render to the front buffer
+    shadow_target_->begin();
+    glCullFace(GL_FRONT); // Only render the back faces to the depth buffer
+    glDisable(GL_LIGHTING);
+    render_shadow_casters();
+    shadow_target_->end();
+    glCullFace(GL_BACK);
+    glEnable(GL_LIGHTING);
+        
     // Initialize the texture matrix for transforming the coordinates
-    GLfloat light_projection[16];
-    GLfloat light_modelview[16];
-    GLfloat light_bias[16] = {
+    Matrix light_bias(
         0.5f, 0.0f, 0.0f, 0.0f,
         0.0f, 0.5f, 0.0f, 0.0f,
         0.0f, 0.0f, 0.5f, 0.0f,
         0.5f, 0.5f, 0.5f, 1.0f
-    };
+    );
+    Matrix light_projection;
+    Matrix light_modelview;
     glGetFloatv(GL_PROJECTION_MATRIX, light_projection);
     glGetFloatv(GL_MODELVIEW_MATRIX, light_modelview);
-    glMatrixMode(GL_TEXTURE);
-    glActiveTexture(GL_TEXTURE4);
-    glLoadMatrixf(light_bias);
-    glMultMatrixf(light_projection);
-    glMultMatrixf(light_modelview);
+    Matrix light_matrix = light_bias*light_projection*light_modelview;
     
-    glBindFramebuffer(GL_FRAMEBUFFER, shadow_buffer_);
-    glDrawBuffer(GL_NONE);
-    glCullFace(GL_FRONT); // Only render the back faces to the depth buffer
-    
-    glClear(GL_DEPTH_BUFFER_BIT);
-    render_shadow_casters();
-    
-    // Switch back to the default frame buffer
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glDrawBuffer(GL_BACK);
-    glCullFace(GL_BACK);
-    
-    glEnable(GL_LIGHT0);
+    ShaderPtr basic = shader("Basic");
+    basic->texture("shadow_map", shadow_target_->texture());
+    basic->texture_matrix("shadow_map", light_matrix);
 }
 
-void Renderer::render_final() {
+void Renderer::render_final(const std::pair<NodePtr, ComponentPtr>& light) {
     GLfloat width = (GLfloat)window_vars_->value("width");
     GLfloat height = (GLfloat)window_vars_->value("height");
     
@@ -239,36 +165,37 @@ void Renderer::render_final() {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     
-    //gluLookAt(5.0f*sinf(angle), 0.0f, 5.0f*cosf(angle), 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-    gluLookAt(10.0f, 0.0f, 10.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+    gluLookAt(15.0f*sinf(angle/2), 0.0f, 15.0f*cosf(angle/2), 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+    //gluLookAt(10.0f, 0.0f, 10.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
     
-    // Set light parameters
+    // Set light parameter
+    const Color& diffuse = light.second->value("diffuse");
+    const Color& specular = light.second->value("specular");
+    const Color& ambient = light.second->value("ambient");
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
+    glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
+    
+    // Set light location/direction.
+    const Vector& light_pos = light.first->position();
+    static GLfloat lposition[4] = { light_pos.x, light_pos.y, light_pos.z };
+    if (light.second->type() == "PointLight") {
+        lposition[3] = 1.0f;
+    } else {
+        lposition[3] = 0.0f;
+    }
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
-    static GLfloat lambient[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-    static GLfloat ldiffuse[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-    static GLfloat lspecular[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-    static GLfloat lposition[4] = { 10.0f, 0.0f, 0.0f, 1.0f };
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, ldiffuse);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, lspecular);
-    glLightfv(GL_LIGHT0, GL_AMBIENT, lambient);
     glLightfv(GL_LIGHT0, GL_POSITION, lposition);
     glEnable(GL_LIGHT0);
     glPopMatrix();
     
-    glActiveTexture(GL_TEXTURE4);
-    glBindTexture(GL_TEXTURE_2D, shadow_map_);
-    glEnable(GL_TEXTURE_2D);
-    
+    // Render to the back buffer.
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     ShaderPtr basic = shader("Basic");
     basic->begin();
     render_visible_objects();
     basic->end();
-    
-    glActiveTexture(GL_TEXTURE4);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    glDisable(GL_TEXTURE_2D);
 }
 
 void Renderer::render_teapots() {
@@ -304,7 +231,7 @@ void Renderer::render_teapots() {
     glFrontFace(GL_CCW);
     //glutSolidSphere(2.0f, 32, 32);
 
-    glutSolidTorus(1.0f, 2.0f, 32, 32);
+    //glutSolidTorus(1.0f, 2.0f, 32, 32);
     glFrontFace(GL_CW);
     glPopMatrix();
     
@@ -314,16 +241,23 @@ void Renderer::render_teapots() {
 
     glMatrixMode(GL_TEXTURE);
     glPushMatrix();
-    glTranslatef(4.0f, 0.0f, 0.0f);
+    glTranslatef(5.0f, 0.0f, 0.0f);
     
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glTranslatef(5.0f, 0.0f, 0.0f);
-    glutSolidTeapot(1.0f);
+    //glutSolidTeapot(1.0f);
     glPopMatrix();
     
     glMatrixMode(GL_TEXTURE);
     glPopMatrix();
+    
+    glFrontFace(GL_CCW);
+    for (Iterator<const pair<NodePtr, ComponentPtr>> i = engine_->renderables(); i; i++) {
+        MeshBufferPtr buffer = mesh(i->second->value("mesh"));
+        buffer->render();
+    }
+    glFrontFace(GL_CW);
 }
 
 void Renderer::render_shadow_casters() {
@@ -346,6 +280,22 @@ Shader* Renderer::shader(const std::string& name) {
             }
         }
         throw range_error("Shader not found: " + name);
+    } else {
+        return i->second.get();
+    }
+}
+
+MeshBuffer* Renderer::mesh(const std::string& name) {
+    map<string, MeshBufferPtr>::iterator i = mesh_.find(name);
+    if (i == mesh_.end()) {
+        engine_->resource(name);
+        MeshPtr mesh(engine_->mesh(name));
+        if (!mesh) {
+            throw runtime_error("Mesh not found: " + name);
+        }
+        MeshBufferPtr mesh_buffer(new MeshBuffer(mesh.get()));
+        mesh_.insert(make_pair(name, mesh_buffer));
+        return mesh_buffer.get();
     } else {
         return i->second.get();
     }

@@ -107,11 +107,18 @@ public:
 
     //! Comparison operator.
     bool operator<(const Vector& other) const {
-        if (x < other.x) return true;
-        if (y < other.y) return true;
+        if (x != other.x) return x < other.x;
+        if (y != other.y) return y < other.y;
         return z < other.z;
     }
     
+    bool operator==(const Vector& other) const {
+        return x == other.x && y == other.y && z == other.z;
+    }
+    
+    bool operator!=(const Vector& other) const {
+        return !this->operator==(other);
+    }
 
     static Vector ZERO;
     static Vector UNIT_X;

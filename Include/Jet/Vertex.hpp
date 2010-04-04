@@ -36,11 +36,19 @@ public:
 
     //! Comparison operator.
     inline bool operator<(const Vertex& other) const {
-        if (position < other.position) return true;
-        if (normal < other.normal) return true;
-        if (binormal < other.binormal) return true;
+        if (position != other.position) return position < other.position;
+        if (normal != other.normal) return normal < other.normal;
+        if (binormal != other.binormal) return binormal < other.binormal;
         return texcoord < other.texcoord;
     }
+    
+    inline bool operator==(const Vertex& other) const {
+        return position == other.position && normal == other.normal && binormal == other.binormal && texcoord == other.texcoord;
+    }
+
+	inline bool operator!=(const Vertex& other) const {
+		return !this->operator==(other);
+	}
     
     Vector position;
     Vector normal;

@@ -49,6 +49,16 @@ public:
         return VT_COLOR; 
     }
     
+    //! Returns a pointer to the internal float data of this color
+    operator const real_t*() const {
+        return &red;
+    }
+    
+    //! Returns a pointer to the internal float data of this color
+    operator real_t*() {
+        return &red;
+    }
+    
     //! Stream operator.
     friend std::ostream& ::operator<<(std::ostream& out, const Color& color);
 

@@ -141,6 +141,14 @@ Value& Value::operator=(const Range& range) {
     return *this;
 }
 
+Value::operator bool() const {
+    switch (type_) {
+        case VT_NIL: return false;
+        case VT_NUMBER: return *number_ != 0.0f;
+        default: return true;
+    }
+}
+
 Value::operator std::string() const {
     switch(type_) {
         case VT_STRING: return *string_;
@@ -161,6 +169,31 @@ Value::operator number_t() const {
         default: throw runtime_error("Invalid type conversion");
     }   
 }
+
+Value::operator real_t() const {
+    switch (type_) {
+        case VT_STRING: *const_cast<Value*>(this) = lexical_cast<real_t>(*string_); // fallthrough
+        case VT_NUMBER: return (real_t)*number_;
+        default: throw runtime_error("Invalid type conversion");
+    }    
+}
+
+Value::operator int32_t() const {
+    switch (type_) {
+        case VT_STRING: *const_cast<Value*>(this) = lexical_cast<int32_t>(*string_); // fallthrough
+        case VT_NUMBER: return (int32_t)*number_;
+        default: throw runtime_error("Invalid type conversion");
+    }   
+}
+
+Value::operator uint32_t() const {
+    switch (type_) {
+        case VT_STRING: *const_cast<Value*>(this) = lexical_cast<uint32_t>(*string_); // fallthrough
+        case VT_NUMBER: return (uint32_t)*number_;
+        default: throw runtime_error("Invalid type conversion");
+    }   
+}
+
 
 Value::operator Color() const {
     switch (type_) {

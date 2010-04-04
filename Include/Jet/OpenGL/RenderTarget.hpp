@@ -18,43 +18,54 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- */
+ */  
+#pragma once
 
-varying vec3 normal;
-varying vec3 view;
-varying vec3 light;
+#include <Jet/Types.hpp>
+#include <Jet/Object.hpp>
 
-attribute vec3 binormal;
+#ifdef WINDOWS
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#endif
+#include <GL/glew.h>
+#include <GL/gl.h>
 
-void main() {
-    // Transform to homogeneous coordinates
-    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-    gl_TexCoord[0] = gl_MultiTexCoord0;
+namespace Jet { namespace OpenGL {
+
+//! This class enables render-to-texture.
+//! @class RenderTarget
+//! @brief Loads and manipulates a render target for render-to-texture.
+class RenderTarget : public Object {
+public:
+    //! Constructor.  Creates the render target and associated texture.
+    //! @param the width of the render target
+    //! @param height the height of the render target
+    //! @param component the type of render target (either GL_DEPTH_COMPONENT
+    //! or GL_RGBA).
+    RenderTarget(GLuint width, GLuint height, GLenum component);
+
+    //! Destructor.
+    virtual ~RenderTarget();
+
+    //! Enables this render target.
+    void begin();
+
+    //! Disables this render target.
+    void end();
     
-#ifdef SHADOW_MAP
-    gl_TexCoord[1] = gl_TextureMatrix[0] * gl_Vertex;
-#endif
+    //! Returns the texture handle.
+    inline GLuint texture() const {
+        return texture_;
+    }
 
-#ifdef NORMAL_MAP
-    vec3 view_position = vec3(gl_ModelViewMatrix * gl_Vertex);
-    vec3 n = normalize(gl_NormalMatrix * gl_Normal);
-    vec3 b = normalize(gl_NormalMatrix * binormal);
-    vec3 t = cross(n, b);
-    
-    // Tangent space calculation
-#ifdef LIGHT_POINT
-    vec3 l = gl_LightSource[0].position.xyz - position;
-#elif defined(LIGHT_DIRECTIONAL)
-    vec3 l = gl_LightSource[0].position.xyz;
-#endif
-    light.x = dot(l, t);
-    light.y = dot(l, b);
-    light.z = dot(l, n);
-    view.x = dot(position, t);
-    view.y = dot(position, b);
-    view.z = dot(position, n);
-#else
-    normal = gl_NormalMatrix * gl_Normal;
-    view = vec3(gl_ModelViewMatrix * gl_Vertex);
-#endif
-}
+private:
+
+    GLuint texture_;
+    GLuint framebuffer_;
+    GLenum component_;
+    GLuint width_;
+    GLuint height_;
+};
+
+}}

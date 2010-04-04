@@ -50,7 +50,11 @@ public:
     //! Method for reading a value from the component.
     //! @param name the name of the value
     const Value& value(const std::string& name) const;
-
+    
+    //! Method for reading a value from the component.
+    //! @param name the name of the value
+    const Value& value(const std::string& name);
+    
     //! Returns the component with the given name.
     //! @param name the name of the component
     Component* component(const std::string& name) const;

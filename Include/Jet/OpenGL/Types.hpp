@@ -24,11 +24,13 @@
 #include <boost/intrusive_ptr.hpp>
 
 namespace Jet { namespace OpenGL {
-    class Mesh;
+    class MeshBuffer;
     class Shader;
     class Renderer;
+    class RenderTarget;
 
-    typedef boost::intrusive_ptr<Mesh> MeshPtr;
+    typedef boost::intrusive_ptr<MeshBuffer> MeshBufferPtr;
     typedef boost::intrusive_ptr<Shader> ShaderPtr;
     typedef boost::intrusive_ptr<Renderer> RendererPtr;
+    typedef boost::intrusive_ptr<RenderTarget> RenderTargetPtr;
 }}
