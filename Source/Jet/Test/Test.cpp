@@ -8,15 +8,15 @@ void main() {
         Jet::EnginePtr engine(new Jet::Engine);
         Jet::ComponentPtr shadows(engine->component("shadows"));
         shadows->type("Config");
-        shadows->value("texture_size", 2048);
+        shadows->value("texture_size", 1024);
         shadows->value("enabled", true);
         
         Jet::ComponentPtr window(engine->component("window"));
         window->type("Config");
-        window->value("width", 800);
-        window->value("height", 600);
+        window->value("width", 1680);
+        window->value("height", 1050);
         window->value("title", "Extreme Asteroids");
-        window->value("fullscreen", 0.0);
+        window->value("fullscreen", true);
         
         engine->folder("../Textures");
         engine->folder("../Meshes");

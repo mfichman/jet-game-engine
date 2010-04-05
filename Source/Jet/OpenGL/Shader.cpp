@@ -119,7 +119,7 @@ void Shader::texture(const std::string& name, GLuint texture) {
 
 void Shader::matrix(const std::string& name, const Matrix& matrix) {
     GLuint location = glGetUniformLocation(program_, name.c_str());
-    glUniformMatrix3fv(location, 1, false, matrix);  
+    glUniformMatrix4fv(location, 1, false, matrix);  
 }
 
 GLuint Shader::uniform(const std::string& name) {

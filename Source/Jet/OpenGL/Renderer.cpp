@@ -205,7 +205,21 @@ void Renderer::render_teapots() {
 
 }
 
-void Renderer::render_shadow_casters() {   
+void Renderer::render_shadow_casters() {
+    
+    // Render geometry
+    glBegin(GL_QUADS);
+    glNormal3f(1.0f, 0.0f, 0.0f);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(-3.0f, -10.0f, -10.0f);
+    glTexCoord2f(0.0, 1.0f);
+    glVertex3f(-3.0f, -10.0f, 10.0f);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(-3.0f, 10.0f, 10.0f);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(-3.0f, 10.0f, -10.0f);
+    glEnd();
+    
     glFrontFace(GL_CCW);
     for (Iterator<const pair<NodePtr, ComponentPtr>> i = engine_->renderables(); i; i++) {
         MeshBufferPtr buffer = mesh(i->second->value("mesh"));
@@ -215,7 +229,7 @@ void Renderer::render_shadow_casters() {
 }
 
 void Renderer::render_visible_objects() {
-    ShaderPtr shader = Renderer::shader("Basic", 0);
+    ShaderPtr shader = Renderer::shader("Basic", MSO_POINT_LIGHT | MSO_SHADOW_MAP);
     shader->begin();
     shader->texture("shadow_map", shadow_target_->texture());
     shader->matrix("shadow_matrix", shadow_matrix_);
@@ -242,6 +256,13 @@ void Renderer::render_visible_objects() {
     glTexCoord2f(1.0f, 0.0f);
     glVertex3f(-3.0f, 10.0f, -10.0f);
     glEnd();
+    
+    shader->end();
+    
+    shader = Renderer::shader("Basic", 31);
+    shader->begin();
+    shader->texture("shadow_map", shadow_target_->texture());
+    shader->matrix("shadow_matrix", shadow_matrix_);
     
     glFrontFace(GL_CCW);
     for (Iterator<const pair<NodePtr, ComponentPtr>> i = engine_->renderables(); i; i++) {

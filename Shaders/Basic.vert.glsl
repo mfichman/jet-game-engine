@@ -28,16 +28,18 @@ uniform mat4 shadow_matrix;
 
 attribute vec3 binormal;
 
+#undef NORMAL_MAP
+
 void main() {
     // Transform to homogeneous coordinates
     gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
     gl_TexCoord[0] = gl_MultiTexCoord0;
     
-//#ifdef SHADOW_MAP
+#ifdef SHADOW_MAP
     gl_TexCoord[1] = shadow_matrix * gl_Vertex;
-//#endif
+#endif
 
-/*#ifdef NORMAL_MAP
+#ifdef NORMAL_MAP
     vec3 view_position = vec3(gl_ModelViewMatrix * gl_Vertex);
     vec3 n = normalize(gl_NormalMatrix * gl_Normal);
     vec3 b = normalize(gl_NormalMatrix * binormal);
@@ -55,9 +57,9 @@ void main() {
     view.x = dot(view_position, t);
     view.y = dot(view_position, b);
     view.z = dot(view_position, n);
-#else*/
+#else
 
     normal = gl_NormalMatrix * gl_Normal;
     view = vec3(gl_ModelViewMatrix * gl_Vertex);
-//#endif
+#endif
 }
