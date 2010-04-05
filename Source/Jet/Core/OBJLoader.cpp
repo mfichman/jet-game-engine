@@ -105,7 +105,7 @@ void OBJLoader::face(istream& in) {
     // Add vertices to the buffer
     for (int j = 0; j < 3; j++) {  
         // Calculate binormals          
-        //binormal(face, j);
+        binormal(face, j);
         
         map<Vertex, uint32_t>::iterator i = vertex_.find(face[j]);
         if (i == vertex_.end()) {

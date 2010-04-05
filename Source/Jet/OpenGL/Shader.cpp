@@ -30,7 +30,14 @@ using namespace Jet::OpenGL;
 using namespace Jet;
 using namespace std;
 
-Shader::Shader(const std::string& path) {
+Shader::Shader(const std::string& path, const vector<string>& defines) :
+    sampler_(0),
+    defines_(defines) {
+        
+    for (size_t i = 0; i < defines_.size(); i++) {
+        defines_[i] = "#define " + defines_[i] + "\n";
+    }
+        
     fragment_ = glCreateShader(GL_FRAGMENT_SHADER);
     source(fragment_, path + ".frag.glsl");
 
@@ -48,10 +55,16 @@ Shader::Shader(const std::string& path) {
     GLsizei length;
     glGetShaderInfoLog(fragment_, 1024, &length, log);
     if (length) {
+        for (size_t i = 0; i < defines_.size(); i++) {
+            cout << defines_[i];
+        }
         throw runtime_error("Fragment shader log: " + string(log, length));
     }
     glGetShaderInfoLog(vertex_, 1024, &length, log);
     if (length) {
+        for (size_t i = 0; i < defines_.size(); i++) {
+            cout << defines_[i];
+        }
         throw runtime_error("Vertex shader log: " + string(log, length));
     }
 }
@@ -84,66 +97,46 @@ void Shader::source(GLuint shader, const std::string& path) {
     buffer.push_back(0); // Null terminate the string
 
     vector<const GLchar*> source;
-    source.push_back("#define LIGHT_POINT\n");
-    source.push_back("#define SHADOW_MAP\n");
+    for (size_t i = 0; i < defines_.size(); i++) {
+        source.push_back(defines_[i].c_str());
+    }
     source.push_back(&buffer.front());
     glShaderSource(shader, source.size(), &source.front(), 0);
     glCompileShader(shader);
 }
 
-void Shader::texture(const std::string& name, GLuint texture) {    
+void Shader::texture(const std::string& name, GLuint texture) {
+    GLuint program;
+    glGetIntegerv(GL_CURRENT_PROGRAM, (GLint*)&program);
+    assert(program == program_);
+    
     GLuint location = glGetUniformLocation(program_, name.c_str());
-    if (texture) {
-        texture_.insert(make_pair(location, texture));
-    } else {
-        texture_.erase(location);
-    }
+    glActiveTexture(GL_TEXTURE0 + sampler_);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glUniform1i(location, sampler_);
+    sampler_++;
 }
 
-void Shader::texture_matrix(const std::string& name, const Matrix& matrix) {
+void Shader::matrix(const std::string& name, const Matrix& matrix) {
     GLuint location = glGetUniformLocation(program_, name.c_str());
-    texture_matrix_.insert(make_pair(location, matrix));
+    glUniformMatrix3fv(location, 1, false, matrix);  
+}
+
+GLuint Shader::uniform(const std::string& name) {
+    return glGetUniformLocation(program_, name.c_str());
 }
 
 void Shader::begin() {
-    
     glUseProgram(program_);
-        
-    GLuint sampler = 0;
-    for (map<GLuint, GLuint>::iterator i = texture_.begin(); i != texture_.end(); i++) {
-        glActiveTexture(GL_TEXTURE0 + sampler);
-        glBindTexture(GL_TEXTURE_2D, i->second);
-        glUniform1i(i->first, sampler);
-        
-        map<GLuint, Matrix>::iterator j = texture_matrix_.find(i->first);
-        if (j != texture_matrix_.end()) {
-            glMatrixMode(GL_TEXTURE);
-            glPushMatrix();
-            glLoadMatrixf(j->second);
-            glMatrixMode(GL_MODELVIEW);
-        }
-
-        sampler++;
-    }
-    
+    sampler_ = 0;
 }
 
 void Shader::end() {
     glUseProgram(0);
     
-    GLuint sampler = 0;
-    for (map<GLuint, GLuint>::iterator i = texture_.begin(); i != texture_.end(); i++) {
-        glActiveTexture(GL_TEXTURE0 + sampler);
+    for (GLuint i = 0; i < sampler_; i++) {
+        glActiveTexture(GL_TEXTURE0 + i);
         glBindTexture(GL_TEXTURE_2D, 0);
-        
-        map<GLuint, Matrix>::iterator j = texture_matrix_.find(i->first);
-        if (j != texture_matrix_.end()) {
-            glMatrixMode(GL_TEXTURE);
-            glPopMatrix();
-            glMatrixMode(GL_MODELVIEW);
-        }
-        
-        sampler++;
     }
 }
 

@@ -25,12 +25,22 @@
 
 namespace Jet { namespace OpenGL {
     class MeshBuffer;
-    class Shader;
     class Renderer;
     class RenderTarget;
+    class Shader;
+    class TextureBuffer;
 
     typedef boost::intrusive_ptr<MeshBuffer> MeshBufferPtr;
-    typedef boost::intrusive_ptr<Shader> ShaderPtr;
     typedef boost::intrusive_ptr<Renderer> RendererPtr;
     typedef boost::intrusive_ptr<RenderTarget> RenderTargetPtr;
+    typedef boost::intrusive_ptr<Shader> ShaderPtr;
+    typedef boost::intrusive_ptr<TextureBuffer> TextureBufferPtr;
+    
+    enum MeshShaderOption {
+        MSO_SHADOW_MAP = 1,
+        MSO_DIFFUSE_MAP = 2,
+        MSO_SPECULAR_MAP = 4,
+        MSO_NORMAL_MAP = 8,
+        MSO_POINT_LIGHT = 16
+    };
 }}

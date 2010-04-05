@@ -23,14 +23,18 @@
 #include <Jet/OpenGL/Renderer.hpp>
 #include <Jet/Engine.hpp>
 #include <Jet/Matrix.hpp>
+#include <boost/lexical_cast.hpp>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <cmath>
+#include <algorithm>
+#include <fstream>
 
 using namespace Jet::OpenGL;
 using namespace Jet;
 using namespace std;
+using namespace boost;
 
 Renderer::Renderer(Engine* engine) :
     engine_(engine),
@@ -52,7 +56,13 @@ Renderer::Renderer(Engine* engine) :
     GLsizei size = (GLsizei)shadow_vars_->value("texture_size");
     shadow_target_.reset(new RenderTarget(size, size, GL_DEPTH_COMPONENT));
     
-    shader("Basic");
+    shader_option(MSO_DIFFUSE_MAP, "DIFFUSE_MAP");
+    shader_option(MSO_SPECULAR_MAP, "SPECULAR_MAP");
+    shader_option(MSO_SHADOW_MAP, "SHADOW_MAP");
+    shader_option(MSO_NORMAL_MAP, "NORMAL_MAP");
+    shader_option(MSO_POINT_LIGHT, "LIGHT_POINT");
+    
+    permute_shaders("Basic");
 }
 
 void Renderer::init_window() {
@@ -144,11 +154,7 @@ void Renderer::generate_shadow_map(const std::pair<NodePtr, ComponentPtr>& light
     Matrix light_modelview;
     glGetFloatv(GL_PROJECTION_MATRIX, light_projection);
     glGetFloatv(GL_MODELVIEW_MATRIX, light_modelview);
-    Matrix light_matrix = light_bias*light_projection*light_modelview;
-    
-    ShaderPtr basic = shader("Basic");
-    basic->texture("shadow_map", shadow_target_->texture());
-    basic->texture_matrix("shadow_map", light_matrix);
+    shadow_matrix_ = light_bias*light_projection*light_modelview;
 }
 
 void Renderer::render_final(const std::pair<NodePtr, ComponentPtr>& light) {
@@ -192,13 +198,28 @@ void Renderer::render_final(const std::pair<NodePtr, ComponentPtr>& light) {
     
     // Render to the back buffer.
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    ShaderPtr basic = shader("Basic");
-    basic->begin();
     render_visible_objects();
-    basic->end();
 }
 
 void Renderer::render_teapots() {
+
+}
+
+void Renderer::render_shadow_casters() {   
+    glFrontFace(GL_CCW);
+    for (Iterator<const pair<NodePtr, ComponentPtr>> i = engine_->renderables(); i; i++) {
+        MeshBufferPtr buffer = mesh(i->second->value("mesh"));
+        buffer->render(0);
+    }
+    glFrontFace(GL_CW);
+}
+
+void Renderer::render_visible_objects() {
+    ShaderPtr shader = Renderer::shader("Basic", 0);
+    shader->begin();
+    shader->texture("shadow_map", shadow_target_->texture());
+    shader->matrix("shadow_matrix", shadow_matrix_);
+    
     glMatrixMode(GL_MODELVIEW);
     // Set up matrials
     static GLfloat mambient[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
@@ -209,77 +230,76 @@ void Renderer::render_teapots() {
     glMaterialfv(GL_FRONT, GL_SPECULAR, mspecular);
     glMaterialf(GL_FRONT, GL_SHININESS, 10.0f);   
     
-   
-    
     // Render geometry
     glBegin(GL_QUADS);
     glNormal3f(1.0f, 0.0f, 0.0f);
+    glTexCoord2f(0.0f, 0.0f);
     glVertex3f(-3.0f, -10.0f, -10.0f);
+    glTexCoord2f(0.0, 1.0f);
     glVertex3f(-3.0f, -10.0f, 10.0f);
+    glTexCoord2f(1.0f, 1.0f);
     glVertex3f(-3.0f, 10.0f, 10.0f);
+    glTexCoord2f(1.0f, 0.0f);
     glVertex3f(-3.0f, 10.0f, -10.0f);
     glEnd();
     
-    
-    glMatrixMode(GL_TEXTURE);
-    glPushMatrix();
-    glRotatef(angle*10, 0.0f, 1.0f, 0.0f);
-    
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glRotatef(angle*10, 0.0f, 1.0f, 0.0f);
-    glFrontFace(GL_CCW);
-    //glutSolidSphere(2.0f, 32, 32);
-
-    //glutSolidTorus(1.0f, 2.0f, 32, 32);
-    glFrontFace(GL_CW);
-    glPopMatrix();
-    
-    glMatrixMode(GL_TEXTURE);
-    glPopMatrix();
-    
-
-    glMatrixMode(GL_TEXTURE);
-    glPushMatrix();
-    glTranslatef(5.0f, 0.0f, 0.0f);
-    
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glTranslatef(5.0f, 0.0f, 0.0f);
-    //glutSolidTeapot(1.0f);
-    glPopMatrix();
-    
-    glMatrixMode(GL_TEXTURE);
-    glPopMatrix();
-    
     glFrontFace(GL_CCW);
     for (Iterator<const pair<NodePtr, ComponentPtr>> i = engine_->renderables(); i; i++) {
+		ComponentPtr material = i->second->component("material");
+        TextureBufferPtr diffuse = texture(material->value("diffuse_map"));
+        TextureBufferPtr specular = texture(material->value("specular_map"));
+        TextureBufferPtr normal = texture(material->value("normal_map"));
+		shader->texture("diffuse_map", diffuse->texture());
+		shader->texture("specular_map", specular->texture());
+		shader->texture("normal_map", normal->texture());
+		
+
         MeshBufferPtr buffer = mesh(i->second->value("mesh"));
-        buffer->render();
+        buffer->render(shader.get());
     }
     glFrontFace(GL_CW);
+    shader->end();
 }
 
-void Renderer::render_shadow_casters() {
-    render_teapots();
-}
-
-void Renderer::render_visible_objects() {
-    render_teapots();
-}
-
-Shader* Renderer::shader(const std::string& name) {
-    map<string, ShaderPtr>::iterator i = shader_.find(name);
-    if (i == shader_.end()) {
-        for (Iterator<const string> i = engine_->folders(); i; i++) {
-            try {
-                string path = (*i) + "/" + name;
-                ShaderPtr shader(new Shader(path));
-                return shader_.insert(make_pair(name, new Shader(path))).first->second.get();
-            } catch (range_error&) {
-            }
+void Renderer::permute_shaders(const string& name) {
+    
+    //! Search for the shader source on the path
+    string path;
+    bool found = false;
+    for (Iterator<const string> i = engine_->folders(); i; i++) {
+        path = (*i) + "/" + name;
+        ifstream in((path + ".frag.glsl").c_str());
+        if (in.good()) {
+            found = true;
+            break;
         }
-        throw range_error("Shader not found: " + name);
+    }
+    
+    if (!found) {
+       throw runtime_error("Shader not found: " + name);
+    }
+    
+    // Load a shader for each combination of the preprocessor definitions
+    size_t noptions = 5;
+    size_t ncombos = 1 << 5;
+    
+    for (uint32_t i = 0; i < ncombos; i++) {
+        vector<string> defines;
+		for (uint32_t j = 0; j < noptions; j++) {
+            size_t opt = 1 << j;
+			if (opt & i) {
+				defines.push_back(shader_option(opt));
+			}
+		}
+		ShaderPtr shader(new Shader(path, defines));
+		shader_.insert(make_pair(make_pair(name, i), shader));
+    }
+}
+
+Shader* Renderer::shader(const std::string& name, uint32_t opts) {
+    map<pair<string, uint32_t>, ShaderPtr>::iterator i = shader_.find(make_pair(name, opts));
+    if (i == shader_.end()) {
+        throw range_error("Shader not loaded: " + name);
     } else {
         return i->second.get();
     }
@@ -288,11 +308,22 @@ Shader* Renderer::shader(const std::string& name) {
 MeshBuffer* Renderer::mesh(const std::string& name) {
     map<string, MeshBufferPtr>::iterator i = mesh_.find(name);
     if (i == mesh_.end()) {
-        engine_->resource(name);
         MeshPtr mesh(engine_->mesh(name));
         MeshBufferPtr mesh_buffer(new MeshBuffer(mesh.get()));
         mesh_.insert(make_pair(name, mesh_buffer));
         return mesh_buffer.get();
+    } else {
+        return i->second.get();
+    }
+}
+
+TextureBuffer* Renderer::texture(const std::string& name) {
+    map<string, TextureBufferPtr>::iterator i = texture_.find(name);
+    if (i == texture_.end()) {
+        TexturePtr texture(engine_->texture(name));
+        TextureBufferPtr texture_buffer(new TextureBuffer(texture.get()));
+        texture_.insert(make_pair(name, texture_buffer));
+        return texture_buffer.get();
     } else {
         return i->second.get();
     }

@@ -21,6 +21,7 @@
  */  
 
 #include <Jet/OpenGL/MeshBuffer.hpp>
+#include <Jet/OpenGL/Shader.hpp>
 #include <Jet/Mesh.hpp>
 
 using namespace Jet::OpenGL;
@@ -43,19 +44,29 @@ MeshBuffer::~MeshBuffer() {
     glDeleteBuffers(1, &vbuffer_);
 }
 
-void MeshBuffer::render() const {
+void MeshBuffer::render(Shader* shader) const {
     // GLuint b = getBinormalLoc
+    
 
     glBindBuffer(GL_ARRAY_BUFFER, vbuffer_);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibuffer_);
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    
+    GLuint binormal = 0;
+    if (shader) {
+        binormal = shader->uniform("binormal");
+        glEnableVertexAttribArray(binormal);
+    }
 
     glVertexPointer(3, GL_FLOAT, sizeof(Vertex), 0);
     glNormalPointer(GL_FLOAT, sizeof(Vertex), (void*)(3*sizeof(GLfloat)));
     glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), (void*)(9*sizeof(GLfloat)));
-
+    
+    if (shader) {
+        glVertexAttribPointer(binormal, 3, GL_FLOAT, false, sizeof(Vertex), (void*)(11*sizeof(GLfloat)));
+    }
     // TODO: Draw indexed, not raw
     //glDrawArrays(GL_TRIANGLES, 0, nvertices_);
     glDrawElements(GL_TRIANGLES, nindices_, GL_UNSIGNED_INT, (void*)0);
@@ -63,6 +74,7 @@ void MeshBuffer::render() const {
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_NORMAL_ARRAY);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    glDisableVertexAttribArray(binormal);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }

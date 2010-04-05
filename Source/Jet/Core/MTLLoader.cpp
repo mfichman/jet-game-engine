@@ -86,7 +86,7 @@ void MTLLoader::reflectivity(istream& in) {
 void MTLLoader::texture_map(istream& in) {
     string value;
     in >> value;
-    material_->value("texture_map", value);
+    material_->value("diffuse_map", value);
 }
 
 void MTLLoader::specular_map(istream& in) {
@@ -112,6 +112,8 @@ void MTLLoader::resource(const std::string& file) {
     
     while (in.good()) {
         in >> command;
+
+		if (!in.good()) break;
         
         if (command.find("#") == 0) {
             // Skip the comment line

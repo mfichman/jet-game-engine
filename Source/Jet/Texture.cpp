@@ -25,7 +25,9 @@
 using namespace Jet;
 
 Texture::Texture() :
-    loaded_(false) {
+    loaded_(false),
+	width_(0), 
+	height_(0) {
         
 }
 

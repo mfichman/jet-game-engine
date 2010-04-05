@@ -18,40 +18,32 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- */  
- 
-#include <Jet/Core/TextureLoader.hpp>
+ */
+
+#include <Jet/OpenGL/TextureBuffer.hpp>
 #include <Jet/Texture.hpp>
-#include <Jet/Engine.hpp>
-#include <IL/IL.h>
-#include <stdexcept>
 
+using namespace Jet::OpenGL;
 using namespace Jet;
-using namespace Jet::Core;
-using namespace std;
 
-TextureLoader::TextureLoader(Engine* engine) :
-    engine_(engine) {
-
-    if (ilGetInteger(IL_VERSION_NUM) < IL_VERSION) {
-        throw runtime_error("IL library version mismatch");
-    }
-
-    ilInit();
+TextureBuffer::TextureBuffer(Texture* texture) {
+    
+    // Initialize the texture
+    glGenTextures(1, &texture_);
+    glBindTexture(GL_TEXTURE_2D, texture_);
+    
+    //! Set texture sampling parameters; we use mip filtering
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    
+    // Load the image
+    gluBuild2DMipmaps(GL_TEXTURE_2D, 3, texture->width(), texture->height(), GL_RGBA, GL_UNSIGNED_BYTE, texture->data());
+    
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void TextureLoader::resource(const std::string& file) {
-    ILuint image;
-    ilGenImages(1, &image);
-    ilBindImage(image);
-    ilLoadImage(file.c_str());
-    //ilGetError()
-
-    std::string name = file.substr(file.rfind("/") + 1, string::npos);
-
-    TexturePtr texture(engine_->texture(name, false));
-    texture->width(ilGetInteger(IL_IMAGE_WIDTH));
-    texture->height(ilGetInteger(IL_IMAGE_HEIGHT));
-    ilCopyPixels(0, 0, 0, texture->width(), texture->height(), 1, IL_RGBA, IL_UNSIGNED_BYTE, texture->data());
-    texture->loaded(true);
+TextureBuffer::~TextureBuffer() {
+    glDeleteTextures(1, &texture_);
 }

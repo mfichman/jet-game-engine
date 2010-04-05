@@ -21,6 +21,7 @@
  */  
 #pragma once
 
+#include <Jet/OpenGL/Types.hpp>
 #include <Jet/Types.hpp>
 #include <Jet/Object.hpp>
 
@@ -45,7 +46,8 @@ public:
     virtual ~MeshBuffer();
 
     //! Renders this mesh.
-    void render() const;
+    //! @param shader the shader to use
+    void render(Shader* shader) const;
 
 private:
     GLuint nvertices_;

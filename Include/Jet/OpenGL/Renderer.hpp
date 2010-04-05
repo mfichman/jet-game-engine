@@ -25,6 +25,7 @@
 #include <Jet/OpenGL/Shader.hpp>
 #include <Jet/OpenGL/RenderTarget.hpp>
 #include <Jet/OpenGL/MeshBuffer.hpp>
+#include <Jet/OpenGL/TextureBuffer.hpp>
 #include <Jet/Types.hpp>
 #include <Jet/Handler.hpp>
 
@@ -38,6 +39,7 @@
 #include <GL/glu.h>
 #include <GL/freeglut.h>
 #include <map>
+#include <vector>
 
 namespace Jet { namespace OpenGL {
 
@@ -60,11 +62,28 @@ public:
     
     //! Retrieves the given shader.
     //! @param name the shader's name
-    Shader* shader(const std::string& name);
+    Shader* shader(const std::string& name, uint32_t opts);
     
     //! Retrieves the given mesh
     //! @param name the mesh's name
     MeshBuffer* mesh(const std::string& name);
+    
+    //! Retrieves the given texture buffer.
+    //! @param name the texture's name
+    TextureBuffer* texture(const std::string& name);
+    
+    //! Gets the rendering #define for shaders.
+    //! @param tag the tag that identifies the #define
+    inline const std::string& shader_option(uint32_t tag) const {
+        return shader_option_.find(tag)->second;
+    }
+    
+    //! Sets the rendering #define for shaders.
+    //! @param tag the shader option tag
+    //! @param define the shader define tag
+    inline void shader_option(uint32_t tag, const std::string& define) {
+        shader_option_[tag] = define;
+    }
 
 private:
     
@@ -78,17 +97,23 @@ private:
     void render_shadow_casters();
     void render_visible_objects();
     
+    void permute_shaders(const std::string& name);
+    
     Engine* engine_;
     
     // Shadow-mapping variables
     ComponentPtr shadow_vars_;
+    Matrix shadow_matrix_;
     RenderTargetPtr shadow_target_;
 
     ComponentPtr window_vars_;
     
     // Shader variables
-    std::map<std::string, ShaderPtr> shader_;
+    std::map<std::pair<std::string, uint32_t>, ShaderPtr> shader_;
     std::map<std::string, MeshBufferPtr> mesh_;
+    std::map<std::string, TextureBufferPtr> texture_;
+    
+    std::map<uint32_t, std::string> shader_option_;
 };
 
 }}

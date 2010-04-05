@@ -23,6 +23,7 @@
 
 #include <Jet/Types.hpp>
 #include <Jet/Object.hpp>
+#include <Jet/Matrix.hpp>
 
 #ifdef WINDOWS
 #define WIN32_LEAN_AND_MEAN
@@ -31,6 +32,7 @@
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <map>
+#include <vector>
 
 namespace Jet { namespace OpenGL {
 
@@ -40,7 +42,7 @@ namespace Jet { namespace OpenGL {
 class Shader : public Object {
 public:
     //! Constructor.
-    Shader(const std::string& path);
+    Shader(const std::string& path, const std::vector<std::string>& defines);
 
     //! Destructor.
     virtual ~Shader();
@@ -60,19 +62,22 @@ public:
     //! texture.
     //! @param name the name of the texture sampler in the shader source
     //! @param matrix the texture matrix
-    void texture_matrix(const std::string& name, const Matrix& matrix);
+    void matrix(const std::string& name, const Matrix& matrix);
+    
+    //! Returns the given uniform location.
+    //! @param name the name of the uniform location
+    GLuint uniform(const std::string& name);
 
 private:
     void source(GLuint shader, const std::string& path);
-    
-    std::map<GLuint, GLuint> texture_;
-    std::map<GLuint, Matrix> texture_matrix_;
 
     GLuint vertex_;
     GLuint fragment_;
     GLuint shader_;
     GLuint program_;
     GLuint binormal_;
+    GLuint sampler_;
+    std::vector<std::string> defines_;
 };
 
 }}

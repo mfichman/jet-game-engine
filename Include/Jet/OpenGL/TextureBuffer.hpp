@@ -19,39 +19,38 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */  
- 
-#include <Jet/Core/TextureLoader.hpp>
-#include <Jet/Texture.hpp>
-#include <Jet/Engine.hpp>
-#include <IL/IL.h>
-#include <stdexcept>
+#pragma once
 
-using namespace Jet;
-using namespace Jet::Core;
-using namespace std;
+#include <Jet/Types.hpp>
+#include <Jet/Object.hpp>
 
-TextureLoader::TextureLoader(Engine* engine) :
-    engine_(engine) {
+#ifdef WINDOWS
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#endif
+#include <GL/glew.h>
+#include <GL/gl.h>
 
-    if (ilGetInteger(IL_VERSION_NUM) < IL_VERSION) {
-        throw runtime_error("IL library version mismatch");
+namespace Jet { namespace OpenGL {
+
+//! This class holds the vertex and index buffers for a triangle mesh.
+//! @class TextureBuffer
+//! @brief Vertex and index buffers for a triangle mesh.
+class TextureBuffer : public Object {
+public:
+    //! Constructor.
+    TextureBuffer(Texture* texture);
+
+    //! Destructor.
+    virtual ~TextureBuffer();
+    
+    //! Returns the handle to the texture.
+    inline GLuint texture() const {
+        return texture_;
     }
 
-    ilInit();
-}
+private:
+    GLuint texture_;
+};
 
-void TextureLoader::resource(const std::string& file) {
-    ILuint image;
-    ilGenImages(1, &image);
-    ilBindImage(image);
-    ilLoadImage(file.c_str());
-    //ilGetError()
-
-    std::string name = file.substr(file.rfind("/") + 1, string::npos);
-
-    TexturePtr texture(engine_->texture(name, false));
-    texture->width(ilGetInteger(IL_IMAGE_WIDTH));
-    texture->height(ilGetInteger(IL_IMAGE_HEIGHT));
-    ilCopyPixels(0, 0, 0, texture->width(), texture->height(), 1, IL_RGBA, IL_UNSIGNED_BYTE, texture->data());
-    texture->loaded(true);
-}
+}}

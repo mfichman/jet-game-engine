@@ -22,8 +22,9 @@
  
 varying vec3 normal;
 varying vec3 view;
+varying vec3 light;
 
-uniform sampler2D texture_map;
+uniform sampler2D diffuse_map;
 uniform sampler2D specular_map;
 uniform sampler2D normal_map;
 uniform sampler2D shadow_map;
@@ -36,16 +37,18 @@ struct LightResult {
 };
 
 LightResult phong() {
-#ifdef NORMAL_MAP
+/*#ifdef NORMAL_MAP
     vec3 n = normalize(texture2D(normal_map, gl_TexCoord[0].st).xyz * 2.0 - 1.0);
-#else
+#else*/
+
     vec3 n = normalize(normal);
-#ifdef LIGHT_POINT
+//#ifdef LIGHT_POINT
     vec3 light = vec3(gl_LightSource[0].position) - view;
-#elif defined(LIGHT_DIRECTIONAL)
-    vec3 light = vec3(gl_LightSource[i].position);
+/*#else
+    vec3 light = vec3(gl_LightSource[0].position);
 #endif
-#endif
+
+#endif*/
 
     vec3 v = normalize(view);
     vec3 r = reflect(v, n);
@@ -70,7 +73,7 @@ LightResult phong() {
     return result;
 }
 
-#ifdef SHADOW_MAP
+//#ifdef SHADOW_MAP
 LightResult mul_shadow_map(in LightResult result) {
     vec4 shadow_coord = gl_TexCoord[1]/gl_TexCoord[1].w;
     float depth = texture2D(shadow_map, shadow_coord.st).z + 0.00002;
@@ -80,21 +83,21 @@ LightResult mul_shadow_map(in LightResult result) {
     }
     return result;
 }
-#endif
+//#endif
 
 
 void main() {
     LightResult result = phong();
     
-#ifdef SHADOW_MAP
+//#ifdef SHADOW_MAP
     result = mul_shadow_map(result);
-#endif
-#ifdef TEXTURE_MAP
-    result.diffuse *= texture2D(texture_map, gl_TexCoord[0]);
-#endif
+//#endif
+//#ifdef DIFFUSE_MAP
+    result.diffuse *= texture2D(diffuse_map, gl_TexCoord[0].st);
+/*#endif
 #ifdef SPECULAR_MAP
-    result.specular *= texture2D(specular_map, gl_TexCoord[0]);
-#endif
+    result.specular *= texture2D(specular_map, gl_TexCoord[0].st);
+#endif*/
     
     gl_FragColor = vec4(result.ambient + result.diffuse + result.specular, 1.0);  
 }
