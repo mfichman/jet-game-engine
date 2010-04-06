@@ -22,7 +22,6 @@
  
 varying vec3 normal;
 varying vec3 view;
-varying vec3 light;
 
 uniform sampler2D diffuse_map;
 uniform sampler2D specular_map;
@@ -32,24 +31,13 @@ uniform samplerCube environment_map;
 
 #undef NORMAL_MAP
 
-struct LightResult {
-    vec3 specular;
-    vec3 diffuse;
-    vec3 ambient;
-};
-
-LightResult phong() {
+void main() {
 #ifdef NORMAL_MAP
     vec3 n = normalize(texture2D(normal_map, gl_TexCoord[0].st).xyz * 2.0 - 1.0);
 #else
     vec3 n = normalize(normal);
-    vec3 light = vec3(gl_LightSource[0].position) - view;
-
 #endif
-
-    vec3 v = normalize(view);
-    vec3 r = reflect(v, n);
-    vec3 l = normalize(light);
+    vec3 light = vec3(gl_LightSource[0].position) - view;
         
     // Calculate attenuation
     float d = length(light);
@@ -57,19 +45,31 @@ LightResult phong() {
     float c1 = gl_LightSource[0].linearAttenuation;
     float c2 = gl_LightSource[0].quadraticAttenuation;
     float a = 1.0 / (c0 + c1*d + c2*d*d);
+    
+    // Clculate view, light, and reflection vectors
+    vec3 v = normalize(view);
+    vec3 l = normalize(light);
+    vec3 r = reflect(v, n);
 
     // Calculate diffuse and specular coefficients
     float s = a * max(0.0, dot(l, n));
     float t = a * max(0.0, pow(dot(l, r), gl_FrontMaterial.shininess));
     
-    LightResult result;
-    result.diffuse = vec3(s * gl_LightSource[0].diffuse * gl_FrontMaterial.diffuse);
-    if (s > 0.0) result.specular = vec3(t * gl_LightSource[0].specular * gl_FrontMaterial.specular);
-    result.ambient = vec3(a * gl_LightSource[0].ambient * gl_FrontMaterial.ambient);
+    // Calculate ambient, diffuse, and specular light
+    vec4 diffuse = s * gl_LightSource[0].diffuse * gl_FrontMaterial.diffuse;
+    vec4 specular = t * gl_LightSource[0].specular * gl_FrontMaterial.specular;
+    vec4 ambient = a * gl_LightSource[0].ambient * gl_FrontMaterial.ambient;
     
-    return result;
+#ifdef DIFFUSE_MAP
+    diffuse *= texture2D(diffuse_map, gl_TexCoord[0].st);
+#endif
+#ifdef SPECULAR_MAP
+    specular *= texture2D(specular_map, gl_TexCoord[0].st);
+#endif
+    
+    gl_FragColor = ambient + diffuse + specular;
 }
-
+/*
 #ifdef SHADOW_MAP
 LightResult mul_shadow_map(in LightResult result) {
     vec4 shadow_coord = gl_TexCoord[1]/gl_TexCoord[1].w;
@@ -80,8 +80,8 @@ LightResult mul_shadow_map(in LightResult result) {
     }
     return result;
 }
-#endif
-
+#endif*/
+/*
 
 void main() {
     LightResult result = phong();
@@ -97,4 +97,4 @@ void main() {
 #endif
     
     gl_FragColor = vec4(result.ambient + result.diffuse + result.specular, 1.0);  
-}
+}*/
