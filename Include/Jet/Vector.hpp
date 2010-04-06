@@ -98,6 +98,16 @@ public:
     ValueType type() const {
         return VT_VECTOR; 
     }
+    
+    //! Returns a pointer to the vector data.
+    operator const real_t*() const {
+        return &x;
+    }
+    
+    //! Returns a pointer to the vector data.
+    operator real_t*() {
+        return &x;
+    }
 
     //! Stream operator.
     friend std::ostream& ::operator<<(std::ostream& out, const Vector& vector);

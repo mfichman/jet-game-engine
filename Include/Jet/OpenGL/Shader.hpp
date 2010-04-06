@@ -31,7 +31,6 @@
 #endif
 #include <GL/glew.h>
 #include <GL/gl.h>
-#include <map>
 #include <vector>
 
 namespace Jet { namespace OpenGL {
@@ -63,6 +62,11 @@ public:
     //! @param name the name of the texture sampler in the shader source
     //! @param matrix the texture matrix
     void matrix(const std::string& name, const Matrix& matrix);
+    
+    //! Attaches a vector to the shader
+    //! @param name the name of the texture location
+    //! @param vector the vector
+    void vector(const std::string& name, const Vector& vector);
     
     //! Returns the given uniform location.
     //! @param name the name of the uniform location

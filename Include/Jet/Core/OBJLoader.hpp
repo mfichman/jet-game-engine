@@ -50,7 +50,7 @@ private:
     void texcoord(std::istream& in);
     void mtllib(std::istream& in);
     void usemtl(std::istream& in);
-    void binormal(Vertex face[3], size_t j);
+    void tangent(Vertex face[3], size_t j);
 
     Engine* engine_;
     std::vector<Vector> position_;

@@ -46,11 +46,7 @@ void main() {
     vec3 t = cross(n, b);
     
     // Tangent space calculation
-#ifdef LIGHT_POINT
     vec3 l = gl_LightSource[0].position.xyz - view_position;
-#else
-    vec3 l = gl_LightSource[0].position.xyz;
-#endif
     light.x = dot(l, t);
     light.y = dot(l, b);
     light.z = dot(l, n);

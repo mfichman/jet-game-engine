@@ -40,7 +40,6 @@ namespace Jet { namespace OpenGL {
         MSO_SHADOW_MAP = 1,
         MSO_DIFFUSE_MAP = 2,
         MSO_SPECULAR_MAP = 4,
-        MSO_NORMAL_MAP = 8,
-        MSO_POINT_LIGHT = 16
+        MSO_NORMAL_MAP = 8
     };
 }}

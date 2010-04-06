@@ -22,15 +22,16 @@
 
 #include <Jet/OpenGL/Shader.hpp>
 #include <Jet/Matrix.hpp>
+#include <Jet/Vector.hpp>
 #include <iostream>
 #include <fstream>
-#include <vector>
+#include <string>
 
 using namespace Jet::OpenGL;
 using namespace Jet;
 using namespace std;
 
-Shader::Shader(const std::string& path, const vector<string>& defines) :
+Shader::Shader(const string& path, const std::vector<string>& defines) :
     sampler_(0),
     defines_(defines) {
         
@@ -76,7 +77,7 @@ Shader::~Shader() {
 }
 
 void Shader::source(GLuint shader, const std::string& path) {
-    vector<GLchar> buffer;
+    std::vector<GLchar> buffer;
 
     ifstream in(path.c_str());
     if (in.fail()) {
@@ -96,7 +97,7 @@ void Shader::source(GLuint shader, const std::string& path) {
     in.close();
     buffer.push_back(0); // Null terminate the string
 
-    vector<const GLchar*> source;
+    std::vector<const GLchar*> source;
     for (size_t i = 0; i < defines_.size(); i++) {
         source.push_back(defines_[i].c_str());
     }
@@ -119,7 +120,12 @@ void Shader::texture(const std::string& name, GLuint texture) {
 
 void Shader::matrix(const std::string& name, const Matrix& matrix) {
     GLuint location = glGetUniformLocation(program_, name.c_str());
-    glUniformMatrix4fv(location, 1, false, matrix);  
+    glUniformMatrix4fv(location, 1, 0, matrix);  
+}
+
+void Shader::vector(const std::string& name, const Vector& vector) {
+    GLuint location = glGetUniformLocation(program_, name.c_str());
+    glUniform3fv(location, 1, vector);
 }
 
 GLuint Shader::uniform(const std::string& name) {

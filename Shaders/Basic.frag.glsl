@@ -42,13 +42,8 @@ LightResult phong() {
 #ifdef NORMAL_MAP
     vec3 n = normalize(texture2D(normal_map, gl_TexCoord[0].st).xyz * 2.0 - 1.0);
 #else
-
     vec3 n = normalize(normal);
-#ifdef LIGHT_POINT
     vec3 light = vec3(gl_LightSource[0].position) - view;
-#else
-    vec3 light = vec3(gl_LightSource[0].position);
-#endif
 
 #endif
 

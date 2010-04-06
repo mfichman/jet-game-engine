@@ -13,10 +13,10 @@ void main() {
         
         Jet::ComponentPtr window(engine->component("window"));
         window->type("Config");
-        window->value("width", 1680);
-        window->value("height", 1050);
+        window->value("width", 1024);
+        window->value("height", 768);
         window->value("title", "Extreme Asteroids");
-        window->value("fullscreen", true);
+        window->value("fullscreen", 0.0);
         
         engine->folder("../Textures");
         engine->folder("../Meshes");
@@ -45,7 +45,7 @@ void main() {
         //box->value("mesh", "Box.obj");
         
         Jet::NodePtr light_node(engine->root()->node("light"));
-        light_node->position(Jet::Vector(10.0f, 0.0f, 0.0f));
+        light_node->position(Jet::Vector(10.0f, 0.0f, 10.0f));
         Jet::ComponentPtr light(light_node->component("light"));
         light->type("PointLight");
         light->value("ambient", Jet::Color(0.1f, 0.1f, 0.1f, 1.0f));

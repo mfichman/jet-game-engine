@@ -38,12 +38,12 @@ public:
     inline bool operator<(const Vertex& other) const {
         if (position != other.position) return position < other.position;
         if (normal != other.normal) return normal < other.normal;
-        if (binormal != other.binormal) return binormal < other.binormal;
+        if (tangent != other.tangent) return tangent < other.tangent;
         return texcoord < other.texcoord;
     }
     
     inline bool operator==(const Vertex& other) const {
-        return position == other.position && normal == other.normal && binormal == other.binormal && texcoord == other.texcoord;
+        return position == other.position && normal == other.normal && tangent == other.tangent && texcoord == other.texcoord;
     }
 
 	inline bool operator!=(const Vertex& other) const {
@@ -52,7 +52,7 @@ public:
     
     Vector position;
     Vector normal;
-    Vector binormal;
+    Vector tangent;
     Texcoord texcoord;
 };
 

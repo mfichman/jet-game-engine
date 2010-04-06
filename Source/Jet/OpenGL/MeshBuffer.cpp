@@ -45,7 +45,6 @@ MeshBuffer::~MeshBuffer() {
 }
 
 void MeshBuffer::render(Shader* shader) const {
-    // GLuint b = getBinormalLoc
     
 
     glBindBuffer(GL_ARRAY_BUFFER, vbuffer_);
@@ -54,10 +53,10 @@ void MeshBuffer::render(Shader* shader) const {
     glEnableClientState(GL_NORMAL_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     
-    GLuint binormal = 0;
+    GLuint tangent = 0;
     if (shader) {
-        binormal = shader->uniform("binormal");
-        glEnableVertexAttribArray(binormal);
+        tangent = shader->uniform("tangent");
+        glEnableVertexAttribArray(tangent);
     }
 
     glVertexPointer(3, GL_FLOAT, sizeof(Vertex), 0);
@@ -65,7 +64,7 @@ void MeshBuffer::render(Shader* shader) const {
     glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), (void*)(9*sizeof(GLfloat)));
     
     if (shader) {
-        glVertexAttribPointer(binormal, 3, GL_FLOAT, false, sizeof(Vertex), (void*)(11*sizeof(GLfloat)));
+        glVertexAttribPointer(tangent, 3, GL_FLOAT, 0, sizeof(Vertex), (void*)(11*sizeof(GLfloat)));
     }
     // TODO: Draw indexed, not raw
     //glDrawArrays(GL_TRIANGLES, 0, nvertices_);
@@ -74,7 +73,7 @@ void MeshBuffer::render(Shader* shader) const {
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_NORMAL_ARRAY);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    glDisableVertexAttribArray(binormal);
+    glDisableVertexAttribArray(tangent);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }

@@ -105,7 +105,7 @@ void OBJLoader::face(istream& in) {
     // Add vertices to the buffer
     for (int j = 0; j < 3; j++) {  
         // Calculate binormals          
-        binormal(face, j);
+        tangent(face, j);
         
         map<Vertex, uint32_t>::iterator i = vertex_.find(face[j]);
         if (i == vertex_.end()) {
@@ -126,7 +126,7 @@ void OBJLoader::face(istream& in) {
     getline(in, line);
 }
 
-void OBJLoader::binormal(Vertex face[3], size_t j) {
+void OBJLoader::tangent(Vertex face[3], size_t j) {
     // Calculate binormals
     Vector d1 = face[(j+1)%3].position - face[j].position;
     Vector d2 = face[(j+2)%3].position - face[j].position;
@@ -139,8 +139,8 @@ void OBJLoader::binormal(Vertex face[3], size_t j) {
     real_t t2 = tex2.v - tex0.v;
 
     real_t a = 1/(s1*t2 - s2*t1);
-    // vertex.tangent = ((d1*t2 - d2*t1)*a).unit();
-    face[j].binormal = ((d2*s1 - d1*s2)*a).unit();
+    face[j].tangent = ((d1*t2 - d2*t1)*a).unit();
+    //face[j].binormal = ((d2*s1 - d1*s2)*a).unit();
 }
 
 // .OBJ (Wavefront) and .MTL loader.  Loads linked materials specified in the

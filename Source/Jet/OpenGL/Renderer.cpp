@@ -60,7 +60,6 @@ Renderer::Renderer(Engine* engine) :
     shader_option(MSO_SPECULAR_MAP, "SPECULAR_MAP");
     shader_option(MSO_SHADOW_MAP, "SHADOW_MAP");
     shader_option(MSO_NORMAL_MAP, "NORMAL_MAP");
-    shader_option(MSO_POINT_LIGHT, "LIGHT_POINT");
     
     permute_shaders("Basic");
 }
@@ -229,7 +228,7 @@ void Renderer::render_shadow_casters() {
 }
 
 void Renderer::render_visible_objects() {
-    ShaderPtr shader = Renderer::shader("Basic", MSO_POINT_LIGHT | MSO_SHADOW_MAP);
+    ShaderPtr shader = Renderer::shader("Basic", MSO_SHADOW_MAP);
     shader->begin();
     shader->texture("shadow_map", shadow_target_->texture());
     shader->matrix("shadow_matrix", shadow_matrix_);
@@ -259,27 +258,47 @@ void Renderer::render_visible_objects() {
     
     shader->end();
     
-    shader = Renderer::shader("Basic", 31);
-    shader->begin();
-    shader->texture("shadow_map", shadow_target_->texture());
-    shader->matrix("shadow_matrix", shadow_matrix_);
     
     glFrontFace(GL_CCW);
     for (Iterator<const pair<NodePtr, ComponentPtr>> i = engine_->renderables(); i; i++) {
 		ComponentPtr material = i->second->component("material");
-        TextureBufferPtr diffuse = texture(material->value("diffuse_map"));
-        TextureBufferPtr specular = texture(material->value("specular_map"));
-        TextureBufferPtr normal = texture(material->value("normal_map"));
-		shader->texture("diffuse_map", diffuse->texture());
-		shader->texture("specular_map", specular->texture());
-		shader->texture("normal_map", normal->texture());
-		
-
+        uint32_t opts = MSO_SHADOW_MAP;
+        if (material->value("diffuse_map")) {
+            opts |= MSO_DIFFUSE_MAP;
+        }
+        if (material->value("specular_map")) {
+            opts |= MSO_SPECULAR_MAP;
+        }
+        if (material->value("normal_map")) {
+            opts |= MSO_NORMAL_MAP;
+        }
+        
+        Vector camera_position(15.0f*sinf(angle/2), 0.0f, 15.0f*cosf(angle/2));
+        ShaderPtr shader = Renderer::shader("Basic", opts);
+        shader->begin();
+        shader->texture("shadow_map", shadow_target_->texture());
+        shader->matrix("shadow_matrix", shadow_matrix_);
+        shader->vector("camera_position", camera_position);
+        
+        if (material->value("diffuse_map")) {
+            TextureBufferPtr diffuse = texture(material->value("diffuse_map"));
+            shader->texture("diffuse_map", diffuse->texture());
+        }
+        if (material->value("specular_map")) {
+            TextureBufferPtr specular = texture(material->value("specular_map"));
+            shader->texture("specular_map", specular->texture());
+        }
+        if (material->value("normal_map")) {
+            TextureBufferPtr normal = texture(material->value("normal_map"));
+            shader->texture("normal_map", normal->texture());
+        }
+        
         MeshBufferPtr buffer = mesh(i->second->value("mesh"));
         buffer->render(shader.get());
+        
+        shader->end();
     }
     glFrontFace(GL_CW);
-    shader->end();
 }
 
 void Renderer::permute_shaders(const string& name) {
@@ -301,8 +320,8 @@ void Renderer::permute_shaders(const string& name) {
     }
     
     // Load a shader for each combination of the preprocessor definitions
-    size_t noptions = 5;
-    size_t ncombos = 1 << 5;
+    size_t noptions = 4;
+    size_t ncombos = 1 << noptions;
     
     for (uint32_t i = 0; i < ncombos; i++) {
         vector<string> defines;
