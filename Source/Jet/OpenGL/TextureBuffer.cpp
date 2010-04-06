@@ -38,6 +38,8 @@ TextureBuffer::TextureBuffer(Texture* texture) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 6.0);
+    
     // Load the image
     gluBuild2DMipmaps(GL_TEXTURE_2D, 3, texture->width(), texture->height(), GL_RGBA, GL_UNSIGNED_BYTE, texture->data());
     

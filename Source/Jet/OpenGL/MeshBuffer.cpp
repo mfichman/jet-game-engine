@@ -55,7 +55,7 @@ void MeshBuffer::render(Shader* shader) const {
     
     GLuint tangent = 0;
     if (shader) {
-        tangent = shader->uniform("tangent");
+        tangent = shader->uniform("tangent_in");
         glEnableVertexAttribArray(tangent);
     }
 

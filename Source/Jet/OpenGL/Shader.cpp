@@ -50,8 +50,6 @@ Shader::Shader(const string& path, const std::vector<string>& defines) :
     glAttachShader(program_, vertex_);
     glLinkProgram(program_);
 
-    binormal_ = glGetAttribLocation(program_, "binormal");
-
     GLchar log[1024];
     GLsizei length;
     glGetShaderInfoLog(fragment_, 1024, &length, log);

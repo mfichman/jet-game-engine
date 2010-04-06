@@ -21,6 +21,7 @@
  */
  
 varying vec3 normal;
+varying vec3 tangent;
 varying vec3 view;
 
 uniform sampler2D diffuse_map;
@@ -29,16 +30,23 @@ uniform sampler2D normal_map;
 uniform sampler2D shadow_map;
 uniform samplerCube environment_map;
 
-#undef NORMAL_MAP
+//#undef NORMAL_MAP
 
 void main() {
-#ifdef NORMAL_MAP
-    vec3 n = normalize(texture2D(normal_map, gl_TexCoord[0].st).xyz * 2.0 - 1.0);
-#else
-    vec3 n = normalize(normal);
-#endif
+    
+    // Calculate light vector
     vec3 light = vec3(gl_LightSource[0].position) - view;
-        
+    
+    // Calculate the tangent, binormal, and normal vectors
+    vec3 n = normalize(normal);
+#ifdef NORMAL_MAP
+    vec3 t = normalize(tangent);
+    vec3 b = normalize(cross(t, n));
+    mat3 tbn_matrix = mat3(t, b, n);
+    vec3 n_sample = normalize(texture2D(normal_map, gl_TexCoord[0].st).xyz * 2.0 - 1.0);
+    n = tbn_matrix * n_sample;
+#endif
+
     // Calculate attenuation
     float d = length(light);
     float c0 = gl_LightSource[0].constantAttenuation;
@@ -52,12 +60,12 @@ void main() {
     vec3 r = reflect(v, n);
 
     // Calculate diffuse and specular coefficients
-    float s = a * max(0.0, dot(l, n));
-    float t = a * max(0.0, pow(dot(l, r), gl_FrontMaterial.shininess));
+    float kd = a * max(0.0, dot(l, n));
+    float ks = a * max(0.0, pow(dot(l, r), gl_FrontMaterial.shininess));
     
     // Calculate ambient, diffuse, and specular light
-    vec4 diffuse = s * gl_LightSource[0].diffuse * gl_FrontMaterial.diffuse;
-    vec4 specular = t * gl_LightSource[0].specular * gl_FrontMaterial.specular;
+    vec4 diffuse = kd * gl_LightSource[0].diffuse * gl_FrontMaterial.diffuse;
+    vec4 specular = ks * gl_LightSource[0].specular * gl_FrontMaterial.specular;
     vec4 ambient = a * gl_LightSource[0].ambient * gl_FrontMaterial.ambient;
     
 #ifdef DIFFUSE_MAP
@@ -65,6 +73,15 @@ void main() {
 #endif
 #ifdef SPECULAR_MAP
     specular *= texture2D(specular_map, gl_TexCoord[0].st);
+#endif
+    
+#ifdef SHADOW_MAP
+    vec4 shadow_coord = gl_TexCoord[1]/gl_TexCoord[1].w;
+    float depth = texture2D(shadow_map, shadow_coord.st).z + 0.00003;
+    if (depth < shadow_coord.z) {
+        diffuse *= 0.2;
+        specular *= 0.0;
+    }
 #endif
     
     gl_FragColor = ambient + diffuse + specular;

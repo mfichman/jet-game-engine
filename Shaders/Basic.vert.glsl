@@ -21,14 +21,11 @@
  */
 
 varying vec3 normal;
+varying vec3 tangent;
 varying vec3 view;
-varying vec3 light;
 
 uniform mat4 shadow_matrix;
-
-attribute vec3 binormal;
-
-#undef NORMAL_MAP
+attribute vec3 tangent_in;
 
 void main() {
     // Transform to homogeneous coordinates
@@ -39,23 +36,7 @@ void main() {
     gl_TexCoord[1] = shadow_matrix * gl_Vertex;
 #endif
 
-#ifdef NORMAL_MAP
-    vec3 view_position = vec3(gl_ModelViewMatrix * gl_Vertex);
-    vec3 n = normalize(gl_NormalMatrix * gl_Normal);
-    vec3 b = normalize(gl_NormalMatrix * binormal);
-    vec3 t = cross(n, b);
-    
-    // Tangent space calculation
-    vec3 l = gl_LightSource[0].position.xyz - view_position;
-    light.x = dot(l, t);
-    light.y = dot(l, b);
-    light.z = dot(l, n);
-    view.x = dot(view_position, t);
-    view.y = dot(view_position, b);
-    view.z = dot(view_position, n);
-#else
-
     normal = gl_NormalMatrix * gl_Normal;
+    tangent = gl_NormalMatrix * tangent_in;
     view = vec3(gl_ModelViewMatrix * gl_Vertex);
-#endif
 }

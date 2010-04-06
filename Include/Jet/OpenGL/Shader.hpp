@@ -79,7 +79,6 @@ private:
     GLuint fragment_;
     GLuint shader_;
     GLuint program_;
-    GLuint binormal_;
     GLuint sampler_;
     std::vector<std::string> defines_;
 };
