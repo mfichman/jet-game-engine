@@ -30,10 +30,7 @@ uniform sampler2D normal_map;
 uniform sampler2D shadow_map;
 uniform samplerCube environment_map;
 
-//#undef NORMAL_MAP
-
 void main() {
-    
     // Calculate light vector
     vec3 light = vec3(gl_LightSource[0].position) - view;
     
@@ -86,32 +83,3 @@ void main() {
     
     gl_FragColor = ambient + diffuse + specular;
 }
-/*
-#ifdef SHADOW_MAP
-LightResult mul_shadow_map(in LightResult result) {
-    vec4 shadow_coord = gl_TexCoord[1]/gl_TexCoord[1].w;
-    float depth = texture2D(shadow_map, shadow_coord.st).z + 0.00002;
-    if (depth < shadow_coord.z) {
-        result.diffuse *= 0.2;
-        result.specular *= 0.0;
-    }
-    return result;
-}
-#endif*/
-/*
-
-void main() {
-    LightResult result = phong();
-    
-#ifdef SHADOW_MAP
-    result = mul_shadow_map(result);
-#endif
-#ifdef DIFFUSE_MAP
-    result.diffuse *= texture2D(diffuse_map, gl_TexCoord[0].st);
-#endif
-#ifdef SPECULAR_MAP
-    result.specular *= texture2D(specular_map, gl_TexCoord[0].st);
-#endif
-    
-    gl_FragColor = vec4(result.ambient + result.diffuse + result.specular, 1.0);  
-}*/
