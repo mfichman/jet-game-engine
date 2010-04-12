@@ -41,7 +41,7 @@ namespace Jet { namespace OpenGL {
 class Shader : public Object {
 public:
     //! Constructor.
-    Shader(const std::string& path, const std::vector<std::string>& defines);
+    Shader(Engine* engine, Jet::Shader* shader);
 
     //! Destructor.
     virtual ~Shader();
@@ -52,25 +52,14 @@ public:
     //! Disables this shader.
     void end();
     
-    //! Attaches a texture sampler to this shader.
-    //! @param name the name of the texture sampler in the shader source
-    //! @param texture the texture handle
-    void texture(const std::string& name, GLuint texture);
-    
-    //! Attaches a texture matrix to be used with the given
-    //! texture.
-    //! @param name the name of the texture sampler in the shader source
-    //! @param matrix the texture matrix
-    void matrix(const std::string& name, const Matrix& matrix);
-    
-    //! Attaches a vector to the shader
-    //! @param name the name of the texture location
-    //! @param vector the vector
-    void vector(const std::string& name, const Vector& vector);
-    
     //! Returns the given uniform location.
     //! @param name the name of the uniform location
-    GLuint uniform(const std::string& name);
+    //GLuint uniform(const std::string& name);
+    
+    //! Returns the location of the tangent variable.
+    GLint tangent() const {
+        return tangent_;
+    }
 
 private:
     void source(GLuint shader, const std::string& path);
@@ -80,7 +69,12 @@ private:
     GLuint shader_;
     GLuint program_;
     GLuint sampler_;
-    std::vector<std::string> defines_;
+    GLint diffuse_map_;
+    GLint specular_map_;
+    GLint normal_map_;
+    GLint shadow_map_;
+    GLint shadow_matrix_;
+    GLint tangent_;
 };
 
 }}

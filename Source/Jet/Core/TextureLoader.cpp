@@ -40,18 +40,18 @@ TextureLoader::TextureLoader(Engine* engine) :
     ilInit();
 }
 
-void TextureLoader::resource(const std::string& file) {
+void TextureLoader::resource(const std::string& name) {
+    
+    std::string file = engine_->resource_path(name);
+    
     ILuint image;
     ilGenImages(1, &image);
     ilBindImage(image);
     ilLoadImage(file.c_str());
     //ilGetError()
 
-    std::string name = file.substr(file.rfind("/") + 1, string::npos);
-
-    TexturePtr texture(engine_->texture(name, false));
+    TexturePtr texture(engine_->texture(name));
     texture->width(ilGetInteger(IL_IMAGE_WIDTH));
     texture->height(ilGetInteger(IL_IMAGE_HEIGHT));
     ilCopyPixels(0, 0, 0, texture->width(), texture->height(), 1, IL_RGBA, IL_UNSIGNED_BYTE, texture->data());
-    texture->loaded(true);
 }

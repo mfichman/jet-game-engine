@@ -21,47 +21,26 @@
  */  
 #pragma once
 
-#include <Jet/Loader.hpp>
-#include <iostream>
-#include <vector>
-#include <map>
+#include <Jet/Types.hpp>
+#include <Jet/Object.hpp>
 
-namespace Jet { namespace Core {
+namespace Jet {
 
-//! This class loads a mesh using the Wavefront .OBJ file format.
-//! @class OBJLoader
-//! @brief Loads .OBJ files
-class OBJLoader : public Loader {
+//! This class is used to load objects from a plugin.  Plugins generally
+//! consist of several factories registered to the main engine class.
+//! @class ResourceLoader
+//! @brief Loads objects from a plugin
+class ResourceLoader : public Object {
 public:
-    //! Constructor
-    OBJLoader(Engine* engine);
 
     //! Destructor
-    virtual ~OBJLoader() {}
+    virtual ~ResourceLoader() {}
 
-    //! Creates a new mesh from the given file.
-    //! @param file the .OBJ file
-    virtual void resource(const std::string& file);
-
-private:
-    void face(std::istream& in);
-    void vertex(std::istream& in);
-    void normal(std::istream& in);
-    void texcoord(std::istream& in);
-    void mtllib(std::istream& in);
-    void usemtl(std::istream& in);
-    void tangent(Vertex face[3], size_t j);
-
-    Engine* engine_;
-    std::vector<Vector> position_;
-    std::vector<Vector> normal_;
-    std::vector<Texcoord> texcoord_;
-    std::map<Vertex, uint32_t> vertex_;
-    std::vector<uint32_t> index_;
-    uint32_t cur_index_;
-    std::string material_;
-    std::map<std::string, void (OBJLoader::*)(std::istream&)> command_;
-
+    //! Creates a new object of the given type.  The object must match the
+    //! type specification parameter, or an exception will be thrown by the
+    //! engine and the object will be discarded.
+    //! @param source the source to load the object from
+    virtual void resource(const std::string& source)=0;
 };
 
-}}
+}

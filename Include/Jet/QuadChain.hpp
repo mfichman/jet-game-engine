@@ -18,27 +18,53 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- */
+ */  
+#pragma once
 
-varying vec3 normal;
-varying vec3 tangent;
-varying vec3 view;
+#include <Jet/Types.hpp>
+#include <Jet/Object.hpp>
+#include <Jet/Range.hpp>
+#include <Jet/Vector.hpp>
+#include <Jet/Quad.hpp>
+#include <Jet/Vertex.hpp>
+#include <vector>
 
-#define SHADOW_MAP_SAMPLER 3
-#define SHADOW_MAP
+namespace Jet {
 
-attribute vec3 tangent_in;
-
-void main() {
-    // Transform to homogeneous coordinates
-    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-    gl_TexCoord[0] = gl_MultiTexCoord0;
+//! Class for rendering a set of textured quads in a chain.
+//! @class QuadChain
+//! Used for trailer effects.
+class JETAPI QuadChain : public Object {
+public:
     
-#ifdef SHADOW_MAP
-    gl_TexCoord[1] = gl_TextureMatrix[0] * gl_Vertex;
-#endif
+    //! Destructor.
+    virtual ~QuadChain() {}
+    
+    //! Returns the parent node.
+    Node* parent() const {
+        return parent_;
+    }
+    
+    //! Returns the list of vertices.
+    inline const Vertex* vertex_data() const {
+        return vertex_.size() ? &vertex_.front() : 0;
+    }
+    
+    //! Returns the number of vertices.
+    inline size_t vertex_count() const {
+        return vertex_.size();
+    }
+    
+private:
+    QuadChain(Engine* engine, Node* parent);
+    
+    Engine* engine_;
+    Node* parent_;
+#pragma warning(disable:4251)
+    std::vector<Vertex> vertex_;
+#pragma warning(default:4251)
 
-    normal = gl_NormalMatrix * gl_Normal;
-    tangent = gl_NormalMatrix * tangent_in;
-    view = vec3(gl_ModelViewMatrix * gl_Vertex);
+    friend class Node;
+};
+
 }

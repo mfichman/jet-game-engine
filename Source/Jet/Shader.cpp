@@ -18,42 +18,24 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- */  
-#pragma once
+ */
 
-#include <Jet/Types.hpp>
-#include <Jet/Object.hpp>
-#include <Jet/Iterator.hpp>
-#include <Jet/Value.hpp>
-#include <vector>
+#include <Jet/Shader.hpp>
+#include <Jet/Engine.hpp>
 
-namespace Jet {
+using namespace Jet;
 
-//! A list of parameters for a dynamic function call.
-//! @class Params
-//! @brief Holds a list of parameters.
-class JETAPI Params {
-public:
+Shader::Shader(Engine* engine, const std::string& name) :
+    engine_(engine),
+    name_(name),
+    loaded_(false) {
+}
 
-    //! Adds a new parameter to the list
-    Params& operator%(const Value& value);
-
-    //! Returns the parameter iterator.
-    operator Iterator<const Value>() const;
-
-    //! Returns the ith parameter
-    const Value& operator[](size_t index) const;
-    
-    //! Returns the number of parameters
-    inline size_t size() const {
-        return params_.size();
-    }
-
-private:
-#pragma warning(disable:4251)
-    std::vector<Value> params_;
-#pragma warning(default:4251)
-};
-
-
+void Shader::loaded(bool loaded) {
+	if (loaded_ != loaded) {
+		if (loaded) {
+			engine_->resource(name_);
+		}
+		loaded_ = loaded;
+	}
 }

@@ -22,7 +22,7 @@
 #pragma once
 
 #include <Jet/Lua/Types.hpp>
-#include <Jet/Loader.hpp>
+#include <Jet/ResourceLoader.hpp>
 #include <lua/lua.hpp>
 #include <set>
 
@@ -31,7 +31,7 @@ namespace Jet { namespace Lua {
 //! This class loads Lua scripts.
 //! @class ScriptLoader
 //! @brief Loads Lua scripts.
-class ScriptLoader : public Loader {
+class ScriptLoader : public ResourceLoader {
 public:
     //! Constructor
     ScriptLoader(Interpreter* interpreter);

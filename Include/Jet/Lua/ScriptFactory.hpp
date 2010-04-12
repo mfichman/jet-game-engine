@@ -22,7 +22,7 @@
 #pragma once
 
 #include <Jet/Lua/Types.hpp>
-#include <Jet/Factory.hpp>
+#include <Jet/ObjectFactory.hpp>
 #include <lua/lua.hpp>
 
 namespace Jet { namespace Lua {
@@ -30,7 +30,7 @@ namespace Jet { namespace Lua {
 //! This class loads controllers from Lua script files.
 //! @class ScriptFactory
 //! @brief Loads controllers from Lua script files.
-class ScriptFactory : public Factory {
+class ScriptFactory : public ObjectFactory {
 public:
     //! Creates a new loader.
     //! @param interpreter the parent interpreter

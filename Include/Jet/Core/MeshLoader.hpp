@@ -18,27 +18,50 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- */
+ */  
+#pragma once
 
-varying vec3 normal;
-varying vec3 tangent;
-varying vec3 view;
+#include <Jet/ResourceLoader.hpp>
+#include <iostream>
+#include <vector>
+#include <map>
 
-#define SHADOW_MAP_SAMPLER 3
-#define SHADOW_MAP
+namespace Jet { namespace Core {
 
-attribute vec3 tangent_in;
+//! This class loads a mesh using the Wavefront .OBJ file format.
+//! @class MeshLoader
+//! @brief Loads .OBJ files
+class MeshLoader : public ResourceLoader {
+public:
+    //! Constructor
+    MeshLoader(Engine* engine);
 
-void main() {
-    // Transform to homogeneous coordinates
-    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-    gl_TexCoord[0] = gl_MultiTexCoord0;
-    
-#ifdef SHADOW_MAP
-    gl_TexCoord[1] = gl_TextureMatrix[0] * gl_Vertex;
-#endif
+    //! Destructor
+    virtual ~MeshLoader() {}
 
-    normal = gl_NormalMatrix * gl_Normal;
-    tangent = gl_NormalMatrix * tangent_in;
-    view = vec3(gl_ModelViewMatrix * gl_Vertex);
-}
+    //! Creates a new mesh from the given file.
+    //! @param file the .OBJ file
+    virtual void resource(const std::string& file);
+
+private:
+    void face(std::istream& in);
+    void vertex(std::istream& in);
+    void normal(std::istream& in);
+    void texcoord(std::istream& in);
+    void mtllib(std::istream& in);
+    void usemtl(std::istream& in);
+    void tangent(Vertex face[3], size_t j);
+
+    Engine* engine_;
+    std::vector<Vector> position_;
+    std::vector<Vector> normal_;
+    std::vector<Texcoord> texcoord_;
+    std::map<Vertex, uint32_t> vertex_;
+    std::vector<uint32_t> index_;
+    uint32_t cur_index_;
+    std::string material_;
+    std::map<std::string, void (MeshLoader::*)(std::istream&)> command_;
+
+};
+
+}}

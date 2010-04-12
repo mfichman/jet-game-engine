@@ -19,41 +19,53 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */  
-#pragma once
 
-#include <Jet/OpenGL/Types.hpp>
-#include <Jet/Types.hpp>
-#include <Jet/Object.hpp>
+#include <Jet/RigidBody.hpp>
 
-#ifdef WINDOWS
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#endif
-#include <GL/glew.h>
-#include <GL/gl.h>
+using namespace Jet;
 
-namespace Jet { namespace OpenGL {
+RigidBody::RigidBody(Engine* engine, Node* parent) :
+    engine_(engine),
+    parent_(parent),
+    listener_(0) {
+}
 
-//! This class holds the vertex and index buffers for a triangle mesh.
-//! @class MeshBuffer
-//! @brief Vertex and index buffers for a triangle mesh.
-class MeshBuffer : public Object {
-public:
-    //! Constructor.
-    MeshBuffer(Mesh* mesh);
+void RigidBody::linear_velocity(const Vector& v) {
+    if (v != linear_velocity_) {
+        linear_velocity_ = v;
+        if (listener_) {
+            listener_->on_linear_velocity();
+        }
+    }
+}
 
-    //! Destructor.
-    virtual ~MeshBuffer();
+void RigidBody::angular_velocity(const Vector& v) {
+    if (v != angular_velocity_) {
+        angular_velocity_ = v;
+        if (listener_) {
+            listener_->on_angular_velocity();
+        }
+    }
+}
 
-    //! Renders this mesh.
-    //! @param shader the shader to use
-    void render(Shader* shader) const;
+void RigidBody::apply_force(const Vector& v) {
+    force_ += v;
+    if (listener_) {
+        listener_->on_force();
+    }
+}
 
-private:
-    GLuint nvertices_;
-    GLuint nindices_;
-    GLuint vbuffer_;
-    GLuint ibuffer_;
-};
+void RigidBody::apply_torque(const Vector& v) {
+    torque_ += v;
+    if (listener_) {
+        listener_->on_torque();
+    }
+}
 
-}}
+void RigidBody::apply_local_force(const Vector& v) {
+
+}
+
+void RigidBody::apply_local_torque(const Vector& v) {
+    
+}

@@ -59,6 +59,16 @@ public:
     inline bool loaded() const {
         return loaded_;
     }
+	
+	//! Returns the implementation object.
+	inline Object* impl() const {
+		return impl_.get();
+	}
+
+	//! Returns the name of the texture
+	inline const std::string& name() const {
+		return name_;
+	}
 
     //! Sets the width of the texture in pixels.
     //! @param width the new width
@@ -69,15 +79,21 @@ public:
     void height(size_t height);
     
     //! Marks this texture as loaded.
-    inline void loaded(bool loaded) {
-        loaded_ = loaded;
-    }
+    void loaded(bool loaded);
+	
+	//! Sets the implementation object.
+	inline void impl(Object* object) {
+		impl_ = object;
+	}
     
 private:
-    Texture();
+	Texture(Engine* engine, const std::string& name);
     
+	Engine* engine_;
+	std::string name_;
     bool loaded_;
 #pragma warning(disable:4251)
+	ObjectPtr impl_;
     std::vector<uint8_t> data_;
     size_t width_;
     size_t height_;

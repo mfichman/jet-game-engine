@@ -45,5 +45,6 @@ Object* ScriptFactory::object(const std::string& path) {
     string type = path.substr(0, path.rfind("."));
     
     // Create the controller
-    return new ScriptController(env_, type);
+    //return new ScriptController(env_, type);
+    return 0;
 }

@@ -21,14 +21,16 @@
  */  
 
 #include <Jet/Texture.hpp>
+#include <Jet/Engine.hpp>
 
 using namespace Jet;
 
-Texture::Texture() :
+Texture::Texture(Engine* engine, const std::string& name) :
+	engine_(engine),
+    name_(name),
     loaded_(false),
 	width_(0), 
 	height_(0) {
-        
 }
 
 void Texture::width(size_t width) {
@@ -39,4 +41,13 @@ void Texture::width(size_t width) {
 void Texture::height(size_t height) {
     height_ = height;
     data_.resize(width_ * height_ * 4);
+}
+
+void Texture::loaded(bool loaded) {
+	if (loaded_ != loaded) {
+		if (loaded) {
+			engine_->resource(name_);
+		}
+		loaded_ = loaded;
+	}
 }

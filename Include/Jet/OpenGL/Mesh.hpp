@@ -21,26 +21,39 @@
  */  
 #pragma once
 
+#include <Jet/OpenGL/Types.hpp>
 #include <Jet/Types.hpp>
 #include <Jet/Object.hpp>
 
-namespace Jet {
+#ifdef WINDOWS
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#endif
+#include <GL/glew.h>
+#include <GL/gl.h>
 
-//! This class is used to load objects from a plugin.  Plugins generally
-//! consist of several factories registered to the main engine class.
-//! @class Loader
-//! @brief Loads objects from a plugin
-class Loader : public Object {
+namespace Jet { namespace OpenGL {
+
+//! This class holds the vertex and index buffers for a triangle mesh.
+//! @class MeshBuffer
+//! @brief Vertex and index buffers for a triangle mesh.
+class Mesh : public Object {
 public:
+    //! Constructor.
+    Mesh(Jet::Mesh* mesh);
 
-    //! Destructor
-    virtual ~Loader() {}
+    //! Destructor.
+    virtual ~Mesh();
 
-    //! Creates a new object of the given type.  The object must match the
-    //! type specification parameter, or an exception will be thrown by the
-    //! engine and the object will be discarded.
-    //! @param source the source to load the object from
-    virtual void resource(const std::string& source)=0;
+    //! Renders this mesh.
+    //! @param shader the shader to use
+    void render(OpenGL::Shader* shader) const;
+
+private:
+    GLuint nvertices_;
+    GLuint nindices_;
+    GLuint vbuffer_;
+    GLuint ibuffer_;
 };
 
-}
+}}

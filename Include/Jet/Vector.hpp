@@ -87,17 +87,18 @@ public:
     //! Scales the vector.
     //! @param s the scaling factor
     Vector operator*(real_t s) const;
+    
+    //! Adds to this vector.
+    Vector& operator+=(const Vector& other);
+    
+    //! Subtracts form this vector.
+    Vector& operator-=(const Vector& other);
 
     //! Returns a unit vector.
     Vector unit() const;
     
     //! Returns an arbitrary vector perpindicular to this one.
     Vector orthogonal() const;
-    
-    //! Returns the type of avector.
-    ValueType type() const {
-        return VT_VECTOR; 
-    }
     
     //! Returns a pointer to the vector data.
     operator const real_t*() const {

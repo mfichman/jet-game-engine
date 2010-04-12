@@ -37,24 +37,6 @@ public:
     //! Destructor.
     virtual ~Mesh() {}
 
-    //! Returns a vertex that is part of this mesh
-    //! @param i the index of the vertex in the vertex buffer
-    inline const Vertex& vertex(size_t i) const {
-        return vertex_[i];
-    }
-
-    //! Returns a vertex that is part of this mesh
-    //! @param i the index of the vertex in the vertex buffer
-    inline Vertex& vertex(size_t i) {
-        return vertex_[i];
-    }
-
-    //! Returns an index that is part of this mesh.
-    //! @param i the index of the index in the index buffer
-    inline uint32_t index(size_t i) const {
-        return index_[i];
-    }
-
     //! Sets a vertex that is part of this mesh.  This method dynamically
     //! resizes the buffer as needed.
     //! @param i the index of the vertex
@@ -68,8 +50,38 @@ public:
     void index(size_t i, uint32_t index);
     
     //! Marks the mesh as loaded.
-    inline void loaded(bool loaded) {
-        loaded_ = loaded;
+    void loaded(bool loaded);
+    
+    //! Sets the implementation object
+    inline void impl(Object* impl) {
+        impl_ = impl;
+    }
+    
+    //! Returns a vertex that is part of this mesh
+    //! @param i the index of the vertex in the vertex buffer
+    inline const Vertex& vertex(size_t i) const {
+        return vertex_[i];
+    }
+
+    //! Returns an index that is part of this mesh.
+    //! @param i the index of the index in the index buffer
+    inline uint32_t index(size_t i) const {
+        return index_[i];
+    }
+    
+    //! Returns true if the mesh data is loaded
+    inline bool loaded() const {
+        return loaded_;
+    }
+    
+    //! Returns a pointer to the implementation object.
+    Object* impl() const {
+        return impl_.get();
+    }
+    
+    //! Returns the name of the mesh.
+    const std::string& name() const {
+        return name_;
     }
 
     //! Returns a pointer to the beginning of the vertex buffer.
@@ -92,16 +104,14 @@ public:
         return index_.size();
     }
     
-    //! Returns true if the mesh data is loaded
-    inline bool loaded() const {
-        return loaded_;
-    }
-    
 private:
-    Mesh();
+    Mesh(Engine* engine, const std::string& name);
     
+    Engine* engine_;
+	std::string name_;
     bool loaded_;
 #pragma warning(disable:4251)
+    ObjectPtr impl_;
     std::vector<Vertex> vertex_;
     std::vector<uint32_t> index_;
 #pragma warning(default:4251)

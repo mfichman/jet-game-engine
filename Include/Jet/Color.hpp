@@ -44,11 +44,6 @@ public:
     //! @param alpha alpha component
     Color(real_t red, real_t blue, real_t green, real_t alpha);
     
-    //! Returns the type of avector.
-    ValueType type() const {
-        return VT_COLOR; 
-    }
-    
     //! Returns a pointer to the internal float data of this color
     operator const real_t*() const {
         return &red;

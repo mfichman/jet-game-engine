@@ -18,34 +18,42 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- */
+ */  
 
-#include <Jet/OpenGL/TextureBuffer.hpp>
-#include <Jet/Texture.hpp>
+#include <Jet/Material.hpp>
+#include <Jet/Engine.hpp>
 
-using namespace Jet::OpenGL;
 using namespace Jet;
+using namespace std;
 
-TextureBuffer::TextureBuffer(Texture* texture) {
-    
-    // Initialize the texture
-    glGenTextures(1, &texture_);
-    glBindTexture(GL_TEXTURE_2D, texture_);
-    
-    //! Set texture sampling parameters; we use mip filtering
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 6.0);
-    
-    // Load the image
-    gluBuild2DMipmaps(GL_TEXTURE_2D, 3, texture->width(), texture->height(), GL_RGBA, GL_UNSIGNED_BYTE, texture->data());
-    
-    glBindTexture(GL_TEXTURE_2D, 0);
+Material::Material(Engine* engine, const std::string& name) :
+    engine_(engine),
+    name_(name),
+	loaded_(false) {
+                
 }
 
-TextureBuffer::~TextureBuffer() {
-    glDeleteTextures(1, &texture_);
+void Material::diffuse_map(const std::string& name) {
+    diffuse_map_ = engine_->texture(name);
+}
+
+void Material::specular_map(const std::string& name) {
+    specular_map_ = engine_->texture(name);
+}
+
+void Material::normal_map(const std::string& name) {
+    normal_map_ = engine_->texture(name);
+}
+
+void Material::shader(const std::string& name) {
+    shader_ = engine_->shader(name);
+}
+
+void Material::loaded(bool loaded) {
+	if (loaded_ != loaded) {
+		if (loaded) {
+			engine_->resource(name_);
+		}
+        loaded_ = loaded;
+	}
 }

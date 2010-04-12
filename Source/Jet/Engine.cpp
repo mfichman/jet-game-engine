@@ -21,6 +21,7 @@
  */  
 
 #include <Jet/Engine.hpp>
+#include <Jet/Material.hpp>
 #ifdef WINDOWS
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -36,6 +37,7 @@
 using namespace Jet;
 using namespace std;
 using namespace boost::filesystem;
+using namespace boost;
 
 Engine::Engine() :
     running_(true) {
@@ -43,7 +45,7 @@ Engine::Engine() :
     root_.reset(new Node(this));
     
 #ifdef WINDOWS
-    int64_t counts_per_sec = 0;
+	::int64_t counts_per_sec = 0;
     QueryPerformanceFrequency((LARGE_INTEGER*)&counts_per_sec);
     secs_per_count_ = 1.0f/(float)counts_per_sec;
     prev_time_ = 0;
@@ -53,120 +55,95 @@ Engine::Engine() :
 Engine::~Engine() {
 }
 
-Node* Engine::node(const std::string& name, bool create) const {
-    map<string, NodePtr>::const_iterator i = node_.find(name);
-    if (i == node_.end()) {
-        if (create) {
-            Engine* self = const_cast<Engine*>(this);
-            NodePtr node(new Node(self));
-            self->node_.insert(make_pair(name, node));
-            return node.get();
-        } else {
-            throw runtime_error("Node not found: " + name);
-        }
-    }
-    return i->second.get();
-}
-
-Component* Engine::component(const std::string& name, bool create) const {
-    map<string, ComponentPtr>::const_iterator i = component_.find(name);
-    if (i == component_.end()) {
-        if (create) {
-            Engine* self = const_cast<Engine*>(this);
-            ComponentPtr component(new Component());
-            self->component_.insert(make_pair(name, component));
-            return component.get();
-        } else {
-            throw runtime_error("Component not found: " + name);
-        }
-    }
-    return i->second.get();
-}
-
-Mesh* Engine::mesh(const std::string& name, bool load) const {
-    map<string, MeshPtr>::const_iterator i = mesh_.find(name);
-    Engine* self = const_cast<Engine*>(this);
+Mesh* Engine::mesh(const std::string& name) {
+    map<string, MeshPtr>::iterator i = mesh_.find(name);
     if (i == mesh_.end()) {
-       
-        MeshPtr mesh(new Mesh());
-        self->mesh_.insert(make_pair(name, mesh));
-        if (load) {
-            self->resource(name);
-        }
+        MeshPtr mesh(new Mesh(this, name));
+        mesh_.insert(make_pair(name, mesh));
         return mesh.get();
-    }
-    if (load && !i->second->loaded()) {
-        self->resource(name);
-    }
-    return i->second.get();
+	} else {
+		return i->second.get();
+	}
 }
 
-Texture* Engine::texture(const std::string& name, bool load) const {
-    map<string, TexturePtr>::const_iterator i = texture_.find(name);
-    Engine* self = const_cast<Engine*>(this);
+Texture* Engine::texture(const std::string& name) {
+    map<string, TexturePtr>::iterator i = texture_.find(name);
     if (i == texture_.end()) {
-        TexturePtr texture(new Texture());
-        self->texture_.insert(make_pair(name, texture));
-        if (load) {
-            self->resource(name);
-        }
+        TexturePtr texture(new Texture(this, name));
+        texture_.insert(make_pair(name, texture));
         return texture.get();
-    }
-    if (load && !i->second->loaded()) {
-        self->resource(name);
-    }
-    return i->second.get();
+	} else {
+		return i->second.get();
+	}
 }
 
-Iterator<const std::string> Engine::folders() const {
-    return Iterator<const std::string>(folder_.begin(), folder_.end());
+Material* Engine::material(const std::string& name) {
+    map<string, MaterialPtr>::iterator i = material_.find(name);
+    if (i == material_.end()) {
+        MaterialPtr material(new Material(this, name));
+        material_.insert(make_pair(name, material));
+        return material.get();
+	} else {
+		return i->second.get();
+	}
 }
 
-Iterator<const pair<NodePtr, ComponentPtr>> Engine::renderables() const {
-    return Iterator<const pair<NodePtr, ComponentPtr>>(renderables_.begin(), renderables_.end());
+Shader* Engine::shader(const std::string& name) {
+    map<string, ShaderPtr>::iterator i = shader_.find(name);
+    if (i == shader_.end()) {
+        ShaderPtr shader(new Shader(this, name));
+        shader_.insert(make_pair(name, shader));
+        return shader.get();
+	} else {
+		return i->second.get();
+	}
 }
 
-Iterator<const pair<NodePtr, ComponentPtr>> Engine::lights() const {
-    return Iterator<const pair<NodePtr, ComponentPtr>>(lights_.begin(), lights_.end());
+Iterator<MeshObjectPtr> Engine::visible_mesh_objects() {
+	return Iterator<MeshObjectPtr>(visible_mesh_objects_.begin(), visible_mesh_objects_.end());
 }
 
-void Engine::loader(const std::string& type, Loader* loader) {
-    loader_[type] = loader;
+Iterator<LightPtr> Engine::active_lights() {
+	return Iterator<LightPtr>(active_lights_.begin(), active_lights_.end());
 }
 
-void Engine::factory(const std::string& type, Factory* factory) {
-    factory_[type] = factory;    
+Iterator<const std::string> Engine::search_folders() const {
+    return Iterator<const std::string>(search_folder_.begin(), search_folder_.end());
+}
+
+void Engine::resource_loader(const std::string& type, ResourceLoader* loader) {
+    resource_loader_[type] = loader;
+}
+
+void Engine::object_factory(const std::string& type, ObjectFactory* factory) {
+    object_factory_[type] = factory;    
 }
 
 void Engine::resource(const std::string& name) {
-    std::string ext = name.substr(name.rfind("."), string::npos);
-    map<string, LoaderPtr>::iterator i = loader_.find(ext);
-    if (i != loader_.end()) {
-        
-        for (Iterator<const string> j = folders(); j; j++) {
-			string path = *j + "/" + name;
-			ifstream in(path.c_str());
-			if (in.good()) {
-				i->second->resource(path);
-				return;
-			}
-        }
-        throw range_error("Resource not found: " + name);
+	size_t start = name.rfind(".");
+	if (start == string::npos) {
+		return;
+	}
+    std::string ext = name.substr(start, string::npos);
+    map<string, ResourceLoaderPtr>::iterator i = resource_loader_.find(ext);
+    if (i != resource_loader_.end()) {
+		i->second->resource(name);
     } else {
         throw runtime_error("No loader for: " + name); 
     }
 }
 
-Object* Engine::object(const std::string& type) {
-    std::string ext = type.substr(type.rfind("."), string::npos);
-    map<string, FactoryPtr>::iterator i = factory_.find(ext);
-    if (i != factory_.end()) {
-        return i->second->object(type);
-    } else {
-        throw runtime_error("No factory for: " + type);
-    }
+std::string Engine::resource_path(const std::string& name) {
+    for (Iterator<const string> j = search_folders(); j; j++) {
+		string folder = *j;
+		string path = folder + "/" + name;
+		ifstream in(path.c_str());
+		if (in.good()) {
+			return path;
+        }
+    } 
+    throw range_error("Resource not found: " + name);
 }
-
 
 void Engine::module(const std::string& path) {
 #ifdef WINDOWS
@@ -197,34 +174,12 @@ void Engine::module(const std::string& path) {
 	load(this);
 }
 
-void Engine::handler(Handler* handler) {
-    handler_.push_back(handler);
+void Engine::listener(EngineListener* listener) {
+    listener_.push_back(listener);
 }
 
-void Engine::folder(const std::string& dir) {
-    //string path = resolve_path(dir);
-    folder_.insert(resolve_path(dir));
-    //set<string>::iterator i = folder_.find(path);
-    
-   // if (i == folder_.end()) {
-    //    cout << resolve_path(dir) << endl;
-    //    folder_.insert(path);
-    
-        /*path folder(dir);
-        directory_iterator end;
-        for (directory_iterator i(folder); i != end; ++i) {
-            if (!is_directory(*i)) {
-                
-                // Get the extension and use the appropriate loader to loader
-                // the resource from the file
-                string ext = i->filename().substr(0, i->filename().rfind("."));
-                map<string, LoaderPtr>::iterator j = loader_.find(ext);
-                if (j != loader_.end()) {
-                    j->second->resource(i->path().file_string());
-                }
-            }
-        }*/
-    //}
+void Engine::search_folder(const std::string& dir) {
+    search_folder_.insert(resolve_path(dir));
 }
 
 std::string Engine::resolve_path(const std::string& name) {
@@ -267,51 +222,65 @@ void Engine::tick() {
     accumulator_ = min(accumulator_, JET_MAX_TIME_LAG);
     while (accumulator_ >= JET_TIME_STEP) {
         // capture input
-        for (list<HandlerPtr>::iterator i = handler_.begin(); i != handler_.end(); i++) {
+        for (list<EngineListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
             (*i)->on_update();
         }
     }
     
-    renderables_.clear();
+    // Traverse the scene graph
     generate_render_list(root_);
-    
-    
+
     // Fire pre-render event
-    for (list<HandlerPtr>::iterator i = handler_.begin(); i != handler_.end(); i++) {
+    for (list<EngineListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
         (*i)->on_pre_render();
     }
     
     // Fire render event
-    for (list<HandlerPtr>::iterator i = handler_.begin(); i != handler_.end(); i++) {
+    for (list<EngineListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
         (*i)->on_render();
     }
     
      // Fire post-render event
-    for (list<HandlerPtr>::iterator i = handler_.begin(); i != handler_.end(); i++) {
+    for (list<EngineListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
         (*i)->on_post_render();
     }
+    
+    
+    // Clear render lists
+    visible_mesh_objects_.clear();
+    visible_particle_systems_.clear();
+    visible_quad_sets_.clear();
+    visible_quad_chains_.clear();
+    active_lights_.clear();
+    audible_audio_sources_.clear();
+    
 }
 
 void Engine::generate_render_list(NodePtr node) {
-    
-    for (Iterator<const ComponentPtr> i = node->components(); i; i++) {
-        if ((*i)->value("renderable")) {
-            renderables_.push_back(make_pair(node, *i));;
-        } else if ((*i)->type() == "DirectionalLight") {
-            lights_.push_back(make_pair(node, *i));
-        } else if ((*i)->type() == "PointLight") {
-            lights_.push_back(make_pair(node, *i));
-        }
-    }
-    for (Iterator<NodePtr> i = node->nodes(); i; i++) {
-        generate_render_list(*i);
+    // Update the transformation matrix for this node, if it
+    // was modified
+    if (node->parent()) {
+        const Matrix& parent = node->parent()->matrix();
+        node->matrix(Matrix(node->rotation(), node->position()) * parent);
+    } else {
+        node->matrix(Matrix(node->rotation(), node->position()));
     }
     
+    for (Iterator<ObjectPtr> i = node->objects(); i; i++) {
+		const type_info& type = typeid(**i);
+		if (type == typeid(Node)) {
+			generate_render_list(static_cast<Node*>(i->get()));
+		} else if (type == typeid(MeshObject)) {
+			visible_mesh_objects_.push_back(static_cast<MeshObject*>(i->get()));
+		} else if (type == typeid(Light)) {
+			active_lights_.push_back(static_cast<Light*>(i->get()));
+		}
+    }
 }
 
 real_t Engine::delta() {
 #ifdef WINDOWS
-    int64_t current_time = 0;
+	::int64_t current_time = 0;
     QueryPerformanceCounter((LARGE_INTEGER*)&current_time);
     if (!prev_time_) {
         prev_time_ = current_time;

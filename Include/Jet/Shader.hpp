@@ -26,21 +26,50 @@
 
 namespace Jet {
 
-//! This class is used to load objects from a plugin.  Plugins generally
-//! consist of several factories registered to the main engine class.
-//! @class Factory
-//! @brief Loads objects from a plugin.
-class JETAPI Factory : public Object {
+//! Shader loader class.
+//! @class Shader
+//! @brief Shader.
+class JETAPI Shader : public Object {
 public:
-
-    //! Destructor
-    virtual ~Factory() {}
-
-    //! Creates a new object of the given type.  The object must match the
-    //! requested type, or a runtime_error will be thrown from within the
-    //! engine.
-    //! @param type the type of controller to create
-    virtual Object* object(const std::string& type)=0;
+    
+    //! Destroys the shader.
+    virtual ~Shader() {}
+    
+    //! Returns true if the shader is loaded.
+    inline bool loaded() const {
+        return loaded_;
+    }
+    	
+    //! Returns the implementation object.
+	inline Object* impl() const {
+		return impl_.get();
+	}
+    
+    //! Returns the shader's path.
+    const std::string& name() const {
+        return name_;
+    }
+    
+    //! Marks the shader as loaded.
+    void loaded(bool loaded);
+    
+    //! Sets the implementation object.
+	inline void impl(Object* object) {
+		impl_ = object;
+	}
+    
+private:
+    //! Creates a shader.
+    Shader(Engine* engine, const std::string& name);
+    
+    Engine* engine_;
+    std::string name_;
+    bool loaded_;
+#pragma warning(disable:4251)
+    ObjectPtr impl_;
+#pragma warning(default:4251)
+    
+    friend class Engine;
 };
 
 }

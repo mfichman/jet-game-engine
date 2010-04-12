@@ -19,36 +19,13 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */  
-#pragma once
 
-#include <Jet/Types.hpp>
-#include <Jet/Object.hpp>
-#include <vector>
+#include <Jet/AudioSource.hpp>
 
-namespace Jet {
+using namespace Jet;
 
-//! Listens for engine events.  Examples include on_pre_render (called before
-//! rendering), on_post_render (called after rendering), on_render (called
-//! during rendering), and on_update (called with each tick of the physics
-//! engine.
-//! @class Handler
-//! @brief Interface for handling engine events.
-class JETAPI Handler : public Object {
-public: 
-    //! Destructor.
-    virtual ~Handler() {}
-
-    //! Called for each physics update.
-    virtual void on_update() {}
-    
-    //! Called before each frame.
-    virtual void on_pre_render() {}
-    
-    //! Called during each frame.
-    virtual void on_render() {}
-    
-    //! Called after each frame.
-    virtual void on_post_render() {}
-};
-
+AudioSource::AudioSource(Engine* engine, Node* parent) :
+    engine_(engine),
+    parent_(parent) {
+   
 }

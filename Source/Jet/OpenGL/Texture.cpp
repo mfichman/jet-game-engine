@@ -18,44 +18,35 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- */  
-#pragma once
+ */
 
-#include <Jet/Loader.hpp>
-#include <map>
-#include <iostream>
+#include <Jet/OpenGL/Texture.hpp>
+#include <Jet/Texture.hpp>
 
-namespace Jet { namespace Core {
+using namespace Jet::OpenGL;
 
-//! This class loads a material using the Wavefront .MTL file format.
-//! @class MatFactory
-//! @brief Loads .OBJ files
-class MTLLoader : public Loader {
-public:
-    //! Constructor.
-    MTLLoader(Engine* engine);
+Texture::Texture(Jet::Texture* texture) {
+    texture->loaded(true);
+    texture->impl(this);
+    
+    // Initialize the texture
+    glGenTextures(1, &texture_);
+    glBindTexture(GL_TEXTURE_2D, texture_);
+    
+    //! Set texture sampling parameters; we use mip filtering
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 6.0);
+    
+    // Load the image
+    gluBuild2DMipmaps(GL_TEXTURE_2D, 3, texture->width(), texture->height(), GL_RGBA, GL_UNSIGNED_BYTE, texture->data());
+    
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
 
-    //! Destructor.
-    virtual ~MTLLoader() {}
-
-    //! Creates a new material from the given file.
-    //! @param file the .MTL file
-    virtual void resource(const std::string& file);
-
-private:
-    void newmtl(std::istream& in);
-    void ambient(std::istream& in);
-    void diffuse(std::istream& in);
-    void specular(std::istream& in);
-    void transparency(std::istream& in);
-    void reflectivity(std::istream& in);
-    void texture_map(std::istream& in);
-    void specular_map(std::istream& in);
-    void normal_map(std::istream& in);
-
-    Engine* engine_;
-    ComponentPtr material_;
-    std::map<std::string, void (MTLLoader::*)(std::istream&)> command_;
-};
-
-}}
+Texture::~Texture() {
+    glDeleteTextures(1, &texture_);
+}

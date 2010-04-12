@@ -44,6 +44,20 @@ public:
            real_t m20, real_t m21, real_t m22, real_t m23,
            real_t m30, real_t m31, real_t m32, real_t m33);
     
+    //! Creates a new combined rotation and translation matrix from
+    //! a quaternion and a vector.
+    //! @param rotation the rotation of the matrix
+    //! @param trans the translation of the matrix
+    Matrix(const Quaternion& rotation, const Vector& trans);
+    
+    //! Creates a rotation matrix from a quaternion.
+    //! @param rotation the rotation of the matrix
+    Matrix(const Quaternion& rotation);
+    
+    //! Creates a translation matrix from a vector.
+    //! @param trans the translation of the matrix
+    Matrix(const Vector& trans);
+    
     //! Creates a new empty matrix, with all entries initialized to zero.
     Matrix();
     

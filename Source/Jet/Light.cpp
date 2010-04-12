@@ -20,25 +20,11 @@
  * IN THE SOFTWARE.
  */
 
-#include <Jet/Params.hpp>
-#include <Jet/Value.hpp>
+#include <Jet/Light.hpp>
 
 using namespace Jet;
-using namespace std;
 
-Params& Params::operator%(const Value& value) {
-    params_.push_back(value);
-    return *this;
-}
-
-Params::operator Iterator<const Value>() const {
-    return Iterator<const Value>(params_.begin(), params_.end());
-}
-
-const Value& Params::operator[](size_t index) const {
-    if (index >= params_.size()) {
-        return Value::NIL;
-    } else {
-        return params_[index];
-    }
+Light::Light(Node* parent) :
+    parent_(parent) {
+        
 }

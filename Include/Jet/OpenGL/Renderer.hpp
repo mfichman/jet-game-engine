@@ -24,10 +24,10 @@
 #include <Jet/OpenGL/Types.hpp>
 #include <Jet/OpenGL/Shader.hpp>
 #include <Jet/OpenGL/RenderTarget.hpp>
-#include <Jet/OpenGL/MeshBuffer.hpp>
-#include <Jet/OpenGL/TextureBuffer.hpp>
+#include <Jet/OpenGL/Mesh.hpp>
+#include <Jet/OpenGL/Texture.hpp>
 #include <Jet/Types.hpp>
-#include <Jet/Handler.hpp>
+#include <Jet/Engine.hpp>
 
 #ifdef WINDOWS
 #define WIN32_LEAN_AND_MEAN
@@ -48,7 +48,7 @@ namespace Jet { namespace OpenGL {
 //! systems, etc.
 //! @class Renderer
 //! @brief Renders visible objects.
-class Renderer : public Handler {
+class Renderer : public EngineListener {
 public:
     //! Constructor.
     Renderer(Engine* engine);
@@ -62,28 +62,15 @@ public:
     
     //! Retrieves the given shader.
     //! @param name the shader's name
-    Shader* shader(const std::string& name, uint32_t opts);
+	OpenGL::Shader* shader(Jet::Shader* desc);
     
     //! Retrieves the given mesh
     //! @param name the mesh's name
-    MeshBuffer* mesh(const std::string& name);
+	OpenGL::Mesh* mesh(Jet::Mesh* desc);
     
     //! Retrieves the given texture buffer.
     //! @param name the texture's name
-    TextureBuffer* texture(const std::string& name);
-    
-    //! Gets the rendering #define for shaders.
-    //! @param tag the tag that identifies the #define
-    inline const std::string& shader_option(uint32_t tag) const {
-        return shader_option_.find(tag)->second;
-    }
-    
-    //! Sets the rendering #define for shaders.
-    //! @param tag the shader option tag
-    //! @param define the shader define tag
-    inline void shader_option(uint32_t tag, const std::string& define) {
-        shader_option_[tag] = define;
-    }
+	OpenGL::Texture* texture(Jet::Texture* desc);
 
 private:
     
@@ -92,27 +79,15 @@ private:
     
     void render_teapots();
     
-    void generate_shadow_map(const std::pair<NodePtr, ComponentPtr>& light);
-    void render_final(const std::pair<NodePtr, ComponentPtr>& light);
+    void generate_shadow_map(Light* light);
+    void render_final(Light* light);
     void render_shadow_casters();
     void render_visible_objects();
-    
-    void permute_shaders(const std::string& name);
     
     Engine* engine_;
     
     // Shadow-mapping variables
-    ComponentPtr shadow_vars_;
-    Matrix shadow_matrix_;
     RenderTargetPtr shadow_target_;
-
-    ComponentPtr window_vars_;
-    
-    // Shader variables
-    std::map<std::pair<std::string, uint32_t>, ShaderPtr> shader_;
-    std::map<std::string, MeshBufferPtr> mesh_;
-    std::map<std::string, TextureBufferPtr> texture_;
-    
     std::map<uint32_t, std::string> shader_option_;
 };
 

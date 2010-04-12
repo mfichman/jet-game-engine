@@ -19,35 +19,13 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */  
-#pragma once
 
-#include <Jet/Types.hpp>
-#include <Jet/Object.hpp>
-#include <vector>
+#include <Jet/ParticleSystem.hpp>
 
-namespace Jet {
+using namespace Jet;
 
-//! Class that stores binary data loaded from the disk and cached in memory.
-//! @class Buffer
-//! @brief Stores binary data loaded from the disk.
-class JETAPI Buffer : public Object {
-public: 
-    //! Destructor
-    virtual ~Buffer() {}
-
-    //! Returns the data stored in this buffer
-    inline const char* data() const {
-        return data_.empty() ? 0 : &data_.front();
-
-    //! Returns the size of the buffer
-    inline size_t size() const= {
-        return data_.size();
-    }
-
-private:
-#pragma warning(disable:4251)
-    std::vector<char> data_;
-#pragma warning(default:4251)
-};
-
+ParticleSystem::ParticleSystem(Engine* engine, Node* parent) :
+    engine_(engine),
+    parent_(parent) {
+   
 }

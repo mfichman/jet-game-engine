@@ -1,33 +1,31 @@
 #include <Jet/Engine.hpp>
-#include <Jet/Component.hpp>
+#include <Jet/Object.hpp>
+#include <Jet/MeshObject.hpp>
+#include <Jet/Matrix.hpp>
 #include <iostream>
 #include <stdexcept>
 
 void main() {
     try {        
         Jet::EnginePtr engine(new Jet::Engine);
-        Jet::ComponentPtr shadows(engine->component("shadows"));
-        shadows->type("Config");
-        shadows->value("texture_size", 1024);
-        shadows->value("enabled", true);
+        engine->option("shadow_texture_size", 1024);
+        engine->option("shadows_enabled", true);
+        engine->option("display_width", 1024);
+        engine->option("display_height", 768);
+		engine->option("window_title", std::string("Extreme Asteroids"));
+        engine->option("fullscreen", false);
         
-        Jet::ComponentPtr window(engine->component("window"));
-        window->type("Config");
-        window->value("width", 1024);
-        window->value("height", 768);
-        window->value("title", "Extreme Asteroids");
-        window->value("fullscreen", 0.0);
-        
-        engine->folder("../Textures");
-        engine->folder("../Meshes");
-        engine->folder("../Shaders");
-        engine->folder("../Scripts");
-        engine->folder("../Sounds");
-        engine->folder("../Music");
-        engine->folder("../Blender");
-        engine->module("Jet.Core");
+        engine->search_folder("../Textures");
+        engine->search_folder("../Meshes");
+        engine->search_folder("../Shaders");
+        engine->search_folder("../Scripts");
+        engine->search_folder("../Sounds");
+        engine->search_folder("../Music");
+        engine->search_folder("../Blender");
+        engine->search_folder("Jet.Core");
+		engine->module("Jet.Core");
         engine->module("Jet.OpenGL");
-        engine->module("Jet.Lua");
+        //engine->module("Jet.Lua");
         //engine->module("Jet.Direct3D9");
         //engine->module("Jet.FMOD");
         //engine->module("Jet.Lua");
@@ -38,19 +36,25 @@ void main() {
         engine->resource("Box.obj");
         //engine->resource("Whatever.xml");
         
+        
         Jet::NodePtr box_node(engine->root()->node("box"));
-        Jet::ComponentPtr box = box_node->component("box", "Box.obj");
-        //box->type("MeshObject");
-        //box->value("renderable", true);
-        //box->value("mesh", "Box.obj");
+        box_node->position(Jet::Vector(5.0f, 0.0f, 0.0f));
+
+        Jet::MeshObjectPtr box(box_node->mesh_object("box"));
+        box->mesh("Box.obj");
+        box->material("Material_MetalDiffuse.png");
+        box->cast_shadows(true);
         
         Jet::NodePtr light_node(engine->root()->node("light"));
         light_node->position(Jet::Vector(10.0f, 0.0f, 10.0f));
-        Jet::ComponentPtr light(light_node->component("light"));
-        light->type("PointLight");
-        light->value("ambient", Jet::Color(0.1f, 0.1f, 0.1f, 1.0f));
-        light->value("diffuse", Jet::Color(1.0f, 1.0f, 1.0f, 1.0f));
-        light->value("specular", Jet::Color(1.0f, 1.0f, 1.0f, 1.0f));
+
+		
+		Jet::LightPtr light(light_node->light("light"));
+		light->type(Jet::POINT_LIGHT);
+        light->ambient_color(Jet::Color(0.1f, 0.1f, 0.1f, 1.0f));
+        light->diffuse_color(Jet::Color(1.0f, 1.0f, 1.0f, 1.0f));
+        light->specular_color(Jet::Color(1.0f, 1.0f, 1.0f, 1.0f));
+		
     
         while (engine->running()) {
             engine->tick();

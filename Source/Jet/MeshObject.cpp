@@ -18,27 +18,24 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- */
+ */  
 
-varying vec3 normal;
-varying vec3 tangent;
-varying vec3 view;
+#include <Jet/MeshObject.hpp>
+#include <Jet/Engine.hpp>
 
-#define SHADOW_MAP_SAMPLER 3
-#define SHADOW_MAP
+using namespace Jet;
 
-attribute vec3 tangent_in;
+MeshObject::MeshObject(Engine* engine, Node* parent) :
+    engine_(engine),
+    parent_(parent),
+    cast_shadows_(true) {
+        
+}
 
-void main() {
-    // Transform to homogeneous coordinates
-    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-    gl_TexCoord[0] = gl_MultiTexCoord0;
-    
-#ifdef SHADOW_MAP
-    gl_TexCoord[1] = gl_TextureMatrix[0] * gl_Vertex;
-#endif
+void MeshObject::material(const std::string& name) {
+    material_ = engine_->material(name);
+}
 
-    normal = gl_NormalMatrix * gl_Normal;
-    tangent = gl_NormalMatrix * tangent_in;
-    view = vec3(gl_ModelViewMatrix * gl_Vertex);
+void MeshObject::mesh(const std::string& name) {
+    mesh_ = engine_->mesh(name);
 }

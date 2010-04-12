@@ -20,8 +20,8 @@
  * IN THE SOFTWARE.
  */  
 
-#include <Jet/Core/MTLLoader.hpp>
-#include <Jet/Core/OBJLoader.hpp>
+#include <Jet/Core/MaterialLoader.hpp>
+#include <Jet/Core/MeshLoader.hpp>
 #include <Jet/Core/TextureLoader.hpp>
 #include <Jet/Types.hpp>
 #include <Jet/Engine.hpp>
@@ -34,16 +34,16 @@ extern "C" {
 }
 
 void load(Engine* engine) {
-    LoaderPtr mtl_loader(new MTLLoader(engine));
-    LoaderPtr obj_loader(new OBJLoader(engine));
-    LoaderPtr texture_loader(new TextureLoader(engine));
+    ResourceLoaderPtr mtl_loader(new MaterialLoader(engine));
+    ResourceLoaderPtr obj_loader(new MeshLoader(engine));
+    ResourceLoaderPtr texture_loader(new TextureLoader(engine));
 
-    engine->loader(".mtl", mtl_loader.get());
-    engine->loader(".MTL", mtl_loader.get());
-    engine->loader(".obj", obj_loader.get());
-    engine->loader(".OBJ", obj_loader.get());
-    engine->loader(".png", texture_loader.get());
-    engine->loader(".tga", texture_loader.get());
-    engine->loader(".jpg", texture_loader.get());
-    engine->loader(".bmp", texture_loader.get());
+    engine->resource_loader(".mtl", mtl_loader.get());
+    engine->resource_loader(".MTL", mtl_loader.get());
+    engine->resource_loader(".obj", obj_loader.get());
+    engine->resource_loader(".OBJ", obj_loader.get());
+    engine->resource_loader(".png", texture_loader.get());
+    engine->resource_loader(".tga", texture_loader.get());
+    engine->resource_loader(".jpg", texture_loader.get());
+    engine->resource_loader(".bmp", texture_loader.get());
 }

@@ -21,6 +21,8 @@
  */
 
 #include <Jet/Matrix.hpp>
+#include <Jet/Quaternion.hpp>
+#include <Jet/Vector.hpp>
 #include <cstring>
 #include <algorithm>
 
@@ -35,14 +37,95 @@ Matrix::Matrix(real_t m00, real_t m01, real_t m02, real_t m03,
     real_t m20, real_t m21, real_t m22, real_t m23,
     real_t m30, real_t m31, real_t m32, real_t m33) {
     
-    data[0] = m00; data[1] = m01; data[2] = m02; data[3] = m03;
-    data[4] = m10; data[5] = m11; data[6] = m12; data[7] = m13;
-    data[8] = m20; data[9] = m21; data[10] = m22; data[11] = m23;
-    data[12] = m30; data[13] = m31; data[14] = m32; data[15] = m33;
+    data[0] = m00; data[4] = m01; data[8] = m02; data[12] = m03;
+    data[1] = m10; data[5] = m11; data[9] = m12; data[13] = m13;
+    data[2] = m20; data[6] = m21; data[10] = m22; data[14] = m23;
+    data[3] = m30; data[7] = m31; data[11] = m32; data[15] = m33;
+}
+
+Matrix::Matrix(const Quaternion& rotation, const Vector& trans) {
+    // This routine is borrowed from Ogre 3D
+    real_t fTx  = 2.0f*rotation.x;
+    real_t fTy  = 2.0f*rotation.y;
+    real_t fTz  = 2.0f*rotation.z;
+    real_t fTwx = fTx*rotation.w;
+    real_t fTwy = fTy*rotation.w;
+    real_t fTwz = fTz*rotation.w;
+    real_t fTxx = fTx*rotation.x;
+    real_t fTxy = fTy*rotation.x;
+    real_t fTxz = fTz*rotation.x;
+    real_t fTyy = fTy*rotation.y;
+    real_t fTyz = fTz*rotation.y;
+    real_t fTzz = fTz*rotation.z;
+
+    data[0] = 1.0f-(fTyy+fTzz);
+    data[4] = fTxy-fTwz;
+    data[8] = fTxz+fTwy;
+    data[12] = trans.x;
+    
+    data[1] = fTxy+fTwz;
+    data[5] = 1.0f-(fTxx+fTzz);
+    data[9] = fTyz-fTwx;
+    data[13] = trans.y;
+    
+    data[2] = fTxz-fTwy;
+    data[6] = fTyz+fTwx;
+    data[10] = 1.0f-(fTxx+fTyy);
+    data[14] = trans.z;
+    
+    data[3] = 0.0f;
+    data[7] = 0.0f;
+    data[11] = 0.0f;
+    data[15] = 1.0f;
+}
+
+Matrix::Matrix(const Quaternion& rotation) {
+    // This routine is borrowed from Ogre 3D
+    real_t fTx  = 2.0f*rotation.x;
+    real_t fTy  = 2.0f*rotation.y;
+    real_t fTz  = 2.0f*rotation.z;
+    real_t fTwx = fTx*rotation.w;
+    real_t fTwy = fTy*rotation.w;
+    real_t fTwz = fTz*rotation.w;
+    real_t fTxx = fTx*rotation.x;
+    real_t fTxy = fTy*rotation.x;
+    real_t fTxz = fTz*rotation.x;
+    real_t fTyy = fTy*rotation.y;
+    real_t fTyz = fTz*rotation.y;
+    real_t fTzz = fTz*rotation.z;
+
+    data[0] = 1.0f-(fTyy+fTzz);
+    data[4] = fTxy-fTwz;
+    data[8] = fTxz+fTwy;
+    data[12] = 0.0f;
+    
+    data[1] = fTxy+fTwz;
+    data[5] = 1.0f-(fTxx+fTzz);
+    data[9] = fTyz-fTwx;
+    data[13] = 0.0f;
+    
+    data[2] = fTxz-fTwy;
+    data[6] = fTyz+fTwx;
+    data[10] = 1.0f-(fTxx+fTyy);
+    data[14] = 0.0f;
+    
+    data[3] = 0.0f;
+    data[7] = 0.0f;
+    data[11] = 0.0f;
+    data[15] = 1.0f;
+}
+
+Matrix::Matrix(const Vector& trans) {
+    std::fill_n(data, 16, 0.0f);
+    
+    data[12] = trans.x;
+    data[13] = trans.y;
+    data[14] = trans.z;
+    data[15] = 1.0f;
 }
 
 Matrix::Matrix() {
-   std::fill_n(data, 16, 0.0f);
+    std::fill_n(data, 16, 0.0f);
 }
 
 Matrix Matrix::operator*(const Matrix& other) const {
@@ -79,7 +162,7 @@ Matrix Matrix::operator*(const Matrix& other) const {
 }
 
 Matrix Matrix::inverse() const {
-    // This inversion routine is taken from Ogre3D version 1.7.
+    // This inversion routine is taken from Ogre3D, version 1.7.
     Matrix out;
     
     real_t m00 = data[0], m01 = data[1], m02 = data[2], m03 = data[3];
@@ -136,20 +219,20 @@ Matrix Matrix::inverse() const {
     real_t d33 = + (v3 * m00 - v1 * m01 + v0 * m02) * invDet;
     
     out.data[0] = d00;
-    out.data[1] = d01;
-    out.data[2] = d02;
-    out.data[3] = d03;
-    out.data[4] = d10;
+    out.data[4] = d01;
+    out.data[8] = d02;
+    out.data[12] = d03;
+    out.data[1] = d10;
     out.data[5] = d11;
-    out.data[6] = d12;
-    out.data[7] = d13;
-    out.data[8] = d20;
-    out.data[9] = d21;
+    out.data[9] = d12;
+    out.data[13] = d13;
+    out.data[2] = d20;
+    out.data[6] = d21;
     out.data[10] = d22;
-    out.data[11] = d23;
-    out.data[12] = d30;
-    out.data[13] = d31;
-    out.data[14] = d32;
+    out.data[14] = d23;
+    out.data[3] = d30;
+    out.data[7] = d31;
+    out.data[11] = d32;
     out.data[15] = d33;
     
     return out;

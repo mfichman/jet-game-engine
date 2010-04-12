@@ -18,27 +18,29 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- */
+ */  
+#pragma once
 
-varying vec3 normal;
-varying vec3 tangent;
-varying vec3 view;
+#include <Jet/Types.hpp>
+#include <Jet/Object.hpp>
 
-#define SHADOW_MAP_SAMPLER 3
-#define SHADOW_MAP
+namespace Jet {
 
-attribute vec3 tangent_in;
+//! This class is used to load objects from a plugin.  Plugins generally
+//! consist of several factories registered to the main engine class.
+//! @class ObjectFactory
+//! @brief Loads objects from a plugin.
+class JETAPI ObjectFactory : public Object {
+public:
 
-void main() {
-    // Transform to homogeneous coordinates
-    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-    gl_TexCoord[0] = gl_MultiTexCoord0;
-    
-#ifdef SHADOW_MAP
-    gl_TexCoord[1] = gl_TextureMatrix[0] * gl_Vertex;
-#endif
+    //! Destructor
+    virtual ~ObjectFactory() {}
 
-    normal = gl_NormalMatrix * gl_Normal;
-    tangent = gl_NormalMatrix * tangent_in;
-    view = vec3(gl_ModelViewMatrix * gl_Vertex);
+    //! Creates a new object of the given type.  The object must match the
+    //! requested type, or a runtime_error will be thrown from within the
+    //! engine.
+    //! @param type the type of controller to create
+    virtual Object* object(const std::string& type)=0;
+};
+
 }

@@ -21,7 +21,7 @@
  */  
 #pragma once
 
-#include <Jet/Loader.hpp>
+#include <Jet/ResourceLoader.hpp>
 #include <iostream>
 #include <vector>
 #include <map>
@@ -31,7 +31,7 @@ namespace Jet { namespace Core {
 //! This class loads a mesh using the Wavefront .OBJ file format.
 //! @class ObjFactory
 //! @brief Loads .OBJ files
-class TextureLoader : public Loader {
+class TextureLoader : public ResourceLoader {
 public:
     //! Constructor
     TextureLoader(Engine* engine);

@@ -22,13 +22,14 @@
 
 #include <Jet/Node.hpp>
 #include <Jet/Engine.hpp>
-#include <Jet/Controller.hpp>
+#include <Jet/MeshObject.hpp>
 #include <stdexcept>
 #include <boost/iterator/transform_iterator.hpp>
 #include <boost/function.hpp>
 
 using namespace Jet;
 using namespace std;
+using namespace std::tr1;
 using namespace boost;
 
 template <typename K, typename V>
@@ -38,157 +39,162 @@ V& get_value(const std::pair<K, V>& p) {
 
 Node::Node(Engine* engine, Node* parent) :
     engine_(engine),
-    parent_(parent) {
+    parent_(parent),
+    destroyed_(false) {
 
 }
 
 Node::Node(Engine* engine) :
     engine_(engine),
-    parent_(0) {
+    parent_(0),
+    destroyed_(false) {
 }
 
-Node* Node::node(const std::string& name, const std::string& blueprint) {
-    NodePtr node(engine_->node(blueprint, false)->clone());
-    node->parent_ = this;
-    node->name_ = name;
-    node_.insert(make_pair(name, node));
-    return node.get();
-}
-
-Component* Node::component(const std::string& name, const std::string& blueprint) {
-    ComponentPtr component(engine_->component(blueprint, false)->clone());
-    component_.insert(make_pair(name, component));
-
-    // Add the component to a second map so that it can be looked up by type
-    // easily
-    component_type_.insert(make_pair(component->type(), component));
-    return component.get();
-}
-
-void Node::controller(const std::string& type) {
-    ControllerPtr controller = dynamic_cast<Controller*>(engine_->object(type));
-    if (!controller) {
-        throw runtime_error("Expected an instance of Jet::Controller");
+Node* Node::node(const std::string& name) {
+    Object* obj = object(name);
+    if (obj) {
+        return dynamic_cast<Node*>(obj);
     } else {
-        controller_.push_back(controller);
+        NodePtr node(new Node(engine_, this));
+        object(name, node.get());
+        return node.get();
     }
 }
 
-void Node::controller(Controller* controller) {
-    controller_.push_back(controller);
+Light* Node::light(const std::string& name) {
+    Object* obj = object(name);
+    if (obj) {
+        return dynamic_cast<Light*>(obj);
+    } else {
+        LightPtr light(new Light(this));
+        object(name, light.get());
+        return light.get();
+    }
 }
 
-Iterator<NodePtr> Node::nodes() {
-    typedef map<string, NodePtr> map_t;
-    typedef function<map_t::mapped_type& (const map_t::value_type&)> fun_t;
-    typedef transform_iterator<fun_t, map_t::iterator> itr_t;
-    typedef pair<map_t::iterator, map_t::iterator> pair_t;
-
-    itr_t begin = make_transform_iterator(node_.begin(), &get_value<string, NodePtr>);
-    itr_t end = make_transform_iterator(node_.end(), &get_value<string, NodePtr>);
-
-    return Iterator<NodePtr>(begin, end);
+MeshObject* Node::mesh_object(const std::string& name) {
+    Object* obj = object(name);
+    if (obj) {
+        return dynamic_cast<MeshObject*>(obj);
+    } else {
+        MeshObjectPtr mesh_object(new MeshObject(engine_, this));
+        object(name, mesh_object.get());
+        return mesh_object.get();
+    }
 }
 
-Iterator<const NodePtr> Node::nodes() const {
-    typedef map<string, NodePtr> map_t;
-    typedef function<const map_t::mapped_type& (const map_t::value_type&)> fun_t;
-    typedef transform_iterator<fun_t, map_t::const_iterator> itr_t;
-    typedef pair<map_t::iterator, map_t::const_iterator> pair_t;
-
-    itr_t begin = make_transform_iterator(node_.begin(), &get_value<string, NodePtr>);
-    itr_t end = make_transform_iterator(node_.end(), &get_value<string, NodePtr>);
-
-    return Iterator<const NodePtr>(begin, end);
+ParticleSystem* Node::particle_system(const std::string& name) {
+    Object* obj = object(name);
+    if (obj) {
+        return dynamic_cast<ParticleSystem*>(obj);
+    } else {
+        ParticleSystemPtr psys(new ParticleSystem(engine_, this));
+        object(name, psys.get());
+        return psys.get();
+    }
 }
 
-Iterator<const ComponentPtr> Node::components() const {
-    typedef map<string, ComponentPtr> map_t;
-    typedef function<const map_t::mapped_type& (const map_t::value_type&)> fun_t;
-    typedef transform_iterator<fun_t, map_t::const_iterator> itr_t;
-    typedef pair<map_t::const_iterator, map_t::const_iterator> pair_t;
-
-    itr_t begin = make_transform_iterator(component_.begin(), &get_value<string, const ComponentPtr>);
-    itr_t end = make_transform_iterator(component_.end(), &get_value<string, const ComponentPtr>);
-
-    return Iterator<const ComponentPtr>(begin, end); 
+QuadSet* Node::quad_set(const std::string& name) {
+    Object* obj = object(name);
+    if (obj) {
+        return dynamic_cast<QuadSet*>(obj);
+    } else {
+        QuadSetPtr quad_set(new QuadSet(engine_, this));
+        object(name, quad_set.get());
+        return quad_set.get();
+    }
 }
 
-Iterator<ComponentPtr> Node::components(const string& type) {
-    typedef multimap<string, ComponentPtr> map_t;
-    typedef function<map_t::mapped_type& (const map_t::value_type&)> fun_t;
-    typedef transform_iterator<fun_t, map_t::iterator> itr_t;
-    typedef pair<map_t::iterator, map_t::iterator> pair_t;
-
-    pair_t range = component_type_.equal_range(type);
-    itr_t begin = make_transform_iterator(range.first, &get_value<string, ComponentPtr>);
-    itr_t end = make_transform_iterator(range.second, &get_value<string, ComponentPtr>);
-
-    return Iterator<ComponentPtr>(begin, end);
+QuadChain* Node::quad_chain(const std::string& name) {
+    Object* obj = object(name);
+    if (obj) {
+        return dynamic_cast<QuadChain*>(obj);
+    } else {
+        QuadChainPtr quad_chain(new QuadChain(engine_, this));
+        object(name, quad_chain.get());
+        return quad_chain.get();
+    }
 }
 
-Iterator<const ComponentPtr> Node::components(const string& type) const {
-    typedef multimap<string, ComponentPtr> map_t;
-    typedef function<const map_t::mapped_type& (const map_t::value_type&)> fun_t;
-    typedef transform_iterator<fun_t, map_t::const_iterator> itr_t;
-    typedef pair<map_t::const_iterator, map_t::const_iterator> pair_t;
+Object* Node::object(const std::string& name) const {
+    unordered_map<string, ObjectPtr>::const_iterator i = object_.find(name);
+    if (i == object_.end()) {
+        return 0;
+    } else {
+        return i->second.get();
+    }
+}
 
-    pair_t range = component_type_.equal_range(type);
-    itr_t begin = make_transform_iterator(range.first, &get_value<string, const ComponentPtr>);
-    itr_t end = make_transform_iterator(range.second, &get_value<string, const ComponentPtr>);
+void Node::object(const std::string& name, Object* object) {
+    for (vector<NodeListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
+        object_.insert(make_pair(name, object));
+        (*i)->on_object_created(object);
+    }
+}
 
-    return Iterator<const ComponentPtr>(begin, end);
+void Node::object_delete(Object* object) {
+    ObjectPtr obj = object;
+    for (tr1::unordered_map<string, ObjectPtr>::iterator i = object_.begin(); i != object_.end(); i++) {
+        if (i->second == obj) {
+            object_.erase(i);
+            return;
+        }
+    }
+}
+
+
+RigidBody* Node::rigid_body() {
+    if (!rigid_body_) {
+        rigid_body_ = new RigidBody(engine_, this);
+    }
+    return rigid_body_.get();
+}
+
+AudioSource* Node::audio_source() {
+    if (!audio_source_) {
+        audio_source_ = new AudioSource(engine_, this);
+    }
+    return audio_source_.get();
+}
+
+Iterator<ObjectPtr> Node::objects() const {
+	typedef unordered_map<string, ObjectPtr> map_t;
+	typedef boost::function<map_t::mapped_type& (const map_t::value_type&)> fun_t;
+	typedef transform_iterator<fun_t, map_t::const_iterator> itr_t;
+	typedef pair<map_t::iterator, map_t::iterator> pair_t;
+
+	itr_t begin = make_transform_iterator(object_.begin(), &get_value<string, ObjectPtr>);
+	itr_t end = make_transform_iterator(object_.end(), &get_value<string, ObjectPtr>);
+
+	return Iterator<ObjectPtr>(begin, end);
 }
 
 void Node::destroy() {
-    if (parent_) {
-        parent_->remove_child(this);
-        parent_ = 0;
+    if (destroyed_) {
+        return;
+    } else {
+        destroyed_ = true;
+        
+        // Keep a reference to this node until the end of this function,
+        // because all references to this node may be released before
+        // finalization happens.
+        NodePtr self(this);
+        
+        // Remove this node from the parent
+        if (parent_) {
+            parent_->object_delete(this);
+            parent_ = 0;
+        }
+        for (vector<NodeListenerPtr>::iterator i = listener_.begin(); i < listener_.end(); i++) {
+            (*i)->on_destroy();
+        }
+        listener_.clear(); // Break cycle between listeners and the node
     }
-}
-
-void Node::event(const std::string& name, const Params& params) {
-     for (list<ControllerPtr>::iterator i = controller_.begin(); i != controller_.end(); i++) {
-        (*i)->on_event(this, name, params);  
-     }
-}
-
-void Node::update() {
-    for (list<ControllerPtr>::iterator i = controller_.begin(); i != controller_.end(); i++) {
-         (*i)->on_update(this);
-    }
-}
-
-void Node::render() {
-    for (list<ControllerPtr>::iterator i = controller_.begin(); i != controller_.end(); i++) {
-        (*i)->on_render(this);
-    }
-}
-
-void Node::remove_child(Node* node) {
-    node_.erase(node->name_);
 }
 
 Node* Node::clone() const {
     Node* clone = new Node(engine_, parent_);
-
-    // Clone all nodes attached to this node, recursively
-    for (map<string, NodePtr>::const_iterator i = node_.begin(); i != node_.end(); i++) {
-        NodePtr node(i->second->clone());
-        node->parent_ = parent_;
-        node->node_.insert(make_pair(i->first, node));
-    }
-    // Clone all components attached to this node
-    for (map<string, ComponentPtr>::const_iterator i = component_.begin(); i != component_.end(); i++) {
-        ComponentPtr component(i->second->clone());
-        clone->component_.insert(make_pair(i->first, component));
-        clone->component_type_.insert(make_pair(component->type(), component));
-    }
-    // TODO: Clone all controllers attached to this node
-    for (list<ControllerPtr>::const_iterator i = controller_.begin(); i != controller_.end(); i++) {
-        ControllerPtr controller = (*i)->clone();
-        clone->controller_.push_back(controller);        
-    }
+	throw runtime_error("Not implemented");
 
     return clone;
 }

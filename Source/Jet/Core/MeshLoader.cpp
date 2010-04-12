@@ -20,7 +20,7 @@
  * IN THE SOFTWARE.
  */
 
-#include <Jet/Core/OBJLoader.hpp>
+#include <Jet/Core/MeshLoader.hpp>
 #include <Jet/Engine.hpp>
 #include <Jet/Vector.hpp>
 #include <Jet/Texcoord.hpp>
@@ -35,48 +35,48 @@ using namespace std;
 using namespace boost;
 
 
-OBJLoader::OBJLoader(Engine* engine) :
+MeshLoader::MeshLoader(Engine* engine) :
     engine_(engine) {
     
-    command_["mtllib"] = &OBJLoader::mtllib;
-    command_["usemtl"] = &OBJLoader::usemtl;
-    command_["v"] = &OBJLoader::vertex;
-    command_["vt"] = &OBJLoader::texcoord;
-    command_["vn"] = &OBJLoader::normal;
-    command_["f"] = &OBJLoader::face;
+    command_["mtllib"] = &MeshLoader::mtllib;
+    command_["usemtl"] = &MeshLoader::usemtl;
+    command_["v"] = &MeshLoader::vertex;
+    command_["vt"] = &MeshLoader::texcoord;
+    command_["vn"] = &MeshLoader::normal;
+    command_["f"] = &MeshLoader::face;
 }
 
-void OBJLoader::mtllib(istream& in) {
+void MeshLoader::mtllib(istream& in) {
     string mttlib;
     in >> mttlib;
     // load material TODO
 	engine_->resource(mttlib);
 }
 
-void OBJLoader::usemtl(istream& in) {
+void MeshLoader::usemtl(istream& in) {
     in >> material_;
 }
 
-void OBJLoader::vertex(istream& in) {
+void MeshLoader::vertex(istream& in) {
     Vector position;
     in >> position;
     position_.push_back(position);
 }
 
-void OBJLoader::texcoord(istream& in) {
+void MeshLoader::texcoord(istream& in) {
     // Read in a texture coordinate
     Texcoord texcoord;
     in >> texcoord;
     texcoord_.push_back(texcoord);
 }
 
-void OBJLoader::normal(istream& in) {
+void MeshLoader::normal(istream& in) {
     Vector normal;
     in >> normal;
     normal_.push_back(normal);
 }
 
-void OBJLoader::face(istream& in) {    
+void MeshLoader::face(istream& in) {    
     // Read in a face for the mesh
     Vertex face[3];
     for (int i = 0; i < 3; i++) {
@@ -126,7 +126,7 @@ void OBJLoader::face(istream& in) {
     getline(in, line);
 }
 
-void OBJLoader::tangent(Vertex face[3], size_t j) {
+void MeshLoader::tangent(Vertex face[3], size_t j) {
     // Calculate binormals
     Vector d1 = face[(j+1)%3].position - face[j].position;
     Vector d2 = face[(j+2)%3].position - face[j].position;
@@ -145,12 +145,14 @@ void OBJLoader::tangent(Vertex face[3], size_t j) {
 
 // .OBJ (Wavefront) and .MTL loader.  Loads linked materials specified in the
 // .OBJ file.  
-void OBJLoader::resource(const std::string& file) {
+void MeshLoader::resource(const std::string& name) {
     static const std::string& ext = ".obj";
-    if ((file.length() - file.rfind(ext)) != ext.length()) {
+    if ((name.length() - name.rfind(ext)) != ext.length()) {
         throw runtime_error("Invalid file extension");
     }
 
+
+	std::string file = engine_->resource_path(name);
     ifstream in(file.c_str());
 
     // Collection of vertices
@@ -167,7 +169,7 @@ void OBJLoader::resource(const std::string& file) {
             string line;
             getline(in, line);
         } else {
-            map<string, void (OBJLoader::*)(istream&)>::iterator i = command_.find(command);
+            map<string, void (MeshLoader::*)(istream&)>::iterator i = command_.find(command);
             if (i != command_.end()) {
                 ((this)->*(i->second))(in);
 			} else {
@@ -177,24 +179,15 @@ void OBJLoader::resource(const std::string& file) {
         }
 
     }
-    
-    std::string name = file.substr(file.rfind("/") + 1, string::npos);
 
     // Build the mesh data
-    MeshPtr mesh(engine_->mesh(name, false));
+    MeshPtr mesh(engine_->mesh(name));
     for (map<Vertex, uint32_t>::iterator i = vertex_.begin(); i != vertex_.end(); i++) {
         mesh->vertex(i->second, i->first);
     }
     for (size_t i = 0; i < index_.size(); i++) {
         mesh->index(i, index_[i]);
     }
-    mesh->loaded(true);
-
-    //! Build a component that is a template meshobject
-    ComponentPtr component(engine_->component(name));
-    component->value("mesh", name);
-	component->value("renderable", true);
-    component->component("material", engine_->component(material_));
 
     position_.clear();
     normal_.clear();

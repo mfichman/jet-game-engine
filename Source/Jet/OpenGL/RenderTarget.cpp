@@ -41,13 +41,12 @@ RenderTarget::RenderTarget(GLuint width, GLuint height, GLenum component) :
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
     glTexImage2D(GL_TEXTURE_2D, 0, component_, width, height, 0, component_, GL_UNSIGNED_BYTE, 0);
-  
-    // Unbind the texture
     glBindTexture(GL_TEXTURE_2D, 0);
     
     // Generate the framebuffer object
     glGenFramebuffers(1, &framebuffer_);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_);
+    glPushAttrib(GL_COLOR_BUFFER_BIT);
     if (GL_DEPTH_COMPONENT == component_) {
         glDrawBuffer(GL_NONE);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texture_, 0);
@@ -58,15 +57,12 @@ RenderTarget::RenderTarget(GLuint width, GLuint height, GLenum component) :
     //! Check for support
     GLuint status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     if (GL_FRAMEBUFFER_COMPLETE != status) {
-        throw runtime_error("Framebuffer configuaration failed");
+        throw runtime_error("Framebuffer configuration failed");
     }
     
     // Switch to the back buffer
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    if (GL_DEPTH_COMPONENT == component_) {
-        glDrawBuffer(GL_BACK);
-    }
+    glPopAttrib();
 }
 
 //! Destructor.
@@ -78,6 +74,7 @@ RenderTarget::~RenderTarget() {
 //! Enables this render target.
 void RenderTarget::begin() {
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_);
+    glPushAttrib(GL_VIEWPORT_BIT | GL_COLOR_BUFFER_BIT);
     glViewport(0, 0, width_, height_);
     if (GL_DEPTH_COMPONENT == component_) {
         glDrawBuffer(GL_NONE);
@@ -89,8 +86,6 @@ void RenderTarget::begin() {
 
 //! Disables this render target.
 void RenderTarget::end() {
+    glPopAttrib();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    if (GL_DEPTH_COMPONENT == component_) {
-        glDrawBuffer(GL_BACK);
-    }
 }

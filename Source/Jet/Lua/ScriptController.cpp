@@ -20,6 +20,7 @@
  * IN THE SOFTWARE.
  */  
 
+/*
 #include <Jet/Lua/ScriptController.hpp>
 #include <Jet/Node.hpp>
 #include <cassert>
@@ -111,7 +112,7 @@ int ScriptController::index(lua_State* env) {
         ScriptController* self = static_cast<ScriptController*>(lua_touserdata(env, lua_upvalueindex(1)));
         string key(lua_tostring(env, 2));
         
-        Component* component = self->node_->component(key);
+        Object* component = self->node_->component(key);
         if (component) {
             // Create a new table that works like a delegate for the
             // component
@@ -149,7 +150,7 @@ int ScriptController::newindex(lua_State* env) {
 
 int ScriptController::component_index(lua_State* env) {
     try {
-        Component* self = static_cast<Component*>(lua_touserdata(env, lua_upvalueindex(1)));
+        Object* self = static_cast<Object*>(lua_touserdata(env, lua_upvalueindex(1)));
         string key(lua_tostring(env, 2));
         luabind::object value(luabind::from_stack(env, -1));
         
@@ -180,7 +181,7 @@ int ScriptController::component_index(lua_State* env) {
 
 int ScriptController::component_newindex(lua_State* env) {
     try {
-        Component* self = static_cast<Component*>(lua_touserdata(env, lua_upvalueindex(1)));
+        Object* self = static_cast<Object*>(lua_touserdata(env, lua_upvalueindex(1)));
         string key(lua_tostring(env, 2));
         
         // Push the value from the component onto the stack, and return it
@@ -203,4 +204,4 @@ int ScriptController::component_newindex(lua_State* env) {
     }
     
     return 0;
-}
+}*/

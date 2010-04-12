@@ -30,6 +30,11 @@ uniform sampler2D normal_map;
 uniform sampler2D shadow_map;
 uniform samplerCube environment_map;
 
+#define NORMAL_MAP
+#define SHADOW_MAP
+#define SPECULAR_MAP
+#define DIFFUSE_MAP
+
 void main() {
     // Calculate light vector
     vec3 light = vec3(gl_LightSource[0].position) - view;
@@ -51,7 +56,7 @@ void main() {
     float c2 = gl_LightSource[0].quadraticAttenuation;
     float a = 1.0 / (c0 + c1*d + c2*d*d);
     
-    // Clculate view, light, and reflection vectors
+    // Calculate view, light, and reflection vectors
     vec3 v = normalize(view);
     vec3 l = normalize(light);
     vec3 r = reflect(v, n);
@@ -76,8 +81,8 @@ void main() {
     vec4 shadow_coord = gl_TexCoord[1]/gl_TexCoord[1].w;
     float depth = texture2D(shadow_map, shadow_coord.st).z + 0.00003;
     if (depth < shadow_coord.z) {
-        diffuse *= 0.2;
-        specular *= 0.0;
+        diffuse *= 0.4;
+        specular *= 0.2;
     }
 #endif
     

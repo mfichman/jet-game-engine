@@ -42,11 +42,6 @@ public:
     //! @param begin the start of the range
     //! @param end the end of the range
     Range(real_t begin, real_t end);
-    
-    //! Returns the type of avector.
-    ValueType type() const {
-        return VT_RANGE; 
-    }
 
     //! Stream operator.
     friend std::ostream& ::operator<<(std::ostream& out, const Range& range);

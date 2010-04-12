@@ -21,49 +21,64 @@
  */  
 
 #include <Jet/OpenGL/Shader.hpp>
+#include <Jet/OpenGL/Types.hpp>
 #include <Jet/Matrix.hpp>
 #include <Jet/Vector.hpp>
+#include <Jet/Shader.hpp>
+#include <Jet/Engine.hpp>
 #include <iostream>
 #include <fstream>
 #include <string>
 
 using namespace Jet::OpenGL;
-using namespace Jet;
 using namespace std;
 
-Shader::Shader(const string& path, const std::vector<string>& defines) :
-    sampler_(0),
-    defines_(defines) {
+Shader::Shader(Jet::Engine* engine, Jet::Shader* shader) :
+    sampler_(0) {
+
+	shader->loaded(true);
+    shader->impl(this);
+
+    // Find the shader files.  Both the .frag.glsl file and
+    // the .vert.glsl files must exist
+	std::string frag_path = engine->resource_path(shader->name() + ".frag.glsl");
+    std::string vert_path = engine->resource_path(shader->name() + ".vert.glsl");
         
-    for (size_t i = 0; i < defines_.size(); i++) {
-        defines_[i] = "#define " + defines_[i] + "\n";
-    }
-        
+    // Load the fragment shader
     fragment_ = glCreateShader(GL_FRAGMENT_SHADER);
-    source(fragment_, path + ".frag.glsl");
+    source(fragment_, frag_path);
 
+    // Load the vertex shader
     vertex_ = glCreateShader(GL_VERTEX_SHADER);
-    source(vertex_, path + ".vert.glsl");
+    source(vertex_, vert_path);
 
+    // Create the vertex program and attach the shaders
     program_ = glCreateProgram();
     glAttachShader(program_, fragment_);
     glAttachShader(program_, vertex_);
     glLinkProgram(program_);
+    
+    // Get the uniform locations of common variables
+    diffuse_map_ = glGetUniformLocation(program_, "diffuse_map");
+    specular_map_ = glGetUniformLocation(program_, "specular_map");
+    normal_map_ = glGetUniformLocation(program_, "normal_map");
+    shadow_map_ = glGetUniformLocation(program_, "shadow_map");
+    shadow_matrix_ = glGetUniformLocation(program_, "shadow_matrix");
+    tangent_ = glGetAttribLocation(program_, "tangent_in");
 
+    // If there was an error, report it and throw an exception
     GLchar log[1024];
     GLsizei length;
+    
+    // Fragment shader errors
     glGetShaderInfoLog(fragment_, 1024, &length, log);
     if (length) {
-        for (size_t i = 0; i < defines_.size(); i++) {
-            cout << defines_[i];
-        }
         throw runtime_error("Fragment shader log: " + string(log, length));
     }
+    
+    // Vertex shader errors
     glGetShaderInfoLog(vertex_, 1024, &length, log);
     if (length) {
-        for (size_t i = 0; i < defines_.size(); i++) {
-            cout << defines_[i];
-        }
         throw runtime_error("Vertex shader log: " + string(log, length));
     }
 }
@@ -77,11 +92,13 @@ Shader::~Shader() {
 void Shader::source(GLuint shader, const std::string& path) {
     std::vector<GLchar> buffer;
 
+    // Open the file
     ifstream in(path.c_str());
     if (in.fail()) {
         throw range_error("Shader not found: " + path);
     }
     
+    // Seek to the end, and reserve a buffer
     in.seekg(0, ios::end);
     buffer.reserve(1 + in.tellg());
     buffer.resize(in.tellg());
@@ -91,56 +108,32 @@ void Shader::source(GLuint shader, const std::string& path) {
         throw runtime_error("Empty shader file: " + path);
     }
     
+    // Read the whole buffer in one call
     in.read(&buffer.front(), buffer.size());
-    in.close();
     buffer.push_back(0); // Null terminate the string
 
+    // 
     std::vector<const GLchar*> source;
-    for (size_t i = 0; i < defines_.size(); i++) {
-        source.push_back(defines_[i].c_str());
-    }
     source.push_back(&buffer.front());
     glShaderSource(shader, source.size(), &source.front(), 0);
     glCompileShader(shader);
 }
 
-void Shader::texture(const std::string& name, GLuint texture) {
-    GLuint program;
-    glGetIntegerv(GL_CURRENT_PROGRAM, (GLint*)&program);
-    assert(program == program_);
-    
-    GLuint location = glGetUniformLocation(program_, name.c_str());
-    glActiveTexture(GL_TEXTURE0 + sampler_);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glUniform1i(location, sampler_);
-    sampler_++;
-}
-
-void Shader::matrix(const std::string& name, const Matrix& matrix) {
-    GLuint location = glGetUniformLocation(program_, name.c_str());
-    glUniformMatrix4fv(location, 1, 0, matrix);  
-}
-
-void Shader::vector(const std::string& name, const Vector& vector) {
-    GLuint location = glGetUniformLocation(program_, name.c_str());
-    glUniform3fv(location, 1, vector);
-}
-
-GLuint Shader::uniform(const std::string& name) {
-    return glGetUniformLocation(program_, name.c_str());
-}
-
 void Shader::begin() {
     glUseProgram(program_);
-    sampler_ = 0;
+    glUniform1i(diffuse_map_, DIFFUSE_MAP_SAMPLER);
+    glUniform1i(specular_map_, SPECULAR_MAP_SAMPLER);
+    glUniform1i(normal_map_, NORMAL_MAP_SAMPLER);
+    glUniform1i(shadow_map_, SHADOW_MAP_SAMPLER);
 }
 
 void Shader::end() {
     glUseProgram(0);
-    
-    for (GLuint i = 0; i < sampler_; i++) {
-        glActiveTexture(GL_TEXTURE0 + i);
-        glBindTexture(GL_TEXTURE_2D, 0);
-    }
+   /* glActiveTexture(GL_TEXTURE0 + DIFFUSE_MAP_SAMPLER);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glActiveTexture(GL_TEXTURE0 + SPECULAR_MAP_SAMPLER);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glActiveTexture(GL_TEXTURE0 + NORMAL_MAP_SAMPLER);
+    glBindTexture(GL_TEXTURE_2D, 0);*/
 }
 

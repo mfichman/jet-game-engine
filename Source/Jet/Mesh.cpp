@@ -22,11 +22,14 @@
 
 #include <Jet/Mesh.hpp>
 #include <Jet/Vertex.hpp>
+#include <Jet/Engine.hpp>
 
 using namespace Jet;
 using namespace std;
 
-Mesh::Mesh() :
+Mesh::Mesh(Engine* engine, const std::string& name) :
+	engine_(engine),
+    name_(name),
     loaded_(false) {
     
 }
@@ -43,4 +46,13 @@ void Mesh::index(size_t i, uint32_t index) {
         index_.resize(i + 1);
     }
     index_[i] = index;
+}
+
+void Mesh::loaded(bool loaded) {
+	if (loaded_ != loaded) {
+		if (loaded) {
+			engine_->resource(name_);
+		}
+		loaded_ = loaded;
+	}
 }

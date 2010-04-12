@@ -37,10 +37,10 @@ extern "C" {
 void load(Engine* engine) {
     InterpreterPtr interpreter(new Interpreter());
     
-    FactoryPtr script_factory(new ScriptFactory(interpreter.get()));
-    engine->factory(".lua", script_factory.get());
+    ObjectFactoryPtr script_factory(new ScriptFactory(interpreter.get()));
+    engine->object_factory(".lua", script_factory.get());
     
-    LoaderPtr script_loader(new ScriptLoader(interpreter.get()));
-    engine->loader(".lua", script_loader.get());
-    engine->loader(".luac", script_loader.get());
+    ResourceLoaderPtr script_loader(new ScriptLoader(interpreter.get()));
+    engine->resource_loader(".lua", script_loader.get());
+    engine->resource_loader(".luac", script_loader.get());
 }

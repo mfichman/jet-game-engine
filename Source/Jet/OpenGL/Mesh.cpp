@@ -20,16 +20,19 @@
  * IN THE SOFTWARE.
  */  
 
-#include <Jet/OpenGL/MeshBuffer.hpp>
+#include <Jet/OpenGL/Mesh.hpp>
 #include <Jet/OpenGL/Shader.hpp>
 #include <Jet/Mesh.hpp>
 
 using namespace Jet::OpenGL;
-using namespace Jet;
 
-MeshBuffer::MeshBuffer(Mesh* mesh) :
+Mesh::Mesh(Jet::Mesh* mesh) :
     nvertices_(mesh->vertex_count()),
     nindices_(mesh->index_count()) {
+
+	// Load mesh data if it hasn't already been loaded from disk
+	mesh->loaded(true);
+    mesh->impl(this);
     
     glGenBuffers(1, &vbuffer_);
     glBindBuffer(GL_ARRAY_BUFFER, vbuffer_);
@@ -40,40 +43,37 @@ MeshBuffer::MeshBuffer(Mesh* mesh) :
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, nindices_*sizeof(uint32_t), mesh->index_data(), GL_STATIC_DRAW);
 }
 
-MeshBuffer::~MeshBuffer() {
+Mesh::~Mesh() {
     glDeleteBuffers(1, &vbuffer_);
 }
 
-void MeshBuffer::render(Shader* shader) const {
-    
-
+void Mesh::render(Jet::OpenGL::Shader* shader) const {
     glBindBuffer(GL_ARRAY_BUFFER, vbuffer_);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibuffer_);
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    
-    GLuint tangent = 0;
-    if (shader) {
-        tangent = shader->uniform("tangent_in");
-        glEnableVertexAttribArray(tangent);
-    }
 
     glVertexPointer(3, GL_FLOAT, sizeof(Vertex), 0);
     glNormalPointer(GL_FLOAT, sizeof(Vertex), (void*)(3*sizeof(GLfloat)));
     glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), (void*)(9*sizeof(GLfloat)));
     
+	// If we have a shader that can handle it, then pass the tangent
+	// vectors for the mesh
     if (shader) {
-        glVertexAttribPointer(tangent, 3, GL_FLOAT, 0, sizeof(Vertex), (void*)(11*sizeof(GLfloat)));
+		glEnableVertexAttribArray(shader->tangent());
+        glVertexAttribPointer(shader->tangent(), 3, GL_FLOAT, 0, sizeof(Vertex), (void*)(11*sizeof(GLfloat)));
     }
-    // TODO: Draw indexed, not raw
-    //glDrawArrays(GL_TRIANGLES, 0, nvertices_);
     glDrawElements(GL_TRIANGLES, nindices_, GL_UNSIGNED_INT, (void*)0);
 
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_NORMAL_ARRAY);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    glDisableVertexAttribArray(tangent);
+
+	// Disable tangent vectors array
+	if (shader) {
+		glDisableVertexAttribArray(shader->tangent());
+	}
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }

@@ -24,22 +24,23 @@
 #include <boost/intrusive_ptr.hpp>
 
 namespace Jet { namespace OpenGL {
-    class MeshBuffer;
+    class Mesh;
     class Renderer;
     class RenderTarget;
     class Shader;
-    class TextureBuffer;
+    class Texture;
 
-    typedef boost::intrusive_ptr<MeshBuffer> MeshBufferPtr;
+    typedef boost::intrusive_ptr<Mesh> MeshPtr;
     typedef boost::intrusive_ptr<Renderer> RendererPtr;
     typedef boost::intrusive_ptr<RenderTarget> RenderTargetPtr;
     typedef boost::intrusive_ptr<Shader> ShaderPtr;
-    typedef boost::intrusive_ptr<TextureBuffer> TextureBufferPtr;
+    typedef boost::intrusive_ptr<Texture> TexturePtr;
     
-    enum MeshShaderOption {
-        MSO_SHADOW_MAP = 1,
-        MSO_DIFFUSE_MAP = 2,
-        MSO_SPECULAR_MAP = 4,
-        MSO_NORMAL_MAP = 8
+    
+    enum TextureSampler {
+        DIFFUSE_MAP_SAMPLER = 0,
+        SPECULAR_MAP_SAMPLER = 1,
+        NORMAL_MAP_SAMPLER = 2,
+        SHADOW_MAP_SAMPLER = 3
     };
 }}

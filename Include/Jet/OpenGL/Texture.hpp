@@ -21,6 +21,7 @@
  */  
 #pragma once
 
+#include <Jet/OpenGL/Types.hpp>
 #include <Jet/Types.hpp>
 #include <Jet/Object.hpp>
 
@@ -34,19 +35,21 @@
 namespace Jet { namespace OpenGL {
 
 //! This class holds the vertex and index buffers for a triangle mesh.
-//! @class TextureBuffer
+//! @class Texture
 //! @brief Vertex and index buffers for a triangle mesh.
-class TextureBuffer : public Object {
+class Texture : public Object {
 public:
     //! Constructor.
-    TextureBuffer(Texture* texture);
+    Texture(Jet::Texture* texture);
 
     //! Destructor.
-    virtual ~TextureBuffer();
+    virtual ~Texture();
     
-    //! Returns the handle to the texture.
-    inline GLuint texture() const {
-        return texture_;
+    //! Binds this texture to a texture sampler
+    inline void bind(TextureSampler sampler) {
+        glActiveTexture(GL_TEXTURE0 + sampler);
+        glBindTexture(GL_TEXTURE_2D, texture_);
+        glEnable(GL_TEXTURE_2D);
     }
 
 private:

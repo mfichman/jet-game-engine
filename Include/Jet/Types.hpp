@@ -41,41 +41,64 @@
 #endif
 
 namespace Jet {
-    class Buffer;
+    class AudioSource;
     class Color;
-    class Component;
-    class Controller;
     class Engine;
-    class Factory;
-    class Loader;
-    class Handler;
+    class EngineListener;
+    class Light;
     class Matrix;
+    class Material;
     class Mesh;
+    class MeshObject;
     class Node;
+    class NodeListener;
     class Object;
-    class Params;
+    class ObjectFactory;
+    class ParticleSystem;
+    class QuadChain;
     class Quaternion;
     class Range;
+    class ResourceLoader;
+    class RigidBody;
+    class RigidBodyListener;
+    class Shader;
     class Texcoord;
     class Texture;
-    class Value;
+    class Quad;
+    class QuadSet;
     class Vector;
     class Vertex;
 
-    typedef boost::intrusive_ptr<Buffer> BufferPtr;
-    typedef boost::intrusive_ptr<Component> ComponentPtr;
-    typedef boost::intrusive_ptr<Controller> ControllerPtr;
+    typedef boost::intrusive_ptr<AudioSource> AudioSourcePtr;
     typedef boost::intrusive_ptr<Engine> EnginePtr;
-    typedef boost::intrusive_ptr<Factory> FactoryPtr;
-    typedef boost::intrusive_ptr<Handler> HandlerPtr;
-    typedef boost::intrusive_ptr<Loader> LoaderPtr;
+    typedef boost::intrusive_ptr<EngineListener> EngineListenerPtr;
+    typedef boost::intrusive_ptr<Light> LightPtr;
+    typedef boost::intrusive_ptr<Material> MaterialPtr;
     typedef boost::intrusive_ptr<Mesh> MeshPtr;
+    typedef boost::intrusive_ptr<MeshObject> MeshObjectPtr;
     typedef boost::intrusive_ptr<Node> NodePtr;
+    typedef boost::intrusive_ptr<NodeListener> NodeListenerPtr;
     typedef boost::intrusive_ptr<Object> ObjectPtr;
+    typedef boost::intrusive_ptr<ObjectFactory> ObjectFactoryPtr;
+    typedef boost::intrusive_ptr<ParticleSystem> ParticleSystemPtr;
+    typedef boost::intrusive_ptr<QuadChain> QuadChainPtr;
+    typedef boost::intrusive_ptr<ResourceLoader> ResourceLoaderPtr;
+    typedef boost::intrusive_ptr<RigidBody> RigidBodyPtr;
+    typedef boost::intrusive_ptr<RigidBodyListener> RigidBodyListenerPtr;
+    typedef boost::intrusive_ptr<Shader> ShaderPtr;
     typedef boost::intrusive_ptr<Texture> TexturePtr;
+    typedef boost::intrusive_ptr<QuadSet> QuadSetPtr;
 
     typedef float real_t;
-    typedef double number_t;
     typedef void (*load_function_t)(Engine* engine);
-    enum ValueType { VT_NIL, VT_STRING, VT_COLOR, VT_NUMBER, VT_QUATERNION, VT_VECTOR, VT_RANGE };
+    
+    enum LightType { POINT_LIGHT, DIFFUSE_LIGHT };
+    enum ParticleSystemType { BOX_EMITTER, ELLIPSOID_EMITTER };
+    enum ModificationFlags {
+        POSITION=1,
+        ROTATION=2,
+        LINEAR_VELOCITY=4,
+        ANGULAR_VELOCITY=8,
+        FORCE=16
+    };
 }

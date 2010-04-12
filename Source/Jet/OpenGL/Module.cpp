@@ -33,6 +33,6 @@ extern "C" {
 }
 
 void load(Engine* engine) {
-    HandlerPtr renderer(new Renderer(engine));
-    engine->handler(renderer.get());
+    EngineListenerPtr renderer(new Renderer(engine));
+    engine->listener(renderer.get());
 }

@@ -93,11 +93,6 @@ public:
 
     //! Returns the normalized copy of this quaternion
     Quaternion unit() const;
-    
-    //! Returns the type of avector.
-    ValueType type() const {
-        return VT_QUATERNION; 
-    }
 
     //! Stream operator
     friend std::ostream& ::operator<<(std::ostream& out, const Quaternion& quaternion);

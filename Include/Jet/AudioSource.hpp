@@ -1,6 +1,4 @@
 /*
- * Copyright (c) 2010 Matt Fichman
- *
  * Permission is hereby granted, free of charge, to any person obtaining a 
  * copy of this software and associated documentation files (the "Software"),
  * to deal in the Software without restriction, including without limitation 
@@ -18,27 +16,37 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- */
+ */  
+#pragma once
 
-varying vec3 normal;
-varying vec3 tangent;
-varying vec3 view;
+#include <Jet/Types.hpp>
+#include <Jet/Object.hpp>
+#include <Jet/Vector.hpp>
+#include <Jet/Quaternion.hpp>
+#include <string>
 
-#define SHADOW_MAP_SAMPLER 3
-#define SHADOW_MAP
+namespace Jet {
 
-attribute vec3 tangent_in;
-
-void main() {
-    // Transform to homogeneous coordinates
-    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-    gl_TexCoord[0] = gl_MultiTexCoord0;
+//! Manages 3D sounds emitting from the node.
+//! @class AudioSource
+//! @brief Emits positional audio.
+class JETAPI AudioSource : public Object {
+public:
+    //! Destructor.
+    virtual ~AudioSource() {}
     
-#ifdef SHADOW_MAP
-    gl_TexCoord[1] = gl_TextureMatrix[0] * gl_Vertex;
-#endif
+    //! Returns the parent node
+    inline Node* parent() const {
+        return parent_;
+    }
+    
+private:
+    AudioSource(Engine* engine, Node* parent);
 
-    normal = gl_NormalMatrix * gl_Normal;
-    tangent = gl_NormalMatrix * tangent_in;
-    view = vec3(gl_ModelViewMatrix * gl_Vertex);
+    Engine* engine_;
+    Node* parent_;
+    
+    friend class Node;
+};
+
 }

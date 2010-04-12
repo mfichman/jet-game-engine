@@ -18,27 +18,44 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- */
+ */  
+#pragma once
 
-varying vec3 normal;
-varying vec3 tangent;
-varying vec3 view;
+#include <Jet/ResourceLoader.hpp>
+#include <map>
+#include <iostream>
 
-#define SHADOW_MAP_SAMPLER 3
-#define SHADOW_MAP
+namespace Jet { namespace Core {
 
-attribute vec3 tangent_in;
+//! This class loads a material using the Wavefront .MTL file format.
+//! @class MatFactory
+//! @brief Loads .OBJ files
+class MaterialLoader : public ResourceLoader {
+public:
+    //! Constructor.
+    MaterialLoader(Engine* engine);
 
-void main() {
-    // Transform to homogeneous coordinates
-    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-    gl_TexCoord[0] = gl_MultiTexCoord0;
-    
-#ifdef SHADOW_MAP
-    gl_TexCoord[1] = gl_TextureMatrix[0] * gl_Vertex;
-#endif
+    //! Destructor.
+    virtual ~MaterialLoader() {}
 
-    normal = gl_NormalMatrix * gl_Normal;
-    tangent = gl_NormalMatrix * tangent_in;
-    view = vec3(gl_ModelViewMatrix * gl_Vertex);
-}
+    //! Creates a new material from the given file.
+    //! @param file the .MTL file
+    virtual void resource(const std::string& file);
+
+private:
+    void newmtl(std::istream& in);
+    void ambient(std::istream& in);
+    void diffuse(std::istream& in);
+    void specular(std::istream& in);
+    void transparency(std::istream& in);
+    void reflectivity(std::istream& in);
+    void texture_map(std::istream& in);
+    void specular_map(std::istream& in);
+    void normal_map(std::istream& in);
+
+    Engine* engine_;
+    MaterialPtr material_;
+    std::map<std::string, void (MaterialLoader::*)(std::istream&)> command_;
+};
+
+}}

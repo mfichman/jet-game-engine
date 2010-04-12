@@ -65,6 +65,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\Source\Jet\OpenGL\CMakeLists.txt"
+				>
+			</File>
+			<File
 				RelativePath="..\Source\CMakeLists.txt"
 				>
 			</File>
@@ -73,19 +77,19 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Source\Jet\OpenGL\CMakeLists.txt"
-				>
-			</File>
-			<File
 				RelativePath="..\Source\Jet\Color.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Source\Jet\Component.cpp"
+				RelativePath="..\Source\Jet\Object.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\Source\Jet\Engine.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Jet\Core\MaterialLoader.cpp"
 				>
 			</File>
 			<File
@@ -101,6 +105,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Source\Jet\Core\MeshLoader.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\Source\Jet\OpenGL\Module.cpp"
 				>
 			</File>
@@ -109,15 +117,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Source\Jet\Core\MTLLoader.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\Source\Jet\Node.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\Jet\Core\OBJLoader.cpp"
 				>
 			</File>
 			<File
@@ -142,6 +142,10 @@
 			</File>
 			<File
 				RelativePath="..\Source\Jet\OpenGL\Shader.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Jet\Test\Test.cpp"
 				>
 			</File>
 			<File
@@ -179,7 +183,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Component.hpp"
+				RelativePath="..\Include\Jet\Object.hpp"
 				>
 			</File>
 			<File
@@ -191,19 +195,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Factory.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Include\Jet\Handler.hpp"
+				RelativePath="..\Include\Jet\EngineListener.hpp"
 				>
 			</File>
 			<File
 				RelativePath="..\Include\Jet\Iterator.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Include\Jet\Loader.hpp"
 				>
 			</File>
 			<File
@@ -227,6 +223,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Include\Jet\ObjectFactory.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\Include\Jet\Params.hpp"
 				>
 			</File>
@@ -247,7 +247,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\OpenGL\Shader.hpp"
+				RelativePath="..\Include\Jet\ResourceLoader.hpp"
 				>
 			</File>
 			<File
@@ -260,10 +260,6 @@
 			</File>
 			<File
 				RelativePath="..\Include\Jet\OpenGL\Types.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Include\Jet\Types.hpp"
 				>
 			</File>
 			<File

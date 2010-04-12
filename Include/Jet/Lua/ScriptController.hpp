@@ -21,7 +21,8 @@
  */  
 #pragma once
 
-#include <Jet/Controller.hpp>
+/*
+
 #include <lua/lua.hpp>
 #include <luabind/luabind.hpp>
 
@@ -87,4 +88,4 @@ private:
     friend class Node;
 };
 
-}}
+}}*/

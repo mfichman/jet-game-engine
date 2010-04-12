@@ -20,7 +20,7 @@
  * IN THE SOFTWARE.
  */
 
-#include <Jet/Core/MTLLoader.hpp>
+#include <Jet/Core/MaterialLoader.hpp>
 #include <Jet/Engine.hpp>
 #include <fstream>
 
@@ -29,84 +29,83 @@ using namespace Jet;
 using namespace std;
 using namespace boost;
 
-MTLLoader::MTLLoader(Engine* engine) :
+MaterialLoader::MaterialLoader(Engine* engine) :
     engine_(engine) {
 
-	command_["newmtl"] = &MTLLoader::newmtl;
-    command_["Ka"] = &MTLLoader::ambient;
-    command_["Kd"] = &MTLLoader::diffuse;
-    command_["Ks"] = &MTLLoader::specular;
-    command_["d"] = &MTLLoader::transparency;
-    command_["tr"] = &MTLLoader::transparency;
-    command_["r"] = &MTLLoader::reflectivity;
-    command_["map_Ka"] = &MTLLoader::texture_map;
-    command_["map_Kd"] = &MTLLoader::texture_map;
-    command_["map_Ks"] = &MTLLoader::specular_map;
-    command_["map_bump"] = &MTLLoader::normal_map;
+	command_["newmtl"] = &MaterialLoader::newmtl;
+    command_["Ka"] = &MaterialLoader::ambient;
+    command_["Kd"] = &MaterialLoader::diffuse;
+    command_["Ks"] = &MaterialLoader::specular;
+    command_["d"] = &MaterialLoader::transparency;
+    command_["tr"] = &MaterialLoader::transparency;
+    command_["r"] = &MaterialLoader::reflectivity;
+    command_["map_Ka"] = &MaterialLoader::texture_map;
+    command_["map_Kd"] = &MaterialLoader::texture_map;
+    command_["map_Ks"] = &MaterialLoader::specular_map;
+    command_["map_bump"] = &MaterialLoader::normal_map;
 }
 
-void MTLLoader::newmtl(istream& in) {
+void MaterialLoader::newmtl(istream& in) {
     string value;
     in >> value;
-    material_ = engine_->component(value);
-    material_->type("Material");
+    material_ = engine_->material(value);
 }
 
-void MTLLoader::ambient(istream& in) {
+void MaterialLoader::ambient(istream& in) {
     real_t red, blue, green;
     in >> red >> blue >> green;
-    material_->value("ambient", Color(red, blue, green, 1.0f));  
+    material_->ambient_color(Color(red, blue, green, 1.0f));  
 }
 
-void MTLLoader::diffuse(istream& in) {
+void MaterialLoader::diffuse(istream& in) {
     real_t red, blue, green;
     in >> red >> blue >> green;
-    material_->value("diffuse", Color(red, blue, green, 1.0f)); 
+    material_->diffuse_color(Color(red, blue, green, 1.0f)); 
 }
 
-void MTLLoader::specular(istream& in) {
+void MaterialLoader::specular(istream& in) {
     real_t red, blue, green;
     in >> red >> blue >> green;
-    material_->value("specular", Color(red, blue, green, 1.0f)); 
+    material_->specular_color(Color(red, blue, green, 1.0f)); 
 }
 
-void MTLLoader::transparency(istream& in) {
+void MaterialLoader::transparency(istream& in) {
     real_t value;
     in >> value;
-    material_->value("transparency", value);
+	//throw runtime_error("Transparency not implemented");
 }
 
-void MTLLoader::reflectivity(istream& in) {
+void MaterialLoader::reflectivity(istream& in) {
     real_t value;
     in >> value;
-    material_->value("reflectivity", value);
-
+	//throw runtime_error("Reflectivity not implemented");
 }
 
-void MTLLoader::texture_map(istream& in) {
+void MaterialLoader::texture_map(istream& in) {
     string value;
     in >> value;
-    material_->value("diffuse_map", value);
+    material_->diffuse_map(value);
 }
 
-void MTLLoader::specular_map(istream& in) {
+void MaterialLoader::specular_map(istream& in) {
     string value;
     in >> value;
-    material_->value("specular_map", value);
+    material_->specular_map(value);
 }
 
-void MTLLoader::normal_map(istream& in) {
+void MaterialLoader::normal_map(istream& in) {
     string value;
     in >> value;
-    material_->value("normal_map", value);
+    material_->normal_map(value);
 }
   
-void MTLLoader::resource(const std::string& file) {
+void MaterialLoader::resource(const std::string& name) {
     static const std::string& ext = ".mtl";
-    if ((file.length() - file.rfind(ext)) != ext.length()) {
+    if ((name.length() - name.rfind(ext)) != ext.length()) {
         throw runtime_error("Invalid file extension");
     }
-
+	
+	std::string file = engine_->resource_path(name);
     ifstream in(file.c_str());
     string command;
     
@@ -120,7 +119,7 @@ void MTLLoader::resource(const std::string& file) {
             string line;
             getline(in, line);
         } else {
-            map<string, void (MTLLoader::*)(istream&)>::iterator i = command_.find(command);
+            map<string, void (MaterialLoader::*)(istream&)>::iterator i = command_.find(command);
             if (i != command_.end()) {
                 ((this)->*(i->second))(in);
             }
