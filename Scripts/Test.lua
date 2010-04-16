@@ -1,4 +1,11 @@
 
+function actor(name)
+
+end
+
+actor 'Test'
+
+
 class 'Starship' (Jet.Controller)
 
 function Starship:__init(node, name)
