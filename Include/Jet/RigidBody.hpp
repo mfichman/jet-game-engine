@@ -35,98 +35,46 @@ namespace Jet {
 //! are using.
 //! @class RigidBody
 //! @brief Physical simulation with collisions.
-class JETAPI RigidBody : public Object {
+class RigidBody : public Object {
 public:
-    virtual ~RigidBody() {}
-    // 1/2 at^2 + vt + x
-    
     //! Returns the parent node.
-    inline Node* parent() const {
-        return parent_;
-    }
+    virtual Node* parent() const=0;
 
     //! Returns the linear velocity of the object.
-    inline const Vector& linear_velocity() const {
-        return linear_velocity_;
-    }
+    virtual const Vector& linear_velocity() const=0;
 
     //! Returns the angular velocity of the object.
-    inline const Vector& angular_velocity() const {
-        return angular_velocity_;
-    }
+    virtual const Vector& angular_velocity() const=0;
     
     //! Returns total force on this object in world coordinates.
-    inline const Vector& force() const {
-        return force_;
-    }
+    virtual const Vector& force() const=0;
 
     //! Sets the linear velocity of the object.
     //! @param v the new linear velocity
-    void linear_velocity(const Vector& v);
+    virtual void linear_velocity(const Vector& v)=0;
 
     //! Sets the angular velocity of the object.
     //! @param v the new angular velocity
-    void angular_velocity(const Vector& v);
+    virtual void angular_velocity(const Vector& v)=0;
 
     //! Applies a force to the object, relative to the world coordinates.
     //! @param v the force to apply
-    void apply_force(const Vector& v);
+    virtual void apply_force(const Vector& v)=0;
 
     //! Applies a torque to the object, relative to the world coordinates.
     //! @param v the torque to apply
-    void apply_torque(const Vector& v);
+    virtual void apply_torque(const Vector& v)=0;
 
     //! Applies a force to the object, relative to the parent scene node's
     //! coordinates.
     //! @param v the force to apply
-    void apply_local_force(const Vector& v);
+    virtual void apply_local_force(const Vector& v)=0;
 
     //! Applies a torque to the object, relative to the parent scene node's
     //! coordinates.
     //! @param v the torque to apply
-    void apply_local_torque(const Vector& v);
-    
-    //! Sets the listener.
-    inline void listener(RigidBodyListener* listener) {
-        listener_ = listener;
-    }
-
-private:
-    RigidBody(Engine* engine, Node* parent);
-    
-    Engine* engine_;
-    Node* parent_;
-    Vector linear_velocity_;
-    Vector angular_velocity_;
-    Vector force_;
-    Vector torque_;
-#pragma warning(disable:4251)
-    RigidBodyListenerPtr listener_;
-#pragma warning(default:4251)    
-
-    friend class Node;
+    virtual void apply_local_torque(const Vector& v)=0;
 };
 
-//! Listens for rigid body events, including changing position, velocity,
-//! and rotation.
-//! @class RigidBodyListener
-//! @brief Interface for handling rigid body events.
-class JETAPI RigidBodyListener : public Object {
-public:
-    //! Destructor.
-    virtual ~RigidBodyListener() {}
-    
-    //! Called when the linear velocity of the rigid body changes
-    virtual void on_linear_velocity() {}
-    
-    //! Called when the angular velocity of the rigid body changes.
-    virtual void on_angular_velocity() {}
-  
-    //! Called when force is applied to the rigid body.
-    virtual void on_force() {}
-    
-    //! Called when torque is applied to the rigid body.
-    virtual void on_torque() {}
-};
 
 }

@@ -23,13 +23,6 @@
 
 #include <Jet/Types.hpp>
 #include <Jet/Object.hpp>
-#include <Jet/Vector.hpp>
-#include <Jet/Quaternion.hpp>
-#include <Jet/Iterator.hpp>
-#include <Jet/Matrix.hpp>
-#include <string>
-#include <vector>
-#include <unordered_map>
 
 namespace Jet {
 
@@ -43,167 +36,88 @@ namespace Jet {
 //! must have a name unique to this scene node, regardless of type.
 //! @class Node
 //! @brief Represents a node in the scene graph.
-class JETAPI Node : public Object {
-public:    
-    //! Destructor.
-    virtual ~Node() {}
-    
+class Node : public Object {
+public:        
     //! Returns the parent scene node
-    inline Node* parent() const { 
-        return parent_;
-    }
+    virtual Node* parent() const=0;
     
     //! Returns the node's current rotation.
-    inline const Quaternion& rotation() const {
-        return rotation_;
-    }
+    virtual const Quaternion& rotation() const=0;
     
     //! Returns the node's current position.
-    inline const Vector& position() const {
-        return position_;
-    }
-    
-    //! Returns the node's current transformation matrix.  Note that this is
-    //! automatically updated from the position and rotation variables once
-    //! per frame.
-    inline const Matrix& matrix() const {
-        return matrix_;
-    }
+    virtual const Vector& position() const=0;
     
     //! Creates a new node at the given index.  The position and rotation of
     //! the new node will be relative to this node.
     //! @param index the index where the new object will be placed; if this
     //! parameter is zero then the object will be created at any free location
-    Node* node(const std::string& name);
+    virtual Node* node(const std::string& name)=0;
     
     //! Creates a new model at the given index.  Models are used for rendering
     //! static meshes with a material.
     //! @param index the index where the new object will be placed; if this
     //! parameter is zero then the object will be created at any free location
-    MeshObject* mesh_object(const std::string& name);
+    virtual MeshObject* mesh_object(const std::string& name)=0;
     
     //! Creates a new particle system at the given index.  Particle systems are
     //! used for fire, water, and other affects.
     //! @param index the index where the new object will be placed; if this
     //! parameter is zero then the object will be created at any free location
-    ParticleSystem* particle_system(const std::string& name);
+    virtual ParticleSystem* particle_system(const std::string& name)=0;
     
     //! Creates a textured quad at the given index.  Textured quads can be used
     //! for billboards.
     //! @param index the index where the new object will be placed; if this
     //! parameter is zero then the object will be created at any free location
-    QuadSet* quad_set(const std::string& name);
+    virtual QuadSet* quad_set(const std::string& name)=0;
     
     //! Creates a quad chain at the given index.  Quad chains can be used for
     //! path effects, like tracers or condensation trails.
     //! @param index the index where the new object will be placed; if this
     //! parameter is zero then the object will be created at any free location
-    QuadChain* quad_chain(const std::string& name);
+    virtual QuadChain* quad_chain(const std::string& name)=0;
     
     //! Creates a light and attaches it at the given index.
     //! @param index the index where the new object will be placed; if this
     //! parameter is zero then the object will be created at any free location
-    Light* light(const std::string& name);
+    virtual Light* light(const std::string& name)=0;
     
     //! Returns the rigid body attached to this node.
-    RigidBody* rigid_body();
+    virtual RigidBody* rigid_body()=0;
     
     //! Returns the audio source attached to this node.
-    AudioSource* audio_source();
+    virtual AudioSource* audio_source()=0;
+	
+	//! Returns the camera attached to this node.
+	virtual Camera* camera()=0;
     
     //! Returns a component that is attached to this node.
     //! @param name the name of the component
-    Object* object(const std::string& name) const;
-
-    //! Returns a list of all objects attached to this node.  This function is
-    //! used to walk over all objects in the tree using dynamic dispace.
-    //! See the component class.
-    Iterator<ObjectPtr> objects() const;
+    virtual Object* object(const std::string& name) const=0;
 
 	//! Sets the position of the node.
     //! @param position the position of the node
-	inline void position(const Vector& position) {
-		position_ = position;
-	}
+	virtual void position(const Vector& position)=0;
 
 	//! Sets the rotation of the node.
     //! @param rotation the rotation of the node
-	inline void rotation(const Quaternion& rotation) {
-		rotation_ = rotation;
-	}
+	virtual void rotation(const Quaternion& rotation)=0;
     
     //! Adds a listener to this node.
     //! @param listener the node listener
-    inline void listener(NodeListener* listener) {
-		if (destroyed_) {
-			throw std::runtime_error("Attempted to add a listener to a node marked for deletion");
-		} else {
-			listener_.push_back(listener);
-		}
-    }
+    virtual inline void listener(NodeListener* listener)=0;
+    
+    //! Orients this node to point at the given position.
+    //! @param target the vector to look at
+    //! @param up the up vector
+    virtual void look(const Vector& target, const Vector& up)=0;
 
 	//! Marks this node for destruction.  The node is removed from the scene 
 	//! graph immediately, but won't be garbage collected until all references
 	//! to the node are destroyed.
-	void destroy();
-
-	//! Called when this node is rendered.  This function is only called if
-	//! the node is visible.
-	void render();
-
-	//! Called during a physics update.  This function is only called if the
-	//! node has a rigid body attached.
-	void update();
-
-	//! Clones this node.
-	Node* clone() const;
-    
-private:
-    //! Creates a new node with no parent.
-    //! @param engine the engine object
-	Node(Engine* engine);
-    
-    //! Creates a new node with a parent.
-    //! @param engine the engine object
-    //! @param node the parent
-	Node(Engine* engine, Node* node);
-    
-    //! Removes an object from this node.
-    //! @param object the object to remove
-	void object_delete(Object* object);
-    
-    //! Addes a new object to the node.
-    void object(const std::string& name, Object* object);
-    
-    //! Sets the transformation matrix for this node.
-    //! @param matrix the transformation matrix
-    inline void matrix(const Matrix& matrix) {
-        matrix_ = matrix;
-    }
-    
-	Engine* engine_;
-    Node* parent_;
-    Vector position_;
-    Quaternion rotation_;
-    Matrix matrix_;
-    
-#pragma warning(disable:4251)
-    RigidBodyPtr rigid_body_;
-    AudioSourcePtr audio_source_;
-    std::tr1::unordered_map<std::string, ObjectPtr> object_;
-    std::vector<NodeListenerPtr> listener_;
-#pragma warning(default:4251)
-    bool destroyed_;
-
-	friend class Engine;
-    friend class MeshObject;
-    friend class ParticleSystem;
-    friend class QuadSet;
-    friend class QuadChain;
-    friend class Light;
-    friend class RigidBody;
-    friend class AudioSource;
+	virtual void destroy()=0;
 };
+
 
 //! Listens for node events.  Examples include on_pre_render (called before
 //! rendering), on_post_render (called after rendering), on_render (called
@@ -211,34 +125,20 @@ private:
 //! engine.
 //! @class NodeListener
 //! @brief Interface for handling node events.
-class JETAPI NodeListener : public Object {
+class NodeListener : public Object {
 public: 
-    //! Destructor.
-    virtual ~NodeListener() {}
-
     //! Called for each physics update.
-    virtual void on_update() {}
+    virtual void on_update()=0;
     
     //! Called during each frame if the node is visible.
-    virtual void on_render() {}
+    virtual void on_render()=0;
     
     //! Called when a colllision is detected by the physics engine.
-    virtual void on_collision() {}
+    virtual void on_collision()=0;
     
     //! Called when the node is destroyed.
-    virtual void on_destroy() {}
-    
-    //! Called when the position of the node changes.
-    virtual void on_position() {}
-    
-    //! Called when the rotation of the node changes.
-    virtual void on_rotation() {}
-    
-    //! Called when a new object is added to this node.
-    virtual void on_object_created(Object* object) {}
-    
-    //! Called when an object is removed from this node.
-    virtual void on_object_destroyed(Object* object) {}
+    virtual void on_destroy()=0;
 };
+
 
 }

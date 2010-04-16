@@ -30,76 +30,36 @@ namespace Jet {
 //! Class to hold a texture data for rendering.
 //! @class Texture
 //! @brief Class to hold texture data.
-class JETAPI Texture : public Object {
+class Texture : public Object {
 public:
-    //! Destructor.
-    virtual ~Texture() {}
-
     //! Returns the width of this texture in pixels.
-    inline size_t width() const {
-        return width_;
-    }
+    virtual size_t width() const=0;
 
     //! Returns the height of this texture in pixels.
-    inline size_t height() const {
-        return height_;
-    }
+    virtual size_t height() const=0;
 
     //! Returns a pointer to the texture data.
-    inline const uint8_t* data() const {
-        return &data_.front();
-    }
+    virtual const uint8_t* data() const=0;
 
     //! Returns a pointer to the texture data.
-    inline uint8_t* data() {
-        return &data_.front();
-    }
+    virtual uint8_t* data()=0;
     
-    //! Returns true if the texture is loaded.
-    inline bool loaded() const {
-        return loaded_;
-    }
-	
-	//! Returns the implementation object.
-	inline Object* impl() const {
-		return impl_.get();
-	}
+	//! Sets the state of the shader
+	virtual ResourceState state() const=0;
 
 	//! Returns the name of the texture
-	inline const std::string& name() const {
-		return name_;
-	}
+	virtual const std::string& name() const=0;
 
     //! Sets the width of the texture in pixels.
     //! @param width the new width
-    void width(size_t width);
+    virtual void width(size_t width)=0;
 
     //! Sets the height of the texture in pixels.
     //! @param height the new height
-    void height(size_t height);
-    
-    //! Marks this texture as loaded.
-    void loaded(bool loaded);
-	
-	//! Sets the implementation object.
-	inline void impl(Object* object) {
-		impl_ = object;
-	}
-    
-private:
-	Texture(Engine* engine, const std::string& name);
-    
-	Engine* engine_;
-	std::string name_;
-    bool loaded_;
-#pragma warning(disable:4251)
-	ObjectPtr impl_;
-    std::vector<uint8_t> data_;
-    size_t width_;
-    size_t height_;
-#pragma warning(default:4251)
+    virtual void height(size_t height)=0;
 
-    friend class Engine;
+	//! Returns the resource state of the shader
+	virtual void state(ResourceState state)=0;
 };
 
 }

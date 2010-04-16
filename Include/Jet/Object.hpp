@@ -27,7 +27,7 @@ namespace Jet {
 
 //! This is the base class for all Jet Engine objects.  It is used for 
 //! reflection and smart pointer reference counting.
-class JETAPI Object {
+class Object {
 public:
 
     //! Constructor.
@@ -49,7 +49,7 @@ public:
     //! Decrements the reference count on this object.
     inline void refcount_dec() const { 
         refcount_--; 
-        if (refcount_ < 0) {
+        if (refcount_ <= 0) {
             delete this;
         } 
     }

@@ -24,15 +24,15 @@
 #include <Jet/Types.hpp>
 #include <iostream>
 
-JETAPI std::ostream& operator<<(std::ostream& out, const Jet::Color& color);
-JETAPI std::istream& operator>>(std::istream& in, Jet::Color& color);
+std::ostream& operator<<(std::ostream& out, const Jet::Color& color);
+std::istream& operator>>(std::istream& in, Jet::Color& color);
 
 namespace Jet {
 
 //! Represents a 4-component RGBA color value.
 //! @class Color
 //! @brief RGBA color value.
-class JETAPI Color {
+class Color {
 public:
     //! Creates a new color, initialized to black.
     Color();

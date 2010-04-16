@@ -24,73 +24,53 @@
 #include <Jet/Types.hpp>
 #include <Jet/Object.hpp>
 #include <Jet/Color.hpp>
+#include <Jet/Vector.hpp>
 
 namespace Jet {
     
 //! Represents a directional or omni-directional point light.
 //! @class Light
 //! @brief Directional or omni-directional point light.
-class JETAPI Light : public Object {
-public:
-    
-    //! Destroys the light.
-    virtual ~Light() {}
-    
+class Light : public Object {
+public:    
     //! Returns the parent node.
-    inline Node* parent() const {
-        return parent_;
-    }
+    virtual Node* parent() const=0;
     
     //! Returns the ambient color of the light.
-    inline const Color& ambient_color() const {
-        return ambient_color_;
-    }
+    virtual const Color& ambient_color() const=0;
     
     //! Returns the diffuse color of the light.
-    inline const Color& diffuse_color() const {
-        return diffuse_color_;
-    }
+    virtual const Color& diffuse_color() const=0;
     
     //! Returns the specular color of the light.
-    inline const Color& specular_color() const {
-        return specular_color_;
-    }
+    virtual const Color& specular_color() const=0;
+    
+    //! Returns the light direction
+    virtual const Vector& direction() const=0;
     
     //! Sets the type of light.
-    inline LightType type() const {
-        return type_;
-    }
+    virtual LightType type() const=0;
+    
+    //! Returns true if the light casts shadows.
+    virtual bool cast_shadows() const=0;
     
     //! Sets the ambient color of the light.
-    inline void ambient_color(const Color& color) {
-        ambient_color_ = color;
-    }
+    virtual void ambient_color(const Color& color)=0;
     
     //! Sets the diffuse color of the light.
-    inline void diffuse_color(const Color& color) {
-        diffuse_color_ = color;
-    }
+    virtual void diffuse_color(const Color& color)=0;
     
     //! Sets the specular color of the light.
-    inline void specular_color(const Color& color) {
-        specular_color_ = color;
-    }
+    virtual void specular_color(const Color& color)=0;
+    
+    //! Sets the light direction
+    virtual void direction(const Vector& direction)=0;
     
     //! Sets the type of light.
-    inline void type(LightType type) {
-        type_ = type;
-    }
-
-private:
-    Light(Node* parent);
+    virtual void type(LightType type)=0;
     
-    Node* parent_;
-    Color ambient_color_;
-    Color diffuse_color_;
-    Color specular_color_;
-    LightType type_;
-    
-    friend class Node;
+    //! True if the light should cast shadows.
+    virtual void cast_shadows(bool cast_shadows)=0;
 };
 
 }

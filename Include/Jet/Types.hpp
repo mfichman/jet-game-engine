@@ -42,6 +42,7 @@
 
 namespace Jet {
     class AudioSource;
+    class Camera;
     class Color;
     class Engine;
     class EngineListener;
@@ -53,23 +54,21 @@ namespace Jet {
     class Node;
     class NodeListener;
     class Object;
-    class ObjectFactory;
     class ParticleSystem;
+    class Quad;
     class QuadChain;
+    class QuadSet;
     class Quaternion;
     class Range;
-    class ResourceLoader;
     class RigidBody;
-    class RigidBodyListener;
     class Shader;
     class Texcoord;
     class Texture;
-    class Quad;
-    class QuadSet;
     class Vector;
     class Vertex;
 
     typedef boost::intrusive_ptr<AudioSource> AudioSourcePtr;
+    typedef boost::intrusive_ptr<Camera> CameraPtr;
     typedef boost::intrusive_ptr<Engine> EnginePtr;
     typedef boost::intrusive_ptr<EngineListener> EngineListenerPtr;
     typedef boost::intrusive_ptr<Light> LightPtr;
@@ -79,12 +78,9 @@ namespace Jet {
     typedef boost::intrusive_ptr<Node> NodePtr;
     typedef boost::intrusive_ptr<NodeListener> NodeListenerPtr;
     typedef boost::intrusive_ptr<Object> ObjectPtr;
-    typedef boost::intrusive_ptr<ObjectFactory> ObjectFactoryPtr;
     typedef boost::intrusive_ptr<ParticleSystem> ParticleSystemPtr;
     typedef boost::intrusive_ptr<QuadChain> QuadChainPtr;
-    typedef boost::intrusive_ptr<ResourceLoader> ResourceLoaderPtr;
     typedef boost::intrusive_ptr<RigidBody> RigidBodyPtr;
-    typedef boost::intrusive_ptr<RigidBodyListener> RigidBodyListenerPtr;
     typedef boost::intrusive_ptr<Shader> ShaderPtr;
     typedef boost::intrusive_ptr<Texture> TexturePtr;
     typedef boost::intrusive_ptr<QuadSet> QuadSetPtr;
@@ -92,13 +88,9 @@ namespace Jet {
     typedef float real_t;
     typedef void (*load_function_t)(Engine* engine);
     
-    enum LightType { POINT_LIGHT, DIFFUSE_LIGHT };
+    enum LightType { POINT_LIGHT, DIRECTIONAL_LIGHT };
     enum ParticleSystemType { BOX_EMITTER, ELLIPSOID_EMITTER };
-    enum ModificationFlags {
-        POSITION=1,
-        ROTATION=2,
-        LINEAR_VELOCITY=4,
-        ANGULAR_VELOCITY=8,
-        FORCE=16
-    };
+    enum PlaybackState { ONCE, REPEAT, STOP };
+    enum ResourceState { UNLOADED, LOADED, SYNCED };
+    enum SyncMode { STATIC_SYNC, DYNAMIC_SYNC };
 }

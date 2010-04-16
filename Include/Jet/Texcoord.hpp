@@ -24,15 +24,15 @@
 #include <Jet/Types.hpp>
 #include <iostream>
 
-JETAPI std::ostream& operator<<(std::ostream& out, const Jet::Texcoord& texcoord);
-JETAPI std::istream& operator>>(std::istream& in, Jet::Texcoord& texcoord);
+std::ostream& operator<<(std::ostream& out, const Jet::Texcoord& texcoord);
+std::istream& operator>>(std::istream& in, Jet::Texcoord& texcoord);
 
 namespace Jet {
 
 //! Represents a 3-component texcoord.
 //! @class Texcoord
 //! @brief 3-component texcoord.
-class JETAPI Texcoord {
+class Texcoord {
 public:
     //! Creates a new texcoord with the given components.
     //! @param u u component

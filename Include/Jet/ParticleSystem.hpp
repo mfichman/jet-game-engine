@@ -31,124 +31,68 @@ namespace Jet {
 //! Class for generating particles effects, like smoke, rain, fire and dust.
 //! @class ParticleSystem
 //! Generates particle effects.
-class JETAPI ParticleSystem : public Object {
-public:
-    
-    //! Destructor.
-    virtual ~ParticleSystem() {}
-    
+class ParticleSystem : public Object {
+public:    
     //! Returns the parent node.
-    inline Node* parent() const {
-        return parent_;
-    }
+    virtual Node* parent() const=0;
     
     //! Returns the life of this particle system.
-    inline const Range& life() const {
-        return life_;
-    }
+    virtual const Range& life() const=0;
     
     //! Returns the width this particle system.  This describes the range of
     //! x-values that particles will be created at.
-    inline const Range& width() const {
-        return width_;
-    }
+    virtual const Range& width() const=0;
     
     //! Returns the height of this particle system.  This describes the rnage
     //! of y-values that particles will be created at.
-    inline const Range& height() const {
-        return height_;
-    }
+    virtual const Range& height() const=0;
     
     //! Returns the depth of this particle system.  This describes the range of
     //! z-values that particles will be created at.
-    inline const Range& depth() const {
-        return depth_;
-    }
+    virtual const Range& depth() const=0;
     
     //! Returns the speed particles will be created with.
-    inline const Range& speed() const {
-        return speed_;
-    }
+    virtual const Range& speed() const=0;
     
     //! Returns the particle system distribution type.  This can either be
     //! cubic or spherical.
-    inline ParticleSystemType type() const {
-        return type_;
-    }
+    virtual ParticleSystemType type() const=0;
     
     //! Returns the direction the particle system is facing.
-    inline const Vector& direction() const {
-        return direction_;
-    }
+    virtual const Vector& direction() const=0;
     
     //! Sets the angle of distribution in radians.
-    inline const Range& angle() const {
-        return angle_;
-    }
+    virtual const Range& angle() const=0;
     
     //! Sets the life of this particle system.
     //! @param life the min and max life of the particle system.
-    inline void life(const Range& life) {
-        life_ = life;
-    }
+    virtual void life(const Range& life)=0;
     
     //! Sets the range of x-values that particles will be created at.
     //! @param width the range of x-values
-    inline void width(const Range& width) {
-        width_ = width;
-    }
+    virtual void width(const Range& width)=0;
     
     //! Sets the range of y-values that particles will be created at.
     //! @param height the range of y values
-    inline void height(const Range& height) {
-        height_ = height;
-    }
+    virtual void height(const Range& height)=0;
     
     //! Sets the range z-values that particles will be created at.
     //! @param depth the range of z-values
-    inline void depth(const Range& depth) {
-        depth_ = depth;
-    }
+    virtual void depth(const Range& depth)=0;
     
     //! Sets the speed of created particles.
     //! @param speed the speed range
-    inline void speed(const Range& speed) {
-        speed_ = speed;
-    }
+    virtual void speed(const Range& speed)=0;
     
     //! Sets the particle system type.
-    inline void type(ParticleSystemType type) {
-        type_ = type;
-    }
+    virtual void type(ParticleSystemType type)=0;
     
     //! Sets the direction of the system.
     //! @param direction the direction
-    inline void direction(const Vector& direction) {
-        direction_ = direction;
-    }
+    virtual void direction(const Vector& direction)=0;
     
     //! Sets the angle of the distribution in radians.
-    inline void angle(const Range& angle) {
-        angle_ = angle;
-    }
-    
-    
-private:
-    ParticleSystem(Engine* engine, Node* parent);
-    
-    Engine* engine_;
-    Node* parent_;
-    Range life_;
-    Range width_;
-    Range height_;
-    Range depth_;
-    Range speed_;
-    ParticleSystemType type_;
-    Vector direction_;
-    Range angle_;
-    
-    friend class Node;
-    
+    virtual void angle(const Range& angle)=0;    
 };
 
 }

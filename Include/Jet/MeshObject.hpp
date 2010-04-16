@@ -23,95 +23,55 @@
 
 #include <Jet/Types.hpp>
 #include <Jet/Object.hpp>
-#include <Jet/Material.hpp>
-#include <Jet/Texture.hpp>
-#include <Jet/Mesh.hpp>
 #include <boost/any.hpp>
-#include <map>
 
 namespace Jet {
 
 //! This class is used to display an instanced mesh on the screen.
 //! @class MeshObject
 //! @brief Displays an instanced mesh.
-class JETAPI MeshObject : public Object {
-public:
-    //! Destructor.
-    virtual ~MeshObject() {}
-    
+class MeshObject : public Object {
+public:    
     //! Returns the parent of this object.
-    Node* parent() const {
-        return parent_;
-    }
+    virtual Node* parent() const=0;
     
     //! Returns the material used to render this object.
-    inline Material* material() const {
-        return material_.get();
-    }
+    virtual Material* material() const=0;
     
     //! Returns the mesh used to render this object.
-    inline Mesh* mesh() const {
-        return mesh_.get();
-    }
+    virtual Mesh* mesh() const=0;
     
     //! Returns true if this object casts shadows.
-    inline bool cast_shadows() const {
-        return cast_shadows_;
-    }
+    virtual bool cast_shadows() const=0;
     
     //! Returns the shader parameter at the given location.
     //! @param name the param name
-    const boost::any& shader_param(const std::string& name) {
-        return shader_param_[name];
-    }
+    virtual const boost::any& shader_param(const std::string& name)=0;
     
     //! Sets the material used to render this object.
     //! @param material a pointer to the material
-    inline void material(Material* material) {
-        material_ = material;
-    }
+    virtual void material(Material* material)=0;
     
     //! Sets the mesh used to render this object.
     //! @param mesh the mesh
-    inline void mesh(Mesh* mesh) {
-        mesh_ = mesh;
-    }
+    virtual void mesh(Mesh* mesh)=0;
     
     //! Sets whether or not this object casts shadows.
     //! @param shadows true if the object should cast shadows
-    inline void cast_shadows(bool shadows) {
-        cast_shadows_ = shadows;
-    }
+    virtual void cast_shadows(bool shadows)=0;
     
     //! Sets the material used to render this object by name.
     //! @param name the name of the material
-    void material(const std::string& name);
+    virtual void material(const std::string& name)=0;
     
     //! Sets the mesh used to render this object by name.
     //! @param name the name of the mesh
-    void mesh(const std::string& name);
+    virtual void mesh(const std::string& name)=0;
     
     //! Sets the shader parameter at the given location.
     //! @param name the param name
     //! @param param the parameter
-    inline void shader_param(const std::string& name, const boost::any& param) {
-        shader_param_[name] = param;
-    }
-    
-private:
-    MeshObject(Engine* engine, Node* parent);
-    
-    Engine* engine_;
-    Node* parent_;
-#pragma warning(disable:4251)
-    MaterialPtr material_;
-    MeshPtr mesh_;
-    std::map<std::string, boost::any> shader_param_;
-#pragma warning(default:4251)
-    bool cast_shadows_;
-
-    friend class Engine;
-	friend class Node;
+    virtual void shader_param(const std::string& name, const boost::any& param)=0;
 };
 
 }

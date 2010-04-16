@@ -65,83 +65,35 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\Source\Jet\OpenGL\CMakeLists.txt"
+				RelativePath="..\Source\Jet\Core\Engine.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Source\CMakeLists.txt"
+				RelativePath="..\Source\Jet\Core\Material.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Source\Jet\CMakeLists.txt"
+				RelativePath="..\Source\Jet\Core\Mesh.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Source\Jet\Color.cpp"
+				RelativePath="..\Source\Jet\Core\Node.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Source\Jet\Object.cpp"
+				RelativePath="..\Source\Jet\Core\RenderSystem.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Source\Jet\Engine.cpp"
+				RelativePath="..\Source\Jet\Core\RenderTarget.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Source\Jet\Core\MaterialLoader.cpp"
+				RelativePath="..\Source\Jet\Core\ScriptSystem.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Source\Jet\Matrix.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\Jet\Mesh.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\Jet\OpenGL\MeshBuffer.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\Jet\Core\MeshLoader.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\Jet\OpenGL\Module.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\Jet\Core\Module.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\Jet\Node.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\Jet\Params.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\Jet\Quaternion.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\Jet\Range.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\Jet\OpenGL\Renderer.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\Jet\OpenGL\RenderTarget.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\Jet\OpenGL\Shader.cpp"
+				RelativePath="..\Source\Jet\Core\Shader.cpp"
 				>
 			</File>
 			<File
@@ -149,23 +101,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Source\Jet\Texcoord.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\Jet\Texture.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\Jet\Core\TextureLoader.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\Jet\Value.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\Jet\Vector.cpp"
+				RelativePath="..\Source\Jet\Core\Texture.cpp"
 				>
 			</File>
 		</Filter>
@@ -175,47 +111,35 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\Include\Jet\Buffer.hpp"
+				RelativePath="..\Include\Jet\Core\AudioSource.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Color.hpp"
+				RelativePath="..\Include\Jet\Core\Camera.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Object.hpp"
+				RelativePath="..\Include\Jet\Core\Engine.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Controller.hpp"
+				RelativePath="..\Include\Jet\Core\Light.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Engine.hpp"
+				RelativePath="..\Include\Jet\Core\Material.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\EngineListener.hpp"
+				RelativePath="..\Include\Jet\Core\Mesh.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Iterator.hpp"
+				RelativePath="..\Include\Jet\Core\MeshObject.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Matrix.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Include\Jet\Mesh.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Include\Jet\OpenGL\MeshBuffer.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Include\Jet\Node.hpp"
+				RelativePath="..\Include\Jet\Core\Node.hpp"
 				>
 			</File>
 			<File
@@ -223,55 +147,47 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\ObjectFactory.hpp"
+				RelativePath="..\Include\Jet\Core\ParticleSystem.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Params.hpp"
+				RelativePath="..\Include\Jet\Core\QuadChain.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Quaternion.hpp"
+				RelativePath="..\Include\Jet\Core\QuadSet.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Range.hpp"
+				RelativePath="..\Include\Jet\Core\RenderSystem.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\OpenGL\Renderer.hpp"
+				RelativePath="..\Include\Jet\Core\RenderTarget.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\OpenGL\RenderTarget.hpp"
+				RelativePath="..\Include\Jet\Core\RigidBody.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\ResourceLoader.hpp"
+				RelativePath="..\Include\Jet\Core\ScriptController.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Texcoord.hpp"
+				RelativePath="..\Include\Jet\Core\ScriptSystem.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Texture.hpp"
+				RelativePath="..\Include\Jet\Core\Shader.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\OpenGL\Types.hpp"
+				RelativePath="..\Include\Jet\Core\Texture.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Value.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Include\Jet\Vector.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Include\Jet\Vertex.hpp"
+				RelativePath="..\Include\Jet\Core\Types.hpp"
 				>
 			</File>
 		</Filter>

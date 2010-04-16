@@ -31,7 +31,7 @@ namespace Jet {
 //! Represents a vertex.
 //! @class Vertex
 //! @brief Vertex class.
-class JETAPI Vertex {
+class Vertex {
 public:
 
     //! Comparison operator.

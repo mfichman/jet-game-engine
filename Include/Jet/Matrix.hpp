@@ -22,6 +22,7 @@
 #pragma once
 
 #include <Jet/Types.hpp>
+#include <Jet/Vector.hpp>
 
 namespace Jet {
 
@@ -29,7 +30,7 @@ namespace Jet {
 //! coordinates.
 //! @class Matrix
 //! @brief 4x4 matrix representation
-class JETAPI Matrix {
+class Matrix {
 public:
     
     //! Creates a new matrix using the given array of floats in row-major
@@ -81,6 +82,31 @@ public:
     
     //! Multiplies two matrices.
     Matrix operator*(const Matrix& other) const;
+    
+    //! Transforms a vector.
+    Vector operator*(const Vector& other) const;
+    
+    //! Returns the forward vector (i.e., along the positive z-axis)
+    Vector forward() const {
+        /*
+        0  4  8  12
+        1  5  9  13
+        2  6  10 14
+        3  7  11 15
+        */
+        // (0, 2) (1, 2) (2, 2)
+        return Vector(data[8], data[9], data[10]);
+    }
+    
+    //! Returns the right vector (i.e., along the positive x-axis)
+    Vector right() const {
+        return Vector(data[0], data[1], data[2]);
+    }
+    
+    //! Returns the left vector (i.e., along the positive y-axis)
+    Vector up() const {
+        return Vector(data[4], data[5], data[6]);
+    }
     
     real_t data[16];
 };

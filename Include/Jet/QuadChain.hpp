@@ -34,37 +34,16 @@ namespace Jet {
 //! Class for rendering a set of textured quads in a chain.
 //! @class QuadChain
 //! Used for trailer effects.
-class JETAPI QuadChain : public Object {
-public:
-    
-    //! Destructor.
-    virtual ~QuadChain() {}
-    
+class QuadChain : public Object {
+public:    
     //! Returns the parent node.
-    Node* parent() const {
-        return parent_;
-    }
+    virtual Node* parent() const=0;
     
     //! Returns the list of vertices.
-    inline const Vertex* vertex_data() const {
-        return vertex_.size() ? &vertex_.front() : 0;
-    }
+    virtual const Vertex* vertex_data() const=0;
     
     //! Returns the number of vertices.
-    inline size_t vertex_count() const {
-        return vertex_.size();
-    }
-    
-private:
-    QuadChain(Engine* engine, Node* parent);
-    
-    Engine* engine_;
-    Node* parent_;
-#pragma warning(disable:4251)
-    std::vector<Vertex> vertex_;
-#pragma warning(default:4251)
-
-    friend class Node;
+    virtual size_t vertex_count() const=0;
 };
 
 }

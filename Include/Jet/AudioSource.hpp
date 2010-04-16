@@ -21,32 +21,35 @@
 
 #include <Jet/Types.hpp>
 #include <Jet/Object.hpp>
-#include <Jet/Vector.hpp>
-#include <Jet/Quaternion.hpp>
-#include <string>
 
 namespace Jet {
 
 //! Manages 3D sounds emitting from the node.
 //! @class AudioSource
 //! @brief Emits positional audio.
-class JETAPI AudioSource : public Object {
-public:
-    //! Destructor.
-    virtual ~AudioSource() {}
-    
+class AudioSource : public Object {
+public:    
     //! Returns the parent node
-    inline Node* parent() const {
-        return parent_;
-    }
+    virtual Node* parent() const=0;
     
-private:
-    AudioSource(Engine* engine, Node* parent);
-
-    Engine* engine_;
-    Node* parent_;
+    //! Returns the clip playing at the given channel.
+    //! @param chan the channel to use
+    virtual const std::string& clip(size_t chan) const=0;
     
-    friend class Node;
+    //! Returns the state of the clip playing at the given channel.
+    //! @param chan the channel to use
+    virtual PlaybackState state(size_t chan) const=0;
+    
+    //! Sets the sound clip at the given index for the audio
+    //! source.
+    //! @param chan the channel to use
+    //! @param name the name of the sound clip
+    virtual void clip(size_t chan, const std::string& name)=0;
+    
+    //! Sets the mode of the given channel.
+    //! @param chan the channel to use
+    //! @param mode the audio state
+    virtual void state(size_t chan, PlaybackState state)=0;
 };
 
 }

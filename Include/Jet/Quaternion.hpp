@@ -24,15 +24,15 @@
 #include <Jet/Types.hpp>
 #include <iostream>
 
-JETAPI std::ostream& operator<<(std::ostream& out, const Jet::Quaternion& quaternion);
-JETAPI std::istream& operator>>(std::istream& in, Jet::Quaternion& quaternion);
+std::ostream& operator<<(std::ostream& out, const Jet::Quaternion& quaternion);
+std::istream& operator>>(std::istream& in, Jet::Quaternion& quaternion);
 
 namespace Jet {
 
 //! Represents a rotation in 3D space.
 //! @class Quaternion
 //! @brief Quaternion rotation class
-class JETAPI Quaternion {
+class Quaternion {
 public:
     //! Creates a new quaternion.
     //! @param w scalar component
@@ -93,6 +93,12 @@ public:
 
     //! Returns the normalized copy of this quaternion
     Quaternion unit() const;
+    
+    //! Returns true if the quaternions are equal
+    bool operator==(const Quaternion other) const;
+    
+    //! Returns true if the quaternions are not equal
+    bool operator!=(const Quaternion& other) const;
 
     //! Stream operator
     friend std::ostream& ::operator<<(std::ostream& out, const Quaternion& quaternion);

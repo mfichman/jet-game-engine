@@ -22,9 +22,7 @@
 #pragma once
 
 #include <Jet/Types.hpp>
-#include <Jet/Vertex.hpp> 
 #include <Jet/Object.hpp>
-#include <vector>
 
 namespace Jet {
 
@@ -32,91 +30,60 @@ namespace Jet {
 //! triangle lists (not triangle strips).
 //! @class Mesh
 //! @brief Class to hold mesh geometry for rendering.
-class JETAPI Mesh : public Object {
+class Mesh : public Object {
 public:
-    //! Destructor.
-    virtual ~Mesh() {}
-
     //! Sets a vertex that is part of this mesh.  This method dynamically
     //! resizes the buffer as needed.
     //! @param i the index of the vertex
     //! @param vertex the vertex to add.
-    void vertex(size_t i, const Vertex& vertex);
+    virtual void vertex(size_t i, const Vertex& vertex)=0;
 
     //! Sets an index that is part of this mesh.  This method dynamically
     //! resizes the buffer as needed.
     //! @param i the index of the index.
     //! @param index the index to add
-    void index(size_t i, uint32_t index);
-    
-    //! Marks the mesh as loaded.
-    void loaded(bool loaded);
-    
-    //! Sets the implementation object
-    inline void impl(Object* impl) {
-        impl_ = impl;
-    }
+    virtual void index(size_t i, uint32_t index)=0;
+
+	//! Returns the resource state of the mesh
+	virtual void state(ResourceState state)=0;
+	
+	//! Sets the sync mode.
+	virtual void sync_mode(SyncMode mode)=0;
     
     //! Returns a vertex that is part of this mesh
     //! @param i the index of the vertex in the vertex buffer
-    inline const Vertex& vertex(size_t i) const {
-        return vertex_[i];
-    }
+    virtual const Vertex& vertex(size_t i) const=0;
 
     //! Returns an index that is part of this mesh.
     //! @param i the index of the index in the index buffer
-    inline uint32_t index(size_t i) const {
-        return index_[i];
-    }
-    
-    //! Returns true if the mesh data is loaded
-    inline bool loaded() const {
-        return loaded_;
-    }
-    
-    //! Returns a pointer to the implementation object.
-    Object* impl() const {
-        return impl_.get();
-    }
+    virtual uint32_t index(size_t i) const=0;
+	
+	//! Sets the number of vertices in this mesh
+	virtual void vertex_count(size_t size)=0;
+	
+	//! Sets the number of indices in this mesh
+	virtual void index_count(size_t size)=0;
+	
+	//! Sets the state of the mesh.
+	virtual ResourceState state() const=0;
+	
+	//! REturns the sync mode.
+	virtual SyncMode sync_mode() const=0;
     
     //! Returns the name of the mesh.
-    const std::string& name() const {
-        return name_;
-    }
+    virtual const std::string& name() const=0;
 
     //! Returns a pointer to the beginning of the vertex buffer.
-    inline const Vertex* vertex_data() const {
-        return vertex_.size() ? &vertex_.front() : 0;
-    }
+    virtual const Vertex* vertex_data() const=0;
 
     //! Returns a pointer to the beginning of the index buffer.
-    inline const uint32_t* index_data() const {
-        return index_.size() ? &index_.front() : 0;
-    }
+    virtual const uint32_t* index_data() const=0;
 
     //! Returns the number of vertices.
-    inline size_t vertex_count() const {
-        return vertex_.size();
-    }
+    virtual size_t vertex_count() const=0;
 
     //! Returns the number of indices.
-    inline size_t index_count() const {
-        return index_.size();
-    }
-    
-private:
-    Mesh(Engine* engine, const std::string& name);
-    
-    Engine* engine_;
-	std::string name_;
-    bool loaded_;
-#pragma warning(disable:4251)
-    ObjectPtr impl_;
-    std::vector<Vertex> vertex_;
-    std::vector<uint32_t> index_;
-#pragma warning(default:4251)
-
-    friend class Engine;
+    virtual size_t index_count() const=0;
 };
 
 }

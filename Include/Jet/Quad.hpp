@@ -30,7 +30,7 @@ namespace Jet {
 //! Represents a quad.
 //! @class Quad
 //! @brief Quadclass.
-class JETAPI Quad {
+class Quad {
 public:
     
     //! Creates a new quad with the given normal, up vector, width, and height.

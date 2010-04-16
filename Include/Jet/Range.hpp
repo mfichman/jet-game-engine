@@ -24,15 +24,15 @@
 #include <Jet/Types.hpp>
 #include <iostream>
 
-JETAPI std::ostream& operator<<(std::ostream& out, const Jet::Range& range);
-JETAPI std::istream& operator>>(std::istream& in, Jet::Range& range);
+std::ostream& operator<<(std::ostream& out, const Jet::Range& range);
+std::istream& operator>>(std::istream& in, Jet::Range& range);
 
 namespace Jet {
 
 //! Represents a range of values (begin, end)
 //! @class Range
 //! @brief Represents a range of values
-class JETAPI Range {
+class Range {
 public:
     
     //! Creates a new range

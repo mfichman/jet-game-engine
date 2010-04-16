@@ -29,47 +29,16 @@ namespace Jet {
 //! Shader loader class.
 //! @class Shader
 //! @brief Shader.
-class JETAPI Shader : public Object {
+class Shader : public Object {
 public:
-    
-    //! Destroys the shader.
-    virtual ~Shader() {}
-    
-    //! Returns true if the shader is loaded.
-    inline bool loaded() const {
-        return loaded_;
-    }
-    	
-    //! Returns the implementation object.
-	inline Object* impl() const {
-		return impl_.get();
-	}
-    
     //! Returns the shader's path.
-    const std::string& name() const {
-        return name_;
-    }
-    
-    //! Marks the shader as loaded.
-    void loaded(bool loaded);
-    
-    //! Sets the implementation object.
-	inline void impl(Object* object) {
-		impl_ = object;
-	}
-    
-private:
-    //! Creates a shader.
-    Shader(Engine* engine, const std::string& name);
-    
-    Engine* engine_;
-    std::string name_;
-    bool loaded_;
-#pragma warning(disable:4251)
-    ObjectPtr impl_;
-#pragma warning(default:4251)
-    
-    friend class Engine;
+    virtual const std::string& name() const=0;
+	
+	//! Sets the state of the shader
+	virtual ResourceState state() const=0;
+	
+	//! Returns the resource state of the shader
+	virtual void state(ResourceState state)=0;
 };
 
 }

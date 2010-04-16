@@ -138,6 +138,13 @@ Matrix Matrix::operator*(const Matrix& other) const {
     12 13 14 15
     */
     
+    /*
+    0  4  8  12
+    1  5  9  13
+    2  6  10 14
+    3  7  11 15
+    */
+    
     out.data[0] = other.data[0]*data[0] + other.data[1]*data[4] + other.data[2]*data[8] + other.data[3]*data[12];
     out.data[1] = other.data[0]*data[1] + other.data[1]*data[5] + other.data[2]*data[9] + other.data[3]*data[13];
     out.data[2] = other.data[0]*data[2] + other.data[1]*data[6] + other.data[2]*data[10] + other.data[3]*data[14];
@@ -158,6 +165,18 @@ Matrix Matrix::operator*(const Matrix& other) const {
     out.data[14] = other.data[12]*data[2] + other.data[13]*data[6] + other.data[14]*data[10] + other.data[15]*data[14];
     out.data[15] = other.data[12]*data[3] + other.data[13]*data[7] + other.data[14]*data[11] + other.data[15]*data[15];
 
+    return out;
+}
+
+Vector Matrix::operator*(const Vector& v) const {
+    Vector out;
+    
+    real_t invw = 1.0f / (data[3]*v.x + data[7]*v.y + data[11]*v.z + data[15]);
+    
+    out.x = (data[0]*v.x + data[4]*v.y + data[8]*v.z + data[12])*invw;
+    out.y = (data[1]*v.x + data[5]*v.y + data[9]*v.z + data[13])*invw;
+    out.z = (data[2]*v.x + data[6]*v.y + data[10]*v.z + data[14])*invw;
+    
     return out;
 }
 

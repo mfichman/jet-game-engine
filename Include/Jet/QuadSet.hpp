@@ -35,49 +35,25 @@ namespace Jet {
 //! billboad clouds.
 //! @class QuadSet
 //! Generates particle effects.
-class JETAPI QuadSet : public Object {
-public:
-    
-    //! Destructor.
-    virtual ~QuadSet() {}
-    
+class QuadSet : public Object {
+public:    
     //! Returns the parent node.
-    Node* parent() const {
-        return parent_;
-    }
+    virtual Node* parent() const=0;
     
     //! Gets the quad at the given index.
     //! @param index the index of the quad
-    inline const Quad& quad(size_t index) const {
-        return quad_[index];
-    }
+    virtual const Quad& quad(size_t index) const=0;
     
     //! Returns the list of vertices.
-    inline const Vertex* vertex_data() const {
-        return vertex_.size() ? &vertex_.front() : 0;
-    }
+    virtual const Vertex* vertex_data() const=0;
     
     //! Returns the number of vertices.
-    inline size_t vertex_count() const {
-        return vertex_.size();
-    }
+    virtual size_t vertex_count() const=0;
     
     //! Sets the quad at the given index
     //! @param index the index of the quad
     //! @param quad the quad.
-    void quad(size_t index, const Quad& quad) const;
-    
-private:
-    QuadSet(Engine* engine, Node* parent);
-    
-    Engine* engine_;
-    Node* parent_;
-#pragma warning(disable:4251)
-    std::vector<Quad> quad_;
-    std::vector<Vertex> vertex_;
-#pragma warning(default:4251)
-
-    friend class Node;
+    virtual void quad(size_t index, const Quad& quad)=0;
 };
 
 }

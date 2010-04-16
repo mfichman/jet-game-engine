@@ -24,15 +24,15 @@
 #include <Jet/Types.hpp>
 #include <iostream>
 
-JETAPI std::ostream& operator<<(std::ostream& out, const Jet::Vector& vector);
-JETAPI std::istream& operator>>(std::istream& in, Jet::Vector& vector);
+std::ostream& operator<<(std::ostream& out, const Jet::Vector& vector);
+std::istream& operator>>(std::istream& in, Jet::Vector& vector);
 
 namespace Jet {
 
 //! Represents a 3-component vector.
 //! @class Vector
 //! @brief 3-component vector.
-class JETAPI Vector {
+class Vector {
 public:
     //! Creates a new vector with the given components.
     //! @param x x component

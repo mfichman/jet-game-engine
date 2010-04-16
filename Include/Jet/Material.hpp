@@ -21,144 +21,108 @@
  */  
 #pragma once
 
+#include <Jet/Core/Types.hpp>
+#include <Jet/Core/Engine.hpp>
 #include <Jet/Types.hpp>
 #include <Jet/Object.hpp>
 #include <Jet/Color.hpp>
-#include <Jet/Shader.hpp>
 
 namespace Jet {
 
 //! Specifies the color and texture properties of an object.
 //! @class Material
 //! @brief Specifies the color and texture properties of an object.
-class JETAPI Material : public Object {
-public:
-    //! Destructor.
-    virtual ~Material() {}
-    
+class Material : public Object {
+public:    
     //! Returns the ambient color.
-    inline const Color& ambient_color() const {
-        return ambient_color_;
-    }
+    virtual const Color& ambient_color() const=0;
     
     //! Returns the diffuse color.
-    inline const Color& diffuse_color() const {
-        return diffuse_color_;
-    }
+    virtual const Color& diffuse_color() const=0;
     
     //! Returns the specular color.
-    inline const Color& specular_color() const {
-        return specular_color_;
-    }
+    virtual const Color& specular_color() const=0;
     
     //! Returns the diffuse texture map.
-    inline Texture* diffuse_map() const {
-        return diffuse_map_.get();
-    }
+    virtual Texture* diffuse_map() const=0;
     
     //! Returns the specular texture map.
-    inline Texture* specular_map() const {
-        return specular_map_.get();
-    }
+    virtual Texture* specular_map() const=0;
     
     //! Returns the normal map name.
-    inline Texture* normal_map() const {
-        return normal_map_.get();
-    }
+    virtual Texture* normal_map() const=0;
     
     //! Returns the shader.  If the default shader or fixed function pipeline
     //! is being used, this value will be null.
-    inline Shader* shader() const {
-        return shader_.get();
-    }
+    virtual Shader* shader() const=0;
+	
+	//! REturns the specular shininess
+	virtual real_t shininess() const=0;
+	
+	//! True if the material receives shadows.
+	virtual bool receive_shadows() const=0;
     
-    //! Returns true if the material is loaded.
-    inline bool loaded() const {
-        return loaded_;
-    }
+    //! Returns the state of the resource.
+    virtual ResourceState state() const=0;
+	
+	//! Returns the name
+	virtual const std::string& name() const=0;
 
     //! Sets the ambient color of the material.
     //! @param color the ambient color
-    inline void ambient_color(const Color& color) {
-        ambient_color_ = color;
-    }
+    virtual void ambient_color(const Color& color)=0;
     
     //! Sets the diffuse color of the material.
     //!! @param color the diffuse color
-    inline void diffuse_color(const Color& color) {
-        diffuse_color_ = color;
-    }
+    virtual void diffuse_color(const Color& color)=0;
     
     //! Sets the specular color of the material.
     //! @param color the specular color
-    inline void specular_color(const Color& color) {
-        specular_color_ = color;
-    }
+    virtual void specular_color(const Color& color)=0;
     
     //! Sets the diffuse texture map.
     //! @param texture the diffuse texture map
-    inline void diffuse_map(Texture* texture) {
-        diffuse_map_ = texture;
-    }
+    virtual void diffuse_map(Texture* texture)=0;
     
     //! Sets the specular texture map.
     //! @param texture the specular texture map
-    inline void specular_map(Texture* texture) {
-        specular_map_ = texture;
-    }
+    virtual void specular_map(Texture* texture)=0;
     
     //! Sets the normal texture map.
     //! @param texture the normal texture map
-    inline void normal_map(Texture* texture) {
-        normal_map_ = texture;
-    }
+    virtual void normal_map(Texture* texture)=0;
     
     //! Sets the shader used to render this material.  If the shader is null,
     //! then the material will be rendered using the default shader or fixed
     //! function pipeline.
     //! @param shader the shader
-    inline void shader(Shader* shader) {
-        shader_ = shader;
-    }
+    virtual void shader(Shader* shader)=0;
+	
+	//! Sets the specular shininess.
+	virtual void shininess(real_t shininess)=0;
+	
+	//! True if the material receives shadows.
+	virtual void receive_shadows(bool receive)=0;
     
     //! Sets the diffuse texture map by name.
     //! @param name texture map name
-    void diffuse_map(const std::string& name);
+    virtual void diffuse_map(const std::string& name)=0;
     
     //! Sets the specular texture map by name.
     //! @param name texture map name
-    void specular_map(const std::string& name);
+    virtual void specular_map(const std::string& name)=0;
     
     //! Sets the normal map by name.
     //! @param name the normal map name
-    void normal_map(const std::string& name);
+    virtual void normal_map(const std::string& name)=0;
     
     //! Sets the shader by name.  If the shader is null, then the material will
     //! be rendered using the default shader or fixed function pipeline.
     //! @param name the shader name
-    void shader(const std::string& name);
+    virtual void shader(const std::string& name)=0;
     
-    //! Marks this material as loaded.
-    //! @param loaded true if the material is loaded
-    void loaded(bool loaded);
-    
-private:
-    Material(Engine* engine, const std::string& name);
-    
-    Engine* engine_;
-    std::string name_;
-    Color ambient_color_;
-    Color diffuse_color_;
-    Color specular_color_;
-#pragma warning(disable:4251)
-    TexturePtr diffuse_map_;
-    TexturePtr specular_map_;
-    TexturePtr normal_map_;
-    ShaderPtr shader_;
-#pragma warning(default:4251)
-	bool loaded_;
-    
-    friend class Engine;
+    //! Sets the state of the resource.
+    virtual void state(ResourceState state)=0;
 };
 
 }
