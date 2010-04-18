@@ -41,13 +41,13 @@ public:
     virtual Node* parent() const=0;
 
     //! Returns the linear velocity of the object.
-    virtual const Vector& linear_velocity() const=0;
+    virtual Vector linear_velocity() const=0;
 
     //! Returns the angular velocity of the object.
-    virtual const Vector& angular_velocity() const=0;
+    virtual Vector angular_velocity() const=0;
     
-    //! Returns total force on this object in world coordinates.
-    virtual const Vector& force() const=0;
+    //! Returns the mass fo the object
+    virtual real_t mass() const=0;
 
     //! Sets the linear velocity of the object.
     //! @param v the new linear velocity
@@ -74,6 +74,9 @@ public:
     //! coordinates.
     //! @param v the torque to apply
     virtual void apply_local_torque(const Vector& v)=0;
+    
+    //! Sets the mass of the rigid body.
+    virtual void mass(real_t mass)=0;
 };
 
 

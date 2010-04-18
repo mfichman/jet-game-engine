@@ -21,7 +21,11 @@
  */  
 #pragma once
 
+#include <Jet/Core/Types.hpp>
+#include <Jet/Core/Node.hpp>
 #include <Jet/RigidBody.hpp>
+#include <Bullet/btBulletDynamicsCommon.h>
+#include <Bullet/btBulletCollisionCommon.h>
 
 namespace Jet { namespace Core {
 
@@ -31,8 +35,11 @@ namespace Jet { namespace Core {
 //! are using.
 //! @class RigidBody
 //! @brief Physical simulation with collisions.
-class RigidBody : public Jet::RigidBody {
+class RigidBody : public Jet::RigidBody, public btMotionState {
 public:
+    
+    //! Destructor
+    virtual ~RigidBody();
     
     //! Returns the parent node.
     inline Node* parent() const {
@@ -40,70 +47,92 @@ public:
     }
 
     //! Returns the linear velocity of the object.
-    inline const Vector& linear_velocity() const {
-        return linear_velocity_;
+    inline Vector linear_velocity() const {
+		const btVector3& v = body_->getLinearVelocity();
+        return Vector(v.x(), v.y(), v.z());
     }
 
     //! Returns the angular velocity of the object.
-    inline const Vector& angular_velocity() const {
-        return angular_velocity_;
+    inline Vector angular_velocity() const {
+        const btVector3& v = body_->getAngularVelocity();
+		return Vector(v.x(), v.y(), v.z());
     }
     
-    //! Returns total force on this object in world coordinates.
-    inline const Vector& force() const {
-        return force_;
+    //! Returns the mass
+    inline real_t mass() const {
+        return mass_;
+    }
+
+    //! Returns the rigid body shape.
+    inline btCollisionShape* shape() const {
+        return shape_.get();
     }
 
     //! Sets the linear velocity of the object.
     //! @param v the new linear velocity
     inline void linear_velocity(const Vector& v) {
-        
+        body_->setLinearVelocity(btVector3(v.x, v.y, v.z));
     }
     
     //! Sets the angular velocity of the object.
     //! @param v the new angular velocity
     inline void angular_velocity(const Vector& v) {
-        
+        body_->setAngularVelocity(btVector3(v.x, v.y, v.z));
     }
 
     //! Applies a force to the object, relative to the world coordinates.
     //! @param v the force to apply
     inline void apply_force(const Vector& v) {
-        
+		body_->activate(true);
+        body_->applyCentralForce(btVector3(v.x, v.y, v.z));
     }
 
     //! Applies a torque to the object, relative to the world coordinates.
     //! @param v the torque to apply
     inline void apply_torque(const Vector& v) {
-        
+        body_->applyTorque(btVector3(v.x, v.y, v.z));
     }
 
     //! Applies a force to the object, relative to the parent scene node's
     //! coordinates.
     //! @param v the force to apply
     inline void apply_local_force(const Vector& v) {
-        
+        btTransform transform = body_->getCenterOfMassTransform();
+        transform.setOrigin(btVector3(0.0f, 0.0f, 0.0f));
+        btVector3 force = transform * btVector3(v.x, v.y, v.z);
+        body_->applyCentralForce(force);
     }
 
     //! Applies a torque to the object, relative to the parent scene node's
     //! coordinates.
     //! @param v the torque to apply
     inline void apply_local_torque(const Vector& v) {
-        
+        btTransform transform = body_->getCenterOfMassTransform();
+        transform.setOrigin(btVector3(0.0f, 0.0f, 0.0f));
+        btVector3 torque = transform * btVector3(v.x, v.y, v.z);
+        body_->applyTorque(torque);
     }
-
+    
+    //! Sets the mass of the rigid body.
+    inline void mass(real_t mass) {
+        mass_ = mass;
+        btVector3 inertia;
+        shape_->calculateLocalInertia(mass, inertia);
+        body_->setMassProps(mass, inertia);
+    }
+    
 private:
-    inline RigidBody(Engine* engine, Node* parent) :
-        engine_(engine),
-        parent_(parent) {
-    }
+    RigidBody(Engine* engine, Node* parent);
+    
+    void getWorldTransform(btTransform& transform) const;
+    void setWorldTransform(const btTransform& transform);
     
     Engine* engine_;
     Node* parent_;
-    Vector linear_velocity_;
-    Vector angular_velocity_;
-    Vector force_;
-    Vector torque_;
+    real_t mass_;
+
+    std::auto_ptr<btRigidBody> body_;
+    std::auto_ptr<btCompoundShape> shape_;
 
     friend class Node;
 };

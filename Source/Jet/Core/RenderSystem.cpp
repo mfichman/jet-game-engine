@@ -109,8 +109,6 @@ void Core::RenderSystem::init_default_states() {
     glSwapInterval(0);
 }
 
-static GLfloat angle = 0.0f;
-
 void Core::RenderSystem::on_init() {
     init_window();
     init_default_states();
@@ -126,13 +124,11 @@ void Core::RenderSystem::on_init() {
 void Core::RenderSystem::on_render() {
 	
     glutMainLoopEvent();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	if (!engine_->camera()) {
 		return;
 	}
-    angle += 0.0005f;
-    
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     // Render the scene once for each light
     for (vector<LightPtr>::iterator i = lights_.begin(); i != lights_.end(); i++) {
@@ -145,7 +141,7 @@ void Core::RenderSystem::on_render() {
     glutSwapBuffers();
 }
 
-void Core::RenderSystem::on_update() {
+void Core::RenderSystem::on_post_update() {
 	mesh_objects_.clear();
 	lights_.clear();
 	

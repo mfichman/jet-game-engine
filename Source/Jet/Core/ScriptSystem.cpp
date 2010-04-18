@@ -36,6 +36,8 @@
 #include <Jet/Material.hpp>
 #include <Jet/Mesh.hpp>
 #include <Jet/AudioSource.hpp>
+#include <Jet/Texture.hpp>
+#include <Jet/Shader.hpp>
 #include <luabind/luabind.hpp>
 #include <luabind/adopt_policy.hpp>
 #include <luabind/operator.hpp>
@@ -54,7 +56,7 @@ Core::ScriptSystem::ScriptSystem(Engine* engine) :
     // These types are enough to perform the majority of operations needed.
     // The rest of the Lua binding is through controllers, and the Node
     // and Object classes.
-    luabind::module(env_, "Jet") [
+    luabind::module(env_) [
         
         luabind::class_<Vector>("Vector")
             .def(luabind::constructor<>())
@@ -105,6 +107,18 @@ Core::ScriptSystem::ScriptSystem(Engine* engine) :
             .def_readwrite("end", &Range::end)
             .def(luabind::tostring(luabind::const_self)),
             
+        luabind::class_<Jet::Material, Jet::MaterialPtr>("Material")
+            .property("ambient_color", (const Color& (Jet::Material::*)() const)&Jet::Material::ambient_color, (void (Jet::Material::*)(const Color&))&Jet::Material::ambient_color)
+            .property("diffuse_color", (const Color& (Jet::Material::*)() const)&Jet::Material::diffuse_color, (void (Jet::Material::*)(const Color&))&Jet::Material::diffuse_color)
+            .property("specular_color", (const Color& (Jet::Material::*)() const)&Jet::Material::specular_color, (void (Jet::Material::*)(const Color&))&Jet::Material::specular_color)
+            .property("diffuse_map", (Jet::Texture* (Jet::Material::*)() const)&Jet::Material::diffuse_map, (void (Jet::Material::*)(const std::string&))&Jet::Material::diffuse_map)
+            .property("specular_map", (Jet::Texture* (Jet::Material::*)() const)&Jet::Material::specular_map, (void (Jet::Material::*)(const std::string&))&Jet::Material::specular_map)
+            .property("normal_map", (Jet::Texture* (Jet::Material::*)() const)&Jet::Material::normal_map, (void (Jet::Material::*)(const std::string&))&Jet::Material::normal_map)
+            .property("shader", (Jet::Shader* (Jet::Material::*)() const)&Jet::Material::shader, (void (Jet::Material::*)(const std::string&))&Jet::Material::shader)
+            .property("shininess", (real_t (Jet::Material::*)() const)&Jet::Material::shininess, (void (Jet::Material::*)(real_t))&Jet::Material::shininess)
+            .property("shininess", (bool (Jet::Material::*)() const)&Jet::Material::receive_shadows, (void (Jet::Material::*)(bool))&Jet::Material::receive_shadows)
+            .property("name", (const std::string& (Jet::Material::*)() const)&Jet::Material::name),
+            
         luabind::class_<Jet::Node, Jet::NodePtr>("Node")
             .property("parent", &Jet::Node::parent)
             .property("position", (const Vector& (Jet::Node::*)() const)&Jet::Node::position, (void (Jet::Node::*)(const Vector&))&Jet::Node::position)
@@ -140,26 +154,24 @@ Core::ScriptSystem::ScriptSystem(Engine* engine) :
             
         luabind::class_<Jet::RigidBody, Jet::RigidBodyPtr>("RigidBody")
             .property("parent", &Jet::RigidBody::parent)
-            .property("linear_velocity", (void (Jet::RigidBody::*)(const Vector&))&Jet::RigidBody::linear_velocity, (const Vector& (Jet::RigidBody::*)() const)&Jet::RigidBody::linear_velocity)
-            .property("linear_velocity", (void (Jet::RigidBody::*)(const Vector&))&Jet::RigidBody::linear_velocity, (const Vector& (Jet::RigidBody::*)() const)&Jet::RigidBody::linear_velocity)
-            .property("angular_velocity", (void (Jet::RigidBody::*)(const Vector&))&Jet::RigidBody::angular_velocity, (const Vector& (Jet::RigidBody::*)() const)&Jet::RigidBody::angular_velocity)
-            .property("apply_force", &Jet::RigidBody::apply_force)
-            .property("apply_torque", &Jet::RigidBody::apply_torque)
-            .property("apply_local_force", &Jet::RigidBody::apply_local_force)
-            .property("apply_local_torque", &Jet::RigidBody::apply_local_torque),
+            .property("linear_velocity", (Vector (Jet::RigidBody::*)() const)&Jet::RigidBody::linear_velocity, (void (Jet::RigidBody::*)(const Vector&))&Jet::RigidBody::linear_velocity)
+            .property("angular_velocity", (Vector (Jet::RigidBody::*)() const)&Jet::RigidBody::angular_velocity, (void (Jet::RigidBody::*)(const Vector&))&Jet::RigidBody::angular_velocity)
+            .def("apply_force", &Jet::RigidBody::apply_force)
+            .def("apply_torque", &Jet::RigidBody::apply_torque)
+            .def("apply_local_force", &Jet::RigidBody::apply_local_force)
+            .def("apply_local_torque", &Jet::RigidBody::apply_local_torque)
+            .property("mass", (real_t (Jet::RigidBody::*)() const)&Jet::RigidBody::mass, (void (Jet::RigidBody::*)(real_t))&Jet::RigidBody::mass),
             
         luabind::class_<Jet::Engine, Jet::EnginePtr>("Engine")
-            .property("root", &Jet::Engine::root),
-            
-		luabind::class_<Jet::NodeListener, ScriptController, NodeListenerPtr>("Controller")
-			.def(luabind::constructor<Jet::Node*, const std::string&>())
-			.property("node", &ScriptController::node)
-
-       
+            .property("root", &Jet::Engine::root)
             
     ];
     
-    luabind::globals(env_)["Jet"]["engine"] = static_cast<Jet::Engine*>(engine_);
+    lua_pushlightuserdata(env_, this);
+    lua_pushcclosure(env_, &ScriptSystem::adopt_actor, 1);
+    lua_setglobal(env_, "__adopt_actor");
+    
+    luabind::globals(env_)["engine"] = static_cast<Jet::Engine*>(engine_);
 }
 
 //! Destructor
@@ -169,12 +181,24 @@ Core::ScriptSystem::~ScriptSystem() {
 
 
 void Core::ScriptSystem::on_init() {
-    std::cout << "init" << std::endl;
+    
     string path = engine_->resource_path("Test.lua");
     if (luaL_dofile(env_, path.c_str())) {
         string message(lua_tostring(env_, -1));
         throw runtime_error("Could not load script: " + message);
     }
+}
+
+int Core::ScriptSystem::adopt_actor(lua_State* env) {
+    using namespace luabind;
     
-    std::cout << "here" << std::endl;
+    ScriptSystem* self = static_cast<ScriptSystem*>(lua_touserdata(env, lua_upvalueindex(1)));
+    
+    luabind::object ref = object(from_stack(env, 1));
+    Jet::Node* node = object_cast<Jet::Node*>(object(from_stack(env, 2)));
+    string name = lua_tostring(env, 3);
+    
+    ObjectPtr obj = new ScriptController(ref, node, name);
+    
+    return 0;
 }

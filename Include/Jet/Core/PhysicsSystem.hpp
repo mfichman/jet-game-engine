@@ -23,46 +23,44 @@
 
 #include <Jet/Core/Types.hpp>
 #include <Jet/Core/Engine.hpp>
-#include <Jet/Core/RenderTarget.hpp>
 #include <vector>
+#include <memory>
+#include <Bullet/btBulletDynamicsCommon.h>
+#include <Bullet/btBulletCollisionCommon.h>
 
 namespace Jet { namespace Core {
 
-//! Renderer, uses OpenGL to traverse the scene graph and display visible
-//! elements.  Handles shadows, bump-mapping, specular mapping, particle
-//! systems, etc.
-//! @class Renderer
-//! @brief Renders visible objects.
-class RenderSystem : public EngineListener {
+//! Physics system.  Animates physical objects and performs collision
+//! detection.
+//! @class PhysicsSystem
+//! @brief Rigid body physics engine
+class PhysicsSystem : public EngineListener {
 public:
-    //! Constructor.
-    RenderSystem(Engine* engine);
+    PhysicsSystem(Engine* engine);
 
     //! Destructor.
-    virtual ~RenderSystem() {}
+    virtual ~PhysicsSystem();
+    
+    //! Returns the physics world
+    inline btDynamicsWorld* world() const {
+        return world_.get();
+    }
 
 private:
     void on_init();
-    void on_update() {}
-    void on_post_update();
+    void on_update();
+    void on_post_update() {}
     void on_render();
-    
-    void init_default_states();
-    void init_window();
-    
-    void generate_render_list(Node* node);
-    void generate_shadow_map(Light* light);
-    void render_final(Light* light);
-    void render_shadow_casters();
-    void render_visible_objects();
     
     Engine* engine_;
     
-    // Shadow-mapping variables
-    RenderTargetPtr shadow_target_;
+    std::auto_ptr<btCollisionConfiguration> config_;
+    std::auto_ptr<btCollisionDispatcher> dispatcher_;
+    std::auto_ptr<btBroadphaseInterface> broadphase_;
+    std::auto_ptr<btConstraintSolver> solver_;
+    std::auto_ptr<btDynamicsWorld> world_;
+
     
-    std::vector<MeshObjectPtr> mesh_objects_;
-    std::vector<LightPtr> lights_;
 };
 
 }}

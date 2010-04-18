@@ -115,8 +115,12 @@ public:
 	
     //! Called for each physics update.
     virtual void on_update()=0;
+	
+	//! Called after a batch of physics updates has finished, but before
+	//! the frame is rendered.
+	virtual void on_post_update()=0;
     
-    //! Called during each frame.
+    //! Called when the frame is rendered.
     virtual void on_render()=0;
 };
 

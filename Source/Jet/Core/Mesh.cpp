@@ -39,6 +39,27 @@ using namespace std;
 using namespace boost;
 
 
+Core::Mesh::Mesh(Engine* engine, const std::string& name) :
+		engine_(engine),
+		name_(name),
+		state_(UNLOADED),
+		vbuffer_(0),
+		ibuffer_(0),
+		nindices_(0),
+		sync_mode_(STATIC_SYNC),
+		shape_(&vertex_array_) {
+			
+	btIndexedMesh mesh;
+	mesh.m_numTriangles = 0;
+	mesh.m_triangleIndexBase = 0;
+	mesh.m_triangleIndexStride = sizeof(uint32_t);
+	mesh.m_numVertices = 0;
+	mesh.m_vertexBase = 0;
+	mesh.m_vertexStride = sizeof(Vertex);
+	
+	vertex_array_.addIndexedMesh(mesh);
+}
+
 Core::Mesh::~Mesh() {
 	
 	// Free the buffer from memory
@@ -191,9 +212,11 @@ void Core::Mesh::read_mesh_data() {
     }
 	
 	// Copy data over to the linear memory buffer
+	Mesh::vertex_count(vertices.size());
 	for (map<Vertex, uint32_t>::iterator i = vertices.begin(); i != vertices.end(); i++) {
 		Mesh::vertex(i->second, i->first);
 	}
+	Mesh::index_count(indices.size());
 	for (size_t i = 0; i < indices.size(); i++) {
 		Mesh::index(i, indices[i]);
 	}
@@ -249,4 +272,32 @@ void Core::Mesh::render(Core::Shader* shader) {
 	
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
+void Core::Mesh::index_count(size_t size) {
+	if (size != index_.size()) {
+		index_.resize(size);
+		
+		btIndexedMesh& mesh = vertex_array_.getIndexedMeshArray()[0];
+		mesh.m_numTriangles = index_count()/3;
+		mesh.m_triangleIndexBase = (uint8_t*)index_data();
+		
+		if (SYNCED == state_) {
+			state(LOADED);
+		}
+	}
+}
+
+void Core::Mesh::vertex_count(size_t size) {
+	if (size != vertex_.size()) {
+		vertex_.resize(size);
+		
+		btIndexedMesh& mesh = vertex_array_.getIndexedMeshArray()[0];
+		mesh.m_numVertices = vertex_count();
+		mesh.m_vertexBase = (uint8_t*)vertex_data();
+		
+		if (SYNCED == state_) {
+			state(LOADED);
+		}
+	}
 }

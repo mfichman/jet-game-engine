@@ -55,11 +55,7 @@ public:
     //! Sets the mesh used to render this object.
     //! @param mesh the mesh
     virtual void mesh(Mesh* mesh)=0;
-    
-    //! Sets whether or not this object casts shadows.
-    //! @param shadows true if the object should cast shadows
-    virtual void cast_shadows(bool shadows)=0;
-    
+
     //! Sets the material used to render this object by name.
     //! @param name the name of the material
     virtual void material(const std::string& name)=0;
@@ -67,6 +63,10 @@ public:
     //! Sets the mesh used to render this object by name.
     //! @param name the name of the mesh
     virtual void mesh(const std::string& name)=0;
+	    
+    //! Sets whether or not this object casts shadows.
+    //! @param shadows true if the object should cast shadows
+    virtual void cast_shadows(bool shadows)=0;
     
     //! Sets the shader parameter at the given location.
     //! @param name the param name

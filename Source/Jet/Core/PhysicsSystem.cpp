@@ -18,51 +18,40 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- */  
-#pragma once
+ */
 
-#include <Jet/Core/Types.hpp>
-#include <Jet/Core/Engine.hpp>
-#include <Jet/Core/RenderTarget.hpp>
-#include <vector>
+#include <Jet/Core/PhysicsSystem.hpp>
+#include <BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h>
 
-namespace Jet { namespace Core {
+using namespace Jet;
 
-//! Renderer, uses OpenGL to traverse the scene graph and display visible
-//! elements.  Handles shadows, bump-mapping, specular mapping, particle
-//! systems, etc.
-//! @class Renderer
-//! @brief Renders visible objects.
-class RenderSystem : public EngineListener {
-public:
-    //! Constructor.
-    RenderSystem(Engine* engine);
+Core::PhysicsSystem::PhysicsSystem(Engine* engine) :
+    engine_(engine) {
+        
+    config_.reset(new btDefaultCollisionConfiguration);
+    dispatcher_.reset(new btCollisionDispatcher(config_.get()));
+    broadphase_.reset(new btDbvtBroadphase);
+    solver_.reset(new btSequentialImpulseConstraintSolver);
+    world_.reset(new btDiscreteDynamicsWorld(dispatcher_.get(), broadphase_.get(), solver_.get(), config_.get()));
+    world_->setWorldUserInfo(this);
+	world_->setGravity(btVector3(0.0f, -9.81f, 0.0f));
+    btGImpactCollisionAlgorithm::registerAlgorithm(dispatcher_.get());
+}
 
-    //! Destructor.
-    virtual ~RenderSystem() {}
-
-private:
-    void on_init();
-    void on_update() {}
-    void on_post_update();
-    void on_render();
+Core::PhysicsSystem::~PhysicsSystem() {
     
-    void init_default_states();
-    void init_window();
-    
-    void generate_render_list(Node* node);
-    void generate_shadow_map(Light* light);
-    void render_final(Light* light);
-    void render_shadow_casters();
-    void render_visible_objects();
-    
-    Engine* engine_;
-    
-    // Shadow-mapping variables
-    RenderTargetPtr shadow_target_;
-    
-    std::vector<MeshObjectPtr> mesh_objects_;
-    std::vector<LightPtr> lights_;
-};
+}
 
-}}
+void Core::PhysicsSystem::on_init() {
+    
+}
+
+void Core::PhysicsSystem::on_update() {
+    world_->stepSimulation(engine_->timestep(), 0);
+    
+    // TODO: check for collisions
+}
+
+void Core::PhysicsSystem::on_render() {
+    
+}

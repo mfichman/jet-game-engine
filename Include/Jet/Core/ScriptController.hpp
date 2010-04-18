@@ -32,46 +32,44 @@ namespace Jet { namespace Core {
 //! This class is used to attach logic to a node.
 //! @class ScriptController
 //! @brief Attaches script logic to a node
-class ScriptController : public Jet::NodeListener, public luabind::wrap_base {
+class ScriptController : public Jet::NodeListener {
 public:
     //! Creates a new script controller with a new node.
-	inline ScriptController(Jet::Node* node, const std::string& name) {
-        node_ = static_cast<Node*>(node->node(name));
+	inline ScriptController(const luabind::object& self, Jet::Node* node, const std::string& name) :
+		self_(self),
+		node_(static_cast<Node*>(node->node(name))) {
+            
 		node_->listener(this);
-        std::cout << "Initialized in C++" << std::endl;
+        self_["node"] = static_cast<Jet::Node*>(node_);
     }
     
     inline virtual ~ScriptController() {
-		std::cout << "Destroyed" << std::endl;
 		if (node_) {
 			node_->destroy();
 		}
-    }
-    
-    //! Returns the node attached to this script controller.
-    inline Jet::Node* node() const {
-        return node_;
+        self_["node"] = luabind::nil;
     }
 
 private:
     inline void on_update() {
-		call<void>("on_update");
+		self_["on_update"](self_);
 	}
 
     inline void on_render() {
-		call<void>("on_render");
+		self_["on_render"](self_);
 	}
 
     inline void on_collision() {
-		call<void>("on_collision");
+		self_["on_collision"](self_);
 	}
 
     inline void on_destroy() {
-		//call<void>("on_destroy");
+		self_["on_destroy"](self_);
 		node_ = 0;
 	}
     
     Node* node_;
+    luabind::object self_;
     
 };
 

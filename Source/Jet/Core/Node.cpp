@@ -45,6 +45,16 @@ V& get_value(const std::pair<K, V>& p) {
     return const_cast<V&>(p.second); 
 }
 
+Core::Node::~Node() {
+	if (!destroyed_) {
+		destroyed_ = true;
+		for (vector<NodeListenerPtr>::iterator i = listener_.begin(); i < listener_.end(); i++) {
+            (*i)->on_destroy();
+        }
+	}
+	listener_.clear();
+}
+
 Node* Core::Node::node(const std::string& name) {
     Object* obj = object(name);
     if (obj) {
@@ -73,7 +83,7 @@ MeshObject* Core::Node::mesh_object(const std::string& name) {
         return dynamic_cast<MeshObject*>(obj);
     } else {
         MeshObjectPtr mesh_object(new Core::MeshObject(engine_, this));
-        object(name, mesh_object.get());
+        object(name, mesh_object.get());		
         return mesh_object.get();
     }
 }
@@ -121,10 +131,60 @@ Object* Core::Node::object(const std::string& name) const {
 }
 
 RigidBody* Core::Node::rigid_body() {
-    if (!rigid_body_) {
-        rigid_body_ = new RigidBody(engine_, this);
-    }
-    return rigid_body_.get();
+	if (!rigid_body_) {
+		rigid_body_ = new RigidBody(engine_, this);
+		update_collision_shapes();
+	}
+	return rigid_body_.get();
+}
+
+void Core::Node::update_collision_shapes() {
+	if (!rigid_body_) {
+		if (parent_ && parent_->rigid_body_) {
+			rigid_body_ = parent_->rigid_body_;
+		} else {
+			return;
+		}
+	}
+	
+	RigidBody* rigid_body = static_cast<RigidBody*>(rigid_body_.get());
+
+	// Update the transform of this node.  If the node is the node that the
+	// rigid body is attached to, then simply set the shape transform to the
+	// identity.  Otherwise, set the shape transform to the concatentation of
+	// the parent node's transform and this node's local transform.
+	if (rigid_body->parent() == this) {
+		shape_transform_ = btTransform::getIdentity();
+	} else {
+		btQuaternion rotation(rotation_.x, rotation_.y, rotation_.z, rotation_.w);
+		btVector3 position(position_.x, position_.y, position_.z);
+		btTransform transform(rotation, position);
+		shape_transform_.mult(parent_->shape_transform_, transform);
+		rigid_body_ = parent_->rigid_body_;
+	}
+	
+	// Iterate through all child objects of "node".  For child MeshObjects,
+	// make sure they are attached to the rigid body.  For child Nodes, make
+	// sure that the node has a reference to the new rigid body.
+	for (unordered_map<string, ObjectPtr>::iterator i = object_.begin(); i != object_.end(); i++) {
+		const type_info& info = typeid(*i->second);
+		if (typeid(Node) == info) {
+			Node* node = static_cast<Node*>(i->second.get());
+			node->update_collision_shapes();
+			
+		} else if (typeid(MeshObject) == info) {
+			
+			// Attach the given mesh object to the node, using the local
+			// transform.  Save the index of the added child shape so it can
+			// be updated when the position of the node changes.
+			MeshObject* mesh_object = static_cast<MeshObject*>(i->second.get());
+			Mesh* mesh = mesh_object->mesh();
+			if (mesh) {
+				btCollisionShape* shape = mesh->shape();
+				rigid_body->shape_->addChildShape(shape_transform_, shape);
+			}
+		}
+	}
 }
 
 AudioSource* Core::Node::audio_source() {

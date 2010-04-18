@@ -26,6 +26,9 @@
 #include <Jet/Vertex.hpp>
 #include <vector>
 #include <iostream>
+#include <Bullet/btBulletDynamicsCommon.h>
+#include <Bullet/btBulletCollisionCommon.h>
+#include <BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h>
 
 namespace Jet { namespace Core {
 
@@ -36,6 +39,7 @@ namespace Jet { namespace Core {
 class Mesh : public Jet::Mesh {
 public:
 
+	//! Destructor.
 	virtual ~Mesh();
 
     //! Sets a vertex that is part of this mesh.  This method dynamically
@@ -44,7 +48,7 @@ public:
     //! @param vertex the vertex to add.
     inline void vertex(size_t i, const Vertex& vertex) {
 		if (i >= vertex_.size()) {
-			vertex_.resize(i + 1);
+			vertex_count(i + 1);
 		}
 		vertex_[i] = vertex;
 		if (SYNCED == state_) {
@@ -58,7 +62,7 @@ public:
     //! @param index the index to add
     inline void index(size_t i, uint32_t index) {
 		if (i >= index_.size()) {
-			index_.resize(i + 1);
+			index_count(i + 1);
 		}
 		index_[i] = index;
 		if (SYNCED == state_) {
@@ -79,14 +83,10 @@ public:
     }
 	
 	//! Sets the number of vertices in this mesh
-	inline void vertex_count(size_t size) {
-		vertex_.resize(size);
-	}
+	void vertex_count(size_t size);
 	
 	//! Sets the number of indices in this mesh
-	inline void index_count(size_t size) {
-		index_.resize(size);
-	}
+	void index_count(size_t size);
 	
 	//! Returns the state of this resource.
 	inline ResourceState state() const {
@@ -123,6 +123,11 @@ public:
         return index_.size();
     }
 	
+	//! Returns the collision shape
+	inline btCollisionShape* shape() {
+		return &shape_;
+	}
+
 	//! Sets the sync mode of this mesh.
 	void sync_mode(SyncMode sync_mode) {
 		sync_mode_ = sync_mode;
@@ -135,16 +140,7 @@ public:
 	void render(Shader* shader);
     
 private:
-    inline Mesh(Engine* engine, const std::string& name) :
-		engine_(engine),
-		name_(name),
-		state_(UNLOADED),
-		vbuffer_(0),
-		ibuffer_(0),
-		nindices_(0),
-		sync_mode_(STATIC_SYNC) {
-			
-	}
+    Mesh(Engine* engine, const std::string& name);
 	
 	void read_mesh_data();
 	void compute_tangent(Vertex face[3], size_t j);
@@ -158,6 +154,9 @@ private:
 	uint32_t ibuffer_;
 	uint32_t nindices_;
 	SyncMode sync_mode_;
+	btTriangleIndexVertexArray vertex_array_;
+	btGImpactMeshShape shape_;
+	
 
     friend class Engine;
 };

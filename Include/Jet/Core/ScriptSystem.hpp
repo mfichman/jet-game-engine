@@ -24,6 +24,7 @@
 #include <Jet/Core/Engine.hpp>
 #include <Jet/Core/Types.hpp>
 #include <lua/lua.hpp>
+#include <luabind/luabind.hpp>
 
 namespace Jet { namespace Core {
 
@@ -46,7 +47,11 @@ public:
 private:
     void on_init();
     void on_update() {}
+    void on_post_update() {}
     void on_render() {}
+    
+    
+    static int adopt_actor(lua_State* env);
     
     Engine* engine_;
     lua_State* env_;

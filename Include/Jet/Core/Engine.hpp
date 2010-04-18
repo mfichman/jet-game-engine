@@ -54,10 +54,30 @@ public:
 	inline Jet::Camera* camera() const {
 		return camera_.get();
 	}
-		
+	
+	//! Returns the physics system.
+	inline PhysicsSystem* physics_system() const {
+		return physics_system_.get();
+	}
+	
+	//! Returns the render system.
+	inline RenderSystem* render_system() const {
+		return render_system_.get();
+	}
+	
+	//! Returns the script system.
+	inline ScriptSystem* script_system() const {
+		return script_system_.get();
+	}
+	
     //! Returns true if the engine is running
     inline bool running() const {
         return running_;
+	}
+	
+	//! Returns the fixed timestep
+	inline real_t timestep() const {
+		return 1.0f/60.0f;
 	}
     
     //! Returns an engine option.  This method will return nil if the option
@@ -148,6 +168,10 @@ private:
 
     Jet::NodePtr root_;
 	Jet::CameraPtr camera_;
+	
+	PhysicsSystemPtr physics_system_;
+	RenderSystemPtr render_system_;
+	ScriptSystemPtr script_system_;
     
     std::map<std::string, Jet::MaterialPtr> material_;
     std::map<std::string, Jet::MeshPtr> mesh_;

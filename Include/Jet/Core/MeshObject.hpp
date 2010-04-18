@@ -27,6 +27,7 @@
 #include <Jet/Core/Material.hpp>
 #include <Jet/Core/Mesh.hpp>
 #include <Jet/Core/Texture.hpp>
+#include <Jet/Core/RigidBody.hpp>
 #include <Jet/MeshObject.hpp>
 #include <map>
 
@@ -74,9 +75,9 @@ public:
     
     //! Sets the mesh used to render this object.
     //! @param mesh the mesh
-    inline void mesh(Jet::Mesh* mesh) {
-        mesh_ = static_cast<Mesh*>(mesh);
-    }
+	inline void mesh(Jet::Mesh* mesh) {
+		mesh_ = static_cast<Mesh*>(mesh);
+	}
     
     //! Sets whether or not this object casts shadows.
     //! @param shadows true if the object should cast shadows
@@ -87,13 +88,13 @@ public:
     //! Sets the material used to render this object by name.
     //! @param name the name of the material
     inline void material(const std::string& name) {
-		material_ = static_cast<Material*>(engine_->material(name));
+		material(static_cast<Material*>(engine_->material(name)));
 	}
     
     //! Sets the mesh used to render this object by name.
     //! @param name the name of the mesh
     inline void mesh(const std::string& name) {
-		mesh_ = static_cast<Mesh*>(engine_->mesh(name));
+		mesh(static_cast<Mesh*>(engine_->mesh(name)));
 	}
     
     //! Sets the shader parameter at the given location.
@@ -108,7 +109,6 @@ private:
 		engine_(engine),
 		parent_(parent),
 		cast_shadows_(true) {
-			
 	}
     
     Engine* engine_;

@@ -34,6 +34,8 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <Bullet/btBulletDynamicsCommon.h>
+#include <Bullet/btBulletCollisionCommon.h>
 
 namespace Jet { namespace Core {
 
@@ -50,7 +52,7 @@ namespace Jet { namespace Core {
 class Node : public Jet::Node {
 public:    
     //! Destructor.
-    virtual ~Node() {}
+    virtual ~Node();
 	
 	//! Creates a new node at the given index.  The position and rotation of
     //! the new node will be relative to this node.
@@ -174,7 +176,8 @@ private:
 	inline Node(Engine* engine) :
 		engine_(engine),
 		parent_(0),
-		destroyed_(false) {
+		destroyed_(false),
+		shape_transform_(btTransform::getIdentity()) {
 		
 	}
     
@@ -184,8 +187,9 @@ private:
 	inline Node(Engine* engine, Node* parent) :
 		engine_(engine),
 		parent_(parent),
-		destroyed_(false) {
-			
+		destroyed_(false),
+		rigid_body_(parent->rigid_body_),
+		shape_transform_(parent->shape_transform_) {
 	}
     
     //! Removes an object from this node.
@@ -194,6 +198,12 @@ private:
     
     //! Addes a new object to the node.
     void object(const std::string& name, Object* object);
+	
+	//! Recursively attaches a rigid body to this node and to all child nodes.
+	//! Note that if any child nodes have rigid bodies, they will be destroyed
+	//! and the new rigid body will become the rigid body for that node.
+	//! @param node the node to attach the body to
+	void update_collision_shapes();
   
 	Engine* engine_;
     Node* parent_;
@@ -206,6 +216,7 @@ private:
 	Jet::CameraPtr camera_;
     std::tr1::unordered_map<std::string, ObjectPtr> object_;
     std::vector<NodeListenerPtr> listener_;
+	btTransform shape_transform_;
     bool destroyed_;
 
 	friend class Engine;

@@ -32,6 +32,7 @@
 
 #include <Jet/Core/RenderSystem.hpp>
 #include <Jet/Core/ScriptSystem.hpp>
+#include <Jet/Core/PhysicsSystem.hpp>
 
 #include <Jet/Core/AudioSource.hpp>
 #include <Jet/Core/Camera.hpp>
@@ -50,7 +51,6 @@
 #include <IL/IL.h>
 
 #define JET_MAX_TIME_LAG 0.5f
-#define JET_TIME_STEP 1.0f/60.0f 
 
 using namespace Jet;
 using namespace std;
@@ -66,10 +66,14 @@ Core::Engine::Engine() :
 	initialized_(false),
 	accumulator_(0) {
         
-    root_.reset(new Core::Node(this));
+    root_ = new Core::Node(this);
+	render_system_ = new RenderSystem(this);
+	script_system_ = new ScriptSystem(this);
+	physics_system_ = new PhysicsSystem(this);
 	
-    listener(new RenderSystem(this));
-	listener(new ScriptSystem(this));
+    listener(render_system_.get());
+	listener(script_system_.get());
+	listener(physics_system_.get());
 	
 #ifdef WINDOWS
 	::int64_t counts_per_sec = 0;
@@ -85,6 +89,7 @@ Core::Engine::Engine() :
 }
 
 Core::Engine::~Engine() {
+	root_.reset();
 }
 
 void Core::Engine::init_systems() {
@@ -171,16 +176,17 @@ std::string Core::Engine::resolve_path(const std::string& name) {
 }
 
 void Core::Engine::tick() {
-    static int frames = 0;
-    static float elapsed = 0.0f;
-	
+	// Initialize the engine systems if this is the first tick
 	if (!initialized_) {
 		init_systems();
 	}
 	
+	// Update the delta since the last tick
     update_delta();
     
-    // Calculate FPS
+    // This is a rough calculation of the number of frames per second.
+	static int frames = 0;
+    static float elapsed = 0.0f;
     elapsed += delta_;
     frames++;
     if (elapsed > 1.0f) {
@@ -189,15 +195,26 @@ void Core::Engine::tick() {
         elapsed = 0.0f;
     }
     
+	// Run the fixed-time step portion of the game by calling on_update when
+	// the accumulator overflows
+	bool updated = false;
     accumulator_ += delta_;
     accumulator_ = min(accumulator_, JET_MAX_TIME_LAG);
-    while (accumulator_ >= JET_TIME_STEP) {
+    while (accumulator_ >= timestep()) {
         // capture input
         for (list<EngineListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
             (*i)->on_update();
         }
-		accumulator_ -= JET_TIME_STEP;
+		accumulator_ -= timestep();
+		updated = true;
     }
+	
+	// Fire post-update event
+	if (updated) {
+		for (list<EngineListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
+			(*i)->on_post_update();
+		}
+	}
     
     // Fire render event
     for (list<EngineListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {

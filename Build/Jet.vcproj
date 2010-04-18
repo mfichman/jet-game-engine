@@ -81,11 +81,23 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Source\Jet\Core\PhysicsSystem.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\Source\Jet\Core\RenderSystem.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\Source\Jet\Core\RenderTarget.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Jet\Core\RigidBody.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Jet\Core\ScriptController.cpp"
 				>
 			</File>
 			<File
@@ -168,6 +180,10 @@
 			</File>
 			<File
 				RelativePath="..\Include\Jet\Core\RigidBody.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Include\Jet\RigidBody.hpp"
 				>
 			</File>
 			<File
