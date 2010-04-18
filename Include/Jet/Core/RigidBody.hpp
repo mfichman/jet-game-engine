@@ -23,6 +23,7 @@
 
 #include <Jet/Core/Types.hpp>
 #include <Jet/Core/Node.hpp>
+#include <Jet/Core/PhysicsSystem.hpp>
 #include <Jet/RigidBody.hpp>
 #include <Bullet/btBulletDynamicsCommon.h>
 #include <Bullet/btBulletCollisionCommon.h>
@@ -116,9 +117,13 @@ public:
     //! Sets the mass of the rigid body.
     inline void mass(real_t mass) {
         mass_ = mass;
-        btVector3 inertia;
+        btVector3 inertia(0.0f, 0.0f, 0.0f);
         shape_->calculateLocalInertia(mass, inertia);
         body_->setMassProps(mass, inertia);
+        body_->updateInertiaTensor();
+        body_->activate(true);
+        engine_->physics_system()->world()->removeCollisionObject(body_.get());
+        engine_->physics_system()->world()->addRigidBody(body_.get());
     }
     
 private:

@@ -18,38 +18,58 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- */
-
-#include <Jet/Core/PhysicsSystem.hpp>
-#include <BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h>
-
+ */  
+    
+#include <Jet/BoundingBox.hpp>
+    
 using namespace Jet;
-
-Core::PhysicsSystem::PhysicsSystem(Engine* engine) :
-    engine_(engine) {
+    
+BoundingBox::BoundingBox() :
+    min_x(0.0f),
+    max_x(0.0f),
+    min_y(0.0f),
+    max_y(0.0f),
+    min_z(0.0f),
+    max_z(0.0f) {
         
-    config_.reset(new btDefaultCollisionConfiguration);
-    dispatcher_.reset(new btCollisionDispatcher(config_.get()));
-    broadphase_.reset(new btDbvtBroadphase);
-    solver_.reset(new btSequentialImpulseConstraintSolver);
-	world_.reset(new btDiscreteDynamicsWorld(dispatcher_.get(), broadphase_.get(), solver_.get(), config_.get()));
-    world_->setWorldUserInfo(this);
-	world_->setGravity(btVector3(0.0f, 0.0f, 0.0f));
-    btGImpactCollisionAlgorithm::registerAlgorithm(dispatcher_.get());
 }
 
-Core::PhysicsSystem::~PhysicsSystem() {
+real_t BoundingBox::width() const {
+    return max_x - min_x;
+}
+
+real_t BoundingBox::height() const {
+    return max_y - min_y;
+}
+
+real_t BoundingBox::depth() const {
+    return max_z - min_z;
+}
+
+Vector BoundingBox::half_extents() const {
+    return Vector(width()/2.0f, height()/2.0f, depth()/2.0f);
+}
+
+Vector BoundingBox::origin() const {
+    return Vector((max_x + min_x)/2.0f, (max_y + min_y)/2.0f, (max_z + min_z)/2.0f);
+}
+
+void BoundingBox::point(const Vector& point) {
+    if (point.x < min_x) {
+        min_x = point.x;
+    } else if (point.x > max_x) {
+        max_x = point.x;
+    }
     
-}
-
-void Core::PhysicsSystem::on_init() {
+    if (point.y < min_y) {
+        min_y = point.y;
+    } else if (point.y > max_y) {
+        max_y = point.y;   
+    }
     
-}
-
-void Core::PhysicsSystem::on_update() {
-    world_->stepSimulation(engine_->timestep()/4.0f, 0);
-}
-
-void Core::PhysicsSystem::on_render() {
-    
+    if (point.z < min_z) {
+        min_z = point.z;
+    } else if (point.z > max_z) {
+        max_z = point.z;
+    }
 }

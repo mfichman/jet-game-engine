@@ -33,6 +33,7 @@
 #include <Jet/Core/RenderSystem.hpp>
 #include <Jet/Core/ScriptSystem.hpp>
 #include <Jet/Core/PhysicsSystem.hpp>
+#include <Jet/Core/InputSystem.hpp>
 
 #include <Jet/Core/AudioSource.hpp>
 #include <Jet/Core/Camera.hpp>
@@ -72,8 +73,9 @@ Core::Engine::Engine() :
 	physics_system_ = new PhysicsSystem(this);
 	
     listener(render_system_.get());
-	listener(script_system_.get());
 	listener(physics_system_.get());
+	listener(script_system_.get());
+	listener(new InputSystem(this));
 	
 #ifdef WINDOWS
 	::int64_t counts_per_sec = 0;
@@ -205,6 +207,9 @@ void Core::Engine::tick() {
         for (list<EngineListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
             (*i)->on_update();
         }
+		if (module_) {
+			module_->on_update();
+		}
 		accumulator_ -= timestep();
 		updated = true;
     }
@@ -220,6 +225,10 @@ void Core::Engine::tick() {
     for (list<EngineListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
         (*i)->on_render();
     }
+	
+	if (module_) {
+		module_->on_render();
+	}
 }
 
 

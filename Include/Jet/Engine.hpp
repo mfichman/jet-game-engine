@@ -36,6 +36,9 @@ public:
     //! Returns the root scene node.  This node can be used to add 
     //! other objects to the scene.
     virtual inline Node* root() const=0;
+	
+	//! Returns the current module.
+	virtual Module* module() const=0;
         
     //! Returns true if the engine is running
     virtual bool running() const=0;
@@ -76,6 +79,10 @@ public:
     //! will be loaded automatically.
     //! @param folder the folder to add
     virtual void search_folder(const std::string& path)=0;
+	
+	//! Sets the current module.  The previous module will be deactivated.
+	//! @param module the module
+	virtual void module(Module* module)=0;
     
     //! Sets whether or not the engine is running.
     //! @param running false to stop the engine

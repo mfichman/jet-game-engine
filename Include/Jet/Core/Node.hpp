@@ -127,15 +127,11 @@ public:
 
 	//! Sets the position of the node.
     //! @param position the position of the node
-	inline void position(const Vector& position) {
-		position_ = position;
-	}
+	void position(const Vector& position);
 
 	//! Sets the rotation of the node.
     //! @param rotation the rotation of the node
-	inline void rotation(const Quaternion& rotation) {
-		rotation_ = rotation;
-	}
+	void rotation(const Quaternion& rotation);
 	
 	//! Sets the matrix for this node.
 	inline void matrix(const Matrix& matrix) {

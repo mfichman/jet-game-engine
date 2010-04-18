@@ -33,6 +33,7 @@
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <stdexcept>
+#include <BulletCollision/CollisionShapes/btShapeHull.h>
 
 using namespace Jet;
 using namespace std;
@@ -47,17 +48,7 @@ Core::Mesh::Mesh(Engine* engine, const std::string& name) :
 		ibuffer_(0),
 		nindices_(0),
 		sync_mode_(STATIC_SYNC),
-		shape_(&vertex_array_) {
-			
-	btIndexedMesh mesh;
-	mesh.m_numTriangles = 0;
-	mesh.m_triangleIndexBase = 0;
-	mesh.m_triangleIndexStride = sizeof(uint32_t);
-	mesh.m_numVertices = 0;
-	mesh.m_vertexBase = 0;
-	mesh.m_vertexStride = sizeof(Vertex);
-	
-	vertex_array_.addIndexedMesh(mesh);
+		bounding_shape_(btVector3(0.0f, 0.0f, 0.0f)) {
 }
 
 Core::Mesh::~Mesh() {
@@ -103,6 +94,38 @@ void Core::Mesh::state(ResourceState state) {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	
 		nindices_ = index_count();
+
+		// Create a triangle array using the data loaded from the disk
+		btIndexedMesh mesh;
+		mesh.m_numTriangles = index_count()/3;
+		mesh.m_triangleIndexBase = (uint8_t*)index_data();
+		mesh.m_triangleIndexStride = 3*sizeof(uint32_t);
+		mesh.m_numVertices = vertex_count();
+		mesh.m_vertexBase = (uint8_t*)vertex_data();
+		mesh.m_vertexStride = sizeof(Vertex);
+		btTriangleIndexVertexArray vertex_array;
+		vertex_array.addIndexedMesh(mesh);
+		
+		//! Create a temporary shape to hold the vertice;
+		btConvexTriangleMeshShape temp_shape(&vertex_array);
+		btShapeHull shape_hull(&temp_shape);
+		btScalar margin = temp_shape.getMargin();
+		shape_hull.buildHull(margin);
+		shape_ = btConvexHullShape();
+		temp_shape.setUserPointer(&shape_hull);
+
+		// Awesome! Create a hull using the hull vertices.
+		for (int i = 0; i < shape_hull.numVertices(); i++) {
+			shape_.addPoint(shape_hull.getVertexPointer()[i]);
+		}
+		
+		// Generate the bounding shape
+		bounding_box_ = BoundingBox();
+		for (vector<Vertex>::iterator i = vertex_.begin(); i != vertex_.end(); i++) {
+			bounding_box_.point(i->position);
+		}
+		btVector3 half_extents(bounding_box_.half_extents().x, bounding_box_.half_extents().y, bounding_box_.half_extents().z);
+		bounding_shape_ = btBoxShape(half_extents);
 	}
 	
 	// Entering the unloaded state
@@ -212,6 +235,7 @@ void Core::Mesh::read_mesh_data() {
     }
 	
 	// Copy data over to the linear memory buffer
+	
 	Mesh::vertex_count(vertices.size());
 	for (map<Vertex, uint32_t>::iterator i = vertices.begin(); i != vertices.end(); i++) {
 		Mesh::vertex(i->second, i->first);
@@ -220,6 +244,8 @@ void Core::Mesh::read_mesh_data() {
 	for (size_t i = 0; i < indices.size(); i++) {
 		Mesh::index(i, indices[i]);
 	}
+	btVector3 half_extents(bounding_box_.half_extents().x, bounding_box_.half_extents().y, bounding_box_.half_extents().z);
+	bounding_shape_ = btBoxShape(half_extents);
 }
 
 void Core::Mesh::compute_tangent(Vertex face[3], size_t j) {
@@ -278,10 +304,6 @@ void Core::Mesh::index_count(size_t size) {
 	if (size != index_.size()) {
 		index_.resize(size);
 		
-		btIndexedMesh& mesh = vertex_array_.getIndexedMeshArray()[0];
-		mesh.m_numTriangles = index_count()/3;
-		mesh.m_triangleIndexBase = (uint8_t*)index_data();
-		
 		if (SYNCED == state_) {
 			state(LOADED);
 		}
@@ -291,10 +313,6 @@ void Core::Mesh::index_count(size_t size) {
 void Core::Mesh::vertex_count(size_t size) {
 	if (size != vertex_.size()) {
 		vertex_.resize(size);
-		
-		btIndexedMesh& mesh = vertex_array_.getIndexedMeshArray()[0];
-		mesh.m_numVertices = vertex_count();
-		mesh.m_vertexBase = (uint8_t*)vertex_data();
 		
 		if (SYNCED == state_) {
 			state(LOADED);

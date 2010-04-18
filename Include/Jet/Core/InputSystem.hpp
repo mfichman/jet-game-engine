@@ -18,38 +18,41 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- */
+ */  
+#pragma once
 
-#include <Jet/Core/PhysicsSystem.hpp>
-#include <BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h>
+#include <Jet/Core/Types.hpp>
+#include <Jet/Core/Engine.hpp>
 
-using namespace Jet;
+namespace Jet { namespace Core {
 
-Core::PhysicsSystem::PhysicsSystem(Engine* engine) :
-    engine_(engine) {
-        
-    config_.reset(new btDefaultCollisionConfiguration);
-    dispatcher_.reset(new btCollisionDispatcher(config_.get()));
-    broadphase_.reset(new btDbvtBroadphase);
-    solver_.reset(new btSequentialImpulseConstraintSolver);
-	world_.reset(new btDiscreteDynamicsWorld(dispatcher_.get(), broadphase_.get(), solver_.get(), config_.get()));
-    world_->setWorldUserInfo(this);
-	world_->setGravity(btVector3(0.0f, 0.0f, 0.0f));
-    btGImpactCollisionAlgorithm::registerAlgorithm(dispatcher_.get());
-}
-
-Core::PhysicsSystem::~PhysicsSystem() {
+//! Physics system.  Animates physical objects and performs collision
+//! detection.
+//! @class InputSystem
+//! @brief Rigid body physics engine
+class InputSystem : public EngineListener {
+public:
+    //! Creates a new input system.
+    InputSystem(Engine* engine);
     
-}
+    //! Destructor.
+    ~InputSystem();
 
-void Core::PhysicsSystem::on_init() {
+private:
+    void on_init();
+    void on_update();
+    void on_post_update() {}
+    void on_render() {}
     
-}
-
-void Core::PhysicsSystem::on_update() {
-    world_->stepSimulation(engine_->timestep()/4.0f, 0);
-}
-
-void Core::PhysicsSystem::on_render() {
+    static void on_keyboard(unsigned char key, int x, int y);
+    static void on_keyboard_up(unsigned char key, int x, int y);
+    static void on_special(int key, int x, int y);
+    static void on_special_up(int key, int x, int y);
+    static void on_mouse(int button, int state, int x, int y);
+    static void on_joystick(unsigned int button, int x, int y, int z);
     
-}
+    Engine* engine_;
+    static InputSystem* system_;
+};
+
+}}

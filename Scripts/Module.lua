@@ -18,23 +18,19 @@
 -- FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 -- IN THE SOFTWARE.
 
-require 'Module'
-require 'Starship'
-require 'Monkey'
+class 'Module'
 
-class 'Test' (Module)
-
-function Test:__init()
-    Module.__init(self)
-    
-    local s0 = Starship(engine.root, "s0")
-    local s1 = Monkey(engine.root, "s1")
-    
-    s1.node.position = Vector(0, 0, 0)
-    s0.node.position = Vector(0, -10, 0)
-    s0.body:apply_force(Vector(-1500, 15000, 0))
+function Module:__init()
+    __adopt_module(self)
 end
 
-function Test:on_key_pressed(key, x, y)
-    print(key, x, y)
-end
+function Module:on_key_pressed(key, x, y) end
+function Module:on_key_released(key, x, y) end
+function Module:on_button_pressed(button, x, y) end
+function Module:on_button_released(button, x, y) end
+function Module:on_mouse_motion(x, y) end
+function Module:on_joystick(button, x, y, z) end
+function Module:on_init() end
+function Module:on_update() end
+function Module:on_render() end
+function Module:on_destroy() end

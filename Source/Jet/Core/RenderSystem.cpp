@@ -156,7 +156,7 @@ void Core::RenderSystem::generate_shadow_map(Light* light) {
     glLoadIdentity();
     //gluPerspective(30.0f, 1.0f, 0.01f, 1000.0f);
     //glOrtho(2048.0, 2048.0, 2048.0, 2048.0, 0.01, 1000.0f);
-    glOrtho(-6.0f, 6.0f, -6.0f, 6.0f, 0.1f, 1000.0f);
+    glOrtho(-12.0f, 12.0f, -12.0f, 12.0f, 0.1f, 1000.0f);
     
     // Set up the view matrix for the light
     glMatrixMode(GL_MODELVIEW);

@@ -39,7 +39,9 @@ void main() {
 		plane_material->diffuse_color(Jet::Color(1.0f, 1.0f, 1.0f, 1.0f));
 		plane_material->diffuse_map("MetalDiffuse.png");
 
-		Jet::MeshObjectPtr plane(engine->root()->mesh_object("plane"));
+		Jet::NodePtr plane_node(engine->root()->node("plane"));
+
+		Jet::MeshObjectPtr plane(plane_node->mesh_object("plane"));
 		plane->mesh("plane");
 		plane->material(plane_material.get());
 		
@@ -89,17 +91,22 @@ void main() {
 		light->direction(Jet::Vector(1.0f, 0.0f, 0.0f));
 		
 		Jet::NodePtr camera_node(engine->root()->node("camera"));
+		camera_node->position(Jet::Vector(15.0f, 0.0f, 15.0f));
+		camera_node->look(Jet::Vector(0.0f, 0.0f, 0.0f), Jet::Vector(0.0f, 1.0f, 0.0f));
 		
 		Jet::CameraPtr camera(camera_node->camera());
 		camera->active(true);
 
-		float pos = 0.0f;
+		//float pos = 0.0f;
         while (engine->running()) {
+			
 			engine->tick();
-			pos += 0.001f;
-			camera_node->position(Jet::Vector(15.0f*sinf(pos), 0.0f, 15.0f*cosf(pos)));
-			camera_node->look(Jet::Vector(0.0f, 0.0f, 0.0f), Jet::Vector(0.0f, 1.0f, 0.0f));
-        }
+			plane_node->rigid_body();
+			//pos += 0.001f;
+			//camera_node->position(Jet::Vector(15.0f*sinf(pos), 0.0f, 15.0f*cosf(pos)));
+			//camera_node->look(Jet::Vector(0.0f, 0.0f, 0.0f), Jet::Vector(0.0f, 1.0f, 0.0f));
+			
+		}
         
     } catch (std::exception& ex) {
         std::cout << ex.what() << std::endl;

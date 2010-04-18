@@ -24,6 +24,7 @@
 #include <Jet/Core/Types.hpp>
 #include <Jet/Mesh.hpp>
 #include <Jet/Vertex.hpp>
+#include <Jet/BoundingBox.hpp>
 #include <vector>
 #include <iostream>
 #include <Bullet/btBulletDynamicsCommon.h>
@@ -127,6 +128,16 @@ public:
 	inline btCollisionShape* shape() {
 		return &shape_;
 	}
+	
+	//! Returns the bounding box shape
+	inline btCollisionShape* bounding_shape() {
+		return &bounding_shape_;
+	}
+	
+	//! Returns the origin of the mesh
+	inline Vector origin() const {
+		return bounding_box_.origin();
+	}
 
 	//! Sets the sync mode of this mesh.
 	void sync_mode(SyncMode sync_mode) {
@@ -155,7 +166,9 @@ private:
 	uint32_t nindices_;
 	SyncMode sync_mode_;
 	btTriangleIndexVertexArray vertex_array_;
-	btGImpactMeshShape shape_;
+	btConvexHullShape shape_;
+	btBoxShape bounding_shape_;
+	BoundingBox bounding_box_;
 	
 
     friend class Engine;

@@ -32,6 +32,10 @@ Core::RigidBody::RigidBody(Engine* engine, Node* parent) :
     mass_(0.0f) {
 
     shape_.reset(new btCompoundShape);
+    
+    //btVector3 inertia(0.0f, 0.0f, 0.0f);
+    //shape_->calculateLocalInertia(mass_, inertia);
+    
     body_.reset(new btRigidBody(mass_, this, shape_.get()));
     body_->setUserPointer(this);
     engine_->physics_system()->world()->addRigidBody(body_.get());
@@ -54,6 +58,6 @@ void Core::RigidBody::setWorldTransform(const btTransform& transform) {
     const btQuaternion& rotation = transform.getRotation();
     const btVector3& position = transform.getOrigin();
     
-    parent_->rotation(Quaternion(rotation.x(), rotation.y(), rotation.z(), rotation.w()));
-    parent_->position(Vector(position.x(), position.y(), position.z()));
+    parent_->rotation_ = Quaternion(rotation.w(), rotation.x(), rotation.y(), rotation.z());
+    parent_->position_ = Vector(position.x(), position.y(), position.z());
 }

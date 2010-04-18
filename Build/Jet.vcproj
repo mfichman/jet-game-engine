@@ -179,15 +179,19 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Core\RigidBody.hpp"
-				>
-			</File>
-			<File
 				RelativePath="..\Include\Jet\RigidBody.hpp"
 				>
 			</File>
 			<File
+				RelativePath="..\Include\Jet\Core\RigidBody.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\Include\Jet\Core\ScriptController.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Include\Jet\Core\ScriptModule.hpp"
 				>
 			</File>
 			<File

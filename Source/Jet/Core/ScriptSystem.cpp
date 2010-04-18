@@ -22,6 +22,7 @@
 
 #include <Jet/Core/ScriptSystem.hpp>
 #include <Jet/Core/ScriptController.hpp>
+#include <Jet/Core/ScriptModule.hpp>
 #include <Jet/Vector.hpp>
 #include <Jet/Quaternion.hpp>
 #include <Jet/Range.hpp>
@@ -171,6 +172,10 @@ Core::ScriptSystem::ScriptSystem(Engine* engine) :
     lua_pushcclosure(env_, &ScriptSystem::adopt_actor, 1);
     lua_setglobal(env_, "__adopt_actor");
     
+    lua_pushlightuserdata(env_, this);
+    lua_pushcclosure(env_, &ScriptSystem::adopt_module, 1);
+    lua_setglobal(env_, "__adopt_module");
+    
     luabind::globals(env_)["engine"] = static_cast<Jet::Engine*>(engine_);
 }
 
@@ -182,7 +187,15 @@ Core::ScriptSystem::~ScriptSystem() {
 
 void Core::ScriptSystem::on_init() {
     
-    string path = engine_->resource_path("Test.lua");
+    // Add all folders on the search path to the Lua module search path
+    string package_path = luabind::object_cast<string>(luabind::globals(env_)["package"]["path"]);
+    for (Iterator<const string> i = engine_->search_folders(); i; i++) {
+        package_path += ";" + *i + "/?.lua";
+    }
+    luabind::globals(env_)["package"]["path"] = package_path;
+    
+    //! Load the main file
+    string path = engine_->resource_path("Main.lua");
     if (luaL_dofile(env_, path.c_str())) {
         string message(lua_tostring(env_, -1));
         throw runtime_error("Could not load script: " + message);
@@ -199,6 +212,18 @@ int Core::ScriptSystem::adopt_actor(lua_State* env) {
     string name = lua_tostring(env, 3);
     
     ObjectPtr obj = new ScriptController(ref, node, name);
+    
+    return 0;
+}
+
+int Core::ScriptSystem::adopt_module(lua_State* env) {
+    using namespace luabind;
+    
+    ScriptSystem* self = static_cast<ScriptSystem*>(lua_touserdata(env, lua_upvalueindex(1)));
+    
+    luabind::object ref = object(from_stack(env, -1));
+    
+    self->engine_->module(new ScriptModule(ref));
     
     return 0;
 }

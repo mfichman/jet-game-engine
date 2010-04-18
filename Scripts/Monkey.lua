@@ -18,23 +18,17 @@
 -- FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 -- IN THE SOFTWARE.
 
-require 'Module'
-require 'Starship'
-require 'Monkey'
+require 'Actor'
 
-class 'Test' (Module)
+class 'Monkey' (Actor)
 
-function Test:__init()
-    Module.__init(self)
+function Monkey:__init(node, name)
+    Actor.__init(self, node, name)
+
+    self.mesh = self.node:mesh_object("mesh")
+    self.mesh.mesh = "Monkey.obj"
+    self.mesh.material = "Rock.mtl"
     
-    local s0 = Starship(engine.root, "s0")
-    local s1 = Monkey(engine.root, "s1")
-    
-    s1.node.position = Vector(0, 0, 0)
-    s0.node.position = Vector(0, -10, 0)
-    s0.body:apply_force(Vector(-1500, 15000, 0))
-end
-
-function Test:on_key_pressed(key, x, y)
-    print(key, x, y)
+    self.body = self.node:rigid_body()
+    self.body.mass = 10.0
 end

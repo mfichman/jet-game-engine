@@ -22,9 +22,11 @@
 #pragma once
 
 #include <Jet/Core/Types.hpp>
+#include <Jet/Iterator.hpp>
 #include <Jet/Types.hpp>
 #include <Jet/Engine.hpp>
 #include <Jet/Camera.hpp>
+#include <Jet/Module.hpp>
 #include <list>
 #include <map>
 #include <set>
@@ -68,6 +70,11 @@ public:
 	//! Returns the script system.
 	inline ScriptSystem* script_system() const {
 		return script_system_.get();
+	}
+	
+	//! Returns the current module.
+	inline Module* module() const {
+		return module_.get();
 	}
 	
     //! Returns true if the engine is running
@@ -134,6 +141,19 @@ public:
     inline void search_folder(const std::string& path) {
         search_folder_.insert(resolve_path(path));
     }
+	
+	//! Sets the current module.
+	//! @param module the module
+	inline void module(Module* module) {
+		if (module_) {
+			module_->on_destroy();
+			module_.reset();
+		}
+		module_ = module;
+		if (module_) {
+			module_->on_init();
+		}
+	}
     
     //! Sets whether or not the engine is running.
     //! @param running false to stop the engine
@@ -155,6 +175,11 @@ public:
     inline void option(const std::string& name, const boost::any& value) {
         option_[name] = value;
     }
+	
+	//! Returns an iterator over all the search folders.
+	inline Iterator<const std::string> search_folders() const {
+		return Iterator<const std::string>(search_folder_.begin(), search_folder_.end());
+	}
     
     //! Runs the engine through one complete loop.  Note that the engine may
     //! or may not actually do anything on a given loop, depending on the
@@ -168,6 +193,7 @@ private:
 
     Jet::NodePtr root_;
 	Jet::CameraPtr camera_;
+	Jet::ModulePtr module_;
 	
 	PhysicsSystemPtr physics_system_;
 	RenderSystemPtr render_system_;

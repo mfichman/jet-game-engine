@@ -18,38 +18,46 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- */
+ */  
+#pragma once
 
-#include <Jet/Core/PhysicsSystem.hpp>
-#include <BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h>
+#include <Jet/Types.hpp>
+#include <Jet/Vector.hpp>
 
-using namespace Jet;
+namespace Jet {
 
-Core::PhysicsSystem::PhysicsSystem(Engine* engine) :
-    engine_(engine) {
-        
-    config_.reset(new btDefaultCollisionConfiguration);
-    dispatcher_.reset(new btCollisionDispatcher(config_.get()));
-    broadphase_.reset(new btDbvtBroadphase);
-    solver_.reset(new btSequentialImpulseConstraintSolver);
-	world_.reset(new btDiscreteDynamicsWorld(dispatcher_.get(), broadphase_.get(), solver_.get(), config_.get()));
-    world_->setWorldUserInfo(this);
-	world_->setGravity(btVector3(0.0f, 0.0f, 0.0f));
-    btGImpactCollisionAlgorithm::registerAlgorithm(dispatcher_.get());
-}
+//! Represents a 3-component texcoord.
+//! @class Texcoord
+//! @brief 3-component texcoord.
+class BoundingBox {
+public:
+    //! Creates a zero-size bounding box.
+    BoundingBox();
 
-Core::PhysicsSystem::~PhysicsSystem() {
+    //! Returns the width of the box
+    real_t width() const;
     
-}
-
-void Core::PhysicsSystem::on_init() {
+    //! Returns the height of the box
+    real_t height() const;
     
-}
-
-void Core::PhysicsSystem::on_update() {
-    world_->stepSimulation(engine_->timestep()/4.0f, 0);
-}
-
-void Core::PhysicsSystem::on_render() {
+    //! Returns the depth of the box
+    real_t depth() const;
     
+    //! Returns the half-extents of the box
+    Vector half_extents() const;
+    
+    //! Returns the origin of the box
+    Vector origin() const;
+    
+    //! Adds a point to the box, expanding it if necessary.
+    void point(const Vector& point);
+
+    real_t min_x;
+    real_t max_x;
+    real_t min_y;
+    real_t max_y;
+    real_t min_z;
+    real_t max_z;
+};
+
 }

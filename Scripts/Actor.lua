@@ -18,23 +18,13 @@
 -- FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 -- IN THE SOFTWARE.
 
-require 'Module'
-require 'Starship'
-require 'Monkey'
+class 'Actor'
 
-class 'Test' (Module)
-
-function Test:__init()
-    Module.__init(self)
-    
-    local s0 = Starship(engine.root, "s0")
-    local s1 = Monkey(engine.root, "s1")
-    
-    s1.node.position = Vector(0, 0, 0)
-    s0.node.position = Vector(0, -10, 0)
-    s0.body:apply_force(Vector(-1500, 15000, 0))
+function Actor:__init(node, name)
+    __adopt_actor(self, node, name)
 end
 
-function Test:on_key_pressed(key, x, y)
-    print(key, x, y)
-end
+function Actor:on_update() end
+function Actor:on_render() end
+function Actor:on_collision() end
+function Actor:on_destroy() end

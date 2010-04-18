@@ -180,8 +180,18 @@ void Core::Node::update_collision_shapes() {
 			MeshObject* mesh_object = static_cast<MeshObject*>(i->second.get());
 			Mesh* mesh = mesh_object->mesh();
 			if (mesh) {
-				btCollisionShape* shape = mesh->shape();
-				rigid_body->shape_->addChildShape(shape_transform_, shape);
+				
+				if (UNLOADED == mesh->state()) {
+					mesh->state(SYNCED);
+				}
+				
+				// TODO: This is for bounding-box shapes
+				//Vector origin = mesh->origin();
+				//btTransform transform = shape_transform_ * btTransform(btQuaternion::getIdentity(), btVector3(origin.x, origin.y, origin.z));
+				//rigid_body->shape_->addChildShape(transform, mesh->bounding_shape());
+				
+				// This is for triangle mesh shapes
+				rigid_body->shape_->addChildShape(shape_transform_, mesh->shape());
 			}
 		}
 	}
@@ -227,6 +237,26 @@ Iterator<ObjectPtr> Core::Node::objects() const {
 	return Iterator<ObjectPtr>(begin, end);
 }
 
+
+void Core::Node::position(const Vector& position) {
+	position_ = position;
+	if (rigid_body_ && rigid_body_->parent() == this) {
+		RigidBody* rigid_body = static_cast<RigidBody*>(rigid_body_.get());
+		btTransform transform = rigid_body->body_->getCenterOfMassTransform();
+		transform.setOrigin(btVector3(position.x, position.y, position.z));
+		rigid_body->body_->setCenterOfMassTransform(transform);
+	}
+}
+
+void Core::Node::rotation(const Quaternion& rotation) {
+	rotation_ = rotation;
+	if (rigid_body_ && rigid_body_->parent() == this) {
+		RigidBody* rigid_body = static_cast<RigidBody*>(rigid_body_.get());
+		btTransform transform = rigid_body->body_->getCenterOfMassTransform();
+		transform.setRotation(btQuaternion(rotation.x, rotation.y, rotation.z, rotation.w));
+		rigid_body->body_->setCenterOfMassTransform(transform);
+	}
+}
 
 void Core::Node::look(const Vector& target, const Vector& up) {
     Vector zaxis = (target - position_).unit();
