@@ -58,9 +58,9 @@ Core::RenderSystem::RenderSystem(Engine* engine) :
 }
 
 void Core::RenderSystem::init_window() {
-    int32_t width = any_cast<int32_t>(engine_->option("display_width"));
-    int32_t height = any_cast<int32_t>(engine_->option("display_height"));
-    string title = any_cast<string>(engine_->option("window_title"));
+    int32_t width = (int32_t)any_cast<real_t>(engine_->option("display_width"));
+    int32_t height = (int32_t)any_cast<real_t>(engine_->option("display_height"));
+    string title = any_cast<string>(engine_->option("window_title"));	
 
     // If in full screen mode, then use GLUT game mode
 	if (any_cast<bool>(engine_->option("fullscreen"))) {
@@ -82,7 +82,7 @@ void Core::RenderSystem::init_window() {
 }
 
 void Core::RenderSystem::init_default_states() {
-    // Initialize some common options
+    // Initialize some common s
     glClearColor(0.0, 0.0, 0.0, 0.0);
     glClearDepth(1.0);
     glShadeModel(GL_SMOOTH);
@@ -94,8 +94,8 @@ void Core::RenderSystem::init_default_states() {
     glFrontFace(GL_CCW); // We always use CCW culling
     glCullFace(GL_BACK);
     
-    GLfloat width = (GLfloat)any_cast<GLint>(engine_->option("display_width"));
-    GLfloat height = (GLfloat)any_cast<GLint>(engine_->option("display_height"));
+    GLfloat width = any_cast<real_t>(engine_->option("display_width"));
+    GLfloat height = any_cast<real_t>(engine_->option("display_height"));
     glViewport(0, 0, (uint32_t)width, (uint32_t)height);
     
     // Set up the projection matrix
@@ -113,7 +113,7 @@ void Core::RenderSystem::on_init() {
     init_window();
     init_default_states();
 
-	GLsizei size = any_cast<GLsizei>(engine_->option("shadow_texture_size"));
+	GLsizei size = (GLsizei)any_cast<real_t>(engine_->option("shadow_texture_size"));
     shadow_target_.reset(new RenderTarget(size, size, GL_DEPTH_COMPONENT));
     
     // Bind the shadow sampler to the shadow texture

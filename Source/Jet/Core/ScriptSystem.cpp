@@ -31,6 +31,7 @@
 #include <Jet/MeshObject.hpp>
 #include <Jet/ParticleSystem.hpp>
 #include <Jet/QuadSet.hpp>
+#include <Jet/Camera.hpp>
 #include <Jet/QuadChain.hpp>
 #include <Jet/Light.hpp>
 #include <Jet/RigidBody.hpp>
@@ -42,9 +43,50 @@
 #include <luabind/luabind.hpp>
 #include <luabind/adopt_policy.hpp>
 #include <luabind/operator.hpp>
+#include <boost/any.hpp>
 
 using namespace Jet;
 using namespace std;
+
+
+namespace luabind {
+    
+    template <>
+    struct default_converter<boost::any> : native_converter_base<boost::any> {
+        static int compute_score(lua_State* env, int index) {
+            return 0;
+        }
+        
+        boost::any from(lua_State* env, int index) {
+            switch (lua_type(env, index)) {
+                case LUA_TNIL: return boost::any();
+                case LUA_TSTRING: return boost::any(string(lua_tostring(env, index)));
+                case LUA_TNUMBER: return boost::any((real_t)lua_tonumber(env, index));
+#pragma warning(disable:4800)
+                case LUA_TBOOLEAN: return boost::any((bool)lua_toboolean(env, index));
+#pragma warning(default:4800)
+                default: return boost::any();
+            }          
+        }
+        
+        void to(lua_State* env, boost::any const& any) {
+            if (typeid(real_t) == any.type()) {
+                lua_pushnumber(env, boost::any_cast<real_t>(any));
+            } else if (typeid(string) == any.type()) {
+                lua_pushstring(env, boost::any_cast<string>(any).c_str());
+            } else if (typeid(bool) == any.type()) {
+                lua_pushboolean(env, boost::any_cast<bool>(any));
+            } else {
+                lua_pushnil(env);
+            }
+        }
+    };
+    
+    template <>
+    struct default_converter<boost::any const&> : default_converter<boost::any> {
+        
+    };
+}
 
 Core::ScriptSystem::ScriptSystem(Engine* engine) :
     engine_(engine),
@@ -78,6 +120,20 @@ Core::ScriptSystem::ScriptSystem(Engine* engine) :
             .property("unit", &Vector::unit)
             .def(luabind::tostring(luabind::const_self)),
             
+        luabind::class_<Vertex>("Vertex")
+            .def(luabind::constructor<>())
+            .def_readwrite("position", &Vertex::position)
+            .def_readwrite("normal", &Vertex::normal)
+            .def_readwrite("texcoord", &Vertex::texcoord)
+            .def_readwrite("tangent", &Vertex::tangent),
+            
+        luabind::class_<Texcoord>("Texcoord")
+            .def(luabind::constructor<real_t, real_t>())
+            .def(luabind::constructor<>())
+            .def_readwrite("u", &Texcoord::u)
+            .def_readwrite("v", &Texcoord::v)
+            .def(luabind::tostring(luabind::const_self)),
+            
         luabind::class_<Quaternion>("Quaternion")
             .def(luabind::constructor<>())
             .def(luabind::constructor<real_t, real_t, real_t, real_t>())
@@ -108,7 +164,13 @@ Core::ScriptSystem::ScriptSystem(Engine* engine) :
             .def_readwrite("end", &Range::end)
             .def(luabind::tostring(luabind::const_self)),
             
-        luabind::class_<Jet::Material, Jet::MaterialPtr>("Material")
+        luabind::class_<Jet::Light, Jet::LightPtr>("Light")
+            .property("ambient_color", (const Color& (Jet::Light::*)() const)&Jet::Light::ambient_color, (void (Jet::Light::*)(const Color&))&Jet::Light::ambient_color)
+            .property("diffuse_color", (const Color& (Jet::Light::*)() const)&Jet::Light::diffuse_color, (void (Jet::Light::*)(const Color&))&Jet::Light::diffuse_color)
+            .property("specular_color", (const Color& (Jet::Light::*)() const)&Jet::Light::specular_color, (void (Jet::Light::*)(const Color&))&Jet::Light::specular_color)
+            .property("direction", (const Vector& (Jet::Light::*)() const)&Jet::Light::direction, (void (Jet::Light::*)(const Vector&))&Jet::Light::direction),
+            
+         luabind::class_<Jet::Material, Jet::MaterialPtr>("Material")
             .property("ambient_color", (const Color& (Jet::Material::*)() const)&Jet::Material::ambient_color, (void (Jet::Material::*)(const Color&))&Jet::Material::ambient_color)
             .property("diffuse_color", (const Color& (Jet::Material::*)() const)&Jet::Material::diffuse_color, (void (Jet::Material::*)(const Color&))&Jet::Material::diffuse_color)
             .property("specular_color", (const Color& (Jet::Material::*)() const)&Jet::Material::specular_color, (void (Jet::Material::*)(const Color&))&Jet::Material::specular_color)
@@ -119,6 +181,10 @@ Core::ScriptSystem::ScriptSystem(Engine* engine) :
             .property("shininess", (real_t (Jet::Material::*)() const)&Jet::Material::shininess, (void (Jet::Material::*)(real_t))&Jet::Material::shininess)
             .property("shininess", (bool (Jet::Material::*)() const)&Jet::Material::receive_shadows, (void (Jet::Material::*)(bool))&Jet::Material::receive_shadows)
             .property("name", (const std::string& (Jet::Material::*)() const)&Jet::Material::name),
+        
+        luabind::class_<Jet::Camera, Jet::CameraPtr>("Camera")
+            .property("parent", &Jet::Camera::parent)
+            .property("active", (bool (Jet::Camera::*)() const)&Jet::Camera::active, (void (Jet::Camera::*)(bool))&Jet::Camera::active),
             
         luabind::class_<Jet::Node, Jet::NodePtr>("Node")
             .property("parent", &Jet::Node::parent)
@@ -132,6 +198,7 @@ Core::ScriptSystem::ScriptSystem(Engine* engine) :
             .def("light", &Jet::Node::light)
             .def("rigid_body", &Jet::Node::rigid_body)
             .def("audio_source", &Jet::Node::audio_source)
+            .def("camera", &Jet::Node::camera)
             .def("look", &Jet::Node::look),
             
         luabind::class_<Jet::MeshObject, Jet::MeshObjectPtr>("MeshObject")
@@ -165,7 +232,16 @@ Core::ScriptSystem::ScriptSystem(Engine* engine) :
             
         luabind::class_<Jet::Engine, Jet::EnginePtr>("Engine")
             .property("root", &Jet::Engine::root)
+            .def("option", (void (Jet::Engine::*)(const std::string&, const boost::any&))&Jet::Engine::option)
+            .def("search_folder", &Jet::Engine::search_folder)
+            .def("mesh", &Jet::Engine::mesh)
+            .def("material", &Jet::Engine::material),
             
+        luabind::class_<Jet::Mesh, Jet::MeshPtr>("Mesh")
+            .def("vertex", (void (Jet::Mesh::*)(size_t, const Vertex&))&Jet::Mesh::vertex)
+            .def("index", (void (Jet::Mesh::*)(size_t, uint32_t))&Jet::Mesh::index)
+            
+        
     ];
     
     lua_pushlightuserdata(env_, this);
@@ -177,11 +253,19 @@ Core::ScriptSystem::ScriptSystem(Engine* engine) :
     lua_setglobal(env_, "__adopt_module");
     
     luabind::globals(env_)["engine"] = static_cast<Jet::Engine*>(engine_);
+
+	//! Load the main file
+    string path = engine_->resource_path("Options.lua");
+    if (luaL_dofile(env_, path.c_str())) {
+        string message(lua_tostring(env_, -1));
+        throw runtime_error("Could not load script: " + message);
+    }
 }
 
 //! Destructor
 Core::ScriptSystem::~ScriptSystem() {
-    lua_close(env_);  
+    lua_close(env_);
+    
 }
 
 

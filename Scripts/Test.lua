@@ -27,13 +27,37 @@ class 'Test' (Module)
 function Test:__init()
     Module.__init(self)
     
+    -- Set up lights
+    self.light_node = engine.root:node("light")
+    self.light = self.light_node:light("light")
+    self.light.ambient_color = Color(.3, .3, .3, 1)
+    self.light.diffuse_color = Color(1, 1, 1, 1)
+    self.light.specular_color = Color(1, 1, 1, 1)
+    self.light.direction = Vector(1, 0, 0)
+    
+    -- Set up the camera
+    self.camera_node = engine.root:node("camera")
+    self.camera_node.position = Vector(15, 0, 15)
+    self.camera_node:look(Vector(0, 0, 0), Vector(0, 1, 0))
+    self.camera = self.camera_node:camera()
+    self.camera.active = true
+    
+    -- Set up the plane
+    self.plane_node = engine.root:node("plane")
+    self.plane = self.plane_node:mesh_object("plane")
+    self.plane.mesh = "plane"
+    self.plane.material = "plane"
+    self.plane_node:rigid_body()
+    
+    -- Set up scene objects and apply some forces
     local s0 = Starship(engine.root, "s0")
     local s1 = Monkey(engine.root, "s1")
     
     s1.node.position = Vector(0, 0, 0)
     s0.node.position = Vector(0, -10, 0)
-    s0.body:apply_force(Vector(-1500, 15000, 0))
+    s0.body:apply_force(Vector(-15000, 15000, 0))
 end
+
 
 function Test:on_key_pressed(key, x, y)
     print(key, x, y)

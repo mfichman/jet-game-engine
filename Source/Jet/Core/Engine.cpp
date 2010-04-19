@@ -66,6 +66,9 @@ Core::Engine::Engine() :
     running_(true),
 	initialized_(false),
 	accumulator_(0) {
+		
+	search_folder(".");
+	search_folder("..");
         
     root_ = new Core::Node(this);
 	render_system_ = new RenderSystem(this);
@@ -92,6 +95,7 @@ Core::Engine::Engine() :
 
 Core::Engine::~Engine() {
 	root_.reset();
+	module_.reset();
 }
 
 void Core::Engine::init_systems() {
