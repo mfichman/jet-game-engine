@@ -86,6 +86,11 @@ public:
 	inline real_t timestep() const {
 		return 1.0f/60.0f;
 	}
+	
+	//! Returns the simulation speed.
+	inline real_t simulation_speed() const {
+		return simulation_speed_;
+	}
     
     //! Returns an engine option.  This method will return nil if the option
     //! cannot bet found.
@@ -161,6 +166,11 @@ public:
         running_ = running;
     }
 	
+	//! Sets the simulation speed)
+	inline void simulation_speed(real_t speed) {
+		simulation_speed_ = speed;
+	}
+	
 	//! Sets the active camera.
 	inline void camera(Jet::Camera* camera) {
 		camera_ = camera;
@@ -213,6 +223,7 @@ private:
 	bool initialized_;
     real_t accumulator_;
     real_t delta_;
+	real_t simulation_speed_;
 #ifdef WINDOWS
     float secs_per_count_;
     int64_t prev_time_;

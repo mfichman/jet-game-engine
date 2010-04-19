@@ -235,7 +235,9 @@ Core::ScriptSystem::ScriptSystem(Engine* engine) :
             .def("option", (void (Jet::Engine::*)(const std::string&, const boost::any&))&Jet::Engine::option)
             .def("search_folder", &Jet::Engine::search_folder)
             .def("mesh", &Jet::Engine::mesh)
-            .def("material", &Jet::Engine::material),
+            .def("material", &Jet::Engine::material)
+            .property("simulation_speed", (real_t (Jet::Engine::*)() const)&Jet::Engine::simulation_speed, (void (Jet::Engine::*)(real_t))&Jet::Engine::simulation_speed)
+            .property("running", (bool (Jet::Engine::*)() const)&Jet::Engine::running, (void (Jet::Engine::*)(bool))&Jet::Engine::running),
             
         luabind::class_<Jet::Mesh, Jet::MeshPtr>("Mesh")
             .def("vertex", (void (Jet::Mesh::*)(size_t, const Vertex&))&Jet::Mesh::vertex)

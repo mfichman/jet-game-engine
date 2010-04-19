@@ -65,7 +65,10 @@ Engine* Engine::create() {
 Core::Engine::Engine() :
     running_(true),
 	initialized_(false),
-	accumulator_(0) {
+	accumulator_(0),
+	simulation_speed_(1.0f) {
+		
+	cout << "Starting kernel..." << endl;
 		
 	search_folder(".");
 	search_folder("..");
@@ -94,8 +97,13 @@ Core::Engine::Engine() :
 }
 
 Core::Engine::~Engine() {
+	if (module_) {
+		module_->on_destroy();
+	}
 	root_.reset();
 	module_.reset();
+	
+	cout << "Shutting down" << endl;
 }
 
 void Core::Engine::init_systems() {

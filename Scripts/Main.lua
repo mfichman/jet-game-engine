@@ -39,5 +39,6 @@ mesh:index(3, 0);
 mesh:index(4, 1);
 mesh:index(5, 2);
 
+engine.simulation_speed = 1.0/4.0
 
 Test()

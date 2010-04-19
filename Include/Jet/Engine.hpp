@@ -42,6 +42,9 @@ public:
         
     //! Returns true if the engine is running
     virtual bool running() const=0;
+	
+	//! Returns the simulation speed of the engine
+	virtual real_t simulation_speed() const=0;
     
     //! Returns an engine option.  This method will return nil if the option
     //! cannot bet found.
@@ -87,6 +90,9 @@ public:
     //! Sets whether or not the engine is running.
     //! @param running false to stop the engine
     virtual void running(bool running)=0;
+	
+	//! Sets the speed factor for the physical simulation.
+	virtual void simulation_speed(real_t speed)=0;
 	
     //! Adds a listener, which listens for engine events.
     //! @param listener the engine listener.

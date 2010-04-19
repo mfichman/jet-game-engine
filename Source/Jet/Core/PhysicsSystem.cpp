@@ -47,7 +47,7 @@ void Core::PhysicsSystem::on_init() {
 }
 
 void Core::PhysicsSystem::on_update() {
-    world_->stepSimulation(engine_->timestep()/4.0f, 0);
+    world_->stepSimulation(engine_->timestep()*engine_->simulation_speed(), 0);
 }
 
 void Core::PhysicsSystem::on_render() {
