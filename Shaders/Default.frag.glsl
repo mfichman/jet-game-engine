@@ -100,7 +100,7 @@ void main() {
 #ifdef SHADOW_MAP
     if (shadow_map_enabled) {
         vec4 shadow_coord = gl_TexCoord[1]/gl_TexCoord[1].w;
-        float depth = texture2D(shadow_map, shadow_coord.st).z + 0.000008;
+        float depth = texture2D(shadow_map, shadow_coord.st).z + 0.00001;
         if (depth < shadow_coord.z) {
             diffuse *= 0.4;
             specular *= 0.2;
@@ -108,5 +108,13 @@ void main() {
     }
 #endif
     
-    gl_FragColor = ambient + diffuse + specular;
+    vec4 color = ambient + diffuse + specular;
+    float intensity = color.r + color.g + color.b;
+    gl_FragData[0] = color;
+    
+    // High-pass filter
+    if (intensity > 3.0) {
+        gl_FragData[1] = color;
+    }
+    
 }

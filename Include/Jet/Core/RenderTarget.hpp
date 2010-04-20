@@ -21,6 +21,7 @@
  */  
 #pragma once
 
+#include <Jet/Core/Types.hpp>
 #include <Jet/Types.hpp>
 #include <Jet/Object.hpp>
 
@@ -32,11 +33,12 @@ namespace Jet { namespace Core {
 class RenderTarget : public Object {
 public:
     //! Constructor.  Creates the render target and associated texture.
+    //! @param engine the engine
     //! @param the width of the render target
     //! @param height the height of the render target
-    //! @param component the type of render target (either GL_DEPTH_COMPONENT
-    //! or GL_RGBA).
-    RenderTarget(uint32_t width, uint32_t height, uint32_t component);
+	//! @param depth_only true if this render target should save depth only (for shadow mapping)
+	//! @param ntargets the number of render targets to be used with this RT
+    RenderTarget(uint32_t width, uint32_t height, bool depth_only, uint32_t ntargets=1);
 
     //! Destructor.
     virtual ~RenderTarget();
@@ -46,22 +48,25 @@ public:
         return enabled_;
     }
     
-    //! Returns the texture handle.
-    inline uint32_t texture() const {
-        return texture_;
-    }
-    
     //! Enables or disables the render target.
     void enabled(bool enabled);
+    
+    //! Sets the sampler the texture is bound to.
+	//! @param the sampler to bind the texture to
+	//! @param index the texture to bind to the sampler;
+	//! when multiple render targets are used, this could
+	//! be render target 0 or render target 1
+	void sampler(uint32_t sampler, size_t index=0);
 
 private:
-
-    uint32_t texture_;
+    uint32_t texture_[2];
     uint32_t framebuffer_;
-    uint32_t component_;
+	uint32_t depth_buffer_;
     uint32_t width_;
     uint32_t height_;
+	uint32_t ntargets_;
     bool enabled_;
+	bool depth_only_;
 };
 
 }}

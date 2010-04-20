@@ -203,7 +203,7 @@ void Core::Engine::tick() {
     static float elapsed = 0.0f;
     elapsed += delta_;
     frames++;
-    if (elapsed > 1.0f) {
+    if (elapsed > 0.1f) {
         cout << frames/elapsed << endl;
         frames = 0;
         elapsed = 0.0f;

@@ -34,7 +34,7 @@ Core::PhysicsSystem::PhysicsSystem(Engine* engine) :
     solver_.reset(new btSequentialImpulseConstraintSolver);
 	world_.reset(new btDiscreteDynamicsWorld(dispatcher_.get(), broadphase_.get(), solver_.get(), config_.get()));
     world_->setWorldUserInfo(this);
-	world_->setGravity(btVector3(0.0f, 0.0f, 0.0f));
+	world_->setGravity(btVector3(0.0f, -10.0f, 0.0f));
     btGImpactCollisionAlgorithm::registerAlgorithm(dispatcher_.get());
 }
 

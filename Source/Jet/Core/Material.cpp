@@ -98,6 +98,27 @@ void Core::Material::read_material_data() {
     }  
 }
 
+void Core::Material::shader(Jet::Shader* shader) {
+	shader_ = static_cast<Core::Shader*>(shader);
+	if (!shader_) {
+		// If the shader was set to null, turn on the default shader
+		Material::shader("Default");
+	} else {
+		shader_->state(SYNCED);
+		
+		uint32_t program = shader_->program();
+		diffuse_map_loc_ = glGetUniformLocation(program, "diffuse_map");
+		specular_map_loc_ = glGetUniformLocation(program, "specular_map");
+		normal_map_loc_ = glGetUniformLocation(program, "normal_map");
+		shadow_map_loc_ = glGetUniformLocation(program, "shadow_map");
+		diffuse_map_enabled_ = glGetUniformLocation(program, "diffuse_map_enabled");
+		specular_map_enabled_ = glGetUniformLocation(program, "specular_map_enabled");
+		normal_map_enabled_ = glGetUniformLocation(program, "normal_map_enabled");
+		shadow_map_enabled_ = glGetUniformLocation(program, "shadow_map_enabled");
+	
+	}
+}
+
 void Core::Material::enabled(bool enabled) {
 	if (enabled == enabled_) {
 		return;
@@ -106,26 +127,44 @@ void Core::Material::enabled(bool enabled) {
 	
 	if (enabled) {
 		state(SYNCED);
+		
+		// Set up texture samplers.  Samplers are enabled if the corresponding
+		// texture in the material is non-null.
 		if (diffuse_map_) {
 			diffuse_map_->sampler(DIFFUSE_MAP_SAMPLER);
+			glUniform1i(diffuse_map_loc_, DIFFUSE_MAP_SAMPLER);
+			glUniform1i(diffuse_map_enabled_, true);
+		} else {
+			glUniform1i(diffuse_map_enabled_, false);
 		}
+
 		if (specular_map_) {
 			specular_map_->sampler(SPECULAR_MAP_SAMPLER);
+			glUniform1i(specular_map_loc_, SPECULAR_MAP_SAMPLER);
+			glUniform1i(specular_map_enabled_, true);
+		} else {
+			glUniform1i(specular_map_enabled_, false);
 		}
+		
 		if (normal_map_) {
 			normal_map_->sampler(NORMAL_MAP_SAMPLER);
+			glUniform1i(normal_map_loc_, NORMAL_MAP_SAMPLER);
+			glUniform1i(normal_map_enabled_, true);
+		} else {
+			glUniform1i(normal_map_enabled_, false);
 		}
 		
-		shader_->sampler_enabled(DIFFUSE_MAP_SAMPLER, diffuse_map_);
-		shader_->sampler_enabled(SPECULAR_MAP_SAMPLER, specular_map_);
-		shader_->sampler_enabled(NORMAL_MAP_SAMPLER, normal_map_);
-		shader_->sampler_enabled(SHADOW_MAP_SAMPLER, receive_shadows());
+		// Enable the shadow map sampler only if this object should receive
+		// shadows
+		glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_SAMPLER);
+		glUniform1i(shadow_map_loc_, SHADOW_MAP_SAMPLER);
+		glUniform1i(shadow_map_enabled_, (bool)receive_shadows_);
 		
+		// Set up material		
 		glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_color());
 		glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_color());
         glMaterialfv(GL_FRONT, GL_SPECULAR, specular_color());
         glMaterialf(GL_FRONT, GL_SHININESS, shininess());
-		
 	}
 	
 	enabled_ = enabled;

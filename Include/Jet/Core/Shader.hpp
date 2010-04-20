@@ -55,14 +55,16 @@ public:
 		return tangent_attrib_;
 	}
 	
+	//! Returns the shader program
+	inline uint32_t program() const {
+		return program_;
+	}
+	
 	//! Returns the resource state of the shader
 	void state(ResourceState state);
 	
 	//! Turns this shader on or off
 	void enabled(bool enabled);
-	
-	//! Turns the given sampler on or off.
-	void sampler_enabled(TextureSampler sampler, bool enabled);
     
 private:
     //! Creates a shader.
@@ -74,10 +76,6 @@ private:
 		vshader_(0),
 		fshader_(0),
 		enabled_(false),
-		diffuse_map_(-1),
-		specular_map_(-1),
-		normal_map_(-1),
-		shadow_map_(-1),
 		tangent_attrib_(-1) {
 	}
 	
@@ -93,16 +91,7 @@ private:
 	
 	bool enabled_;
 	
-	int32_t diffuse_map_;
-	int32_t specular_map_;
-	int32_t normal_map_;
-	int32_t shadow_map_;
 	int32_t tangent_attrib_;
-	
-	int32_t diffuse_map_enabled_;
-	int32_t specular_map_enabled_;
-	int32_t normal_map_enabled_;
-	int32_t shadow_map_enabled_;
 	
 	std::vector<char> vsource_;
 	std::vector<char> fsource_;

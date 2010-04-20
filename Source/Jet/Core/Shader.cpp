@@ -92,14 +92,6 @@ void Core::Shader::state(ResourceState state) {
 			throw runtime_error("Vertex shader log: " + string(log, length));
 		}
 		
-		diffuse_map_ = glGetUniformLocation(program_, "diffuse_map");
-		specular_map_ = glGetUniformLocation(program_, "specular_map");
-		normal_map_ = glGetUniformLocation(program_, "normal_map");
-		shadow_map_ = glGetUniformLocation(program_, "shadow_map");
-		diffuse_map_enabled_ = glGetUniformLocation(program_, "diffuse_map_enabled");
-		specular_map_enabled_ = glGetUniformLocation(program_, "specular_map_enabled");
-		normal_map_enabled_ = glGetUniformLocation(program_, "normal_map_enabled");
-		shadow_map_enabled_ = glGetUniformLocation(program_, "shadow_map_enabled");
 		tangent_attrib_ = glGetAttribLocation(program_, "tangent_in");
 	}
 	
@@ -151,33 +143,9 @@ void Core::Shader::enabled(bool enabled) {
 	if (enabled) {
 		state(SYNCED);
 		glUseProgram(program_);
-		sampler_enabled(SHADOW_MAP_SAMPLER, true);
-		glActiveTexture(GL_TEXTURE3);
-		glUniform1i(diffuse_map_, DIFFUSE_MAP_SAMPLER);
-		glUniform1i(specular_map_, SPECULAR_MAP_SAMPLER);
-		glUniform1i(normal_map_, NORMAL_MAP_SAMPLER);
-		glUniform1i(shadow_map_, SHADOW_MAP_SAMPLER);
 	} else {
 		glUseProgram(0);
 	}
 	
 	enabled_ = enabled;
-}
-
-void Core::Shader::sampler_enabled(TextureSampler sampler, bool enabled) {
-	glActiveTexture(GL_TEXTURE0 + sampler);
-	switch (sampler) {
-		case DIFFUSE_MAP_SAMPLER:
-			glUniform1i(diffuse_map_enabled_, enabled);
-			break;
-		case SPECULAR_MAP_SAMPLER:
-			glUniform1i(specular_map_enabled_, enabled);
-			break;
-		case NORMAL_MAP_SAMPLER:
-			glUniform1i(normal_map_enabled_, enabled);
-			break;
-		case SHADOW_MAP_SAMPLER:
-			glUniform1i(shadow_map_enabled_, enabled);
-			break;
-	}
 }

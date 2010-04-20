@@ -136,13 +136,7 @@ public:
     //! then the material will be rendered using the default shader or fixed
     //! function pipeline.
     //! @param shader the shader
-    inline void shader(Jet::Shader* shader) {
-        shader_ = static_cast<Shader*>(shader);
-		if (!shader_) {
-			// If the shader was set to null, turn on the default shader
-			Material::shader("Default");
-		}
-    }
+    void shader(Jet::Shader* shader);
 	
 	//! Sets the specular shininess.
 	inline void shininess(real_t shininess) {
@@ -157,26 +151,26 @@ public:
     //! Sets the diffuse texture map by name.
     //! @param name texture map name
     inline void diffuse_map(const std::string& name) {
-		diffuse_map_ = static_cast<Texture*>(engine_->texture(name));
+		diffuse_map(engine_->texture(name));
 	}
     
     //! Sets the specular texture map by name.
     //! @param name texture map name
     inline void specular_map(const std::string& name) {
-		specular_map_ = static_cast<Texture*>(engine_->texture(name));
+		specular_map(engine_->texture(name));
 	}
     
     //! Sets the normal map by name.
     //! @param name the normal map name
     inline void normal_map(const std::string& name) {
-		normal_map_ = static_cast<Texture*>(engine_->texture(name));
+		normal_map(engine_->texture(name));
 	}
     
     //! Sets the shader by name.  If the shader is null, then the material will
     //! be rendered using the default shader or fixed function pipeline.
     //! @param name the shader name
     inline void shader(const std::string& name) {
-		shader_ = static_cast<Shader*>(engine_->shader(name));
+		shader(engine_->shader(name));
 	}
 	
 	//! Sets the resource state.
@@ -192,7 +186,15 @@ private:
 		state_(UNLOADED),
 		enabled_(false),
 		shininess_(40.0f),
-		receive_shadows_(true) {
+		receive_shadows_(true),
+		diffuse_map_loc_(-1),
+		specular_map_loc_(-1),
+		normal_map_loc_(-1),
+		shadow_map_loc_(-1),
+		diffuse_map_enabled_(-1),
+		specular_map_enabled_(-1),
+		normal_map_enabled_(-1),
+		shadow_map_enabled_(-1) {
 			
 		shader("Default");
 	}
@@ -212,6 +214,18 @@ private:
 	real_t shininess_;
 	bool enabled_;
 	bool receive_shadows_;
+	
+	
+	// Shader uniform variable handles
+	int32_t diffuse_map_loc_;
+	int32_t specular_map_loc_;
+	int32_t normal_map_loc_;
+	int32_t shadow_map_loc_;
+	
+	int32_t diffuse_map_enabled_;
+	int32_t specular_map_enabled_;
+	int32_t normal_map_enabled_;
+	int32_t shadow_map_enabled_;
     
     friend class Engine;
 };

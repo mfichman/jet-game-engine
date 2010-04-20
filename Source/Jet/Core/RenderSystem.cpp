@@ -83,11 +83,11 @@ void Core::RenderSystem::init_window() {
 
 void Core::RenderSystem::init_default_states() {
     // Initialize some common s
-    glClearColor(0.0, 0.0, 0.0, 0.0);
-    glClearDepth(1.0);
-    glShadeModel(GL_SMOOTH);
-    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClearDepth(1.0f);
+    
     glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
     glEnable(GL_NORMALIZE);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -98,6 +98,7 @@ void Core::RenderSystem::init_default_states() {
     GLfloat height = any_cast<real_t>(engine_->option("display_height"));
     glViewport(0, 0, (uint32_t)width, (uint32_t)height);
     
+	
     // Set up the projection matrix
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -110,21 +111,21 @@ void Core::RenderSystem::init_default_states() {
 }
 
 void Core::RenderSystem::on_init() {
-    init_window();
+	init_window();
     init_default_states();
+	
+	GLuint width = (GLuint)any_cast<real_t>(engine_->option("display_width"));
+	GLuint height = (GLuint)any_cast<real_t>(engine_->option("display_height"));
 
-	GLsizei size = (GLsizei)any_cast<real_t>(engine_->option("shadow_texture_size"));
-    shadow_target_.reset(new RenderTarget(size, size, GL_DEPTH_COMPONENT));
-    
-    // Bind the shadow sampler to the shadow texture
-    glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_SAMPLER);
-    glBindTexture(GL_TEXTURE_2D, shadow_target_->texture());
+	GLuint size = (GLuint)any_cast<real_t>(engine_->option("shadow_texture_size"));
+    shadow_target_.reset(new RenderTarget(size, size, true, 1));
+    color_target_.reset(new RenderTarget(width, height, false, 2));
+	bloom_target1_.reset(new RenderTarget(width/8, height/8, false, 1));
+	bloom_target2_.reset(new RenderTarget(width/8, height/8, false, 1));
 }
 
 void Core::RenderSystem::on_render() {
-	
     glutMainLoopEvent();
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	if (!engine_->camera()) {
 		return;
@@ -148,14 +149,12 @@ void Core::RenderSystem::on_post_update() {
 	generate_render_list(static_cast<Core::Node*>(engine_->root()));
 }
 
-
 void Core::RenderSystem::generate_shadow_map(Light* light) {    
+
     // Set up the projection matrix for the light
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
-    //gluPerspective(30.0f, 1.0f, 0.01f, 1000.0f);
-    //glOrtho(2048.0, 2048.0, 2048.0, 2048.0, 0.01, 1000.0f);
     glOrtho(-12.0f, 12.0f, -12.0f, 12.0f, 0.1f, 1000.0f);
     
     // Set up the view matrix for the light
@@ -176,7 +175,7 @@ void Core::RenderSystem::generate_shadow_map(Light* light) {
     glDisable(GL_LIGHTING);
     render_shadow_casters();
     shadow_target_->enabled(false);
-    glCullFace(GL_BACK);
+    glCullFace(GL_BACK); 
     glEnable(GL_LIGHTING);
         
     // Initialize the texture matrix for transforming the shadow map
@@ -227,12 +226,45 @@ void Core::RenderSystem::render_final(Light* light) {
         const Vector& direction = light->direction();
         GLfloat lposition[4] = { direction.x, direction.y, direction.z, 0.0f };
         glLightfv(GL_LIGHT0, GL_POSITION, lposition);
-    }
-    glEnable(GL_LIGHT0);
+	}
+		
+	// Bind the shadow sampler to the shadow texture
+	shadow_target_->sampler(SHADOW_MAP_SAMPLER);
     
     // Render to the back buffer.
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	render_visible_objects();
+	
+
+	/* TODO: Finish gaussian filter
+	// Render the scene to the highpass and color buffers
+	color_target_->enabled(true);
     render_visible_objects();
+	color_target_->enabled(false);
+
+	// Clear the texture matrix back to the identity
+	glMatrixMode(GL_TEXTURE);
+	glActiveTexture(GL_TEXTURE0);
+	glLoadIdentity();
+	
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	//color_target_->sampler(0, 0);
+	color_target_->sampler(0, 1);
+	glEnable(GL_TEXTURE_2D);
+
+	glDisable(GL_LIGHTING);
+	glDisable(GL_DEPTH_TEST);
+
+	render_fullscreen_quad();
+
+	glEnable(GL_LIGHTING);
+	glEnable(GL_DEPTH_TEST);
+
+	glActiveTexture(GL_TEXTURE0);
+	glDisable(GL_TEXTURE_2D);
+	glActiveTexture(GL_TEXTURE1);
+	glDisable(GL_TEXTURE_2D);*/
 }
 
 
@@ -330,4 +362,34 @@ void Core::RenderSystem::render_visible_objects() {
 	if (material) {
 		material->enabled(false);
 	}
+}
+
+void Core::RenderSystem::render_fullscreen_quad() {	
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
+
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+	
+	glColor3f(1.0f, 1.0f, 1.0f);	
+	glBegin(GL_QUADS);
+	glTexCoord2f(0.0f, 0.0f);
+	glVertex2f(0.0f, 0.0f);
+	glTexCoord2f(1.0f, 0.0f);
+	glVertex2f(1.0f, 0.0f);
+	glTexCoord2f(1.0f, 1.0f);
+	glVertex2f(1.0f, 1.0f);
+	glTexCoord2f(0.0f, 1.0f);
+	glVertex2f(0.0f, 1.0f);
+	glEnd();
+
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+    
 }

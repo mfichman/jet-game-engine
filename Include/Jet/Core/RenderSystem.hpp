@@ -55,11 +55,16 @@ private:
     void render_final(Light* light);
     void render_shadow_casters();
     void render_visible_objects();
+    void render_fullscreen_quad();
     
     Engine* engine_;
     
     // Shadow-mapping variables
     RenderTargetPtr shadow_target_;
+    RenderTargetPtr color_target_;
+    RenderTargetPtr highpass_target_;
+    RenderTargetPtr bloom_target1_;
+    RenderTargetPtr bloom_target2_;
     
     std::vector<MeshObjectPtr> mesh_objects_;
     std::vector<LightPtr> lights_;

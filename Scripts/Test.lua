@@ -56,12 +56,12 @@ function Test:__init()
     
     -- Set up scene objects and apply some forces
     print("Creating objects")
-    local s0 = Starship(engine.root, "s0")
-    local s1 = Monkey(engine.root, "s1")
+    self.s0 = Starship(engine.root, "s0")
+    self.s1 = Monkey(engine.root, "s1")
     
-    s1.node.position = Vector(0, 0, 0)
-    s0.node.position = Vector(0, -10, 0)
-    s0.body:apply_force(Vector(-15000, 15000, 0))
+    self.s1.node.position = Vector(0, 0, 0)
+    self.s0.node.position = Vector(0, -10, 0)
+    self.s0.body:apply_force(Vector(-15000, 15000, 0))
 end
 
 function Test:on_destroy()
@@ -72,5 +72,13 @@ function Test:on_key_pressed(key, x, y)
     
     if (key == 'q') then
         engine.running = false
+    elseif (key == 's') then
+        engine.simulation_speed = 1.0/4.0
+    elseif (key == 'r') then
+        self.s1.node.position = Vector(0, 0, 0)
+        self.s1.body.linear_velocity = Vector(0, 0, 0)
+        self.s0.node.position = Vector(0, -10, 0)
+        self.s0.body.linear_velocity = Vector(0, 0, 0)
+        self.s0.body:apply_force(Vector(-15000, 15000, 0))
     end
 end

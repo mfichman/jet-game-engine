@@ -52,9 +52,9 @@ void Core::Texture::state(ResourceState state) {
 		ilBindImage(image);
 		ilLoadImage(file.c_str());
 		
-		//if (ilGetError()) {
-		//	throw runtime_error("Error loading image: " + name_);
-		//}
+		if (ilGetError()) {
+			throw runtime_error("Error loading image: " + name_);
+		}
 		
 		width(ilGetInteger(IL_IMAGE_WIDTH));
 		height(ilGetInteger(IL_IMAGE_HEIGHT));
@@ -64,6 +64,8 @@ void Core::Texture::state(ResourceState state) {
 	
 	// Entering the SYNCED state
 	if (SYNCED == state) {
+		glPushAttrib(GL_TEXTURE_BIT);
+		
 		// Initialize the texture
 		glGenTextures(1, &texture_);
 		glBindTexture(GL_TEXTURE_2D, texture_);
@@ -76,8 +78,8 @@ void Core::Texture::state(ResourceState state) {
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 6.0);
 		
 		// Load the image
-		gluBuild2DMipmaps(GL_TEXTURE_2D, 3, width(), height(), GL_RGBA, GL_UNSIGNED_BYTE, data());
-		glBindTexture(GL_TEXTURE_2D, 0);
+		gluBuild2DMipmaps(GL_TEXTURE_2D, 3, width(), height(), GL_RGBA, GL_UNSIGNED_BYTE, data());		
+		glPopAttrib();
 	}
 	
 	// Leaving the SYNCED state
@@ -94,9 +96,8 @@ void Core::Texture::state(ResourceState state) {
 	state_ = state;
 }
 
-void Core::Texture::sampler(TextureSampler sampler) {
+void Core::Texture::sampler(uint32_t sampler) {
 	state(SYNCED);
 	glActiveTexture(GL_TEXTURE0 + sampler);
 	glBindTexture(GL_TEXTURE_2D, texture_);
-	glEnable(GL_TEXTURE_2D);
 }

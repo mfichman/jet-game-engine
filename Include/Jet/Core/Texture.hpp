@@ -83,7 +83,7 @@ public:
 	void state(ResourceState state);
 	
 	//! Sets the sampler this texture is bound to.
-	void sampler(TextureSampler sampler);
+	void sampler(uint32_t sampler);
 
 private:
 	inline Texture(Engine* engine, const std::string& name) :
