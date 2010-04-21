@@ -8,11 +8,13 @@ find_library(GL NAMES OpenGL opengl32)
 find_library(GLU NAMES glu32 GLU)
 find_library(GLEW NAMES glew32 GLEW)
 find_library(IL NAMES IL DevIL PATHS ${CMAKE_LINK_DIRECTORIES})
-find_library(SDL2 NAMES SDLmain)
+find_library(SDL NAMES SDL)
+find_library(BOOST_SYSTEM NAMES boost_system)
+find_library(BOOST_FILESYSTEM NAMES boost_filesystem)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 find_library(LUA NAMES lua_d lua)
-find_library(LUABIND NAMES luabind_d luabindd)
+find_library(LUABIND NAMES luabind_d luabind)
 find_library(BULLET_COLLISION NAMES libbulletcollision_d bulletcollision)
 find_library(BULLET_DYNAMICS NAMES libbulletdynamics_d bulletdynamics)
 find_library(BULLET_MATH NAMES libbulletmath_d bulletmath)
@@ -27,5 +29,6 @@ endif()
 add_subdirectory("Test")
 
 target_link_libraries(Jet ${IL} ${LUA} ${LUABIND} ${BULLET_COLLISION}
-    ${BULLET_DYNAMICS} ${BULLET_MATH} ${GL} ${GLU} ${GLEW} SDL)
+    ${BULLET_DYNAMICS} ${BULLET_MATH} ${GL} ${GLU} ${GLEW} ${SDL}
+	${BOOST_SYSTEM} ${BOOST_FILESYSTEM})
 

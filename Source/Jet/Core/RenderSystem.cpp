@@ -64,7 +64,7 @@ void Core::RenderSystem::init_window() {
 		throw runtime_error(string("SDL initialization failed: ") + SDL_GetError());
 	}
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	uint32_t flags = SDL_SWSURFACE | SDL_OPENGL;
+	uint32_t flags = SDL_OPENGL;
 	if (fullscreen) {
 		flags |= SDL_FULLSCREEN;
 	}
