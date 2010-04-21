@@ -32,7 +32,8 @@ namespace Jet {
 //! @class Engine
 //! @brief Main engine class.
 class Engine : public Object {
-public: 
+public:
+	
     //! Returns the root scene node.  This node can be used to add 
     //! other objects to the scene.
     virtual Node* root() const=0;
@@ -45,11 +46,6 @@ public:
 	
 	//! Returns the simulation speed of the engine
 	virtual real_t simulation_speed() const=0;
-    
-    //! Returns an engine option.  This method will return nil if the option
-    //! cannot bet found.
-    //! @param name the name of the option
-    virtual const boost::any& option(const std::string& name)=0;
     
     //! Returns an engine option.  This method will throw an exception if
     //! the option could not be found.

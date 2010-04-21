@@ -276,7 +276,8 @@ Core::ScriptSystem::~ScriptSystem() {
 
 
 void Core::ScriptSystem::on_init() {
-    
+    std::cout << "Initializing script system" << std::endl;
+
     // Add all folders on the search path to the Lua module search path
     string package_path = luabind::object_cast<string>(luabind::globals(env_)["package"]["path"]);
     for (Iterator<const string> i = engine_->search_folders(); i; i++) {

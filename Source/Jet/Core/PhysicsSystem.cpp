@@ -43,7 +43,7 @@ Core::PhysicsSystem::~PhysicsSystem() {
 }
 
 void Core::PhysicsSystem::on_init() {
-    
+    std::cout << "Initializing physics system" << std::endl;
 }
 
 void Core::PhysicsSystem::on_update() {

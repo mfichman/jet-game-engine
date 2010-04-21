@@ -79,9 +79,9 @@ Core::Engine::Engine() :
 	physics_system_ = new PhysicsSystem(this);
 	
     listener(render_system_.get());
+	listener(new InputSystem(this));
 	listener(physics_system_.get());
 	listener(script_system_.get());
-	listener(new InputSystem(this));
 	
 #ifdef WINDOWS
 	::int64_t counts_per_sec = 0;

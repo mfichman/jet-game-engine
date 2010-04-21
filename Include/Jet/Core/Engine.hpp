@@ -198,7 +198,16 @@ public:
     //! Runs the engine through one complete loop.  Note that the engine may
     //! or may not actually do anything on a given loop, depending on the
     //! elapsed time.
-    void tick();
+    void tick();	
+	
+	template <typename T>
+	inline T option(const std::string& name) const {
+		try {
+			return any_cast<T>(option(name));
+		} catch (boost::bad_any_cast) {
+			throw std::runtime_error("Wrong type for option: " + name);
+		}
+	}
 
 private:
     std::string resolve_path(const std::string& path);
