@@ -93,7 +93,7 @@ public:
     
     //! Returns a component that is attached to this node.
     //! @param name the name of the component
-    virtual Object* object(const std::string& name) const=0;
+    virtual Object* object(const std::string& name)=0;
 
 	//! Sets the position of the node.
     //! @param position the position of the node

@@ -32,8 +32,13 @@
 #include <Jet/Iterator.hpp>
 
 #include <string>
+#include <stdexcept>
 #include <vector>
+#ifdef WINDOWS
 #include <unordered_map>
+#else
+#include <tr1/unordered_map>
+#endif
 #include <Bullet/btBulletDynamicsCommon.h>
 #include <Bullet/btBulletCollisionCommon.h>
 
@@ -100,7 +105,7 @@ public:
     
     //! Returns a component that is attached to this node.
     //! @param name the name of the component
-    Jet::Object* object(const std::string& name) const;
+    Jet::Object* object(const std::string& name);
 	
 	//! Returns an iterator over the objects connected to this node.
 	Iterator<ObjectPtr> objects() const;
@@ -172,8 +177,8 @@ private:
 	inline Node(Engine* engine) :
 		engine_(engine),
 		parent_(0),
-		destroyed_(false),
-		shape_transform_(btTransform::getIdentity()) {
+		shape_transform_(btTransform::getIdentity()),
+		destroyed_(false) {
 		
 	}
     
@@ -183,9 +188,9 @@ private:
 	inline Node(Engine* engine, Node* parent) :
 		engine_(engine),
 		parent_(parent),
-		destroyed_(false),
 		rigid_body_(parent->rigid_body_),
-		shape_transform_(parent->shape_transform_) {
+		shape_transform_(parent->shape_transform_),
+		destroyed_(false) {
 	}
     
     //! Removes an object from this node.

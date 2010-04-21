@@ -72,9 +72,9 @@ private:
 		engine_(engine),
 		name_(name),
 		state_(UNLOADED),
-		program_(0),
 		vshader_(0),
 		fshader_(0),
+		program_(0),
 		enabled_(false),
 		tangent_attrib_(-1) {
 	}

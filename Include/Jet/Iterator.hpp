@@ -143,7 +143,7 @@ public:
     }
 
 private:
-    std::auto_ptr<BaseIterator<T&>> base_;
+    std::auto_ptr<BaseIterator<T&> > base_;
 };
 
 }

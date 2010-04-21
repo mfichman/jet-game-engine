@@ -35,7 +35,7 @@ class Engine : public Object {
 public: 
     //! Returns the root scene node.  This node can be used to add 
     //! other objects to the scene.
-    virtual inline Node* root() const=0;
+    virtual Node* root() const=0;
 	
 	//! Returns the current module.
 	virtual Module* module() const=0;

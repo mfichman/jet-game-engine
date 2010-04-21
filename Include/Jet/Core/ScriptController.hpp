@@ -36,8 +36,8 @@ class ScriptController : public Jet::NodeListener {
 public:
     //! Creates a new script controller with a new node.
 	inline ScriptController(const luabind::object& self, Jet::Node* node, const std::string& name) :
-		self_(self),
-		node_(static_cast<Node*>(node->node(name))) {
+		node_(static_cast<Node*>(node->node(name))),
+		self_(self) {
             
 		node_->listener(this);
         self_["node"] = static_cast<Jet::Node*>(node_);

@@ -85,11 +85,11 @@ void Core::InputSystem::on_keyboard_up(unsigned char key, int x, int y) {
 }
 
 void Core::InputSystem::on_special(int key, int x, int y) {
-    Module* module = system_->engine_->module();
+    //Module* module = system_->engine_->module();
 }
 
 void Core::InputSystem::on_special_up(int key, int x, int y) {
-    Module* module = system_->engine_->module();
+    //Module* module = system_->engine_->module();
 }
 
 void Core::InputSystem::on_mouse(int button, int state, int x, int y) {

@@ -25,6 +25,7 @@ if(UNIX AND APPLE)
 add_definitions(-g)
 add_definitions(-Wall -Werror)
 add_definitions(-DDARWIN)
+include_directories(/usr/local/include/Bullet/)
 endif()
 
 if(UNIX AND NOT APPLE)

@@ -105,9 +105,11 @@ void Core::RenderSystem::init_default_states() {
     gluPerspective(45.0f, width/height, 0.1f, 1000.0f);
     
     // Turn of VSYNC so the game can run at full frame rate
+#ifdef WINDOWS
     typedef int (APIENTRY *swap_interval_t)(int);
     swap_interval_t glSwapInterval = (swap_interval_t)wglGetProcAddress("wglSwapIntervalEXT");
     glSwapInterval(0);
+#endif
 }
 
 void Core::RenderSystem::on_init() {

@@ -21,7 +21,12 @@
  */  
 #pragma once
 
+#ifdef WINDOWS
 #include <cstdint>
+#else
+#include <stdint.h>
+#endif
+
 #include <utility>
 #include <string>
 #include <boost/intrusive_ptr.hpp>

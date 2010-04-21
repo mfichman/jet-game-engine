@@ -28,7 +28,6 @@
 #include <dlfcn.h>
 #endif
 #include <boost/filesystem/operations.hpp>
-#include <cstdint>
 
 #include <Jet/Core/RenderSystem.hpp>
 #include <Jet/Core/ScriptSystem.hpp>
@@ -50,6 +49,7 @@
 
 #include <Jet/Iterator.hpp>
 #include <IL/IL.h>
+#include <fstream>
 
 #define JET_MAX_TIME_LAG 0.5f
 
@@ -88,6 +88,9 @@ Core::Engine::Engine() :
     QueryPerformanceFrequency((LARGE_INTEGER*)&counts_per_sec);
     secs_per_count_ = 1.0f/(float)counts_per_sec;
     prev_time_ = 0;
+#else
+	prev_time_.tv_usec = 0;
+	prev_time_.tv_sec = 0;
 #endif
 
     if (ilGetInteger(IL_VERSION_NUM) < IL_VERSION) {
@@ -254,6 +257,17 @@ void Core::Engine::update_delta() {
     delta_ = (current_time - prev_time_) * secs_per_count_;
     prev_time_ = current_time;
 #else
-#error "Not implemented"
+	timeval current_time;
+	gettimeofday(&current_time, 0);
+	if (!prev_time_.tv_sec && prev_time_.tv_usec) {
+		prev_time_ = current_time;
+	}
+
+	time_t delta_sec = current_time.tv_sec - prev_time_.tv_sec;
+	long delta_usec = current_time.tv_usec - prev_time_.tv_usec;
+
+	delta_ = (float)delta_sec + (float)delta_usec/1000000.0f;
+	prev_time_ = current_time;
+
 #endif
 }

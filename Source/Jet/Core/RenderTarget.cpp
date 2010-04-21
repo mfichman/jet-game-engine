@@ -27,16 +27,17 @@
 #endif
 #include <GL/glew.h>
 #include <GL/gl.h>
+#include <stdexcept>
 
 using namespace Jet;
 using namespace std;
 
 Core::RenderTarget::RenderTarget(uint32_t width, uint32_t height, bool depth_only, uint32_t ntargets) :
+	depth_buffer_(0),
     width_(width),
     height_(height),
-	enabled_(false),
-	depth_buffer_(0),
 	ntargets_(ntargets),
+	enabled_(false),
 	depth_only_(depth_only) {
 
 	if (ntargets_ < 1 || ntargets_ > 2) {

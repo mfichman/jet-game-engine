@@ -30,7 +30,11 @@
 #include <list>
 #include <map>
 #include <set>
+#include <stdexcept>
 #include <boost/any.hpp>
+#ifndef WINDOWS
+#include <sys/time.h>
+#endif
 
 namespace Jet { namespace Core {
 
@@ -227,6 +231,8 @@ private:
 #ifdef WINDOWS
     float secs_per_count_;
     int64_t prev_time_;
+#else
+	timeval prev_time_;
 #endif
     
 };

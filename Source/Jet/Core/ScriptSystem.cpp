@@ -62,9 +62,13 @@ namespace luabind {
                 case LUA_TNIL: return boost::any();
                 case LUA_TSTRING: return boost::any(string(lua_tostring(env, index)));
                 case LUA_TNUMBER: return boost::any((real_t)lua_tonumber(env, index));
+#ifdef WINDOWS
 #pragma warning(disable:4800)
+#endif
                 case LUA_TBOOLEAN: return boost::any((bool)lua_toboolean(env, index));
+#ifdef WINDOWS
 #pragma warning(default:4800)
+#endif
                 default: return boost::any();
             }          
         }
@@ -291,7 +295,6 @@ void Core::ScriptSystem::on_init() {
 int Core::ScriptSystem::adopt_actor(lua_State* env) {
     using namespace luabind;
     
-    ScriptSystem* self = static_cast<ScriptSystem*>(lua_touserdata(env, lua_upvalueindex(1)));
     
     luabind::object ref = object(from_stack(env, 1));
     Jet::Node* node = object_cast<Jet::Node*>(object(from_stack(env, 2)));

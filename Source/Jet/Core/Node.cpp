@@ -121,7 +121,7 @@ QuadChain* Core::Node::quad_chain(const std::string& name) {
     }
 }
 
-Object* Core::Node::object(const std::string& name) const {
+Object* Core::Node::object(const std::string& name)  {
     unordered_map<string, ObjectPtr>::const_iterator i = object_.find(name);
     if (i == object_.end()) {
         return 0;
