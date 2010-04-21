@@ -2,6 +2,7 @@
 -- this file: 
 
 
+engine:option("vsync", true)
 engine:option("shadow_texture_size", 1024)
 engine:option("shadows_enabled", true)
 engine:option("display_width", 1200)

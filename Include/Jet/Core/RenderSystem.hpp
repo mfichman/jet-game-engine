@@ -39,7 +39,7 @@ public:
     RenderSystem(Engine* engine);
 
     //! Destructor.
-    virtual ~RenderSystem() {}
+    virtual ~RenderSystem();
 
 private:
     void on_init();

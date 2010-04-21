@@ -39,6 +39,7 @@ Core::InputSystem::~InputSystem() {
 }
 
 void Core::InputSystem::on_init() {
+    std::cout << "Initializing input system" << std::endl;
     SDL_EnableUNICODE(true);
 }
 

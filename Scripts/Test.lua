@@ -61,7 +61,7 @@ function Test:__init()
     
     self.s1.node.position = Vector(0, 0, 0)
     self.s0.node.position = Vector(0, -10, 0)
-    self.s0.body:apply_force(Vector(-15000, 15000, 0))
+    self.s0.body:apply_force(Vector(-15000, 30000, 0))
 end
 
 function Test:on_destroy()
@@ -79,6 +79,6 @@ function Test:on_key_pressed(key, x, y)
         self.s1.body.linear_velocity = Vector(0, 0, 0)
         self.s0.node.position = Vector(0, -10, 0)
         self.s0.body.linear_velocity = Vector(0, 0, 0)
-        self.s0.body:apply_force(Vector(-15000, 15000, 0))
+        self.s0.body:apply_force(Vector(-15000, 30000, 0))
     end
 end

@@ -52,18 +52,32 @@ using namespace boost;
 Core::RenderSystem::RenderSystem(Engine* engine) :
     engine_(engine) {
 }
+	
+Core::RenderSystem::~RenderSystem() {
+	SDL_Quit();
+}
 
 void Core::RenderSystem::init_window() {
-    int32_t width = (int32_t)any_cast<real_t>(engine_->option("display_width"));
-    int32_t height = (int32_t)any_cast<real_t>(engine_->option("display_height"));
-    string title = any_cast<string>(engine_->option("window_title"));
-	bool fullscreen = any_cast<bool>(engine_->option("fullscreen"));
+	std::cout << "Initializing render system" << std::endl;
+    GLuint width = (GLuint)engine_->option<real_t>("display_width");
+    GLuint height = (GLuint)engine_->option<real_t>("display_height");
+    string title = engine_->option<string>("window_title");
+	bool fullscreen = engine_->option<bool>("fullscreen");
+	bool vsync = engine_->option<bool>("vsync");
 	
 	// Initialize SDL
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		throw runtime_error(string("SDL initialization failed: ") + SDL_GetError());
 	}
+	
+	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, vsync);
+	
 	uint32_t flags = SDL_OPENGL;
 	if (fullscreen) {
 		flags |= SDL_FULLSCREEN;
@@ -96,8 +110,8 @@ void Core::RenderSystem::init_default_states() {
     glFrontFace(GL_CCW); // We always use CCW culling
     glCullFace(GL_BACK);
     
-    GLfloat width = any_cast<real_t>(engine_->option("display_width"));
-    GLfloat height = any_cast<real_t>(engine_->option("display_height"));
+    GLfloat width = engine_->option<real_t>("display_width");
+    GLfloat height = engine_->option<real_t>("display_height");
     glViewport(0, 0, (uint32_t)width, (uint32_t)height);
     
 	
@@ -118,10 +132,10 @@ void Core::RenderSystem::on_init() {
 	init_window();
     init_default_states();
 	
-	GLuint width = (GLuint)any_cast<real_t>(engine_->option("display_width"));
-	GLuint height = (GLuint)any_cast<real_t>(engine_->option("display_height"));
+	GLuint width = (GLuint)engine_->option<real_t>("display_width");
+	GLuint height = (GLuint)engine_->option<real_t>("display_height");
 
-	GLuint size = (GLuint)any_cast<real_t>(engine_->option("shadow_texture_size"));
+	GLuint size = (GLuint)engine_->option<real_t>("shadow_texture_size");
     shadow_target_.reset(new RenderTarget(size, size, true, 1));
     color_target_.reset(new RenderTarget(width, height, false, 2));
 	bloom_target1_.reset(new RenderTarget(width/8, height/8, false, 1));

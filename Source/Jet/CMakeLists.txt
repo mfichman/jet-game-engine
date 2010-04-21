@@ -8,7 +8,7 @@ find_library(GL NAMES OpenGL opengl32)
 find_library(GLU NAMES glu32 GLU)
 find_library(GLEW NAMES glew32 GLEW)
 find_library(IL NAMES IL DevIL PATHS ${CMAKE_LINK_DIRECTORIES})
-find_library(SDL NAMES SDL)
+find_library(SDL NAMES SDL SDLmain)
 find_library(BOOST_SYSTEM NAMES boost_system)
 find_library(BOOST_FILESYSTEM NAMES boost_filesystem)
 
@@ -28,7 +28,23 @@ endif()
 
 add_subdirectory("Test")
 
-target_link_libraries(Jet ${IL} ${LUA} ${LUABIND} ${BULLET_COLLISION}
-    ${BULLET_DYNAMICS} ${BULLET_MATH} ${GL} ${GLU} ${GLEW} ${SDL}
-	${BOOST_SYSTEM} ${BOOST_FILESYSTEM})
+set(LIBRARIES ${LIBRARIES} ${IL})
+set(LIBRARIES ${LIBRARIES} ${LUA})
+set(LIBRARIES ${LIBRARIES} ${LUABIND})
+set(LIBRARIES ${LIBRARIES} ${BULLET_COLLISION})
+set(LIBRARIES ${LIBRARIES} ${BULLET_DYNAMICS})
+set(LIBRARIES ${LIBRARIES} ${BULLET_MATH})
+set(LIBRARIES ${LIBRARIES} ${GL})
+set(LIBRARIES ${LIBRARIES} ${GLU})
+set(LIBRARIES ${LIBRARIES} ${GLEW})
+set(LIBRARIES ${LIBRARIES} ${SDL})
+
+if(DARWIN)
+set(LIBRARIES ${LIBRARIES} ${BOOST_SYSTEM})
+set(LIBRARIES ${LIBRARIES} ${BOOST_FILESYSTEM})
+else()
+set(LIBRARIES ${LIBRARIES} SDL)
+endif()
+
+target_link_libraries(Jet ${LIBRARIES})
 
