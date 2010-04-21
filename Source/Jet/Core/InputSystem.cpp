@@ -22,64 +22,69 @@
 
 #include <Jet/Core/InputSystem.hpp>
 #include <Jet/Core/Engine.hpp>
-#define FREEGLUT_LIB_PRAGMAS 0
-#include <GL/freeglut.h>
+#include <SDL/SDL.h>
 #include <cmath>
 
 using namespace Jet;
 using namespace std;
+using namespace boost;
 
-Core::InputSystem* Core::InputSystem::system_ = 0;
 
 Core::InputSystem::InputSystem(Engine* engine) :
     engine_(engine){
 
-    
-    system_ = this;
 }
 
 Core::InputSystem::~InputSystem() {
-    system_ = 0;
 }
 
 void Core::InputSystem::on_init() {
-    glutKeyboardFunc(&InputSystem::on_keyboard);
-    glutKeyboardUpFunc(&InputSystem::on_keyboard_up);
-    glutSpecialFunc(&InputSystem::on_special);
-    glutSpecialUpFunc(&InputSystem::on_special_up);
-    glutMouseFunc(&InputSystem::on_mouse);
-    glutJoystickFunc(&InputSystem::on_joystick, 100);
-    glutIgnoreKeyRepeat(1);
+    SDL_EnableUNICODE(true);
 }
 
 void Core::InputSystem::on_update() {
+    SDL_EnableUNICODE(true);
+    SDL_Event evt;
+    while(SDL_PollEvent(&evt)) {
+        switch (evt.type) {
+            case SDL_QUIT: engine_->running(false); break;
+            case SDL_KEYDOWN: on_keyboard(evt.key.keysym.unicode & 0x7F); break;
+            case SDL_KEYUP: on_keyboard_up(evt.key.keysym.unicode & 0x7F); break;
+            case SDL_MOUSEBUTTONDOWN: on_mouse(evt.button.button, evt.button.x, evt.button.y); break;
+            case SDL_MOUSEBUTTONUP: on_mouse_up(evt.button.button, evt.button.x, evt.button.y); break;
+        }
+    }
 
 }
 
-void Core::InputSystem::on_keyboard(unsigned char key, int x, int y) {
-    Module* module = system_->engine_->module();
+void Core::InputSystem::on_keyboard(char key) {
+    Module* module = engine_->module();
     if (module) {
-        char str[2] = { key, 0 };
-        real_t width = (real_t)glutGet(GLUT_WINDOW_WIDTH);
-        real_t height = (real_t)glutGet(GLUT_WINDOW_HEIGHT);
+        int x, y;
+        SDL_GetMouseState(&x, &y);
+        real_t width = any_cast<real_t>(engine_->option("display_width"));
+        real_t height = any_cast<real_t>(engine_->option("display_height"));
         real_t xpos = 2.0f*(real_t)x/width - 1.0f;
         real_t ypos = 2.0f*(real_t)y/height - 1.0f;
         xpos = max(-1.0f, min(1.0f, xpos));
         ypos = max(-1.0f, min(1.0f, ypos));
+        char str[2] = { key, 0 };
         module->on_key_pressed(str, xpos, ypos);
     }
 }
 
-void Core::InputSystem::on_keyboard_up(unsigned char key, int x, int y) {
-    Module* module = system_->engine_->module();
+void Core::InputSystem::on_keyboard_up(char key) {
+    Module* module = engine_->module();
     if (module) {
-        char str[2] = { key, 0 };
-        real_t width = (real_t)glutGet(GLUT_WINDOW_WIDTH);
-        real_t height = (real_t)glutGet(GLUT_WINDOW_HEIGHT);
+        int x, y;
+        SDL_GetMouseState(&x, &y);
+        real_t width = any_cast<real_t>(engine_->option("display_width"));
+        real_t height = any_cast<real_t>(engine_->option("display_height"));
         real_t xpos = 2.0f*(real_t)x/width - 1.0f;
         real_t ypos = 2.0f*(real_t)y/height - 1.0f;
         xpos = max(-1.0f, min(1.0f, xpos));
         ypos = max(-1.0f, min(1.0f, ypos));
+        char str[2] = { key, 0 };
         module->on_key_released(str, xpos, ypos);
     }
 }
@@ -92,26 +97,35 @@ void Core::InputSystem::on_special_up(int key, int x, int y) {
     //Module* module = system_->engine_->module();
 }
 
-void Core::InputSystem::on_mouse(int button, int state, int x, int y) {
-    Module* module = system_->engine_->module();
+void Core::InputSystem::on_mouse(int button, int x, int y) {
+    Module* module = engine_->module();
     if (module) {
-        real_t width = (real_t)glutGet(GLUT_WINDOW_WIDTH);
-        real_t height = (real_t)glutGet(GLUT_WINDOW_HEIGHT);
+        real_t width = any_cast<real_t>(engine_->option("display_width"));
+        real_t height = any_cast<real_t>(engine_->option("display_height"));
         real_t xpos = 2.0f*(real_t)x/width - 1.0f;
         real_t ypos = 2.0f*(real_t)y/height - 1.0f;
         xpos = max(-1.0f, min(1.0f, xpos));
         ypos = max(-1.0f, min(1.0f, ypos));
-        if (state == GLUT_DOWN) {
-            module->on_button_pressed(button, xpos, ypos);
-        } else {
-            module->on_button_released(button, xpos, ypos);
-        }
+        module->on_button_pressed(button, xpos, ypos);
     }
 }
 
-void Core::InputSystem::on_joystick(unsigned int button, int x, int y, int z) {
-    Module* module = system_->engine_->module();
+void Core::InputSystem::on_mouse_up(int button, int x, int y) {
+    Module* module = engine_->module();
+    if (module) {
+        real_t width = any_cast<real_t>(engine_->option("display_width"));
+        real_t height = any_cast<real_t>(engine_->option("display_height"));
+        real_t xpos = 2.0f*(real_t)x/width - 1.0f;
+        real_t ypos = 2.0f*(real_t)y/height - 1.0f;
+        xpos = max(-1.0f, min(1.0f, xpos));
+        ypos = max(-1.0f, min(1.0f, ypos));
+        module->on_button_released(button, xpos, ypos);
+    }
+}
+
+void Core::InputSystem::on_joystick(int button, int x, int y, int z) {
+    /*Module* module = system_->engine_->module();
     if (module) {
         module->on_joystick(button, (real_t)x/1000.0f, (real_t)y/1000.0f, (real_t)z/1000.0f);
-    }
+    }*/
 }

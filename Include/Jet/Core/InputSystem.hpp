@@ -44,15 +44,15 @@ private:
     void on_post_update() {}
     void on_render() {}
     
-    static void on_keyboard(unsigned char key, int x, int y);
-    static void on_keyboard_up(unsigned char key, int x, int y);
-    static void on_special(int key, int x, int y);
-    static void on_special_up(int key, int x, int y);
-    static void on_mouse(int button, int state, int x, int y);
-    static void on_joystick(unsigned int button, int x, int y, int z);
+    void on_keyboard(char key);
+    void on_keyboard_up(char key);
+    void on_special(int key, int x, int y);
+    void on_special_up(int key, int x, int y);
+    void on_mouse(int button, int x, int y);
+    void on_mouse_up(int button, int x, int y);
+    void on_joystick(int button, int x, int y, int z);
     
     Engine* engine_;
-    static InputSystem* system_;
 };
 
 }}

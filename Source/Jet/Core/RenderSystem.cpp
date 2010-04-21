@@ -35,7 +35,7 @@
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <GL/freeglut.h>
+#include <SDL/SDL.h>
 
 #include <boost/lexical_cast.hpp>
 #include <iostream>
@@ -51,28 +51,30 @@ using namespace boost;
 
 Core::RenderSystem::RenderSystem(Engine* engine) :
     engine_(engine) {
-        
-    GLint argc = 0;
-    glutInit(&argc, 0);
-	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_STENCIL);
 }
 
 void Core::RenderSystem::init_window() {
     int32_t width = (int32_t)any_cast<real_t>(engine_->option("display_width"));
     int32_t height = (int32_t)any_cast<real_t>(engine_->option("display_height"));
-    string title = any_cast<string>(engine_->option("window_title"));	
-
-    // If in full screen mode, then use GLUT game mode
-	if (any_cast<bool>(engine_->option("fullscreen"))) {
-        stringstream ss;
-        ss << width << "x" << height << ":32@60" << endl;
-        glutGameModeString(ss.str().c_str());
-        glutEnterGameMode();
-    } else {
-		glutInitWindowSize(width, height);
-        glutCreateWindow(title.c_str());
-    }
+    string title = any_cast<string>(engine_->option("window_title"));
+	bool fullscreen = any_cast<bool>(engine_->option("fullscreen"));
 	
+	// Initialize SDL
+	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+		throw runtime_error(string("SDL initialization failed: ") + SDL_GetError());
+	}
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+	uint32_t flags = SDL_SWSURFACE | SDL_OPENGL;
+	if (fullscreen) {
+		flags |= SDL_FULLSCREEN;
+	}
+	SDL_WM_SetCaption(title.c_str(), NULL);
+	
+	if (!SDL_SetVideoMode(width, height, 0, flags)) {
+		throw runtime_error(string("SDL initialization failed: ") + SDL_GetError());
+	}
+
+	// Initialize extensions	
 	if (GLEW_OK != glewInit()) {
         throw runtime_error("GLEW initialization failed");
     }
@@ -106,9 +108,9 @@ void Core::RenderSystem::init_default_states() {
     
     // Turn of VSYNC so the game can run at full frame rate
 #ifdef WINDOWS
-    typedef int (APIENTRY *swap_interval_t)(int);
-    swap_interval_t glSwapInterval = (swap_interval_t)wglGetProcAddress("wglSwapIntervalEXT");
-    glSwapInterval(0);
+    //typedef int (APIENTRY *swap_interval_t)(int);
+    //swap_interval_t glSwapInterval = (swap_interval_t)wglGetProcAddress("wglSwapIntervalEXT");
+    //glSwapInterval(0);
 #endif
 }
 
@@ -126,9 +128,7 @@ void Core::RenderSystem::on_init() {
 	bloom_target2_.reset(new RenderTarget(width/8, height/8, false, 1));
 }
 
-void Core::RenderSystem::on_render() {
-    glutMainLoopEvent();
-	
+void Core::RenderSystem::on_render() {	
 	if (!engine_->camera()) {
 		return;
 	}
@@ -140,8 +140,8 @@ void Core::RenderSystem::on_render() {
 		// TODO: render more than one light
         break;
     }
-    
-    glutSwapBuffers();
+	
+	SDL_GL_SwapBuffers();
 }
 
 void Core::RenderSystem::on_post_update() {

@@ -8,7 +8,7 @@ find_library(GL NAMES OpenGL opengl32)
 find_library(GLU NAMES glu32 GLU)
 find_library(GLEW NAMES glew32 GLEW)
 find_library(IL NAMES IL DevIL PATHS ${CMAKE_LINK_DIRECTORIES})
-find_library(FREEGLUT NAMES freeglut)
+find_library(SDL2 NAMES SDLmain)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 find_library(LUA NAMES lua_d lua)
@@ -27,5 +27,5 @@ endif()
 add_subdirectory("Test")
 
 target_link_libraries(Jet ${IL} ${LUA} ${LUABIND} ${BULLET_COLLISION}
-    ${BULLET_DYNAMICS} ${BULLET_MATH} ${GL} ${GLU} ${FREEGLUT} ${GLEW})
+    ${BULLET_DYNAMICS} ${BULLET_MATH} ${GL} ${GLU} ${GLEW} SDL)
 
