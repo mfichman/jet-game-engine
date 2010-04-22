@@ -203,7 +203,7 @@ public:
 	template <typename T>
 	inline T option(const std::string& name) const {
 		try {
-			return any_cast<T>(option(name));
+			return boost::any_cast<T>(option(name));
 		} catch (boost::bad_any_cast) {
 			throw std::runtime_error("Wrong type for option: " + name);
 		}
