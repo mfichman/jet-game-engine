@@ -1,6 +1,7 @@
 #include <Jet/Engine.hpp>
 #include <iostream>
 #include <stdexcept>
+#include <SDL/SDL.h>
 
 int main(int argc, char** argv) {
     try {        
