@@ -9,11 +9,12 @@ engine:option("shadows_enabled", true)
 engine:option("display_width", 1200)
 engine:option("display_height", 800)
 engine:option("fullscreen", false)
-
+engine:option("shaders_enabled", false);
+--[[
 engine:option("display_width", 1680)
 engine:option("display_height", 1050)
 engine:option("fullscreen", true)
-
+]]
 engine:option("window_title", "Extreme Asteroids")
 
 

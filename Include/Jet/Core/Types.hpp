@@ -68,9 +68,9 @@ namespace Jet { namespace Core {
     
     
     enum TextureSampler {
-        DIFFUSE_MAP_SAMPLER = 3,
+        DIFFUSE_MAP_SAMPLER = 0,
         SPECULAR_MAP_SAMPLER = 1,
         NORMAL_MAP_SAMPLER = 2,
-        SHADOW_MAP_SAMPLER = 0
+        SHADOW_MAP_SAMPLER = 3
     };
 }}

@@ -95,8 +95,11 @@ void Core::RenderSystem::init_window() {
         throw runtime_error("GLEW initialization failed");
     }
     if (!glewIsSupported("GL_VERSION_2_0")) {
-        throw runtime_error("OpenGL 2.0 not supported");
+		engine_->option("shaders_enabled", false);
     }
+	if (!glewIsSupported("GL_VERSION_1_4")) {
+		throw runtime_error("OpenGL 1.4 is not supported");
+	}
 }
 
 void Core::RenderSystem::init_default_states() {
@@ -142,10 +145,14 @@ void Core::RenderSystem::on_render() {
 	if (!engine_->camera()) {
 		return;
 	}
+	
+	bool shaders_enabled = engine_->option<bool>("shaders_enabled");
     
     // Render the scene once for each light
     for (vector<LightPtr>::iterator i = lights_.begin(); i != lights_.end(); i++) {
-        generate_shadow_map(i->get());
+		if (shaders_enabled) {
+			generate_shadow_map(i->get());
+		}
         render_final(i->get());
 		// TODO: render more than one light
         break;
@@ -168,7 +175,7 @@ void Core::RenderSystem::generate_shadow_map(Light* light) {
 	
 	// Generate an orthogonal basis (rotation matrix) for the
 	// directional light
-	Vector forward = -light->direction().unit();
+	Vector forward = light->direction().unit();
 	Vector up = forward.orthogonal();
 	Vector right = forward.cross(up);
 	Matrix matrix(right, up, forward);
@@ -191,11 +198,9 @@ void Core::RenderSystem::generate_shadow_map(Light* light) {
     
     // Render to the front buffer
     shadow_target_->enabled(true);
-    //glCullFace(GL_FRONT); // Only render the back faces to the depth buffer
     glDisable(GL_LIGHTING);
     render_shadow_casters();
     shadow_target_->enabled(false);
-    //glCullFace(GL_BACK); 
     glEnable(GL_LIGHTING);
         
     // Initialize the texture matrix for transforming the shadow map
@@ -250,10 +255,11 @@ void Core::RenderSystem::render_final(Light* light) {
         GLfloat lposition[4] = { position.x, position.y, position.z, 1.0f };
         glLightfv(GL_LIGHT0, GL_POSITION, lposition);
     } else {
-        const Vector& direction = light->direction();
+        const Vector& direction = light->direction().unit();
         GLfloat lposition[4] = { direction.x, direction.y, direction.z, 0.0f };
         glLightfv(GL_LIGHT0, GL_POSITION, lposition);
 	}
+	glEnable(GL_LIGHT0);
 		
 	// Bind the shadow sampler to the shadow texture
 	shadow_target_->sampler(SHADOW_MAP_SAMPLER);

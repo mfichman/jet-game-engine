@@ -210,7 +210,13 @@ public:
 		try {
 			return boost::any_cast<T>(option(name));
 		} catch (boost::bad_any_cast) {
-			throw std::runtime_error("Wrong type for option: " + name);
+			std::string type;
+			if (typeid(T) == typeid(std::string)) {
+				type = "string";
+			} else {
+				type = typeid(T).name();
+			}
+			throw std::runtime_error("Option '" + name + "' is invalid: expected type '" + type + "'");
 		}
 	}
 

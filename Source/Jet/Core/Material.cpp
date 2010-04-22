@@ -123,48 +123,86 @@ void Core::Material::enabled(bool enabled) {
 	if (enabled == enabled_) {
 		return;
 	}
-	shader_->enabled(enabled);
 	
 	if (enabled) {
+		// Make sure the material is properly loaded into memory
 		state(SYNCED);
 		
-		// Set up texture samplers.  Samplers are enabled if the corresponding
-		// texture in the material is non-null.
-		if (diffuse_map_) {
-			diffuse_map_->sampler(DIFFUSE_MAP_SAMPLER);
-			glUniform1i(diffuse_map_loc_, DIFFUSE_MAP_SAMPLER);
-			glUniform1i(diffuse_map_enabled_, true);
+		if (engine_->option<bool>("shaders_enabled")) {
+			// Enable material shader
+			shader_->enabled(true);
+			
+			// Set up texture samplers.  Samplers are enabled if the corresponding
+			// texture in the material is non-null.
+			if (diffuse_map_) {
+				diffuse_map_->sampler(DIFFUSE_MAP_SAMPLER);
+				glUniform1i(diffuse_map_loc_, DIFFUSE_MAP_SAMPLER);
+				glUniform1i(diffuse_map_enabled_, true);
+			} else {
+				glUniform1i(diffuse_map_enabled_, false);
+			}
+	
+			if (specular_map_) {
+				specular_map_->sampler(SPECULAR_MAP_SAMPLER);
+				glUniform1i(specular_map_loc_, SPECULAR_MAP_SAMPLER);
+				glUniform1i(specular_map_enabled_, true);
+			} else {
+				glUniform1i(specular_map_enabled_, false);
+			}
+			
+			if (normal_map_) {
+				normal_map_->sampler(NORMAL_MAP_SAMPLER);
+				glUniform1i(normal_map_loc_, NORMAL_MAP_SAMPLER);
+				glUniform1i(normal_map_enabled_, true);
+			} else {
+				glUniform1i(normal_map_enabled_, false);
+			}
+			
+			// Enable the shadow map sampler only if this object should receive
+			// shadows
+			glUniform1i(shadow_map_loc_, SHADOW_MAP_SAMPLER);
+			glUniform1i(shadow_map_enabled_, (bool)receive_shadows_);
+			
+			
 		} else {
-			glUniform1i(diffuse_map_enabled_, false);
-		}
-
-		if (specular_map_) {
-			specular_map_->sampler(SPECULAR_MAP_SAMPLER);
-			glUniform1i(specular_map_loc_, SPECULAR_MAP_SAMPLER);
-			glUniform1i(specular_map_enabled_, true);
-		} else {
-			glUniform1i(specular_map_enabled_, false);
-		}
+			glActiveTexture(GL_TEXTURE1);
+			glDisable(GL_TEXTURE_2D);
+			glActiveTexture(GL_TEXTURE2);
+			glDisable(GL_TEXTURE_2D);
+			glActiveTexture(GL_TEXTURE3);
+			glDisable(GL_TEXTURE_2D);
+			
+			
+			
+			// Only use diffuse texture mapping
+			if (diffuse_map_) {
+				diffuse_map_->sampler(0);
+				glActiveTexture(GL_TEXTURE0);
+				glEnable(GL_TEXTURE_2D);
+				glMatrixMode(GL_TEXTURE);
+				glLoadIdentity();
+			} else {
+				glActiveTexture(GL_TEXTURE0);
+				glDisable(GL_TEXTURE_2D);
+			}
+			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+			
 		
-		if (normal_map_) {
-			normal_map_->sampler(NORMAL_MAP_SAMPLER);
-			glUniform1i(normal_map_loc_, NORMAL_MAP_SAMPLER);
-			glUniform1i(normal_map_enabled_, true);
-		} else {
-			glUniform1i(normal_map_enabled_, false);
 		}
-		
-		// Enable the shadow map sampler only if this object should receive
-		// shadows
-		glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_SAMPLER);
-		glUniform1i(shadow_map_loc_, SHADOW_MAP_SAMPLER);
-		glUniform1i(shadow_map_enabled_, (bool)receive_shadows_);
 		
 		// Set up material		
 		glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_color());
 		glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_color());
-        glMaterialfv(GL_FRONT, GL_SPECULAR, specular_color());
-        glMaterialf(GL_FRONT, GL_SHININESS, shininess());
+		glMaterialfv(GL_FRONT, GL_SPECULAR, specular_color());
+		glMaterialf(GL_FRONT, GL_SHININESS, shininess());
+	} else {
+		if (engine_->option<bool>("shaders_enabled")) {
+			// Disable the shader for this material
+			shader_->enabled(false);
+		} else {
+			glActiveTexture(GL_TEXTURE0);
+			glDisable(GL_TEXTURE_2D);
+		}
 	}
 	
 	enabled_ = enabled;

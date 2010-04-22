@@ -36,9 +36,9 @@ uniform bool specular_map_enabled;
 uniform bool normal_map_enabled;
 uniform bool shadow_map_enabled;
 
-//#define NORMAL_MAP
+#define NORMAL_MAP
 #define SHADOW_MAP
-//#define SPECULAR_MAP
+#define SPECULAR_MAP
 #define DIFFUSE_MAP
 
 void main() {
@@ -70,7 +70,7 @@ void main() {
         
         // Calculate view, light, and reflection vectors
         vec3 v = normalize(view);
-        vec3 l = normalize(-light);
+        vec3 l = normalize(light);
         vec3 r = reflect(v, n);
     
         // Calculate diffuse and specular coefficients
@@ -100,7 +100,7 @@ void main() {
 #ifdef SHADOW_MAP
     if (shadow_map_enabled) {
         vec4 shadow_coord = gl_TexCoord[1]/gl_TexCoord[1].w;
-        float depth = texture2D(shadow_map, shadow_coord.st).z + 0.001;
+        float depth = texture2D(shadow_map, shadow_coord.st).z + 0.0005;
         if (depth < shadow_coord.z) {
             diffuse *= 0.4;
             specular *= 0.2;

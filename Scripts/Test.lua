@@ -36,7 +36,7 @@ function Test:__init()
     self.light.ambient_color = Color(.3, .3, .3, 1)
     self.light.diffuse_color = Color(1, 1, 1, 1)
     self.light.specular_color = Color(1, 1, 1, 1)
-    self.light.direction = Vector(-1, 0, 1)
+    self.light.direction = Vector(1, 0, 1)
     
     -- Set up the camera
     print("Creating camera")
@@ -66,7 +66,10 @@ end
 blah = 0.0
 
 function Test:on_update()
-    self.light.direction = Vector(math.sin(blah), math.cos(blah) - 1.0, -2.5)
+    --self.light.direction = Vector(0, 0, -2.5)
+    --self.camera_node.position = Vector(blah + 15, 0, blah + 15)
+    
+    blah = blah + 0.1
 end
 
 function Test:on_destroy()

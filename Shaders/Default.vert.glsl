@@ -37,7 +37,7 @@ void main() {
     
 #ifdef SHADOW_MAP
     if (shadow_map_enabled) {
-        gl_TexCoord[1] = gl_TextureMatrix[0] * gl_Vertex;
+        gl_TexCoord[1] = gl_TextureMatrix[3] * gl_Vertex;
     }
 #endif
 

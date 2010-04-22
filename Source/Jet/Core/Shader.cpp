@@ -40,7 +40,7 @@ Core::Shader::~Shader() {
 }
 
 void Core::Shader::state(ResourceState state) {
-	if (state == state_) {
+	if (state == state_ || !engine_->option<bool>("shaders_enabled")) {
 		return;
 	}
 	
@@ -136,7 +136,7 @@ void Core::Shader::read_source(const string& path, vector<char>& source) {
 }
 
 void Core::Shader::enabled(bool enabled) {
-	if (enabled == enabled_) {
+	if (enabled == enabled_ || !engine_->option<bool>("shaders_enabled")) {
 		return;
 	}
 	
