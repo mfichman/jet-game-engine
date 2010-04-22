@@ -24,6 +24,7 @@
 #include <cmath>
 
 using namespace Jet;
+using namespace std;
 
 #define JET_RADIANS(x) ((x)*3.14f/180.0f)
 
