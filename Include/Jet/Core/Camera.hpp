@@ -23,6 +23,7 @@
 
 #include <Jet/Core/Types.hpp>
 #include <Jet/Core/Engine.hpp>
+#include <Jet/Core/Node.hpp>
 #include <Jet/Camera.hpp>
 
 namespace Jet { namespace Core {
@@ -48,6 +49,19 @@ public:
         return field_of_view_;
     }
     
+    //! Returns the clipping distance
+    inline real_t far_clipping_distance() const {
+        return far_clipping_distance_;
+    }
+    
+    //! Returns the clipping distance
+    inline real_t near_clipping_distance() const {
+        return near_clipping_distance_;
+    }
+    
+    //! Returns the viewing frustum
+    Frustum frustum() const;
+    
     //! Sets the field of view
     inline void field_of_view(real_t fov) {
         field_of_view_ = fov;
@@ -57,18 +71,32 @@ public:
     inline void active(bool active) {
         engine_->camera(this);
     }
+    
+    //! Sets the clipping distance
+    inline void far_clipping_distance(real_t distance) {
+        far_clipping_distance_ = distance;
+    }
+    
+    //! Sets the clipping distance
+    inline void near_clipping_distance(real_t distance) {
+        near_clipping_distance_ = distance;
+    }
 
 private:
     Camera(Engine* engine, Node* parent) :
         engine_(engine),
         parent_(parent),
-        field_of_view_(45.0f) {
+        field_of_view_(45.0f),
+        near_clipping_distance_(0.1f),
+        far_clipping_distance_(1000.0f) {
             
     }
     
     Engine* engine_;
     Node* parent_;
     real_t field_of_view_;
+    real_t near_clipping_distance_;
+    real_t far_clipping_distance_;
     
     friend class Node;
 };

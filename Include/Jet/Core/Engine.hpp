@@ -91,6 +91,11 @@ public:
 		return 1.0f/60.0f;
 	}
 	
+	//! The delta since the last physics step
+	inline real_t delta() const {
+		return delta_;
+	}
+	
 	//! Returns the simulation speed.
 	inline real_t simulation_speed() const {
 		return simulation_speed_;
@@ -203,13 +208,14 @@ public:
 	template <typename T>
 	inline T option(const std::string& name) const {
 		try {
-			return any_cast<T>(option(name));
+			return boost::any_cast<T>(option(name));
 		} catch (boost::bad_any_cast) {
 			throw std::runtime_error("Wrong type for option: " + name);
 		}
 	}
 
 private:
+	friend class PhysicsSystem;
     std::string resolve_path(const std::string& path);
     void update_delta();
 	void init_systems();

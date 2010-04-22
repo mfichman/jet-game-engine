@@ -24,6 +24,7 @@
 #include <BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h>
 
 using namespace Jet;
+using namespace std;
 
 Core::PhysicsSystem::PhysicsSystem(Engine* engine) :
     engine_(engine) {
@@ -33,13 +34,18 @@ Core::PhysicsSystem::PhysicsSystem(Engine* engine) :
     broadphase_.reset(new btDbvtBroadphase);
     solver_.reset(new btSequentialImpulseConstraintSolver);
 	world_.reset(new btDiscreteDynamicsWorld(dispatcher_.get(), broadphase_.get(), solver_.get(), config_.get()));
-    world_->setWorldUserInfo(this);
 	world_->setGravity(btVector3(0.0f, -10.0f, 0.0f));
+    world_->setInternalTickCallback(&Core::PhysicsSystem::on_tick, this, true);
     btGImpactCollisionAlgorithm::registerAlgorithm(dispatcher_.get());
+    
 }
 
 Core::PhysicsSystem::~PhysicsSystem() {
     
+}
+
+void Core::PhysicsSystem::step() {
+	world_->stepSimulation(engine_->delta()*engine_->simulation_speed(), 4, engine_->timestep());
 }
 
 void Core::PhysicsSystem::on_init() {
@@ -47,9 +53,27 @@ void Core::PhysicsSystem::on_init() {
 }
 
 void Core::PhysicsSystem::on_update() {
-    world_->stepSimulation(engine_->timestep()*engine_->simulation_speed(), 0);
 }
 
-void Core::PhysicsSystem::on_render() {
+void Core::PhysicsSystem::on_tick(btDynamicsWorld* world, btScalar step) {
     
+    btCollisionObjectArray objects = world->getCollisionObjectArray();
+    world->clearForces();
+    for (int i = 0; i < objects.size(); i++) {
+         btRigidBody* rigid_body = btRigidBody::upcast(objects[i]);
+         if (rigid_body) {
+            rigid_body->applyGravity();
+         }
+    }
+	    
+    PhysicsSystem* system = static_cast<PhysicsSystem*>(world->getWorldUserInfo());    
+    std::list<EngineListenerPtr>& listener = system->engine_->listener_;
+	
+	for (list<EngineListenerPtr>::iterator i = listener.begin(); i != listener.end(); i++) {
+        (*i)->on_update();
+    }
+    if (system->engine_->module()) {
+        system->engine_->module()->on_update();
+    }
+    return;
 }

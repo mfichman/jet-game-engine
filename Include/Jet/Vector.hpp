@@ -93,6 +93,9 @@ public:
     
     //! Subtracts form this vector.
     Vector& operator-=(const Vector& other);
+    
+    //! Projects a vector onto this vector.
+    Vector project(const Vector& other) const;
 
     //! Returns a unit vector.
     Vector unit() const;

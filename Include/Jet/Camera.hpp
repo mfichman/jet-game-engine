@@ -25,6 +25,7 @@
 #include <Jet/Object.hpp>
 #include <Jet/Color.hpp>
 #include <Jet/Vector.hpp>
+#include <Jet/Frustum.hpp>
 
 namespace Jet {
     
@@ -39,11 +40,26 @@ public:
     //! Returns the field of view
     virtual real_t field_of_view() const=0;
     
+    //! Returns the clipping distance
+    virtual real_t far_clipping_distance() const=0;
+    
+    //! Returns the clipping distance
+    virtual real_t near_clipping_distance() const=0;
+    
     //! Returns true if this is the active camera.
     virtual bool active() const=0;
     
+    //! Returns the view frustum for this camera
+    virtual Frustum frustum() const=0;
+    
     //! Sets the field of view
     virtual void field_of_view(real_t fov)=0;
+    
+    //! Sets the clipping distance
+    virtual void far_clipping_distance(real_t distance)=0;
+
+    //! Sets the clipping distance
+    virtual void near_clipping_distance(real_t distance)=0;
 
     // Makes the camera active.
     virtual void active(bool active)=0;

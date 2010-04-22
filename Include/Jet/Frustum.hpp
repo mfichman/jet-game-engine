@@ -18,50 +18,30 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- */  
-#pragma once
+ */
+ #pragma once
 
 #include <Jet/Types.hpp>
 #include <Jet/Vector.hpp>
 
-namespace Jet {
-
-//! Represents a 3-component texcoord.
-//! @class Texcoord
-//! @brief 3-component texcoord.
-class BoundingBox {
+namespace Jet { 
+    
+//! Represents the view frustum of a camera.
+//! @class Frustum
+//! @brief The view frustum volume.
+class Frustum {
 public:
-    //! Creates a zero-size bounding box.
-    BoundingBox();
-    
-    //! Creates a bounding box from a frustum.
-    //! @param frustum the frustum to get the bounding box for.
-    BoundingBox(const Frustum& frustum);
+  
 
-    //! Returns the width of the box
-    real_t width() const;
+    Vector near_top_left;
+    Vector near_top_right;
+    Vector near_bottom_left;
+    Vector near_bottom_right;
     
-    //! Returns the height of the box
-    real_t height() const;
-    
-    //! Returns the depth of the box
-    real_t depth() const;
-    
-    //! Returns the half-extents of the box
-    Vector half_extents() const;
-    
-    //! Returns the origin of the box
-    Vector origin() const;
-    
-    //! Adds a point to the box, expanding it if necessary.
-    void point(const Vector& point);
-
-    real_t min_x;
-    real_t max_x;
-    real_t min_y;
-    real_t max_y;
-    real_t min_z;
-    real_t max_z;
+    Vector far_top_left;
+    Vector far_top_right;
+    Vector far_bottom_left;
+    Vector far_bottom_right;
 };
 
 }

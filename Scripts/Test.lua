@@ -36,7 +36,7 @@ function Test:__init()
     self.light.ambient_color = Color(.3, .3, .3, 1)
     self.light.diffuse_color = Color(1, 1, 1, 1)
     self.light.specular_color = Color(1, 1, 1, 1)
-    self.light.direction = Vector(1, 0, 0)
+    self.light.direction = Vector(-1, 0, 1)
     
     -- Set up the camera
     print("Creating camera")
@@ -63,6 +63,11 @@ function Test:__init()
     self.s0.node.position = Vector(0, -10, 0)
     self.s0.body:apply_force(Vector(-15000, 30000, 0))
 end
+blah = 0.0
+
+function Test:on_update()
+    self.light.direction = Vector(math.sin(blah), math.cos(blah) - 1.0, -2.5)
+end
 
 function Test:on_destroy()
     print("Goodbye")
@@ -75,10 +80,10 @@ function Test:on_key_pressed(key, x, y)
     elseif (key == 's') then
         engine.simulation_speed = 1.0/4.0
     elseif (key == 'r') then
-        self.s1.node.position = Vector(0, 0, 0)
+        self.s1.node.position = Vector(5, 0, 0)
         self.s1.body.linear_velocity = Vector(0, 0, 0)
-        self.s0.node.position = Vector(0, -10, 0)
+        self.s0.node.position = Vector(0, 5, 0)
         self.s0.body.linear_velocity = Vector(0, 0, 0)
-        self.s0.body:apply_force(Vector(-15000, 30000, 0))
+        --self.s0.body:apply_force(Vector(-15000, 30000, 0))
     end
 end

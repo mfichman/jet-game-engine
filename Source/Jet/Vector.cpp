@@ -90,7 +90,6 @@ Vector Vector::operator*(real_t s) const {
     return Vector(s*x, s*y, s*z);
 }
 
-
 Vector& Vector::operator+=(const Vector& other) {
     x += other.x;
     y += other.y;
@@ -105,9 +104,25 @@ Vector& Vector::operator-=(const Vector& other) {
     return *this;
 }
 
+
+Vector Vector::project(const Vector& other) const {
+    Vector u = unit();
+    return u * other.dot(u);
+}
+
 Vector Vector::unit() const {
     real_t norm = length();
     return Vector(x/norm, y/norm, z/norm);
+}
+
+Vector Vector::orthogonal() const {
+    
+    Vector ortho = cross(Vector(1.0f, 0.0f, 0.0f));
+    if (ortho.length2() < 1e-12) {
+        ortho = cross(Vector(0.0f, 1.0f, 0.0f));
+    }
+    
+    return ortho.unit();    
 }
 
 ostream& operator<<(ostream& out, const Vector& vector) {

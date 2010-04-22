@@ -26,6 +26,8 @@
 #include <Jet/Core/MeshObject.hpp>
 #include <Jet/Core/Camera.hpp>
 #include <Jet/Matrix.hpp>
+#include <Jet/BoundingBox.hpp>
+#include <Jet/Frustum.hpp>
 
 #ifdef WINDOWS
 #define WIN32_LEAN_AND_MEAN
@@ -114,12 +116,6 @@ void Core::RenderSystem::init_default_states() {
     GLfloat height = engine_->option<real_t>("display_height");
     glViewport(0, 0, (uint32_t)width, (uint32_t)height);
     
-	
-    // Set up the projection matrix
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(45.0f, width/height, 0.1f, 1000.0f);
-    
     // Turn of VSYNC so the game can run at full frame rate
 #ifdef WINDOWS
     //typedef int (APIENTRY *swap_interval_t)(int);
@@ -167,31 +163,39 @@ void Core::RenderSystem::on_post_update() {
 
 void Core::RenderSystem::generate_shadow_map(Light* light) {    
 
-    // Set up the projection matrix for the light
-    glMatrixMode(GL_PROJECTION);
-    glPushMatrix();
-    glLoadIdentity();
-    glOrtho(-12.0f, 12.0f, -12.0f, 12.0f, 0.1f, 1000.0f);
+	Core::CameraPtr camera = static_cast<Core::Camera*>(engine_->camera());
+
+	
+	// Generate an orthogonal basis (rotation matrix) for the
+	// directional light
+	Vector forward = -light->direction().unit();
+	Vector up = forward.orthogonal();
+	Vector right = forward.cross(up);
+	Matrix matrix(right, up, forward);
+	
+	// Transform the view frustum into light space and calculate
+	// the bounding box 
+	Frustum frustum = camera->frustum();
+	frustum = matrix * frustum;
+	BoundingBox bounds(frustum);
+	
+	// Set up the projection matrix for the directional light
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(bounds.min_x, bounds.max_x, bounds.min_y, bounds.max_y, bounds.min_z, bounds.max_z);
     
-    // Set up the view matrix for the light
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    
-    if (light->type() == POINT_LIGHT) {
-        const Vector& position = light->parent()->position();
-        gluLookAt(position.x, position.y, position.z, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-    } else {
-        const Vector& direction = light->direction();
-        gluLookAt(100*direction.x, 100*direction.y, 100*direction.z, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-    }    
+	// Set up the view matrix for the directional light
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glLoadMatrixf(matrix);
     
     // Render to the front buffer
     shadow_target_->enabled(true);
-    glCullFace(GL_FRONT); // Only render the back faces to the depth buffer
+    //glCullFace(GL_FRONT); // Only render the back faces to the depth buffer
     glDisable(GL_LIGHTING);
     render_shadow_casters();
     shadow_target_->enabled(false);
-    glCullFace(GL_BACK); 
+    //glCullFace(GL_BACK); 
     glEnable(GL_LIGHTING);
         
     // Initialize the texture matrix for transforming the shadow map
@@ -211,22 +215,29 @@ void Core::RenderSystem::generate_shadow_map(Light* light) {
     glLoadMatrixf(light_bias);
     glMultMatrixf(light_projection);
     glMultMatrixf(light_modelview);
-    
-    // Pop the projection matrix
-    glMatrixMode(GL_PROJECTION);
-    glPopMatrix();
+	
+	
 }
 
 void Core::RenderSystem::render_final(Light* light) {
-    
-    // Modelview matrix setup
+   
 	Core::CameraPtr camera = static_cast<Core::Camera*>(engine_->camera());
-	const Matrix& matrix = camera->parent()->matrix();
-	Vector eye = matrix * Vector(0.0f, 0.0f, 0.0f);
+	Matrix matrix = camera->parent()->matrix();
+	real_t width = engine_->option<real_t>("display_width");
+	real_t height = engine_->option<real_t>("display_height");
+	
+    // Set up the projection matrix
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(camera->field_of_view(), width/height, camera->near_clipping_distance(), camera->far_clipping_distance());
+	
+	// Modelview matrix setup
+	Vector eye = matrix.origin();
 	Vector at = matrix * Vector(0.0f, 0.0f, 1.0f);
+	Vector up = matrix.up();
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	gluLookAt(eye.x, eye.y, eye.z, at.x, at.y, at.z, 0.0f, 1.0f, 0.0f);
+	gluLookAt(eye.x, eye.y, eye.z, at.x, at.y, at.z, up.x, up.y, up.z);
         
     // Set light parameter
     glLightfv(GL_LIGHT0, GL_DIFFUSE, light->diffuse_color());

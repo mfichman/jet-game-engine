@@ -21,17 +21,39 @@
  */  
     
 #include <Jet/BoundingBox.hpp>
+#include <Jet/Frustum.hpp>
+#include <cfloat>
     
 using namespace Jet;
     
 BoundingBox::BoundingBox() :
-    min_x(0.0f),
-    max_x(0.0f),
-    min_y(0.0f),
-    max_y(0.0f),
-    min_z(0.0f),
-    max_z(0.0f) {
+    min_x(FLT_MAX),
+    max_x(FLT_MIN),
+    min_y(FLT_MAX),
+    max_y(FLT_MIN),
+    min_z(FLT_MAX),
+    max_z(FLT_MIN) {
         
+}
+
+BoundingBox::BoundingBox(const Frustum& frustum) :
+    min_x(FLT_MAX),
+    max_x(FLT_MIN),
+    min_y(FLT_MAX),
+    max_y(FLT_MIN),
+    min_z(FLT_MAX),
+    max_z(FLT_MIN) {
+        
+    point(frustum.near_top_left);
+    point(frustum.near_top_right);
+    point(frustum.near_bottom_left);
+    point(frustum.near_bottom_right);
+    
+    point(frustum.far_top_left);
+    point(frustum.far_top_right);
+    point(frustum.far_bottom_left);
+    point(frustum.far_bottom_right);
+    
 }
 
 real_t BoundingBox::width() const {

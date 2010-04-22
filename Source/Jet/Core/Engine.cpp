@@ -80,7 +80,7 @@ Core::Engine::Engine() :
 	
     listener(render_system_.get());
 	listener(new InputSystem(this));
-	listener(physics_system_.get());
+	//listener(physics_system_.get());
 	listener(script_system_.get());
 	
 #ifdef WINDOWS
@@ -213,27 +213,11 @@ void Core::Engine::tick() {
     }
     
 	// Run the fixed-time step portion of the game by calling on_update when
-	// the accumulator overflows
-	bool updated = false;
-    accumulator_ += delta_;
-    accumulator_ = min(accumulator_, JET_MAX_TIME_LAG);
-    while (accumulator_ >= timestep()) {
-        // capture input
-        for (list<EngineListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
-            (*i)->on_update();
-        }
-		if (module_) {
-			module_->on_update();
-		}
-		accumulator_ -= timestep();
-		updated = true;
-    }
-	
+	physics_system_->step();
+
 	// Fire post-update event
-	if (updated) {
-		for (list<EngineListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
-			(*i)->on_post_update();
-		}
+	for (list<EngineListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
+		(*i)->on_post_update();
 	}
     
     // Fire render event

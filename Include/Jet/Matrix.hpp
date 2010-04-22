@@ -23,6 +23,7 @@
 
 #include <Jet/Types.hpp>
 #include <Jet/Vector.hpp>
+#include <Jet/Frustum.hpp>
 
 namespace Jet {
 
@@ -59,6 +60,9 @@ public:
     //! @param trans the translation of the matrix
     Matrix(const Vector& trans);
     
+    //! Creates a matrix from 3 orthonormal vectors
+    Matrix(const Vector& x, const Vector& y, const Vector& z);
+    
     //! Creates a new empty matrix, with all entries initialized to zero.
     Matrix();
     
@@ -86,6 +90,9 @@ public:
     //! Transforms a vector.
     Vector operator*(const Vector& other) const;
     
+    //! Transforms the view frustum.
+    Frustum operator*(const Frustum& other) const;
+    
     //! Returns the forward vector (i.e., along the positive z-axis)
     Vector forward() const {
         /*
@@ -106,6 +113,11 @@ public:
     //! Returns the left vector (i.e., along the positive y-axis)
     Vector up() const {
         return Vector(data[4], data[5], data[6]);
+    }
+    
+    //! Returns the origin of the matrix translation
+    Vector origin() const {
+        return Vector(data[12], data[13], data[14]);
     }
     
     real_t data[16];

@@ -183,7 +183,7 @@ Core::ScriptSystem::ScriptSystem(Engine* engine) :
             .property("normal_map", (Jet::Texture* (Jet::Material::*)() const)&Jet::Material::normal_map, (void (Jet::Material::*)(const std::string&))&Jet::Material::normal_map)
             .property("shader", (Jet::Shader* (Jet::Material::*)() const)&Jet::Material::shader, (void (Jet::Material::*)(const std::string&))&Jet::Material::shader)
             .property("shininess", (real_t (Jet::Material::*)() const)&Jet::Material::shininess, (void (Jet::Material::*)(real_t))&Jet::Material::shininess)
-            .property("shininess", (bool (Jet::Material::*)() const)&Jet::Material::receive_shadows, (void (Jet::Material::*)(bool))&Jet::Material::receive_shadows)
+            .property("receive_shadows", (bool (Jet::Material::*)() const)&Jet::Material::receive_shadows, (void (Jet::Material::*)(bool))&Jet::Material::receive_shadows)
             .property("name", (const std::string& (Jet::Material::*)() const)&Jet::Material::name),
         
         luabind::class_<Jet::Camera, Jet::CameraPtr>("Camera")

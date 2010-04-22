@@ -2,32 +2,36 @@ require 'Test'
 
 local material = engine:material("plane")
 material.diffuse_color = Color(1, 1, 1, 1)
+--material.specular_color = Color(1, 1, 1, 1)
+--material.shininess = 600
 material.diffuse_map = "MetalDiffuse.png"
 material.normal_map = "MetalNormal.png"
 
 local mesh = engine:mesh("plane")
 local v = Vertex()
-v.normal = Vector(1, 0, 0);
+v.normal = Vector(0, 0, 1);
 v.tangent = Vector(0, 0, 1);
-v.position = Vector(-3, 10, -10);
+v.position = Vector(10, -10, -2);
 v.texcoord = Texcoord(1, 0);
 mesh:vertex(0, v);
 
-v.normal = Vector(1, 0, 0);
+v.normal = Vector(0, 0, 1);
 v.tangent = Vector(0, 1, 0);
-v.position = Vector(-3, 10, 10);
+v.position = Vector(10, 10, -2);
 v.texcoord = Texcoord(1, 1);
 mesh:vertex(1, v);
 
-v.normal = Vector(1, 0, 0);
+
+v.normal = Vector(0, 0, 1);
 v.tangent = Vector(0, 0, 1);
-v.position = Vector(-3, -10, 10);
+v.position = Vector(-10, 10, -2);
 v.texcoord = Texcoord(0, 1);
 mesh:vertex(2, v);
 
-v.normal = Vector(1, 0, 0);
+
+v.normal = Vector(0, 0, 1);
 v.tangent = Vector(0, 1, 0);
-v.position = Vector(-3, -10, -10);
+v.position = Vector(-10, -10, -2);
 v.texcoord = Texcoord(0, 0);
 mesh:vertex(3, v);
 

@@ -1,7 +1,7 @@
 # Blender3D MTL File: Box.blend
 # Material Count: 1
 newmtl Material_MetalDiffuse.png
-Ns 800.078431
+Ns 30.078431
 Ka 0.000000 0.000000 0.000000
 Kd 0.800000 0.800000 0.800000
 Ks 1.000000 1.000000 1.000000

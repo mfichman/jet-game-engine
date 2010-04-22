@@ -52,6 +52,7 @@ namespace Jet {
     class Color;
     class Engine;
     class EngineListener;
+    class Frustum;
     class Light;
     class Matrix;
     class Material;

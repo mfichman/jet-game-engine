@@ -45,13 +45,17 @@ public:
     inline btDynamicsWorld* world() const {
         return world_.get();
     }
+    
+    //! Steps the physics system
+    void step();
 
 private:
     void on_init();
-    void on_update();
     void on_post_update() {}
-    void on_render();
+    void on_update();
+    void on_render() {}
     
+    static void on_tick(btDynamicsWorld* world, btScalar step);    
     Engine* engine_;
     
     std::auto_ptr<btCollisionConfiguration> config_;

@@ -43,6 +43,33 @@ Matrix::Matrix(real_t m00, real_t m01, real_t m02, real_t m03,
     data[3] = m30; data[7] = m31; data[11] = m32; data[15] = m33;
 }
 
+Matrix::Matrix(const Vector& x, const Vector& y, const Vector& z) {
+    
+    // Right
+    data[0] = x.x;
+    data[1] = x.y;
+    data[2] = x.z;
+    data[3] = 0.0f;
+    
+    // Up
+    data[4] = y.x;
+    data[5] = y.y;
+    data[6] = y.z;
+    data[7] = 0.0f;
+    
+    // Forward
+    data[8] = z.x;
+    data[9] = z.y;
+    data[10] = z.z;
+    data[11] = 0.0f;
+
+    
+    data[12] = 0.0f;
+    data[13] = 0.0f;
+    data[14] = 0.0f;
+    data[15] = 1.0f;
+}
+
 Matrix::Matrix(const Quaternion& rotation, const Vector& trans) {
     // This routine is borrowed from Ogre 3D
     real_t fTx  = 2.0f*rotation.x;
@@ -176,6 +203,22 @@ Vector Matrix::operator*(const Vector& v) const {
     out.x = (data[0]*v.x + data[4]*v.y + data[8]*v.z + data[12])*invw;
     out.y = (data[1]*v.x + data[5]*v.y + data[9]*v.z + data[13])*invw;
     out.z = (data[2]*v.x + data[6]*v.y + data[10]*v.z + data[14])*invw;
+    
+    return out;
+}
+
+Frustum Matrix::operator*(const Frustum& f) const {
+    Frustum out;
+    
+    out.near_top_left = (*this) * f.near_top_left;
+    out.near_top_right = (*this) * f.near_top_right;
+    out.near_bottom_left = (*this) * f.near_bottom_left;
+    out.near_bottom_right = (*this) * f.near_bottom_right;
+    
+    out.far_top_left = (*this) * f.far_top_left;
+    out.far_top_right = (*this) * f.far_top_right;
+    out.far_bottom_left = (*this) * f.far_bottom_left;
+    out.far_bottom_right = (*this) * f.far_bottom_right;
     
     return out;
 }
