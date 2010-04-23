@@ -53,6 +53,11 @@ using namespace boost;
 
 Core::RenderSystem::RenderSystem(Engine* engine) :
     engine_(engine) {
+		
+	// Initialize SDL
+	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+		throw runtime_error(string("SDL initialization failed: ") + SDL_GetError());
+	}
 }
 	
 Core::RenderSystem::~RenderSystem() {
@@ -66,11 +71,6 @@ void Core::RenderSystem::init_window() {
     string title = engine_->option<string>("window_title");
 	bool fullscreen = engine_->option<bool>("fullscreen");
 	bool vsync = engine_->option<bool>("vsync");
-	
-	// Initialize SDL
-	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-		throw runtime_error(string("SDL initialization failed: ") + SDL_GetError());
-	}
 	
 	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
@@ -89,7 +89,18 @@ void Core::RenderSystem::init_window() {
 	if (!SDL_SetVideoMode(width, height, 0, flags)) {
 		throw runtime_error(string("SDL initialization failed: ") + SDL_GetError());
 	}
+    glViewport(0, 0, (uint32_t)width, (uint32_t)height);
+}
+	
+void Core::RenderSystem::init_shadow_target() {
+	if (engine_->option<bool>("shadows_enabled")) {
+		GLuint size = (GLuint)engine_->option<real_t>("shadow_texture_size");
+    	shadow_target_.reset(new RenderTarget(size, size, true, 1));
+	}
+}
 
+void Core::RenderSystem::init_extensions() {
+	
 	// Initialize extensions	
 	if (GLEW_OK != glewInit()) {
         throw runtime_error("GLEW initialization failed");
@@ -172,27 +183,15 @@ void Core::RenderSystem::init_default_states() {
     glEnable(GL_CULL_FACE);
     glFrontFace(GL_CCW); // We always use CCW culling
     glCullFace(GL_BACK);
-    
-    GLfloat width = engine_->option<real_t>("display_width");
-    GLfloat height = engine_->option<real_t>("display_height");
-    glViewport(0, 0, (uint32_t)width, (uint32_t)height);
-    
-    // Turn of VSYNC so the game can run at full frame rate
-#ifdef WINDOWS
-    //typedef int (APIENTRY *swap_interval_t)(int);
-    //swap_interval_t glSwapInterval = (swap_interval_t)wglGetProcAddress("wglSwapIntervalEXT");
-    //glSwapInterval(0);
-#endif
 }
 
 void Core::RenderSystem::on_init() {
 	init_window();
+	init_extensions();
     init_default_states();
-
-	if (engine_->option<bool>("shadows_enabled")) {
-		GLuint size = (GLuint)engine_->option<real_t>("shadow_texture_size");
-    	shadow_target_.reset(new RenderTarget(size, size, true, 1));
-	}	
+	init_shadow_target();
+	
+	engine_->option("video_mode_synced", true);
 		//GLuint width = (GLuint)engine_->option<real_t>("display_width");
 		//GLuint height = (GLuint)engine_->option<real_t>("display_height");
     //color_target_.reset(new RenderTarget(width, height, false, 2));
@@ -205,12 +204,43 @@ void Core::RenderSystem::on_render() {
 		return;
 	}
 	
+	// If the video mode has been marked as changed, then switch modes
+	if (!engine_->option<bool>("video_mode_synced")) {
+		glClear(GL_COLOR_BUFFER_BIT);
+		SDL_GL_SwapBuffers();
+		
+		// Demote all resources to the LOADED state, because the OpenGL context
+		// is about to be destroyed
+		for (Iterator<pair<const string, Jet::MeshPtr> > i = engine_->meshes(); i; i++) {
+			i->second->state(LOADED);
+		}
+		for (Iterator<pair<const string, Jet::TexturePtr> > i = engine_->textures(); i; i++) {
+			i->second->state(LOADED);
+		}
+		for (Iterator<pair<const string, Jet::ShaderPtr> > i = engine_->shaders(); i; i++) {
+			i->second->state(LOADED);
+		}
+		shadow_target_.reset();
+		on_init();
+	}
+	
+	// If shadows are enabled, make sure a render target is ready for
+	// receiving them.  Otherwise, clear the render target.
 	bool shaders_enabled = engine_->option<bool>("shaders_enabled");
 	bool shadows_enabled = engine_->option<bool>("shadows_enabled");
+	if (shaders_enabled && shadows_enabled) {
+		if (!shadow_target_) {
+			GLuint size = (GLuint)engine_->option<real_t>("shadow_texture_size");
+			shadow_target_.reset(new RenderTarget(size, size, true, 1));
+		}
+	} else {
+		shadow_target_.reset();
+	}
     
     // Render the scene once for each light
     for (vector<LightPtr>::iterator i = lights_.begin(); i != lights_.end(); i++) {
 		if (shaders_enabled && shadows_enabled) {
+
 			generate_shadow_map(i->get());
 		}
         render_final(i->get());
@@ -218,6 +248,7 @@ void Core::RenderSystem::on_render() {
         break;
     }
 	
+	// Swap back buffer to front
 	SDL_GL_SwapBuffers();
 }
 
@@ -365,6 +396,7 @@ void Core::RenderSystem::render_final(Light* light) {
 
 void Core::RenderSystem::generate_render_list(Core::Node* node) {
 	
+	// Calculate the transform for this node.
 	if (node->parent()) {
 		node->matrix(node->parent()->matrix() * Matrix(node->rotation(), node->position()));
 	} else {

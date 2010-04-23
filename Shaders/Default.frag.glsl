@@ -36,9 +36,9 @@ uniform bool specular_map_enabled;
 uniform bool normal_map_enabled;
 uniform bool shadow_map_enabled;
 
-//#define NORMAL_MAP
+#define NORMAL_MAP
 #define SHADOW_MAP
-//#define SPECULAR_MAP
+#define SPECULAR_MAP
 #define DIFFUSE_MAP
 
 void main() {

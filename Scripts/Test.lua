@@ -88,5 +88,24 @@ function Test:on_key_pressed(key, x, y)
         self.s0.node.position = Vector(0, 5, 0)
         self.s0.body.linear_velocity = Vector(0, 0, 0)
         --self.s0.body:apply_force(Vector(-15000, 30000, 0))
+    elseif (key == 'n') then
+        engine:option("normal_mapping_enabled", not engine:option("normal_mapping_enabled"))
+    elseif (key == 'p') then
+        engine:option("specular_mapping_enabled", not engine:option("specular_mapping_enabled"))
+    elseif (key == 'h') then
+        engine:option("shadows_enabled", not engine:option("shadows_enabled"))
+    elseif (key == 'm') then
+    
+        if (engine:option("fullscreen")) then
+            engine:option("display_width", 1024)
+            engine:option("display_height", 768)
+            engine:option("fullscreen", false)
+        else
+            engine:option("display_width", 1680)
+            engine:option("display_height", 1050)
+            engine:option("fullscreen", true)
+        end
+        
+        engine:option("video_mode_synced", false)
     end
 end

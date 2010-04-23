@@ -49,6 +49,8 @@ private:
     
     void init_default_states();
     void init_window();
+    void init_extensions();
+    void init_shadow_target();
     
     void generate_render_list(Node* node);
     void generate_shadow_map(Light* light);

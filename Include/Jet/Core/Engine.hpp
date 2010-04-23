@@ -199,6 +199,21 @@ public:
 	inline Iterator<const std::string> search_folders() const {
 		return Iterator<const std::string>(search_folder_.begin(), search_folder_.end());
 	}
+	
+	//! Returns an iterator to the meshes
+	inline Iterator<std::pair<const std::string, Jet::MeshPtr> > meshes() {
+		return Iterator<std::pair<const std::string, Jet::MeshPtr> >(mesh_.begin(), mesh_.end());
+	}
+	
+	//! Returns an iterator to the meshes
+	inline Iterator<std::pair<const std::string, Jet::TexturePtr> > textures() {
+		return Iterator<std::pair<const std::string, Jet::TexturePtr> >(texture_.begin(), texture_.end());
+	}
+	
+	//! Returns an iterator to the meshes
+	inline Iterator<std::pair<const std::string, Jet::ShaderPtr> > shaders() {
+		return Iterator<std::pair<const std::string, Jet::ShaderPtr> >(shader_.begin(), shader_.end());
+	}
     
     //! Runs the engine through one complete loop.  Note that the engine may
     //! or may not actually do anything on a given loop, depending on the

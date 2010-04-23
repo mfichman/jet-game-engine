@@ -66,14 +66,15 @@ void Core::Mesh::state(ResourceState state) {
 	if (UNLOADED == state_) {
 		// Load the data from the file
 		read_mesh_data();
-		
-		// Create index and vertex buffers
-		glGenBuffers(1, &vbuffer_);
-		glGenBuffers(1, &ibuffer_);
 	}
+	
 	
 	// Entering the SYNCED state
 	if (SYNCED == state) {		
+		// Create index and vertex buffers
+		glGenBuffers(1, &vbuffer_);
+		glGenBuffers(1, &ibuffer_);
+
 		// Choose the appropriate buffer mode.  TODO: Calling glBufferData
 		// below may be destructive in terms of performance; investigate
 		GLenum mode;
@@ -127,19 +128,21 @@ void Core::Mesh::state(ResourceState state) {
 		btVector3 half_extents(bounding_box_.half_extents().x, bounding_box_.half_extents().y, bounding_box_.half_extents().z);
 		bounding_shape_ = btBoxShape(half_extents);
 	}
-	
-	// Entering the unloaded state
-	if (UNLOADED == state) {
-		vertex_.clear();
-		index_.clear();
-		
-		// Only completely free the buffer if we're in static sync mode,
-		// or if we're completely unloading this mesh
+
+	// Leaving the SYNCED state
+	if (SYNCED == state_) {
+		// Free the vertex buffers
 		glDeleteBuffers(1, &vbuffer_);
 		glDeleteBuffers(1, &ibuffer_);
 		vbuffer_ = 0;
 		ibuffer_ = 0;
 		nindices_ = 0;
+	}
+	
+	// Entering the unloaded state
+	if (UNLOADED == state) {
+		vertex_.clear();
+		index_.clear();
 	}
 	
 	state_ = state;
@@ -265,39 +268,37 @@ void Core::Mesh::compute_tangent(Vertex face[3], size_t j) {
 }
 
 void Core::Mesh::render(Core::Shader* shader) {
-	if (UNLOADED == state_) {
-		state(SYNCED);
-	}
+	state(SYNCED);
 	
+	// Bind and enable the vertex and index buffers
 	glBindBuffer(GL_ARRAY_BUFFER, vbuffer_);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibuffer_);
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
-    glVertexPointer(3, GL_FLOAT, sizeof(Vertex), 0);
-    glNormalPointer(GL_FLOAT, sizeof(Vertex), (void*)(3*sizeof(GLfloat)));
-    glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), (void*)(9*sizeof(GLfloat)));
-	
 	if (shader && engine_->option<bool>("shaders_enabled")) {
 		// Enable tangent vectors
 		glEnableVertexAttribArray(shader->tangent_attrib());
 		glVertexAttribPointer(shader->tangent_attrib(), 3, GL_FLOAT, 0, sizeof(Vertex), (void*)(11*sizeof(GLfloat)));
 	}
-    
+
+	// Set up the buffer offsets (equivalent of FVF in D3D9)
+	// and then render the indexed buffers
+    glVertexPointer(3, GL_FLOAT, sizeof(Vertex), 0);
+    glNormalPointer(GL_FLOAT, sizeof(Vertex), (void*)(3*sizeof(GLfloat)));
+    glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), (void*)(9*sizeof(GLfloat)));
     glDrawElements(GL_TRIANGLES, nindices_, GL_UNSIGNED_INT, (void*)0);
 
-    glDisableClientState(GL_VERTEX_ARRAY);
+	// Disable index and vertex buffers
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_NORMAL_ARRAY);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	
 	if (shader && engine_->option<bool>("shaders_enabled")) {
 		// Disable tangent vectors
 		glDisableVertexAttribArray(shader->tangent_attrib());
 	}
-	
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 void Core::Mesh::index_count(size_t size) {

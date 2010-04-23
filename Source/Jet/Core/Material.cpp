@@ -144,7 +144,7 @@ void Core::Material::enabled(bool enabled) {
 				glUniform1i(diffuse_map_enabled_, false);
 			}
 	
-			if (specular_map_) {
+			if (specular_map_ && engine_->option<bool>("specular_mapping_enabled")) {
 				specular_map_->sampler(SPECULAR_MAP_SAMPLER);
 				glUniform1i(specular_map_loc_, SPECULAR_MAP_SAMPLER);
 				glUniform1i(specular_map_enabled_, true);
@@ -152,7 +152,7 @@ void Core::Material::enabled(bool enabled) {
 				glUniform1i(specular_map_enabled_, false);
 			}
 			
-			if (normal_map_) {
+			if (normal_map_ && engine_->option<bool>("normal_mapping_enabled")) {
 				normal_map_->sampler(NORMAL_MAP_SAMPLER);
 				glUniform1i(normal_map_loc_, NORMAL_MAP_SAMPLER);
 				glUniform1i(normal_map_enabled_, true);

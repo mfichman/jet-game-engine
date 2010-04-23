@@ -237,6 +237,7 @@ Core::ScriptSystem::ScriptSystem(Engine* engine) :
         luabind::class_<Jet::Engine, Jet::EnginePtr>("Engine")
             .property("root", &Jet::Engine::root)
             .def("option", (void (Jet::Engine::*)(const std::string&, const boost::any&))&Jet::Engine::option)
+            .def("option", (const boost::any& (Jet::Engine::*)(const std::string&) const)&Jet::Engine::option)
             .def("search_folder", &Jet::Engine::search_folder)
             .def("mesh", &Jet::Engine::mesh)
             .def("material", &Jet::Engine::material)
