@@ -25,9 +25,10 @@ class 'Starship' (Actor)
 function Starship:__init(node, name)
     Actor.__init(self, node, name)
 
-    self.mesh = self.node:mesh_object("mesh")
-    self.mesh.mesh = "Shark.obj"
-    self.mesh.material = "Rock.mtl"
+    self.mesh = self.node:mesh_object("mesh") {
+        mesh = "Shark.obj",
+        material = "Rock.mtl"
+    }
     
     self.body = self.node:rigid_body()
     self.body.mass = 10.0

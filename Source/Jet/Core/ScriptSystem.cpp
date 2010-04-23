@@ -188,7 +188,10 @@ Core::ScriptSystem::ScriptSystem(Engine* engine) :
         
         luabind::class_<Jet::Camera, Jet::CameraPtr>("Camera")
             .property("parent", &Jet::Camera::parent)
-            .property("active", (bool (Jet::Camera::*)() const)&Jet::Camera::active, (void (Jet::Camera::*)(bool))&Jet::Camera::active),
+            .property("active", (bool (Jet::Camera::*)() const)&Jet::Camera::active, (void (Jet::Camera::*)(bool))&Jet::Camera::active)
+            .property("field_of_view", (real_t (Jet::Camera::*)() const)&Jet::Camera::field_of_view, (void (Jet::Camera::*)(real_t))&Jet::Camera::field_of_view)
+            .property("far_clipping_distance", (real_t (Jet::Camera::*)() const)&Jet::Camera::far_clipping_distance, (void (Jet::Camera::*)(real_t))&Jet::Camera::far_clipping_distance)
+            .property("near_clipping_distance", (real_t (Jet::Camera::*)() const)&Jet::Camera::near_clipping_distance, (void (Jet::Camera::*)(real_t))&Jet::Camera::near_clipping_distance),
             
         luabind::class_<Jet::Node, Jet::NodePtr>("Node")
             .property("parent", &Jet::Node::parent)
@@ -261,8 +264,17 @@ Core::ScriptSystem::ScriptSystem(Engine* engine) :
     
     luabind::globals(env_)["engine"] = static_cast<Jet::Engine*>(engine_);
 
+    string path;
+
+	//! Load builtins
+	path = engine_->resource_path("Engine.lua");
+    if (luaL_dofile(env_, path.c_str())) {
+        string message(lua_tostring(env_, -1));
+        throw runtime_error("Could not load script: " + message);
+    }
+
 	//! Load the main file
-    string path = engine_->resource_path("Options.lua");
+    path = engine_->resource_path("Options.lua");
     if (luaL_dofile(env_, path.c_str())) {
         string message(lua_tostring(env_, -1));
         throw runtime_error("Could not load script: " + message);

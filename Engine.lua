@@ -18,18 +18,44 @@
 -- FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 -- IN THE SOFTWARE.
 
-require 'Actor'
-
-class 'Monkey' (Actor)
-
-function Monkey:__init(node, name)
-    Actor.__init(self, node, name)
-
-    self.mesh = self.node:mesh_object("mesh") {
-        mesh = "Monkey.obj",
-        material = "Rock.mtl"
-    }
-    
-    self.body = self.node:rigid_body()
-    self.body.mass = 10.0
+function option(key, value)
+    engine:option(key, value)
 end
+
+function search_folder(folder)
+    engine:search_folder(folder)
+end
+
+function copy(src, dest)
+    for k,v in pairs(src) do
+        dest[k] = v
+    end
+end
+
+local function table_syntax(o)
+    local mt = getmetatable(o)
+    mt.__call = function(o, table) copy(table, o) end
+    return o
+end
+
+
+local engine_material = engine.material;
+function engine:material(name)
+    return table_syntax(engine_material(self, name))
+end
+
+local node_mesh_object = engine.root.mesh_object;
+function Node:mesh_object(name)
+    return table_syntax(node_mesh_object(self, name))
+end
+
+local node_light = engine.root.light;
+function Node:light(name)
+    return table_syntax(node_light(self, name))
+end
+
+local node_camera = engine.root.camera;
+function Node:camera()
+    return table_syntax(node_camera(self))
+end
+

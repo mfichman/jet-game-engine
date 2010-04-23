@@ -12,13 +12,14 @@ engine:option("fullscreen", false)
 engine:option("shaders_enabled", true)
 engine:option("normal_mapping_enabled", true)
 engine:option("specular_mapping_enabled", true)
+engine:option("window_title", "Extreme Asteroids")
+
+
 --[[
 engine:option("display_width", 1680)
 engine:option("display_height", 1050)
 engine:option("fullscreen", true)
 ]]
-engine:option("window_title", "Extreme Asteroids")
-
 
 engine:search_folder("../Textures")
 engine:search_folder("../Meshes")

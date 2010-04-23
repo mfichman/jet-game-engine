@@ -32,26 +32,32 @@ function Test:__init()
     -- Set up lights
     print("Creating lights")
     self.light_node = engine.root:node("light")
-    self.light = self.light_node:light("light")
-    self.light.ambient_color = Color(.3, .3, .3, 1)
-    self.light.diffuse_color = Color(1, 1, 1, 1)
-    self.light.specular_color = Color(1, 1, 1, 1)
-    self.light.direction = Vector(1, 0, 1)
+    self.light = self.light_node:light("light") {
+        ambient_color = Color(.3, .3, .3, 1),
+        diffuse_color = Color(1, 1, 1, 1),
+        specular_color = Color(1, 1, 1, 1),
+        direction = Vector(1, 0, 1)
+    }
     
     -- Set up the camera
     print("Creating camera")
     self.camera_node = engine.root:node("camera")
     self.camera_node.position = Vector(15, 0, 15)
     self.camera_node:look(Vector(0, 0, 0), Vector(0, 1, 0))
-    self.camera = self.camera_node:camera()
-    self.camera.active = true
+    self.camera = self.camera_node:camera() {
+        active = true,
+        field_of_view = 45,
+        far_clipping_distance = 1000,
+        near_clipping_distance = 0.1
+    }
     
     -- Set up the plane
     print("Creating plane")
     self.plane_node = engine.root:node("plane")
-    self.plane = self.plane_node:mesh_object("plane")
-    self.plane.mesh = "plane"
-    self.plane.material = "plane"
+    self.plane = self.plane_node:mesh_object("plane") {
+        mesh = "plane",
+        material = "plane"
+    }
     self.plane_node:rigid_body()
     
     -- Set up scene objects and apply some forces
@@ -62,14 +68,6 @@ function Test:__init()
     self.s1.node.position = Vector(0, 0, 0)
     self.s0.node.position = Vector(0, -10, 0)
     self.s0.body:apply_force(Vector(-15000, 30000, 0))
-end
-blah = 0.0
-
-function Test:on_update()
-    --self.light.direction = Vector(0, 0, -2.5)
-    --self.camera_node.position = Vector(blah + 15, 0, blah + 15)
-    
-    blah = blah + 0.1
 end
 
 function Test:on_destroy()

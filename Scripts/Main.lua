@@ -1,11 +1,11 @@
 require 'Test'
 
-local material = engine:material("plane")
-material.diffuse_color = Color(1, 1, 1, 1)
---material.specular_color = Color(1, 1, 1, 1)
---material.shininess = 600
-material.diffuse_map = "MetalDiffuse.png"
-material.normal_map = "MetalNormal.png"
+
+local material = engine:material("plane") {
+    diffuse_color = Color(1, 1, 1, 1),
+    diffuse_map = "MetalDiffuse.png",
+    normal_map = "MetalNormal.png"
+}
 
 local mesh = engine:mesh("plane")
 local v = Vertex()
