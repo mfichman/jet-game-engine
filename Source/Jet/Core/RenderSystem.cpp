@@ -133,10 +133,13 @@ void Core::RenderSystem::init_window() {
 			glCheckFramebufferStatus = glCheckFramebufferStatusEXT;
 			glDeleteFramebuffers = glDeleteFramebuffersEXT;
 			glDeleteRenderbuffers = glDeleteRenderbuffersEXT;
+			glEnableVertexAttribArray = glEnableVertexAttribArrayARB;
+			glDisableVertexAttribArray = glDisableVertexAttribArrayARB;
+			glVertexAttribPointer = glVertexAttribPointerARB;
 		}
 		
 		// Shaders.  This functionality is optional.
-		if (!glewIsSupported("GL_ARB_vertex_program GL_ARG_fragment_program GL_ARB_shader_objects GL_ARB_shading_language_100")) {
+		if (!glewIsSupported("GL_ARB_vertex_program GL_ARB_fragment_program GL_ARB_shader_objects GL_ARB_shading_language_100")) {
 			engine_->option("shaders_enabled", false);
 			engine_->option("shadows_enabled", false);
 		} else {
@@ -152,6 +155,7 @@ void Core::RenderSystem::init_window() {
 			glDeleteShader = glDeleteObjectARB;
 			glUseProgram = glUseProgramObjectARB;
 			glUniform1i = glUniform1iARB;
+			glGetUniformLocation = glGetUniformLocationARB;
 		}
     }	
 }

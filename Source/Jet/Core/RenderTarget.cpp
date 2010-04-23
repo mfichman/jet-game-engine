@@ -28,6 +28,7 @@
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <stdexcept>
+#include <iostream>
 
 using namespace Jet;
 using namespace std;
@@ -49,7 +50,6 @@ Core::RenderTarget::RenderTarget(uint32_t width, uint32_t height, bool depth_onl
 	// Generate the framebuffer object
     glGenFramebuffers(1, &framebuffer_);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_);
-    glPushAttrib(GL_COLOR_BUFFER_BIT);
 
     // Initialize the texture
     glGenTextures(ntargets_, texture_);
@@ -74,6 +74,7 @@ Core::RenderTarget::RenderTarget(uint32_t width, uint32_t height, bool depth_onl
 		// Depth buffer texture only
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texture_[0], 0);
 		glDrawBuffer(GL_NONE);
+		glReadBuffer(GL_NONE);
 	} else {
 		GLenum buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
 		glDrawBuffers(ntargets_, buffers);
@@ -86,14 +87,16 @@ Core::RenderTarget::RenderTarget(uint32_t width, uint32_t height, bool depth_onl
 
     //! Check for support
     GLuint status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    if (GL_FRAMEBUFFER_COMPLETE != status) {
-        throw runtime_error("Framebuffer configuration failed");
-    }
+	if (GL_FRAMEBUFFER_COMPLETE != status) {
+		throw runtime_error("Invalid framebuffer configuration");
+	}
     
     // Switch to the back buffer
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glPopAttrib();
+	glDrawBuffer(GL_BACK);
+	glReadBuffer(GL_BACK);
 }
+	
 
 //! Destructor.
 Core::RenderTarget::~RenderTarget() {

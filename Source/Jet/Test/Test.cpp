@@ -11,7 +11,6 @@ int main(int argc, char** argv) {
         
         while (engine->running()) {
 			engine->tick();
-			cout << "tick" << endl;
 		}
        	return 0; 
     } catch (std::exception& ex) {

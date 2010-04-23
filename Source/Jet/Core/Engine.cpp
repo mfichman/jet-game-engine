@@ -213,16 +213,13 @@ void Core::Engine::tick() {
     elapsed += delta_;
     frames++;
     if (elapsed > 0.1f) {
-        //cout << frames/elapsed << endl;
+        cout << frames/elapsed << endl;
         frames = 0;
         elapsed = 0.0f;
     }
     
 	// Run the fixed-time step portion of the game by calling on_update when
 	physics_system_->step();
-    for (list<EngineListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
-        (*i)->on_update();
-    }
 
 	// Fire post-update event
 	for (list<EngineListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
@@ -252,7 +249,7 @@ void Core::Engine::update_delta() {
 #else
 	timeval current_time;
 	gettimeofday(&current_time, 0);
-	if (!prev_time_.tv_sec && prev_time_.tv_usec) {
+	if (prev_time_.tv_sec == 0 && prev_time_.tv_usec == 0) {
 		prev_time_ = current_time;
 	}
 

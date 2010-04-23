@@ -36,9 +36,9 @@ uniform bool specular_map_enabled;
 uniform bool normal_map_enabled;
 uniform bool shadow_map_enabled;
 
-#define NORMAL_MAP
+//#define NORMAL_MAP
 #define SHADOW_MAP
-#define SPECULAR_MAP
+//#define SPECULAR_MAP
 #define DIFFUSE_MAP
 
 void main() {
@@ -74,12 +74,15 @@ void main() {
         vec3 r = reflect(v, n);
     
         // Calculate diffuse and specular coefficients
+		float ndotl = dot(l, n);
         float kd = a * max(0.0, dot(l, n));
-        float ks = a * max(0.0, pow(dot(l, r), gl_FrontMaterial.shininess));
+        float ks = a * pow(max(0.0, dot(l, r)), gl_FrontMaterial.shininess);
             
         // Calculate ambient, diffuse, and specular light
-        diffuse += kd * gl_LightSource[i].diffuse;
-        specular += ks * gl_LightSource[i].specular;
+		if (ndotl > 0.0) {
+        	diffuse += kd * gl_LightSource[i].diffuse;
+        	specular += ks * gl_LightSource[i].specular;
+		}
         ambient += a * gl_LightSource[i].ambient;
     }
     
