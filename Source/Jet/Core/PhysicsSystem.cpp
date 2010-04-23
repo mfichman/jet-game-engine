@@ -36,10 +36,7 @@ Core::PhysicsSystem::PhysicsSystem(Engine* engine) :
 	world_.reset(new btDiscreteDynamicsWorld(dispatcher_.get(), broadphase_.get(), solver_.get(), config_.get()));
 	world_->setGravity(btVector3(0.0f, -10.0f, 0.0f));
     world_->setInternalTickCallback(&Core::PhysicsSystem::on_tick, this, true);
-    btGImpactCollisionAlgorithm::registerAlgorithm(dispatcher_.get());
-
-	cout << "GOOD" << endl;
-    
+    btGImpactCollisionAlgorithm::registerAlgorithm(dispatcher_.get());    
 }
 
 Core::PhysicsSystem::~PhysicsSystem() {
@@ -47,7 +44,7 @@ Core::PhysicsSystem::~PhysicsSystem() {
 }
 
 void Core::PhysicsSystem::step() {
-	cout << "delta: " << engine_->delta() << " step: " << engine_->timestep() << endl;
+	//cout << "delta: " << engine_->delta() << " step: " << engine_->timestep() << endl;
 	world_->stepSimulation(engine_->delta()*engine_->simulation_speed(), 4, engine_->timestep());
 }
 

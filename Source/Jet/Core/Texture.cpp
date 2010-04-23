@@ -22,7 +22,7 @@
 
 #include <Jet/Core/Texture.hpp>
 #include <Jet/Core/Engine.hpp>
-#include <IL/IL.h>
+#include <SDL/SDL_image.h>
 #ifdef WINDOWS
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -47,19 +47,17 @@ void Core::Texture::state(ResourceState state) {
 	if (UNLOADED == state_) {
 		// Load the image data
 		string file = engine_->resource_path(name_);
-		ILuint image;
-		ilGenImages(1, &image);
-		ilBindImage(image);
-		ilLoadImage(file.c_str());
-		
-		if (ilGetError()) {
-			throw runtime_error("Error loading image: " + name_);
+		SDL_Surface* surface = IMG_Load(file.c_str());
+
+		if (surface->format->BitsPerPixel != 32) {
+			throw runtime_error("Invalid image format: " + name_);
 		}
-		
-		width(ilGetInteger(IL_IMAGE_WIDTH));
-		height(ilGetInteger(IL_IMAGE_HEIGHT));
-		ilCopyPixels(0, 0, 0, width(), height(), 1, IL_RGBA, IL_UNSIGNED_BYTE, data());
-		ilDeleteImages(1, &image);
+
+		width(surface->w);
+		height(surface->h);
+		memcpy(data(), surface->pixels, data_.size());
+
+		SDL_FreeSurface(surface);
 	}
 	
 	// Entering the SYNCED state

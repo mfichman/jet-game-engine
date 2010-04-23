@@ -28,6 +28,7 @@
 #include <dlfcn.h>
 #endif
 #include <boost/filesystem/operations.hpp>
+#include <SDL/SDL_image.h>
 
 #include <Jet/Core/RenderSystem.hpp>
 #include <Jet/Core/ScriptSystem.hpp>
@@ -48,7 +49,6 @@
 #include <Jet/Core/Shader.hpp>
 
 #include <Jet/Iterator.hpp>
-#include <IL/IL.h>
 #include <fstream>
 
 #define JET_MAX_TIME_LAG 0.5f
@@ -93,17 +93,14 @@ Core::Engine::Engine() :
 	prev_time_.tv_sec = 0;
 #endif
 
-    if (ilGetInteger(IL_VERSION_NUM) < IL_VERSION) {
-        throw runtime_error("IL library version mismatch");
-	}
-    ilInit();
+	IMG_Init(IMG_INIT_JPG|IMG_INIT_PNG);
 }
 
 Core::Engine::~Engine() {
 	if (module_) {
 		module_->on_destroy();
 	}
-	ilShutDown();
+
 
 	root_.reset();
 	module_.reset();
@@ -114,6 +111,8 @@ Core::Engine::~Engine() {
 	
 	cout << "Shutting down" << endl;
 	listener_.clear();
+
+	IMG_Quit();
 }
 
 void Core::Engine::init_systems() {
@@ -214,13 +213,12 @@ void Core::Engine::tick() {
     elapsed += delta_;
     frames++;
     if (elapsed > 0.1f) {
-        cout << frames/elapsed << endl;
+        //cout << frames/elapsed << endl;
         frames = 0;
         elapsed = 0.0f;
     }
     
 	// Run the fixed-time step portion of the game by calling on_update when
-	std::cout << delta_ << std::endl;
 	physics_system_->step();
     for (list<EngineListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
         (*i)->on_update();
