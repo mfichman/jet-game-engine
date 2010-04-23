@@ -97,10 +97,14 @@ void Core::Shader::state(ResourceState state) {
 	
 	// Leaving the SYNCED state
 	if (SYNCED == state_) {
-		glDeleteProgram(program_);
+		assert(program_ && vshader_ && fshader_);
+		glUseProgram(0);
 		glDeleteShader(vshader_);
 		glDeleteShader(fshader_);
+		glDeleteProgram(program_);
 		program_ = 0;
+		vshader_ = 0;
+		fshader_ = 0;
 	}
 	
 	// Entering the UNLOADED state
