@@ -37,6 +37,8 @@ Core::PhysicsSystem::PhysicsSystem(Engine* engine) :
 	world_->setGravity(btVector3(0.0f, -10.0f, 0.0f));
     world_->setInternalTickCallback(&Core::PhysicsSystem::on_tick, this, true);
     btGImpactCollisionAlgorithm::registerAlgorithm(dispatcher_.get());
+
+	cout << "GOOD" << endl;
     
 }
 

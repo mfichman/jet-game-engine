@@ -80,7 +80,7 @@ Core::Engine::Engine() :
 	
     listener(render_system_.get());
 	listener(new InputSystem(this));
-	//listener(physics_system_.get());
+	listener(physics_system_.get());
 	listener(script_system_.get());
 	
 #ifdef WINDOWS
@@ -218,6 +218,7 @@ void Core::Engine::tick() {
     }
     
 	// Run the fixed-time step portion of the game by calling on_update when
+	std::cout << delta_ << std::endl;
 	physics_system_->step();
 
 	// Fire post-update event
