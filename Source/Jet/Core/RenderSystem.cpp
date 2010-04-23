@@ -56,7 +56,7 @@ Core::RenderSystem::RenderSystem(Engine* engine) :
 }
 	
 Core::RenderSystem::~RenderSystem() {
-	SDL_Quit();
+	//SDL_Quit();
 }
 
 void Core::RenderSystem::init_window() {
@@ -108,6 +108,7 @@ void Core::RenderSystem::init_window() {
 			glGenBuffers = glGenBuffersARB;
 			glBindBuffer = glBindBufferARB;
 			glBufferData = glBufferDataARB;
+			glDeleteBuffers = glDeleteBuffersARB;
 		}
 
 		// Multitexturing.  This functionality is required.

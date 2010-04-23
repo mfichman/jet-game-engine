@@ -103,6 +103,7 @@ Core::Engine::~Engine() {
 	if (module_) {
 		module_->on_destroy();
 	}
+	ilShutDown();
 
 	root_.reset();
 	module_.reset();
@@ -112,6 +113,7 @@ Core::Engine::~Engine() {
 	material_.clear();
 	
 	cout << "Shutting down" << endl;
+	listener_.clear();
 }
 
 void Core::Engine::init_systems() {
@@ -220,6 +222,9 @@ void Core::Engine::tick() {
 	// Run the fixed-time step portion of the game by calling on_update when
 	std::cout << delta_ << std::endl;
 	physics_system_->step();
+    for (list<EngineListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
+        (*i)->on_update();
+    }
 
 	// Fire post-update event
 	for (list<EngineListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {

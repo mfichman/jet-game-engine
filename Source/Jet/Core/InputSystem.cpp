@@ -46,7 +46,6 @@ void Core::InputSystem::on_init() {
 void Core::InputSystem::on_update() {
     SDL_EnableUNICODE(true);
     SDL_Event evt;
-cout << "poll" << endl;
     while(SDL_PollEvent(&evt)) {
         switch (evt.type) {
             case SDL_QUIT: engine_->running(false); break;
@@ -60,7 +59,6 @@ cout << "poll" << endl;
 }
 
 void Core::InputSystem::on_keyboard(char key) {
-	cout << "on key" << endl;
     Module* module = engine_->module();
     if (module) {
         int x, y;

@@ -47,6 +47,7 @@ Core::PhysicsSystem::~PhysicsSystem() {
 }
 
 void Core::PhysicsSystem::step() {
+	cout << "delta: " << engine_->delta() << " step: " << engine_->timestep() << endl;
 	world_->stepSimulation(engine_->delta()*engine_->simulation_speed(), 4, engine_->timestep());
 }
 
