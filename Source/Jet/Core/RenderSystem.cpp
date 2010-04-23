@@ -95,11 +95,24 @@ void Core::RenderSystem::init_window() {
         throw runtime_error("GLEW initialization failed");
     }
     if (!glewIsSupported("GL_VERSION_2_0")) {
+
 		engine_->option("shaders_enabled", false);
+		engine_->option("shadows_enabled", false);
+		if (!glewIsSupported("GL_ARB_vertex_buffer_object")) {
+			throw runtime_error("Unsupported graphics hardware");
+		} else {
+			glGenBuffers = glGenBuffersARB;
+			glBindBuffer = glBindBufferARB;
+			glBufferData = glBufferDataARB;
+		}
+
+		if (!glewIsSupported("GL_ARB_multitexture")) {
+			throw runtime_error("Unsupported graphics hardware");
+		} else {
+			glActiveTexture = glActiveTextureARB;
+		}
     }
-	if (!glewIsSupported("GL_VERSION_1_4")) {
-		throw runtime_error("OpenGL 1.4 is not supported");
-	}
+	
 }
 
 void Core::RenderSystem::init_default_states() {
@@ -130,15 +143,16 @@ void Core::RenderSystem::init_default_states() {
 void Core::RenderSystem::on_init() {
 	init_window();
     init_default_states();
-	
-	GLuint width = (GLuint)engine_->option<real_t>("display_width");
-	GLuint height = (GLuint)engine_->option<real_t>("display_height");
 
-	GLuint size = (GLuint)engine_->option<real_t>("shadow_texture_size");
-    shadow_target_.reset(new RenderTarget(size, size, true, 1));
-    color_target_.reset(new RenderTarget(width, height, false, 2));
-	bloom_target1_.reset(new RenderTarget(width/8, height/8, false, 1));
-	bloom_target2_.reset(new RenderTarget(width/8, height/8, false, 1));
+	if (engine_->option<bool>("shadows_enabled")) {
+		GLuint size = (GLuint)engine_->option<real_t>("shadow_texture_size");
+    	shadow_target_.reset(new RenderTarget(size, size, true, 1));
+	}	
+		//GLuint width = (GLuint)engine_->option<real_t>("display_width");
+		//GLuint height = (GLuint)engine_->option<real_t>("display_height");
+    //color_target_.reset(new RenderTarget(width, height, false, 2));
+	//bloom_target1_.reset(new RenderTarget(width/8, height/8, false, 1));
+	//bloom_target2_.reset(new RenderTarget(width/8, height/8, false, 1));
 }
 
 void Core::RenderSystem::on_render() {	
@@ -147,10 +161,11 @@ void Core::RenderSystem::on_render() {
 	}
 	
 	bool shaders_enabled = engine_->option<bool>("shaders_enabled");
+	bool shadows_enabled = engine_->option<bool>("shadows_enabled");
     
     // Render the scene once for each light
     for (vector<LightPtr>::iterator i = lights_.begin(); i != lights_.end(); i++) {
-		if (shaders_enabled) {
+		if (shaders_enabled && shadows_enabled) {
 			generate_shadow_map(i->get());
 		}
         render_final(i->get());
@@ -262,7 +277,9 @@ void Core::RenderSystem::render_final(Light* light) {
 	glEnable(GL_LIGHT0);
 		
 	// Bind the shadow sampler to the shadow texture
-	shadow_target_->sampler(SHADOW_MAP_SAMPLER);
+	if (shadow_target_) {
+		shadow_target_->sampler(SHADOW_MAP_SAMPLER);
+	}
     
     // Render to the back buffer.
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

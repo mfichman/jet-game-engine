@@ -279,7 +279,7 @@ void Core::Mesh::render(Core::Shader* shader) {
     glNormalPointer(GL_FLOAT, sizeof(Vertex), (void*)(3*sizeof(GLfloat)));
     glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), (void*)(9*sizeof(GLfloat)));
 	
-	if (shader) {
+	if (shader && engine_->option<bool>("shaders_enabled")) {
 		// Enable tangent vectors
 		glEnableVertexAttribArray(shader->tangent_attrib());
 		glVertexAttribPointer(shader->tangent_attrib(), 3, GL_FLOAT, 0, sizeof(Vertex), (void*)(11*sizeof(GLfloat)));
@@ -291,7 +291,7 @@ void Core::Mesh::render(Core::Shader* shader) {
     glDisableClientState(GL_NORMAL_ARRAY);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	
-	if (shader) {
+	if (shader && engine_->option<bool>("shaders_enabled")) {
 		// Disable tangent vectors
 		glDisableVertexAttribArray(shader->tangent_attrib());
 	}

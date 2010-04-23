@@ -106,15 +106,17 @@ void Core::Material::shader(Jet::Shader* shader) {
 	} else {
 		shader_->state(SYNCED);
 		
-		uint32_t program = shader_->program();
-		diffuse_map_loc_ = glGetUniformLocation(program, "diffuse_map");
-		specular_map_loc_ = glGetUniformLocation(program, "specular_map");
-		normal_map_loc_ = glGetUniformLocation(program, "normal_map");
-		shadow_map_loc_ = glGetUniformLocation(program, "shadow_map");
-		diffuse_map_enabled_ = glGetUniformLocation(program, "diffuse_map_enabled");
-		specular_map_enabled_ = glGetUniformLocation(program, "specular_map_enabled");
-		normal_map_enabled_ = glGetUniformLocation(program, "normal_map_enabled");
-		shadow_map_enabled_ = glGetUniformLocation(program, "shadow_map_enabled");
+		if (engine_->option<bool>("shaders_enabled")) {
+			uint32_t program = shader_->program();
+			diffuse_map_loc_ = glGetUniformLocation(program, "diffuse_map");
+			specular_map_loc_ = glGetUniformLocation(program, "specular_map");
+			normal_map_loc_ = glGetUniformLocation(program, "normal_map");
+			shadow_map_loc_ = glGetUniformLocation(program, "shadow_map");
+			diffuse_map_enabled_ = glGetUniformLocation(program, "diffuse_map_enabled");
+			specular_map_enabled_ = glGetUniformLocation(program, "specular_map_enabled");
+			normal_map_enabled_ = glGetUniformLocation(program, "normal_map_enabled");
+			shadow_map_enabled_ = glGetUniformLocation(program, "shadow_map_enabled");
+		}
 	
 	}
 }
