@@ -226,6 +226,9 @@ private:
     void update_delta();
 	void init_systems();
 
+	
+	std::map<std::string, boost::any> option_;
+
     Jet::NodePtr root_;
 	Jet::CameraPtr camera_;
 	Jet::ModulePtr module_;
@@ -242,7 +245,6 @@ private:
     std::list<EngineListenerPtr> listener_;
     std::set<std::string> search_folder_;
     
-	std::map<std::string, boost::any> option_;
     
     bool running_;
 	bool initialized_;

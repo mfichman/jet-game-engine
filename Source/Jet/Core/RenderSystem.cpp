@@ -94,10 +94,14 @@ void Core::RenderSystem::init_window() {
 	if (GLEW_OK != glewInit()) {
         throw runtime_error("GLEW initialization failed");
     }
+
+	// If OpenGL 2.0 is not supported, we have to check extensions individually, and
+	// copy the function pointers that GLEW set up for us.  Most extensions that
+	// were incorporated into OpenGL 2.0 have an equivalent ARB board extension in
+	// pre-2.0 version.
     if (!glewIsSupported("GL_VERSION_2_0")) {
 
-		engine_->option("shaders_enabled", false);
-		engine_->option("shadows_enabled", false);
+		// Vertex buffer objects.  This functionality is required.
 		if (!glewIsSupported("GL_ARB_vertex_buffer_object")) {
 			throw runtime_error("Unsupported graphics hardware");
 		} else {
@@ -106,13 +110,49 @@ void Core::RenderSystem::init_window() {
 			glBufferData = glBufferDataARB;
 		}
 
+		// Multitexturing.  This functionality is required.
 		if (!glewIsSupported("GL_ARB_multitexture")) {
 			throw runtime_error("Unsupported graphics hardware");
 		} else {
 			glActiveTexture = glActiveTextureARB;
 		}
-    }
-	
+
+		//! Frame buffer objects.  This functionality is optional.
+		if (!glewIsSupported("GL_EXT_framebuffer_object GL_ARB_draw_buffers")) {
+			engine_->option("shadows_enabled", false);
+		} else {
+			glGenFramebuffers = glGenFramebuffersEXT;
+			glBindFramebuffer = glBindFramebufferEXT;
+			glFramebufferTexture2D = glFramebufferTexture2DEXT;
+			glGenRenderbuffers = glGenRenderbuffersEXT;
+			glDrawBuffers = glDrawBuffersARB;
+			glBindRenderbuffer = glBindRenderbufferEXT;
+			glRenderbufferStorage = glRenderbufferStorageEXT;
+			glFramebufferRenderbuffer = glFramebufferRenderbufferEXT;
+			glCheckFramebufferStatus = glCheckFramebufferStatusEXT;
+			glDeleteFramebuffers = glDeleteFramebuffersEXT;
+			glDeleteRenderbuffers = glDeleteRenderbuffersEXT;
+		}
+		
+		// Shaders.  This functionality is optional.
+		if (!glewIsSupported("GL_ARB_vertex_program GL_ARG_fragment_program GL_ARB_shader_objects GL_ARB_shading_language_100")) {
+			engine_->option("shaders_enabled", false);
+			engine_->option("shadows_enabled", false);
+		} else {
+			glCreateShader = glCreateShaderObjectARB;
+			glCreateProgram = glCreateProgramObjectARB;
+			glShaderSource = glShaderSourceARB;
+			glCompileShader = glCompileShaderARB;
+			glAttachShader = glAttachObjectARB;
+			glLinkProgram = glLinkProgramARB;
+			glGetShaderInfoLog = glGetInfoLogARB;
+			glGetAttribLocation = glGetAttribLocationARB;
+			glDeleteProgram = glDeleteObjectARB;
+			glDeleteShader = glDeleteObjectARB;
+			glUseProgram = glUseProgramObjectARB;
+			glUniform1i = glUniform1iARB;
+		}
+    }	
 }
 
 void Core::RenderSystem::init_default_states() {

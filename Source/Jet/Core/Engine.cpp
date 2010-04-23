@@ -103,8 +103,13 @@ Core::Engine::~Engine() {
 	if (module_) {
 		module_->on_destroy();
 	}
+
 	root_.reset();
 	module_.reset();
+	mesh_.clear();
+	texture_.clear();
+	shader_.clear();
+	material_.clear();
 	
 	cout << "Shutting down" << endl;
 }

@@ -160,10 +160,14 @@ void Core::Material::enabled(bool enabled) {
 				glUniform1i(normal_map_enabled_, false);
 			}
 			
-			// Enable the shadow map sampler only if this object should receive
-			// shadows
-			glUniform1i(shadow_map_loc_, SHADOW_MAP_SAMPLER);
-			glUniform1i(shadow_map_enabled_, (bool)receive_shadows_);
+			if (engine_->option<bool>("shadows_enabled")) {
+				// Enable the shadow map sampler only if this object should receive
+				// shadows
+				glUniform1i(shadow_map_loc_, SHADOW_MAP_SAMPLER);
+				glUniform1i(shadow_map_enabled_, (bool)receive_shadows_);
+			} else {
+				glUniform1i(shadow_map_enabled_, false);
+			}
 			
 			
 		} else {
