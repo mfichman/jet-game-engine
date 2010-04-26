@@ -18,41 +18,30 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- */  
-#pragma once
+ */
 
-#include <Jet/Types.hpp>
-#include <Jet/Vector.hpp>
-#include <Jet/Texcoord.hpp>
-#include <iostream>
+varying vec3 normal;
+varying vec3 tangent;
+varying vec3 view;
 
-namespace Jet {
+uniform bool shadow_map_enabled;
 
-//! Represents a vertex.
-//! @class Vertex
-//! @brief Vertex class.
-class Vertex {
-public:
+#define SHADOW_MAP
 
-    //! Comparison operator.
-    inline bool operator<(const Vertex& other) const {
-        if (position != other.position) return position < other.position;
-        if (normal != other.normal) return normal < other.normal;
-        return texcoord < other.texcoord;
-    }
+attribute vec3 tangent_in;
+
+void main() {
+    // Transform to homogeneous coordinates
+    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+    gl_TexCoord[0] = gl_MultiTexCoord0;
     
-    inline bool operator==(const Vertex& other) const {
-        return position == other.position && texcoord == other.texcoord && normal == other.normal;
+#ifdef SHADOW_MAP
+    if (shadow_map_enabled) {
+        gl_TexCoord[1] = gl_TextureMatrix[3] * gl_Vertex;
     }
+#endif
 
-	inline bool operator!=(const Vertex& other) const {
-		return !this->operator==(other);
-	}
-    
-    Vector position;
-    Vector normal;
-    Vector tangent;
-    Texcoord texcoord;
-};
-
+    normal = gl_NormalMatrix * gl_Normal;
+    tangent = gl_NormalMatrix * tangent_in;
+    view = vec3(gl_ModelViewMatrix * gl_Vertex);
 }

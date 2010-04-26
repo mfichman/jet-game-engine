@@ -20,28 +20,43 @@
  * IN THE SOFTWARE.
  */
 
-varying vec3 normal;
-varying vec3 tangent;
-varying vec3 view;
+//varying vec3 normal;
+//varying vec3 tangent;
+//varying vec3 view;
 
 uniform bool shadow_map_enabled;
 
-#define SHADOW_MAP
+varying vec3 eye_dir;
+varying vec3 light_dir;
 
 attribute vec3 tangent_in;
 
+#define SHADOW_MAP
+
 void main() {
-    // Transform to homogeneous coordinates
-    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+    
+    eye_dir = vec3(gl_ModelViewMatrix * gl_Vertex);
+    gl_Position = ftransform();
     gl_TexCoord[0] = gl_MultiTexCoord0;
+    
+    vec3 n = normalize(gl_NormalMatrix * gl_Normal);
+    vec3 t = normalize(gl_NormalMatrix * tangent_in);
+    vec3 b = cross(n, t);
+    
+    vec3 v;
+    v.x = dot(gl_LightSource[0].position.xyz, t);
+    v.y = dot(gl_LightSource[0].position.xyz, b);
+    v.z = dot(gl_LightSource[0].position.xyz, n);
+    light_dir = normalize(v);
+    
+    v.x = dot(eye_dir, t);
+    v.y = dot(eye_dir, b);
+    v.z = dot(eye_dir, n);
+    eye_dir = normalize(v);
     
 #ifdef SHADOW_MAP
     if (shadow_map_enabled) {
         gl_TexCoord[1] = gl_TextureMatrix[3] * gl_Vertex;
     }
 #endif
-
-    normal = gl_NormalMatrix * gl_Normal;
-    tangent = gl_NormalMatrix * tangent_in;
-    view = vec3(gl_ModelViewMatrix * gl_Vertex);
 }

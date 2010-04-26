@@ -123,7 +123,19 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\Include\Jet\AudioSource.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\Include\Jet\Core\AudioSource.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Include\Jet\BoundingBox.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Include\Jet\Camera.hpp"
 				>
 			</File>
 			<File
@@ -131,7 +143,23 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Include\Jet\Color.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\Include\Jet\Core\Engine.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Include\Jet\Engine.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Include\Jet\Frustum.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Include\Jet\Iterator.hpp"
 				>
 			</File>
 			<File
@@ -139,7 +167,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Include\Jet\Light.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\Include\Jet\Core\Material.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Include\Jet\Material.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Include\Jet\Matrix.hpp"
 				>
 			</File>
 			<File
@@ -147,7 +187,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Include\Jet\Mesh.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\Include\Jet\Core\MeshObject.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Include\Jet\MeshObject.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Include\Jet\Module.hpp"
 				>
 			</File>
 			<File
@@ -155,7 +207,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Include\Jet\Node.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\Include\Jet\Object.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Include\Jet\Particle.hpp"
 				>
 			</File>
 			<File
@@ -163,11 +223,35 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Include\Jet\ParticleSystem.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Include\Jet\Quad.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Include\Jet\QuadChain.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\Include\Jet\Core\QuadChain.hpp"
 				>
 			</File>
 			<File
+				RelativePath="..\Include\Jet\QuadSet.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\Include\Jet\Core\QuadSet.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Include\Jet\Quaternion.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Include\Jet\Range.hpp"
 				>
 			</File>
 			<File
@@ -203,11 +287,35 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Include\Jet\Shader.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Include\Jet\Texcoord.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Include\Jet\Texture.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\Include\Jet\Core\Texture.hpp"
 				>
 			</File>
 			<File
 				RelativePath="..\Include\Jet\Core\Types.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Include\Jet\Types.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Include\Jet\Vector.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Include\Jet\Vertex.hpp"
 				>
 			</File>
 		</Filter>

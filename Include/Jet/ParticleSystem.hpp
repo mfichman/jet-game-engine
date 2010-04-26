@@ -52,17 +52,30 @@ public:
     virtual const Range& depth() const=0;
     
     //! Returns the speed particles will be created with.
-    virtual const Range& speed() const=0;
+    virtual const Range& emission_speed() const=0;
+    
+    //! Returns the direction the particle system is facing.
+    virtual const Vector& emission_direction() const=0;
+    
+    //! Sets the angle of distribution in radians.
+    virtual const Range& emission_angle() const=0;
+    
+    //! Returns the emission rate of the particle system in particles/second.
+    virtual real_t emission_rate() const=0;
     
     //! Returns the particle system distribution type.  This can either be
     //! cubic or spherical.
     virtual ParticleSystemType type() const=0;
     
-    //! Returns the direction the particle system is facing.
-    virtual const Vector& direction() const=0;
+    //! Returns the maximum number of particles that can be active in the
+    //! system at one time
+    virtual size_t quota() const=0;
+
+    //! Returns the texture in use for this particle system.
+    virtual Texture* texture() const=0;
     
-    //! Sets the angle of distribution in radians.
-    virtual const Range& angle() const=0;
+    //! Returns the shader in user for this particle system.
+    virtual Shader* shader() const=0;
     
     //! Sets the life of this particle system.
     //! @param life the min and max life of the particle system.
@@ -82,17 +95,40 @@ public:
     
     //! Sets the speed of created particles.
     //! @param speed the speed range
-    virtual void speed(const Range& speed)=0;
+    virtual void emission_speed(const Range& speed)=0;
+    
+    //! Sets the direction of the system.
+    //! @param direction the direction
+    virtual void emission_direction(const Vector& direction)=0;
+    
+    //! Sets the angle of the distribution in radians.
+    virtual void emission_angle(const Range& angle)=0;
+    
+    //! Sets the emission rate of the particle emitter in particles/second
+    virtual void emission_rate(real_t rate)=0;
     
     //! Sets the particle system type.
     virtual void type(ParticleSystemType type)=0;
     
-    //! Sets the direction of the system.
-    //! @param direction the direction
-    virtual void direction(const Vector& direction)=0;
+    //! Sets the maximum number of particles that can be active in the system
+    //! at one time
+    virtual void quota(size_t quota)=0;
     
-    //! Sets the angle of the distribution in radians.
-    virtual void angle(const Range& angle)=0;    
+    //! Sets the texture in use for his particle system by name.
+    //! @param name the name of the texture
+    virtual void texture(const std::string& name)=0;
+    
+    //! Sets the texture.
+    //! @param texture a pointer to the texture object
+    virtual void texture(Texture* texture)=0;
+    
+    //! Sets the shader in user for this particle system by name.
+    //! @param name the name of the shader
+    virtual void shader(const std::string& name)=0;
+    
+    //! Sets the shader.
+    //! @param shader a pointer to the shader object.
+    virtual void shader(Shader* shader)=0;
 };
 
 }

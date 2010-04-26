@@ -166,10 +166,13 @@ void Core::Mesh::read_mesh_data() {
 	vector<Vector> positions;
 	vector<Vector> normals;
 	vector<Texcoord> texcoords;
+
+	typedef Vertex vkey_t;
+	typedef pair<Vertex, uint32_t> vval_t;
 	
 	// This map is used to cache vertices that are already present so that we
 	// can use the index buffer to get rid of duplicates
-	map<Vertex, uint32_t> vertices;
+	map<vkey_t, vval_t> vertices;
 	vector<uint32_t> indices;
     
 	// Read in the whole file, one commmand at a time.  Each line starts
@@ -222,16 +225,17 @@ void Core::Mesh::read_mesh_data() {
 			for (int i = 0; i < 3; i++) {
 				// Calculate tangent
 				compute_tangent(face, i);
-				map<Vertex, uint32_t>::iterator j = vertices.find(face[i]);
+				map<vkey_t, vval_t>::iterator j = vertices.find(face[i]);
 				if (j == vertices.end()) {
 					// Vertex was not found, so push a new index and vertex
 					// into the list
 					indices.push_back(index);
-					vertices.insert(make_pair(face[i], index));
+					vertices.insert(make_pair(face[i], make_pair(face[i], index)));
 					index++;
 				} else {
 					// Vertex was found, so use the existing index.
-					indices.push_back(j->second);
+					//j->second.first.tangent = j->second.first.tangent + face[i].tangent;
+					indices.push_back(j->second.second);
 				}
 			}
 		}
@@ -240,8 +244,13 @@ void Core::Mesh::read_mesh_data() {
 	// Copy data over to the linear memory buffer
 	
 	Mesh::vertex_count(vertices.size());
-	for (map<Vertex, uint32_t>::iterator i = vertices.begin(); i != vertices.end(); i++) {
-		Mesh::vertex(i->second, i->first);
+	for (map<vkey_t, vval_t>::iterator i = vertices.begin(); i != vertices.end(); i++) {
+		Vertex& vertex = i->second.first;
+		uint32_t index = i->second.second;
+
+		//Vector temp = vertex.tangent.unit().cross(vertex.normal);
+		vertex.tangent = vertex.tangent.unit(); //temp.cross(vertex.normal);
+		Mesh::vertex(index, vertex);
 	}
 	Mesh::index_count(indices.size());
 	for (size_t i = 0; i < indices.size(); i++) {
@@ -253,18 +262,24 @@ void Core::Mesh::read_mesh_data() {
 
 void Core::Mesh::compute_tangent(Vertex face[3], size_t j) {
 	// Calculate binormals
-    Vector d1 = face[(j+1)%3].position - face[j].position;
-    Vector d2 = face[(j+2)%3].position - face[j].position;
-    const Texcoord& tex0 = face[j].texcoord;
-    const Texcoord& tex1 = face[(j+1)%3].texcoord;
-    const Texcoord& tex2 = face[(j+2)%3].texcoord;
+	Vertex& p0 = face[j];
+	Vertex& p1 = face[(j+1)%3];
+	Vertex& p2 = face[(j+2)%3];
+	
+    Vector d1 = p1.position - p0.position;
+    Vector d2 = p2.position - p1.position;
+    const Texcoord& tex0 = p0.texcoord;
+    const Texcoord& tex1 = p1.texcoord;
+    const Texcoord& tex2 = p2.texcoord;
     real_t s1 = tex1.u - tex0.u;
     real_t t1 = tex1.v - tex0.v;
     real_t s2 = tex2.u - tex0.u;
     real_t t2 = tex2.v - tex0.v;
 
     real_t a = 1/(s1*t2 - s2*t1);
-    face[j].tangent = ((d1*t2 - d2*t1)*a).unit();
+    p0.tangent = p0.tangent + ((d1*t2 - d2*t1)*a).unit();
+	p1.tangent = p1.tangent + ((d1*t2 - d2*t1)*a).unit();
+	p2.tangent = p2.tangent + ((d1*t2 - d2*t1)*a).unit();
 }
 
 void Core::Mesh::render(Core::Shader* shader) {
@@ -279,7 +294,7 @@ void Core::Mesh::render(Core::Shader* shader) {
 	if (shader && engine_->option<bool>("shaders_enabled")) {
 		// Enable tangent vectors
 		glEnableVertexAttribArray(shader->tangent_attrib());
-		glVertexAttribPointer(shader->tangent_attrib(), 3, GL_FLOAT, 0, sizeof(Vertex), (void*)(11*sizeof(GLfloat)));
+		glVertexAttribPointer(shader->tangent_attrib(), 3, GL_FLOAT, 1, sizeof(Vertex), (void*)(6*sizeof(GLfloat)));
 	}
 
 	// Set up the buffer offsets (equivalent of FVF in D3D9)

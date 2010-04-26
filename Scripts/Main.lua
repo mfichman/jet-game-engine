@@ -1,16 +1,18 @@
 require 'Test'
 
 
-local material = engine:material("plane") {
+local material = engine:material("Plane") {
     diffuse_color = Color(1, 1, 1, 1),
-    diffuse_map = "MetalDiffuse.png",
-    normal_map = "MetalNormal.png"
+    --diffuse_map = "MetalDiffuse.png",
+    normal_map = "LinesNormal.png"
 }
 
-local mesh = engine:mesh("plane")
+--ocal mesh = engine:mesh("plane")
+
+--[[
 local v = Vertex()
 v.normal = Vector(0, 0, 1);
-v.tangent = Vector(0, 0, 1);
+v.tangent = Vector(0, 1, 0);
 v.position = Vector(10, -10, -2);
 v.texcoord = Texcoord(1, 0);
 mesh:vertex(0, v);
@@ -23,7 +25,7 @@ mesh:vertex(1, v);
 
 
 v.normal = Vector(0, 0, 1);
-v.tangent = Vector(0, 0, 1);
+v.tangent = Vector(0, 1, 0);
 v.position = Vector(-10, 10, -2);
 v.texcoord = Texcoord(0, 1);
 mesh:vertex(2, v);
@@ -42,6 +44,7 @@ mesh:index(2, 3);
 mesh:index(3, 0);
 mesh:index(4, 1);
 mesh:index(5, 2);
+]]
 
 --engine.simulation_speed = 1.0/4.0
 

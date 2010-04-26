@@ -44,6 +44,8 @@ Core::PhysicsSystem::~PhysicsSystem() {
 }
 
 void Core::PhysicsSystem::step() {
+    real_t gravity = engine_->option<real_t>("gravity");
+    world_->setGravity(btVector3(0.0f, -gravity, 0.0f));
 	//cout << "delta: " << engine_->delta() << " step: " << engine_->timestep() << endl;
 	world_->stepSimulation(engine_->delta()*engine_->simulation_speed(), 4, engine_->timestep());
 }

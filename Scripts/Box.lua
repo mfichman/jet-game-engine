@@ -20,13 +20,13 @@
 
 require 'Actor'
 
-class 'Monkey' (Actor)
+class 'Box' (Actor)
 
-function Monkey:__init(node, name)
+function Box:__init(node, name)
     Actor.__init(self, node, name)
 
     self.mesh = self.node:mesh_object("mesh") {
-        mesh = "Monkey.obj",
+        mesh = "Box.obj",
         material = "Metal.mtl"
     }
     

@@ -21,6 +21,8 @@
 require 'Module'
 require 'Starship'
 require 'Monkey'
+require 'Rock'
+require 'Box'
 
 class 'Test' (Module)
 
@@ -36,13 +38,13 @@ function Test:__init()
         ambient_color = Color(.3, .3, .3, 1),
         diffuse_color = Color(1, 1, 1, 1),
         specular_color = Color(1, 1, 1, 1),
-        direction = Vector(1, 0, 1)
+        direction = Vector(0, 0, 1)
     }
     
     -- Set up the camera
     print("Creating camera")
     self.camera_node = engine.root:node("camera")
-    self.camera_node.position = Vector(15, 0, 15)
+    self.camera_node.position = Vector(20, 0, 20)
     self.camera_node:look(Vector(0, 0, 0), Vector(0, 1, 0))
     self.camera = self.camera_node:camera() {
         active = true,
@@ -51,28 +53,37 @@ function Test:__init()
         near_clipping_distance = 0.1
     }
     
+    
     -- Set up the plane
     print("Creating plane")
     self.plane_node = engine.root:node("plane")
     self.plane = self.plane_node:mesh_object("plane") {
-        mesh = "plane",
-        material = "plane"
+        mesh = "Plane.obj",
+        material = "Metal.mtl"
     }
     self.plane_node:rigid_body()
     
     -- Set up scene objects and apply some forces
     print("Creating objects")
     self.s0 = Starship(engine.root, "s0")
-    self.s1 = Monkey(engine.root, "s1")
+    self.s1 = Rock(engine.root, "s1")
     
-    self.s1.node.position = Vector(0, 0, 0)
-    self.s0.node.position = Vector(0, -10, 0)
-    self.s0.body:apply_force(Vector(-15000, 30000, 0))
+    --self.s1.node.position = Vector(0, 0, 0)
+    --self.s0.node.position = Vector(0, -10, 0)
+    ---self.s0.body:apply_force(Vector(-15000, 30000, 0))
+    
 end
 
 function Test:on_destroy()
     print("Goodbye")
 end
+
+time = 0.
+function Test:on_update()
+    --self.plane_node.rotation = Quaternion(Vector(0, 1, 0), time)
+    time = time + 0.01
+end
+
 
 function Test:on_key_pressed(key, x, y)
     
@@ -85,7 +96,7 @@ function Test:on_key_pressed(key, x, y)
         self.s1.body.linear_velocity = Vector(0, 0, 0)
         self.s0.node.position = Vector(0, 5, 0)
         self.s0.body.linear_velocity = Vector(0, 0, 0)
-        --self.s0.body:apply_force(Vector(-15000, 30000, 0))
+        self.s0.body:apply_force(Vector(1500, -3000, -1000))
     elseif (key == 'n') then
         engine:option("normal_mapping_enabled", not engine:option("normal_mapping_enabled"))
     elseif (key == 'p') then
@@ -105,5 +116,9 @@ function Test:on_key_pressed(key, x, y)
         end
         
         engine:option("video_mode_synced", false)
+    elseif (key == 'x') then
+        self.plane.material.shader = "Default"
+    elseif (key == 'y') then
+        self.plane.material.shader = "Default2"
     end
 end

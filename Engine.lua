@@ -34,7 +34,10 @@ end
 
 local function table_syntax(o)
     local mt = getmetatable(o)
-    mt.__call = function(o, table) copy(table, o) end
+    mt.__call = function(o, table)
+        copy(table, o)
+        return o
+    end
     return o
 end
 

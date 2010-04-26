@@ -23,36 +23,25 @@
 
 #include <Jet/Types.hpp>
 #include <Jet/Vector.hpp>
-#include <Jet/Texcoord.hpp>
-#include <iostream>
 
 namespace Jet {
 
-//! Represents a vertex.
-//! @class Vertex
-//! @brief Vertex class.
-class Vertex {
+//! Represents a particle.  Particles are sent to the GPU for rendering using
+//! the data layout present in this class.
+//! @class Particle
+//! @brief Particle structure.
+class Particle {
 public:
-
-    //! Comparison operator.
-    inline bool operator<(const Vertex& other) const {
-        if (position != other.position) return position < other.position;
-        if (normal != other.normal) return normal < other.normal;
-        return texcoord < other.texcoord;
+    
+    Particle() :
+        initial_time(0.0f) {
+            
     }
     
-    inline bool operator==(const Vertex& other) const {
-        return position == other.position && texcoord == other.texcoord && normal == other.normal;
-    }
-
-	inline bool operator!=(const Vertex& other) const {
-		return !this->operator==(other);
-	}
-    
-    Vector position;
-    Vector normal;
-    Vector tangent;
-    Texcoord texcoord;
+    Vector initial_position;
+    real_t initial_time;
+    Vector velocity;
+    real_t life;
 };
 
 }

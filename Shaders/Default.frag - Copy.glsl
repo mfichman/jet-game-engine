@@ -19,6 +19,10 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
+ 
+varying vec3 normal;
+varying vec3 tangent;
+varying vec3 view;
 
 uniform sampler2D diffuse_map;
 uniform sampler2D specular_map;
@@ -37,16 +41,17 @@ uniform bool shadow_map_enabled;
 #define SPECULAR_MAP
 #define DIFFUSE_MAP
 
-varying vec3 eye_dir;
-varying vec3 light_dir;
-
 void main() {
     
     // Calculate the tangent, binormal, and normal vectors
-    vec3 n = vec3(0.0, 0.0, 1.0);
+    vec3 n = normalize(normal);
 #ifdef NORMAL_MAP
     if (normal_map_enabled) {
-        n = normalize(texture2D(normal_map, gl_TexCoord[0].st).xyz * 2.0 - 1.0);
+        vec3 t = normalize(tangent);
+        vec3 b = normalize(cross(t, n));
+        mat3 tbn_matrix = mat3(t, b, n);
+        vec3 n_sample = normalize(texture2D(normal_map, gl_TexCoord[0].st).xyz * 2.0 - 1.0);
+        n = tbn_matrix * n_sample;
     }
 #endif
 
@@ -54,47 +59,65 @@ void main() {
     
     for (int i = 0; i < 1; i++) {
         // Calculate light vector
-        vec3 v = normalize(eye_dir);
-        vec3 l = normalize(light_dir);
+        vec3 light = vec3(gl_LightSource[i].position) - view*gl_LightSource[i].position.w;
+    
+        // Calculate attenuation
+        float d = length(light);
+        float c0 = gl_LightSource[i].constantAttenuation;
+        float c1 = gl_LightSource[i].linearAttenuation;
+        float c2 = gl_LightSource[i].quadraticAttenuation;
+        float a = 1.0 / (c0 + c1*d + c2*d*d);
+        
+        // Calculate view, light, and reflection vectors
+        vec3 v = normalize(view);
+        vec3 l = normalize(light);
         vec3 r = reflect(v, n);
     
         // Calculate diffuse and specular coefficients
-        float kd = max(0.0, dot(l, n));
-        float ks = pow(max(0.0, dot(l, r)), gl_FrontMaterial.shininess);
+		float ndotl = dot(l, n);
+        float kd = a * max(0.0, dot(l, n));
+        float ks = a * pow(max(0.0, dot(l, r)), gl_FrontMaterial.shininess);
             
         // Calculate ambient, diffuse, and specular light
-        diffuse += kd * gl_LightSource[i].diffuse;
-        specular += ks * gl_LightSource[i].specular;
-        ambient += gl_LightSource[i].ambient;
+		if (ndotl > 0.0) {
+        	diffuse += kd * gl_LightSource[i].diffuse;
+        	specular += ks * gl_LightSource[i].specular;
+		}
+        ambient += a * gl_LightSource[i].ambient;
     }
-
+    
     diffuse *= gl_FrontMaterial.diffuse;
     specular *= gl_FrontMaterial.specular;
     ambient *= gl_FrontMaterial.ambient;
-   
+    
 #ifdef DIFFUSE_MAP
     if (diffuse_map_enabled) {
         diffuse *= texture2D(diffuse_map, gl_TexCoord[0].st);
     }
 #endif
-
 #ifdef SPECULAR_MAP
     if (specular_map_enabled) {
         specular *= texture2D(specular_map, gl_TexCoord[0].st);
     }
-   
 #endif
 #ifdef SHADOW_MAP
     if (shadow_map_enabled) {
         vec4 shadow_coord = gl_TexCoord[1]/gl_TexCoord[1].w;
-        float depth = texture2D(shadow_map, shadow_coord.st).z + 0.0001;
+        float depth = texture2D(shadow_map, shadow_coord.st).z + 0.00009;
         if (depth < shadow_coord.z) {
             diffuse *= 0.4;
-            specular *= 0.1;
+            specular *= 0.2;
         }
     }
 #endif
     
-    gl_FragColor = vec4(ambient + diffuse + specular);
-
+    vec4 color = ambient + diffuse + specular;
+    float intensity = color.r + color.g + color.b;
+    gl_FragData[0] = color;
+    
+    // High-pass filter
+    if (intensity > 3.0) {
+        gl_FragData[1] = color;
+    }
+    
 }

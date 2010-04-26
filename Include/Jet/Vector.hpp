@@ -23,6 +23,7 @@
 
 #include <Jet/Types.hpp>
 #include <iostream>
+#include <cmath>
 
 std::ostream& operator<<(std::ostream& out, const Jet::Vector& vector);
 std::istream& operator>>(std::istream& in, Jet::Vector& vector);
@@ -121,13 +122,19 @@ public:
 
     //! Comparison operator.
     bool operator<(const Vector& other) const {
-        if (x != other.x) return x < other.x;
-        if (y != other.y) return y < other.y;
-        return z < other.z;
+        static real_t epsilon = 0.0000001f;
+        if (abs(x - other.x) > epsilon) return x < other.x;
+        if (abs(y - other.y) > epsilon) return y < other.y;
+        if (abs(z - other.z) > epsilon) return z < other.z;
+        return false;
     }
     
     bool operator==(const Vector& other) const {
-        return x == other.x && y == other.y && z == other.z;
+        static real_t epsilon = 0.0000001f;
+        if (abs(x - other.x) > epsilon) return false;
+        if (abs(y - other.y) > epsilon) return false;
+        if (abs(z - other.z) > epsilon) return false;
+        return true;
     }
     
     bool operator!=(const Vector& other) const {

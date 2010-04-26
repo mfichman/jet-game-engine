@@ -257,6 +257,9 @@ void Core::RenderSystem::on_post_update() {
 	lights_.clear();
 	
 	generate_render_list(static_cast<Core::Node*>(engine_->root()));
+	
+	// Sort the meshes by material
+	sort(mesh_objects_.begin(), mesh_objects_.end(), &RenderSystem::compare_mesh_objects);
 }
 
 void Core::RenderSystem::generate_shadow_map(Light* light) {    
@@ -520,3 +523,8 @@ void Core::RenderSystem::render_fullscreen_quad() {
 	glPopMatrix();
     
 }
+
+bool Core::RenderSystem::compare_mesh_objects(MeshObjectPtr o1, MeshObjectPtr o2) {
+    return o1->material() < o2->material();
+}
+

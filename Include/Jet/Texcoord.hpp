@@ -23,6 +23,7 @@
 
 #include <Jet/Types.hpp>
 #include <iostream>
+#include <cmath>
 
 std::ostream& operator<<(std::ostream& out, const Jet::Texcoord& texcoord);
 std::istream& operator>>(std::istream& in, Jet::Texcoord& texcoord);
@@ -49,12 +50,17 @@ public:
     friend std::istream& ::operator>>(std::istream& in, Texcoord& texcoord);
 
     inline bool operator<(const Texcoord& other) const {
-        if (u != other.u) return u < other.u;
-        return v < other.v;       
+        static real_t epsilon = 0.0000001f;
+        if (abs(u - other.u) < epsilon) return u < other.u;
+        if (abs(v - other.v) < epsilon) return v < other.v;
+        return false;
     }
 
     inline bool operator==(const Texcoord& other) const {
-        return u == other.u && v == other.v;
+        static real_t epsilon = 0.0000001f;
+        if (abs(u - other.u) > epsilon) return false;
+        if (abs(v - other.v) > epsilon) return false;
+        return true;
     }
     
     inline bool operator!=(const Texcoord& other) const {

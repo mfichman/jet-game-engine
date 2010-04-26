@@ -27,7 +27,7 @@ function Starship:__init(node, name)
 
     self.mesh = self.node:mesh_object("mesh") {
         mesh = "Shark.obj",
-        material = "Rock.mtl"
+        material = "Metal.mtl"
     }
     
     self.body = self.node:rigid_body()

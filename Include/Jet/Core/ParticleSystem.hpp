@@ -23,7 +23,11 @@
 
 #include <Jet/Core/Types.hpp>
 #include <Jet/Core/Node.hpp>
+#include <Jet/Core/Texture.hpp>
+#include <Jet/Core/Shader.hpp>
+#include <Jet/Core/Engine.hpp>
 #include <Jet/ParticleSystem.hpp>
+#include <Jet/Particle.hpp>
 
 namespace Jet { namespace Core {
 
@@ -65,8 +69,23 @@ public:
     }
     
     //! Returns the speed particles will be created with.
-    inline const Range& speed() const {
-        return speed_;
+    inline const Range& emission_speed() const {
+        return emission_speed_;
+    }
+    
+    //! Returns the direction the particle system is facing.
+    inline const Vector& emission_direction() const {
+        return emission_direction_;
+    }
+    
+    //! Sets the angle of distribution in radians.
+    inline const Range& emission_angle() const {
+        return emission_angle_;
+    }
+    
+    //! Sets the emission rate
+    inline real_t emission_rate() const {
+        return emission_rate_;
     }
     
     //! Returns the particle system distribution type.  This can either be
@@ -75,14 +94,20 @@ public:
         return type_;
     }
     
-    //! Returns the direction the particle system is facing.
-    inline const Vector& direction() const {
-        return direction_;
+    //! Returns the maximum number of particles that can be active in the
+    //! system at one time
+    inline size_t quota() const {
+        return quota_;
     }
     
-    //! Sets the angle of distribution in radians.
-    inline const Range& angle() const {
-        return angle_;
+    //! Returns the texture in use for this particle system.
+    inline Texture* texture() const {
+        return texture_.get();
+    }
+    
+    //! Returns the shader in user for this particle system.
+    inline Shader* shader() const {
+        return shader_.get();
     }
     
     //! Sets the life of this particle system.
@@ -111,8 +136,24 @@ public:
     
     //! Sets the speed of created particles.
     //! @param speed the speed range
-    inline void speed(const Range& speed) {
-        speed_ = speed;
+    inline void emission_speed(const Range& speed) {
+        emission_speed_ = speed;
+    }
+    
+    //! Sets the direction of the system.
+    //! @param direction the direction
+    inline void emission_direction(const Vector& direction) {
+        emission_direction_ = direction;
+    }
+    
+    //! Sets the angle of the distribution in radians.
+    inline void emission_angle(const Range& angle) {
+        emission_angle_ = angle;
+    }
+    
+    //! Sets the emission rate
+    inline void emission_rate(real_t rate) {
+        emission_rate_ = rate;
     }
     
     //! Sets the particle system type.
@@ -120,23 +161,56 @@ public:
         type_ = type;
     }
     
-    //! Sets the direction of the system.
-    //! @param direction the direction
-    inline void direction(const Vector& direction) {
-        direction_ = direction;
+    //! Sets the maximum number of particles that can be active in the system
+    //! at one time
+    inline void quota(size_t quota) {
+        quota_ = quota;
+        particle_.resize(quota);
+        dead_particle_.clear();
     }
     
-    //! Sets the angle of the distribution in radians.
-    inline void angle(const Range& angle) {
-        angle_ = angle;
+    //! Sets the texture in use for his particle system by name.
+    //! @param name the name of the texture
+    inline void texture(const std::string& name) {
+        texture(engine_->texture(name));
+    }
+
+    //! Sets the texture.
+    //! @param texture a pointer to the texture object
+    inline void texture(Jet::Texture* texture) {
+        texture_ = static_cast<Texture*>(texture);
     }
     
+    //! Sets the shader in user for this particle system by name.
+    //! @param name the name of the shader
+    inline void shader(const std::string& name) {
+        shader(engine_->shader(name));
+    }
+    
+    //! Sets the shader.
+    //! @param shader a pointer to the shader object.
+    inline void shader(Jet::Shader* shader) {
+        shader_ = static_cast<Shader*>(shader);
+        if (!shader_) {
+            // If the shader variable is null, switch to the default
+            // shader variable
+            ParticleSystem::shader("Particle");
+        }
+    }
+    
+    //! Renders this particle system using the given particle buffer
+    void render(ParticleBuffer* buffer);
     
 private:
     inline ParticleSystem(Engine* engine, Node* parent) :
         engine_(engine),
-        parent_(parent) {
+        parent_(parent),
+        quota_(1000),
+        time_(0.0f),
+        accumulator_(0.0f) {
             
+        shader("Particle");
+        particle_.resize(quota_);
     }
     
     Engine* engine_;
@@ -145,10 +219,18 @@ private:
     Range width_;
     Range height_;
     Range depth_;
-    Range speed_;
+    Range emission_speed_;
+    Vector emission_direction_;
+    real_t emission_rate_;
     ParticleSystemType type_;
-    Vector direction_;
-    Range angle_;
+    Range emission_angle_;
+    size_t quota_;
+    TexturePtr texture_;
+    ShaderPtr shader_;
+    std::vector<Particle> particle_;
+    std::vector<Particle*> dead_particle_;
+    real_t time_;
+    real_t accumulator_;
     
     friend class Node;
     

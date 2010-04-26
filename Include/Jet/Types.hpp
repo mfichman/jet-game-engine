@@ -62,6 +62,7 @@ namespace Jet {
     class Node;
     class NodeListener;
     class Object;
+    class Particle;
     class ParticleSystem;
     class Quad;
     class QuadChain;
@@ -98,7 +99,7 @@ namespace Jet {
     typedef void (*load_function_t)(Engine* engine);
     
     enum LightType { POINT_LIGHT, DIRECTIONAL_LIGHT };
-    enum ParticleSystemType { BOX_EMITTER, ELLIPSOID_EMITTER };
+    enum ParticleSystemType { BOX_EMITTER, ELLIPSOID_EMITTER, POINT_EMITTER };
     enum PlaybackState { ONCE, REPEAT, STOP };
     enum ResourceState { UNLOADED, LOADED, SYNCED };
     enum SyncMode { STATIC_SYNC, DYNAMIC_SYNC };

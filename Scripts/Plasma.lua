@@ -20,16 +20,18 @@
 
 require 'Actor'
 
-class 'Monkey' (Actor)
+class 'Plasma' (Actor)
 
-function Monkey:__init(node, name)
+function Plasma:__init(node, name)
     Actor.__init(self, node, name)
 
-    self.mesh = self.node:mesh_object("mesh") {
-        mesh = "Monkey.obj",
-        material = "Metal.mtl"
+    self.plasma = self.node:particle_system("plasma") {
+        emission_speed = 10,
+        emission_direction = Vector(0, 1, 0),
+        emission_angle = 45,
+        emission_rate = 10,
+        width = 5,
+        height = 5,
+        depth = 5
     }
-    
-    self.body = self.node:rigid_body()
-    self.body.mass = 10.0
 end

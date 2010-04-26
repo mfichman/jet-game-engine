@@ -24,6 +24,8 @@
 #include <Jet/Core/Types.hpp>
 #include <Jet/Core/Engine.hpp>
 #include <Jet/Core/RenderTarget.hpp>
+#include <Jet/MeshObject.hpp>
+#include <Jet/ParticleSystem.hpp>
 #include <vector>
 
 namespace Jet { namespace Core {
@@ -58,6 +60,9 @@ private:
     void render_shadow_casters();
     void render_visible_objects();
     void render_fullscreen_quad();
+    
+    static bool compare_mesh_objects(MeshObjectPtr o1, MeshObjectPtr o2);
+    static bool compare_particle_systems(ParticleSystemPtr o1, ParticleSystemPtr o2);
     
     Engine* engine_;
     
