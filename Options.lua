@@ -11,7 +11,7 @@ engine:option("display_height", 800)
 engine:option("fullscreen", false)
 engine:option("shaders_enabled", true)
 engine:option("normal_mapping_enabled", false)
-engine:option("specular_mapping_enabled", false)
+engine:option("specular_mapping_enabled", true)
 engine:option("window_title", "Extreme Asteroids")
 engine:option("gravity", 0)
 

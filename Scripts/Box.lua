@@ -27,7 +27,7 @@ function Box:__init(node, name)
 
     self.mesh = self.node:mesh_object("mesh") {
         mesh = "Box.obj",
-        material = "Metal.mtl"
+        material = "Rock.mtl"
     }
     
     self.body = self.node:rigid_body()
