@@ -25,7 +25,7 @@
 #include <Jet/Core/Engine.hpp>
 #include <Jet/Core/Node.hpp>
 #include <Jet/Camera.hpp>
-#include <cmath>
+#include <algorithm>
 
 namespace Jet { namespace Core {
     
@@ -68,7 +68,11 @@ public:
     //! Returns the shadow frustum
     inline Frustum shadow_frustum() const {
         real_t shadow_distance = engine_->option<real_t>("shadow_distance");
+#ifdef WINDOWS
+        real_t far_distance = min(shadow_distance, far_clipping_distance());
+#else
         real_t far_distance = std::min(shadow_distance, far_clipping_distance());
+#endif
         return compute_frustum(far_distance);
     }
     

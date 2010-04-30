@@ -45,7 +45,7 @@ function Test:__init()
     -- Set up the camera
     print("Creating camera")
     self.camera_node = engine.root:node("camera")
-    self.camera_node.position = Vector(30, 0, 30)
+    self.camera_node.position = Vector(25, 0, 25)
     self.camera_node:look(Vector(0, 0, 0), Vector(0, 1, 0))
     self.camera = self.camera_node:camera() {
         active = true,
