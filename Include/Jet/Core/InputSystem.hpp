@@ -41,7 +41,6 @@ public:
 private:
     void on_init();
     void on_update();
-    void on_post_update() {}
     void on_render() {}
     
     void on_keyboard(char key);

@@ -200,6 +200,8 @@ private:
 	}
 	
 	void read_material_data();
+	void begin_shader();
+	void begin_fixed_pipeline();
     
     Engine* engine_;
     std::string name_;

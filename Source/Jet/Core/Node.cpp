@@ -30,6 +30,7 @@
 #include <Jet/Core/QuadChain.hpp>
 #include <Jet/Core/QuadSet.hpp>
 #include <Jet/Core/RigidBody.hpp>
+#include <Jet/Core/FractureObject.hpp>
 
 #include <stdexcept>
 #include <boost/iterator/transform_iterator.hpp>
@@ -88,6 +89,17 @@ MeshObject* Core::Node::mesh_object(const std::string& name) {
     }
 }
 
+FractureObject* Core::Node::fracture_object(const std::string& name) {
+    Object* obj = object(name);
+    if (obj) {
+        return dynamic_cast<FractureObject*>(obj);
+    } else {
+        FractureObjectPtr fracture_object(new Core::FractureObject(engine_, this));
+        object(name, fracture_object.get());		
+        return fracture_object.get();
+    }
+}
+
 ParticleSystem* Core::Node::particle_system(const std::string& name) {
     Object* obj = object(name);
     if (obj) {
@@ -133,68 +145,8 @@ Object* Core::Node::object(const std::string& name)  {
 RigidBody* Core::Node::rigid_body() {
 	if (!rigid_body_) {
 		rigid_body_ = new RigidBody(engine_, this);
-		update_collision_shapes();
 	}
 	return rigid_body_.get();
-}
-
-void Core::Node::update_collision_shapes() {
-	if (!rigid_body_) {
-		if (parent_ && parent_->rigid_body_) {
-			rigid_body_ = parent_->rigid_body_;
-		} else {
-			return;
-		}
-	}
-	
-	RigidBody* rigid_body = static_cast<RigidBody*>(rigid_body_.get());
-
-	// Update the transform of this node.  If the node is the node that the
-	// rigid body is attached to, then simply set the shape transform to the
-	// identity.  Otherwise, set the shape transform to the concatentation of
-	// the parent node's transform and this node's local transform.
-	if (rigid_body->parent() == this) {
-		shape_transform_ = btTransform::getIdentity();
-	} else {
-		btQuaternion rotation(rotation_.x, rotation_.y, rotation_.z, rotation_.w);
-		btVector3 position(position_.x, position_.y, position_.z);
-		btTransform transform(rotation, position);
-		shape_transform_.mult(parent_->shape_transform_, transform);
-		rigid_body_ = parent_->rigid_body_;
-	}
-	
-	// Iterate through all child objects of "node".  For child MeshObjects,
-	// make sure they are attached to the rigid body.  For child Nodes, make
-	// sure that the node has a reference to the new rigid body.
-	for (unordered_map<string, ObjectPtr>::iterator i = object_.begin(); i != object_.end(); i++) {
-		const type_info& info = typeid(*i->second);
-		if (typeid(Node) == info) {
-			Node* node = static_cast<Node*>(i->second.get());
-			node->update_collision_shapes();
-			
-		} else if (typeid(MeshObject) == info) {
-			
-			// Attach the given mesh object to the node, using the local
-			// transform.  Save the index of the added child shape so it can
-			// be updated when the position of the node changes.
-			MeshObject* mesh_object = static_cast<MeshObject*>(i->second.get());
-			Mesh* mesh = mesh_object->mesh();
-			if (mesh) {
-				
-				if (UNLOADED == mesh->state()) {
-					mesh->state(SYNCED);
-				}
-				
-				// TODO: This is for bounding-box shapes
-				//Vector origin = mesh->origin();
-				//btTransform transform = shape_transform_ * btTransform(btQuaternion::getIdentity(), btVector3(origin.x, origin.y, origin.z));
-				//rigid_body->shape_->addChildShape(transform, mesh->bounding_shape());
-				
-				// This is for triangle mesh shapes
-				rigid_body->shape_->addChildShape(shape_transform_, mesh->shape());
-			}
-		}
-	}
 }
 
 AudioSource* Core::Node::audio_source() {
@@ -239,22 +191,32 @@ Iterator<ObjectPtr> Core::Node::objects() const {
 
 
 void Core::Node::position(const Vector& position) {
-	position_ = position;
-	if (rigid_body_ && rigid_body_->parent() == this) {
-		RigidBody* rigid_body = static_cast<RigidBody*>(rigid_body_.get());
-		btTransform transform = rigid_body->body_->getCenterOfMassTransform();
-		transform.setOrigin(btVector3(position.x, position.y, position.z));
-		rigid_body->body_->setCenterOfMassTransform(transform);
+	if (position_ == position) {
+		return;
+	} else {
+		position_ = position;
+		transform_dirty_ = true;
+		if (rigid_body_ && rigid_body_->parent() == this) {
+			RigidBody* rigid_body = static_cast<RigidBody*>(rigid_body_.get());
+			btTransform transform = rigid_body->body_->getCenterOfMassTransform();
+			transform.setOrigin(btVector3(position.x, position.y, position.z));
+			rigid_body->body_->setCenterOfMassTransform(transform);
+		}
 	}
 }
 
 void Core::Node::rotation(const Quaternion& rotation) {
-	rotation_ = rotation;
-	if (rigid_body_ && rigid_body_->parent() == this) {
-		RigidBody* rigid_body = static_cast<RigidBody*>(rigid_body_.get());
-		btTransform transform = rigid_body->body_->getCenterOfMassTransform();
-		transform.setRotation(btQuaternion(rotation.x, rotation.y, rotation.z, rotation.w));
-		rigid_body->body_->setCenterOfMassTransform(transform);
+	if (rotation == rotation_) {
+		return;
+	} else {
+		rotation_ = rotation;
+		transform_dirty_ = true;
+		if (rigid_body_ && rigid_body_->parent() == this) {
+			RigidBody* rigid_body = static_cast<RigidBody*>(rigid_body_.get());
+			btTransform transform = rigid_body->body_->getCenterOfMassTransform();
+			transform.setRotation(btQuaternion(rotation.x, rotation.y, rotation.z, rotation.w));
+			rigid_body->body_->setCenterOfMassTransform(transform);
+		}
 	}
 }
 
@@ -296,7 +258,39 @@ void Core::Node::render() {
 }
 
 void Core::Node::update() {
-	for (vector<NodeListenerPtr>::iterator i = listener_.begin(); i < listener_.end(); i++) {
+	
+	update_transform();
+	
+	// Update all child nodes, and their transforms
+	for (unordered_map<string, ObjectPtr>::iterator i = object_.begin(); i != object_.end(); i++) {
+		const type_info& info = typeid(*i->second);
+		if (typeid(Node) == info) {
+			Node* node = static_cast<Node*>(i->second.get());
+			if (transform_dirty_) {
+				node->transform_dirty_ = true;
+			}
+			node->update();
+		}
+	}
+	transform_dirty_ = false;
+	
+	for (vector<NodeListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
 		(*i)->on_update();
+	}
+	
+}
+
+void Core::Node::update_transform() {
+		
+	// Calculate the transform for this node if the transform is dirty.
+	if (transform_dirty_) {
+		
+		if (parent()) {
+			matrix_ = parent()->matrix() * Matrix(rotation_, position_);
+		} else {
+			matrix_ = Matrix(rotation_, position_);
+		}
+		world_position_ = matrix_.origin();
+		world_rotation_ = matrix_.rotation();
 	}
 }

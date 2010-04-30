@@ -56,6 +56,10 @@ BoundingBox::BoundingBox(const Frustum& frustum) :
     
 }
 
+real_t BoundingBox::volume() const {
+    return width() * height() * depth();
+}
+
 real_t BoundingBox::width() const {
     return max_x - min_x;
 }
@@ -77,6 +81,7 @@ Vector BoundingBox::origin() const {
 }
 
 void BoundingBox::point(const Vector& point) {
+    // Check to see if the added point expands the bounding box.
     if (point.x < min_x) {
         min_x = point.x;
     } else if (point.x > max_x) {

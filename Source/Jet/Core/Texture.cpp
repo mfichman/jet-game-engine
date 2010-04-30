@@ -45,39 +45,12 @@ void Core::Texture::state(ResourceState state) {
 	
 	// Leaving the UNLOADED state
 	if (UNLOADED == state_) {
-		// Load the image data
-		string file = engine_->resource_path(name_);
-		SDL_Surface* surface = IMG_Load(file.c_str());
-
-		if (surface->format->BitsPerPixel != 32) {
-			throw runtime_error("Invalid image format: " + name_);
-		}
-
-		width(surface->w);
-		height(surface->h);
-		memcpy(data(), surface->pixels, data_.size());
-
-		SDL_FreeSurface(surface);
+		read_texture_data();
 	}
 	
 	// Entering the SYNCED state
 	if (SYNCED == state) {
-		glPushAttrib(GL_TEXTURE_BIT);
-		
-		// Initialize the texture
-		glGenTextures(1, &texture_);
-		glBindTexture(GL_TEXTURE_2D, texture_);
-		
-		//! Set texture sampling parameters; we use mip filtering
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 6.0);
-		
-		// Load the image
-		gluBuild2DMipmaps(GL_TEXTURE_2D, 3, width(), height(), GL_RGBA, GL_UNSIGNED_BYTE, data());		
-		glPopAttrib();
+		init_texture();
 	}
 	
 	// Leaving the SYNCED state
@@ -92,6 +65,40 @@ void Core::Texture::state(ResourceState state) {
 	}
 	
 	state_ = state;
+}
+
+void Core::Texture::read_texture_data() {
+	// Load the image data
+	string file = engine_->resource_path(name_);
+	SDL_Surface* surface = IMG_Load(file.c_str());
+
+	if (surface->format->BitsPerPixel != 32) {
+		throw runtime_error("Invalid image format: " + name_);
+	}
+
+	width(surface->w);
+	height(surface->h);
+	memcpy(data(), surface->pixels, data_.size());
+
+	SDL_FreeSurface(surface);
+}
+
+void Core::Texture::init_texture() {
+	
+	// Initialize the texture
+	glGenTextures(1, &texture_);
+	glBindTexture(GL_TEXTURE_2D, texture_);
+	
+	//! Set texture sampling parameters; we use mip filtering
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 6.0);
+	
+	// Load the image
+	gluBuild2DMipmaps(GL_TEXTURE_2D, 3, width(), height(), GL_RGBA, GL_UNSIGNED_BYTE, data());		
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Core::Texture::sampler(uint32_t sampler) {

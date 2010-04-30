@@ -45,12 +45,12 @@ public:
     Color(real_t red, real_t blue, real_t green, real_t alpha);
     
     //! Returns a pointer to the internal float data of this color
-    operator const real_t*() const {
+    inline operator const real_t*() const {
         return &red;
     }
     
     //! Returns a pointer to the internal float data of this color
-    operator real_t*() {
+    inline operator real_t*() {
         return &red;
     }
     

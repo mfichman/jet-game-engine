@@ -95,6 +95,9 @@ private:
 		texture_(0) {
 			
 	}
+	
+	void read_texture_data();
+	void init_texture();
     
 	Engine* engine_;
 	std::string name_;

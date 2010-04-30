@@ -21,6 +21,7 @@
  */
 
 #include <Jet/Core/PhysicsSystem.hpp>
+#include <Jet/Core/Node.hpp>
 #include <BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h>
 
 using namespace Jet;
@@ -28,6 +29,8 @@ using namespace std;
 
 Core::PhysicsSystem::PhysicsSystem(Engine* engine) :
     engine_(engine) {
+        
+    engine_->listener(this);
         
     config_.reset(new btDefaultCollisionConfiguration);
     dispatcher_.reset(new btCollisionDispatcher(config_.get()));
@@ -45,9 +48,14 @@ Core::PhysicsSystem::~PhysicsSystem() {
 
 void Core::PhysicsSystem::step() {
     real_t gravity = engine_->option<real_t>("gravity");
+    real_t simulation_speed = engine_->option<real_t>("simulation_speed");
     world_->setGravity(btVector3(0.0f, -gravity, 0.0f));
-	//cout << "delta: " << engine_->delta() << " step: " << engine_->timestep() << endl;
-	world_->stepSimulation(engine_->delta()*engine_->simulation_speed(), 4, engine_->timestep());
+    
+    // Step simulation returns how many substeps were taken.  If at least one
+    // substep was taken, then we have to update matrices for our objects.
+	world_->stepSimulation(engine_->frame_delta()*simulation_speed, 4, engine_->timestep());
+    Node* node = static_cast<Node*>(engine_->root());
+    node->update_transform();
 }
 
 void Core::PhysicsSystem::on_init() {
@@ -59,6 +67,7 @@ void Core::PhysicsSystem::on_update() {
 
 void Core::PhysicsSystem::on_tick(btDynamicsWorld* world, btScalar step) {
     
+    // Clear force, and apply gravity to all rigid bodies
     btCollisionObjectArray objects = world->getCollisionObjectArray();
     world->clearForces();
     for (int i = 0; i < objects.size(); i++) {
@@ -67,15 +76,22 @@ void Core::PhysicsSystem::on_tick(btDynamicsWorld* world, btScalar step) {
             rigid_body->applyGravity();
          }
     }
-	    
-    PhysicsSystem* system = static_cast<PhysicsSystem*>(world->getWorldUserInfo());    
-    std::list<EngineListenerPtr>& listener = system->engine_->listener_;
-	
-	for (list<EngineListenerPtr>::iterator i = listener.begin(); i != listener.end(); i++) {
+
+    PhysicsSystem* system = static_cast<PhysicsSystem*>(world->getWorldUserInfo());
+    
+    // Update all engine listeners
+    for (Iterator<EngineListenerPtr> i = system->engine_->listeners(); i; i++) {
         (*i)->on_update();
     }
+	
+    // Update the active module
     if (system->engine_->module()) {
         system->engine_->module()->on_update();
     }
+    
+    // Update the node
+    Node* node = static_cast<Node*>(system->engine_->root());
+    node->update();
+    
     return;
 }

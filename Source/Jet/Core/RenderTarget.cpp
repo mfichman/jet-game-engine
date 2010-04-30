@@ -114,6 +114,7 @@ void Core::RenderTarget::enabled(bool enabled) {
 	}
 
 	if (enabled) {
+        // Bind the framebuffer, and set the viewport
 		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_);
 		glPushAttrib(GL_VIEWPORT_BIT | GL_COLOR_BUFFER_BIT);
 		glViewport(0, 0, width_, height_);

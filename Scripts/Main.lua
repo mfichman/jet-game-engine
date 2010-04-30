@@ -1,12 +1,6 @@
 require 'Test'
 
 
-local material = engine:material("Plane") {
-    diffuse_color = Color(1, 1, 1, 1),
-    --diffuse_map = "MetalDiffuse.png",
-    normal_map = "LinesNormal.png"
-}
-
 --ocal mesh = engine:mesh("plane")
 
 --[[

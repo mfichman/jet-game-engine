@@ -213,6 +213,10 @@ private:
         particle_.resize(quota_);
     }
     
+    void init_particle_box(Particle& p);
+    void init_particle_ellipsoid(Particle& p);
+    void init_particle_point(Particle& p);
+    
     Engine* engine_;
     Node* parent_;
     Range life_;

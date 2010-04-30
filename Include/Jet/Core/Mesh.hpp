@@ -26,6 +26,7 @@
 #include <Jet/Vertex.hpp>
 #include <Jet/BoundingBox.hpp>
 #include <vector>
+#include <map>
 #include <iostream>
 #include <Bullet/btBulletDynamicsCommon.h>
 #include <Bullet/btBulletCollisionCommon.h>
@@ -148,13 +149,23 @@ public:
 	void state(ResourceState state);
 	
 	//! Renders this mesh
-	void render(Shader* shader);
+	inline void render(Shader* shader) {
+		render(shader, ibuffer_, nindices_);
+	}
+	
+	//! Renders this mesh using an ibuffer subset.
+	//! @param shader the shader to use
+	//! @param ibuffer an OpenGL index buffer that is a subset
+	//! of the index buffer attached to this mesh
+	//! @param nindices how many indices to render
+	void render(Shader* shader, uint32_t ibuffer, size_t nindices);
     
 private:
     Mesh(Engine* engine, const std::string& name);
 	
 	void read_mesh_data();
-	void compute_tangent(Vertex face[3], size_t j);
+	void init_hardware_buffers();
+	void update_collision_shape();
     
     Engine* engine_;
 	std::string name_;
@@ -165,7 +176,6 @@ private:
 	uint32_t ibuffer_;
 	uint32_t nindices_;
 	SyncMode sync_mode_;
-	btTriangleIndexVertexArray vertex_array_;
 	btConvexHullShape shape_;
 	btBoxShape bounding_shape_;
 	BoundingBox bounding_box_;

@@ -27,8 +27,10 @@
 #include <Jet/Quaternion.hpp>
 #include <Jet/Range.hpp>
 #include <Jet/Color.hpp>
+#include <Jet/Plane.hpp>
 #include <Jet/Node.hpp>
 #include <Jet/MeshObject.hpp>
+#include <Jet/FractureObject.hpp>
 #include <Jet/ParticleSystem.hpp>
 #include <Jet/QuadSet.hpp>
 #include <Jet/Camera.hpp>
@@ -96,9 +98,91 @@ Core::ScriptSystem::ScriptSystem(Engine* engine) :
     engine_(engine),
     env_(lua_open()) {
         
+    engine_->listener(this);
+        
+    // Open default libraries and Luabind
     luaL_openlibs(env_);
     luabind::open(env_);
     
+    // Load all Luabind bindings
+    init_value_type_bindings();
+    init_entity_type_bindings();
+    
+    // Add __adopt_actor function
+    lua_pushlightuserdata(env_, this);
+    lua_pushcclosure(env_, &ScriptSystem::adopt_actor, 1);
+    lua_setglobal(env_, "__adopt_actor");
+    
+    // Add __adopt_module function
+    lua_pushlightuserdata(env_, this);
+    lua_pushcclosure(env_, &ScriptSystem::adopt_module, 1);
+    lua_setglobal(env_, "__adopt_module");
+    
+    // Set a variable for the engine
+    luabind::globals(env_)["engine"] = static_cast<Jet::Engine*>(engine_);
+    
+	//! Load some utility functions related to the engine
+	string engine_path = engine_->resource_path("Engine.lua");
+    if (luaL_dofile(env_, engine_path.c_str())) {
+        string message(lua_tostring(env_, -1));
+        throw runtime_error("Could not load script: " + message);
+    }
+
+	//! Load the options file
+    string options_path = engine_->resource_path("Options.lua");
+    if (luaL_dofile(env_, options_path.c_str())) {
+        string message(lua_tostring(env_, -1));
+        throw runtime_error("Could not load script: " + message);
+    }
+}
+
+//! Destructor
+Core::ScriptSystem::~ScriptSystem() {
+    lua_close(env_);
+    
+}
+
+void Core::ScriptSystem::on_init() {
+    std::cout << "Initializing script system" << std::endl;
+
+    // Add all folders on the search path to the Lua module search path
+    string package_path = luabind::object_cast<string>(luabind::globals(env_)["package"]["path"]);
+    for (Iterator<const string> i = engine_->search_folders(); i; i++) {
+        package_path += ";" + *i + "/?.lua";
+    }
+    luabind::globals(env_)["package"]["path"] = package_path;
+    
+    //! Load the main file
+    string main_path = engine_->resource_path("Main.lua");
+    if (luaL_dofile(env_, main_path.c_str())) {
+        string message(lua_tostring(env_, -1));
+        throw runtime_error("Could not load script: " + message);
+    }
+}
+
+int Core::ScriptSystem::adopt_actor(lua_State* env) {
+    using namespace luabind;
+    
+    luabind::object ref = object(from_stack(env, 1));
+    Jet::Node* node = object_cast<Jet::Node*>(object(from_stack(env, 2)));
+    string name = lua_tostring(env, 3);
+    
+    ObjectPtr obj = new ScriptController(ref, node, name);
+    
+    return 0;
+}
+
+int Core::ScriptSystem::adopt_module(lua_State* env) {
+    using namespace luabind;
+    
+    ScriptSystem* self = static_cast<ScriptSystem*>(lua_touserdata(env, lua_upvalueindex(1)));
+    luabind::object ref = object(from_stack(env, -1));
+    self->engine_->module(new ScriptModule(ref));
+    
+    return 0;
+}
+
+void Core::ScriptSystem::init_value_type_bindings() {
     // Load Lua bindings for basic value types exported by the engine.
     // These types are enough to perform the majority of operations needed.
     // The rest of the Lua binding is through controllers, and the Node
@@ -168,6 +252,23 @@ Core::ScriptSystem::ScriptSystem(Engine* engine) :
             .def_readwrite("end", &Range::end)
             .def(luabind::tostring(luabind::const_self)),
             
+        luabind::class_<Plane>("Plane")
+            .def(luabind::constructor<>())
+            .def(luabind::constructor<const Vector&, const Vector&>())
+            .def(luabind::constructor<const Vector&, const Vector&, const Vector&>())
+            .def(luabind::constructor<real_t, real_t, real_t, real_t>())
+            .def_readwrite("a", &Plane::a)
+            .def_readwrite("b", &Plane::b)
+            .def_readwrite("c", &Plane::c)
+            .def_readwrite("d", &Plane::d)
+    ];
+}
+    
+    
+void Core::ScriptSystem::init_entity_type_bindings() {
+    
+    // Load value for entity types used by the engine
+    luabind::module(env_) [     
         luabind::class_<Jet::Light, Jet::LightPtr>("Light")
             .property("ambient_color", (const Color& (Jet::Light::*)() const)&Jet::Light::ambient_color, (void (Jet::Light::*)(const Color&))&Jet::Light::ambient_color)
             .property("diffuse_color", (const Color& (Jet::Light::*)() const)&Jet::Light::diffuse_color, (void (Jet::Light::*)(const Color&))&Jet::Light::diffuse_color)
@@ -206,6 +307,7 @@ Core::ScriptSystem::ScriptSystem(Engine* engine) :
             .def("rigid_body", &Jet::Node::rigid_body)
             .def("audio_source", &Jet::Node::audio_source)
             .def("camera", &Jet::Node::camera)
+            .def("fracture_object", &Jet::Node::fracture_object)
             .def("look", &Jet::Node::look),
             
         luabind::class_<Jet::MeshObject, Jet::MeshObjectPtr>("MeshObject")
@@ -216,6 +318,15 @@ Core::ScriptSystem::ScriptSystem(Engine* engine) :
             .def("shader_param", (void (Jet::MeshObject::*)(const std::string&, const boost::any&))&Jet::MeshObject::shader_param)
             .def("shader_param", (const boost::any& (Jet::MeshObject::*)(const std::string&))&Jet::MeshObject::shader_param),
     
+        luabind::class_<Jet::FractureObject, Jet::FractureObjectPtr>("FractureObject")
+            .property("parent", &Jet::FractureObject::parent)
+            .property("material", (Jet::Material* (Jet::FractureObject::*)() const)&Jet::FractureObject::material, (void (Jet::FractureObject::*)(const std::string&))&Jet::FractureObject::material)
+            .property("mesh", (Jet::Mesh* (Jet::FractureObject::*)() const)&Jet::FractureObject::mesh, (void (Jet::FractureObject::*)(const std::string&))&Jet::FractureObject::mesh)
+            .property("cast_shadows", (bool (Jet::FractureObject::*)() const)&Jet::FractureObject::cast_shadows, (void (Jet::FractureObject::*)(bool))&Jet::FractureObject::cast_shadows)
+            .property("seal_fractures", (bool (Jet::FractureObject::*)() const)&Jet::FractureObject::seal_fractures, (void (Jet::FractureObject::*)(bool))&Jet::FractureObject::seal_fractures)
+            .property("fracture_count", (size_t (Jet::FractureObject::*)() const)&Jet::FractureObject::fracture_count, (void (Jet::FractureObject::*)(size_t))&Jet::FractureObject::fracture_count)
+            .def("fracture", &Jet::FractureObject::fracture),
+            
         luabind::class_<Jet::ParticleSystem, Jet::ParticleSystemPtr>("ParticleSystem")
             .property("parent", &Jet::ParticleSystem::parent)
             .property("life", (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::life, (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::life)
@@ -245,7 +356,6 @@ Core::ScriptSystem::ScriptSystem(Engine* engine) :
             .def("search_folder", &Jet::Engine::search_folder)
             .def("mesh", &Jet::Engine::mesh)
             .def("material", &Jet::Engine::material)
-            .property("simulation_speed", (real_t (Jet::Engine::*)() const)&Jet::Engine::simulation_speed, (void (Jet::Engine::*)(real_t))&Jet::Engine::simulation_speed)
             .property("running", (bool (Jet::Engine::*)() const)&Jet::Engine::running, (void (Jet::Engine::*)(bool))&Jet::Engine::running),
             
         luabind::class_<Jet::Mesh, Jet::MeshPtr>("Mesh")
@@ -254,80 +364,4 @@ Core::ScriptSystem::ScriptSystem(Engine* engine) :
             
         
     ];
-    
-    lua_pushlightuserdata(env_, this);
-    lua_pushcclosure(env_, &ScriptSystem::adopt_actor, 1);
-    lua_setglobal(env_, "__adopt_actor");
-    
-    lua_pushlightuserdata(env_, this);
-    lua_pushcclosure(env_, &ScriptSystem::adopt_module, 1);
-    lua_setglobal(env_, "__adopt_module");
-    
-    luabind::globals(env_)["engine"] = static_cast<Jet::Engine*>(engine_);
-
-    string path;
-
-	//! Load builtins
-	path = engine_->resource_path("Engine.lua");
-    if (luaL_dofile(env_, path.c_str())) {
-        string message(lua_tostring(env_, -1));
-        throw runtime_error("Could not load script: " + message);
-    }
-
-	//! Load the main file
-    path = engine_->resource_path("Options.lua");
-    if (luaL_dofile(env_, path.c_str())) {
-        string message(lua_tostring(env_, -1));
-        throw runtime_error("Could not load script: " + message);
-    }
-}
-
-//! Destructor
-Core::ScriptSystem::~ScriptSystem() {
-    lua_close(env_);
-    
-}
-
-
-void Core::ScriptSystem::on_init() {
-    std::cout << "Initializing script system" << std::endl;
-
-    // Add all folders on the search path to the Lua module search path
-    string package_path = luabind::object_cast<string>(luabind::globals(env_)["package"]["path"]);
-    for (Iterator<const string> i = engine_->search_folders(); i; i++) {
-        package_path += ";" + *i + "/?.lua";
-    }
-    luabind::globals(env_)["package"]["path"] = package_path;
-    
-    //! Load the main file
-    string path = engine_->resource_path("Main.lua");
-    if (luaL_dofile(env_, path.c_str())) {
-        string message(lua_tostring(env_, -1));
-        throw runtime_error("Could not load script: " + message);
-    }
-}
-
-int Core::ScriptSystem::adopt_actor(lua_State* env) {
-    using namespace luabind;
-    
-    
-    luabind::object ref = object(from_stack(env, 1));
-    Jet::Node* node = object_cast<Jet::Node*>(object(from_stack(env, 2)));
-    string name = lua_tostring(env, 3);
-    
-    ObjectPtr obj = new ScriptController(ref, node, name);
-    
-    return 0;
-}
-
-int Core::ScriptSystem::adopt_module(lua_State* env) {
-    using namespace luabind;
-    
-    ScriptSystem* self = static_cast<ScriptSystem*>(lua_touserdata(env, lua_upvalueindex(1)));
-    
-    luabind::object ref = object(from_stack(env, -1));
-    
-    self->engine_->module(new ScriptModule(ref));
-    
-    return 0;
 }

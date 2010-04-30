@@ -65,24 +65,28 @@ Engine* Engine::create() {
 Core::Engine::Engine() :
     running_(true),
 	initialized_(false),
-	accumulator_(0),
-	simulation_speed_(1.0f) {
+	fps_frame_count_(0),
+	fps_elapsed_time_(0.0f) {
 		
 	cout << "Starting kernel..." << endl;
 		
+	// Add some default search folders
 	search_folder(".");
 	search_folder("..");
+	
+	// Default options
+	option("simulation_speed", 1.0f);
         
+	// Create the root node of the scene graph
     root_ = new Core::Node(this);
+	
+	// Create subsystems and register them
 	render_system_ = new RenderSystem(this);
 	script_system_ = new ScriptSystem(this);
 	physics_system_ = new PhysicsSystem(this);
+	input_system_ = new InputSystem(this);
 	
-    listener(render_system_.get());
-	listener(new InputSystem(this));
-	listener(physics_system_.get());
-	listener(script_system_.get());
-	
+	// Platform-dependent timer code
 #ifdef WINDOWS
 	::int64_t counts_per_sec = 0;
     QueryPerformanceFrequency((LARGE_INTEGER*)&counts_per_sec);
@@ -93,6 +97,7 @@ Core::Engine::Engine() :
 	prev_time_.tv_sec = 0;
 #endif
 
+	// Initialize SDL image library
 	IMG_Init(IMG_INIT_JPG|IMG_INIT_PNG);
 }
 
@@ -101,7 +106,7 @@ Core::Engine::~Engine() {
 		module_->on_destroy();
 	}
 
-
+	// Free the scene graph, the free all resources
 	root_.reset();
 	module_.reset();
 	mesh_.clear();
@@ -112,6 +117,7 @@ Core::Engine::~Engine() {
 	cout << "Shutting down" << endl;
 	listener_.clear();
 
+	// Quit the SDL image library
 	IMG_Quit();
 }
 
@@ -205,26 +211,11 @@ void Core::Engine::tick() {
 	}
 	
 	// Update the delta since the last tick
-    update_delta();
-    
-    // This is a rough calculation of the number of frames per second.
-	static int frames = 0;
-    static float elapsed = 0.0f;
-    elapsed += delta_;
-    frames++;
-    if (elapsed > 0.1f) {
-        cout << frames/elapsed << endl;
-        frames = 0;
-        elapsed = 0.0f;
-    }
+    update_frame_delta();
+	update_fps();
     
 	// Run the fixed-time step portion of the game by calling on_update when
 	physics_system_->step();
-
-	// Fire post-update event
-	for (list<EngineListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
-		(*i)->on_post_update();
-	}
     
     // Fire render event
     for (list<EngineListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
@@ -236,15 +227,26 @@ void Core::Engine::tick() {
 	}
 }
 
+void Core::Engine::update_fps() {
+	// This is a rough calculation of the number of frames per second.
+    fps_elapsed_time_ += frame_delta_;
+    fps_frame_count_++;
+    if (fps_elapsed_time_ > 0.1f) {
+        cout << fps_frame_count_/fps_elapsed_time_ << endl;
+        fps_frame_count_ = 0;
+        fps_elapsed_time_ = 0.0f;
+    }
+}
 
-void Core::Engine::update_delta() {
+
+void Core::Engine::update_frame_delta() {
 #ifdef WINDOWS
 	::int64_t current_time = 0;
     QueryPerformanceCounter((LARGE_INTEGER*)&current_time);
     if (!prev_time_) {
         prev_time_ = current_time;
     }
-    delta_ = (current_time - prev_time_) * secs_per_count_;
+    frame_delta_ = (current_time - prev_time_) * secs_per_count_;
     prev_time_ = current_time;
 #else
 	timeval current_time;
@@ -253,10 +255,10 @@ void Core::Engine::update_delta() {
 		prev_time_ = current_time;
 	}
 
-	time_t delta_sec = current_time.tv_sec - prev_time_.tv_sec;
-	long delta_usec = current_time.tv_usec - prev_time_.tv_usec;
+	time_t frame_delta_sec = current_time.tv_sec - prev_time_.tv_sec;
+	long frame_delta_usec = current_time.tv_usec - prev_time_.tv_usec;
 
-	delta_ = (float)delta_sec + (float)delta_usec/1000000.0f;
+	frame_delta_ = (float)frame_delta_sec + (float)frame_delta_usec/1000000.0f;
 	prev_time_ = current_time;
 
 #endif

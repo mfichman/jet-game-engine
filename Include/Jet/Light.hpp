@@ -69,7 +69,8 @@ public:
     //! Sets the type of light.
     virtual void type(LightType type)=0;
     
-    //! True if the light should cast shadows.
+    //! True if the light should cast shadows.  Note that current versions of
+    //! the engine only allow one light to cast shadows.
     virtual void cast_shadows(bool cast_shadows)=0;
 };
 

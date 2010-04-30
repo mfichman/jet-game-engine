@@ -18,53 +18,44 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- */  
-#pragma once
+ */
 
-#include <Jet/Types.hpp>
-#include <Jet/Vector.hpp>
+#include <Jet/Plane.hpp>
 
-namespace Jet {
+using namespace Jet;
 
-//! Represents a 3-component texcoord.
-//! @class Texcoord
-//! @brief 3-component texcoord.
-class BoundingBox {
-public:
-    //! Creates a zero-size bounding box.
-    BoundingBox();
+Plane::Plane() :
+    a(0.0f),
+    b(1.0f),
+    c(0.0f),
+    d(0.0f) {
     
-    //! Creates a bounding box from a frustum.
-    //! @param frustum the frustum to get the bounding box for.
-    BoundingBox(const Frustum& frustum);
+}
 
-    //! Returns the width of the box
-    real_t width() const;
+Plane::Plane(const Vector& normal, const Vector& point) :
+    a(normal.x),
+    b(normal.y),
+    c(normal.z),
+    d(-normal.dot(point)) {
     
-    //! Returns the height of the box
-    real_t height() const;
-    
-    //! Returns the depth of the box
-    real_t depth() const;
-    
-    //! Returns the volume of the box.
-    real_t volume() const;
-    
-    //! Returns the half-extents of the box
-    Vector half_extents() const;
-    
-    //! Returns the origin of the box
-    Vector origin() const;
-    
-    //! Adds a point to the box, expanding it if necessary.
-    void point(const Vector& point);
+}
 
-    real_t min_x;
-    real_t max_x;
-    real_t min_y;
-    real_t max_y;
-    real_t min_z;
-    real_t max_z;
-};
+Plane::Plane(const Vector& p1, const Vector& p2, const Vector& p3) {
+    Vector normal = (p2 - p1).cross(p3 - p1);
+    a = normal.x;
+    b = normal.y;
+    c = normal.z;
+    d = -normal.dot(p1);
+}
 
+Plane::Plane(real_t a, real_t b, real_t c, real_t d) :
+    a(a),
+    b(b),
+    c(c),
+    d(d) {
+    
+}
+
+real_t Plane::distance(const Vector& vector) const {
+    return (a*vector.x + b*vector.y + c*vector.z + d)/sqrtf(a*a + b*b + c*c);
 }

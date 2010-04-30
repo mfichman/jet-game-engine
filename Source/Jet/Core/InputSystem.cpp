@@ -33,6 +33,7 @@ using namespace boost;
 Core::InputSystem::InputSystem(Engine* engine) :
     engine_(engine){
 
+    engine_->listener(this);
 }
 
 Core::InputSystem::~InputSystem() {
@@ -44,7 +45,6 @@ void Core::InputSystem::on_init() {
 }
 
 void Core::InputSystem::on_update() {
-    SDL_EnableUNICODE(true);
     SDL_Event evt;
     while(SDL_PollEvent(&evt)) {
         switch (evt.type) {

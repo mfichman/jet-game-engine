@@ -85,10 +85,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Source\Jet\Core\RenderSystem.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\Source\Jet\Core\RenderTarget.cpp"
 				>
 			</File>
@@ -123,11 +119,11 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\Include\Jet\AudioSource.hpp"
+				RelativePath="..\Include\Jet\Core\AudioSource.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Core\AudioSource.hpp"
+				RelativePath="..\Include\Jet\AudioSource.hpp"
 				>
 			</File>
 			<File
@@ -135,11 +131,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Camera.hpp"
+				RelativePath="..\Include\Jet\Core\Camera.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Core\Camera.hpp"
+				RelativePath="..\Include\Jet\Camera.hpp"
 				>
 			</File>
 			<File
@@ -147,11 +143,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Include\Jet\Engine.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\Include\Jet\Core\Engine.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Engine.hpp"
+				RelativePath="..\Include\Jet\Core\FractureObject.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Include\Jet\FractureObject.hpp"
 				>
 			</File>
 			<File
@@ -159,11 +163,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Iterator.hpp"
+				RelativePath="..\Include\Jet\Core\InputSystem.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Core\Light.hpp"
+				RelativePath="..\Include\Jet\Iterator.hpp"
 				>
 			</File>
 			<File
@@ -171,11 +175,19 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Core\Material.hpp"
+				RelativePath="..\Include\Jet\Core\Light.hpp"
 				>
 			</File>
 			<File
 				RelativePath="..\Include\Jet\Material.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Include\Jet\Core\Material.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Include\Jet\Core\MaterialLoader.hpp"
 				>
 			</File>
 			<File
@@ -191,11 +203,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Core\MeshObject.hpp"
+				RelativePath="..\Include\Jet\Core\MeshLoader.hpp"
 				>
 			</File>
 			<File
 				RelativePath="..\Include\Jet\MeshObject.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Include\Jet\Core\MeshObject.hpp"
 				>
 			</File>
 			<File
@@ -219,6 +235,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Include\Jet\Core\ParticleBuffer.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\Include\Jet\Core\ParticleSystem.hpp"
 				>
 			</File>
@@ -227,11 +247,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Quad.hpp"
+				RelativePath="..\Include\Jet\Core\PhysicsSystem.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\QuadChain.hpp"
+				RelativePath="..\Include\Jet\Plane.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Include\Jet\Quad.hpp"
 				>
 			</File>
 			<File
@@ -239,11 +263,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\QuadSet.hpp"
+				RelativePath="..\Include\Jet\QuadChain.hpp"
 				>
 			</File>
 			<File
 				RelativePath="..\Include\Jet\Core\QuadSet.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Include\Jet\QuadSet.hpp"
 				>
 			</File>
 			<File
@@ -252,6 +280,10 @@
 			</File>
 			<File
 				RelativePath="..\Include\Jet\Range.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Jet\Core\RenderSystem.cpp"
 				>
 			</File>
 			<File
@@ -283,11 +315,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Core\Shader.hpp"
+				RelativePath="..\Include\Jet\Shader.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Shader.hpp"
+				RelativePath="..\Include\Jet\Core\Shader.hpp"
 				>
 			</File>
 			<File
@@ -303,11 +335,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Core\Types.hpp"
+				RelativePath="..\Include\Jet\Types.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Types.hpp"
+				RelativePath="..\Include\Jet\Core\Types.hpp"
 				>
 			</File>
 			<File

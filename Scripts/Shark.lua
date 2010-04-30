@@ -20,14 +20,14 @@
 
 require 'Actor'
 
-class 'Starship' (Actor)
+class 'Shark' (Actor)
 
-function Starship:__init(node, name)
+function Shark:__init(node, name)
     Actor.__init(self, node, name)
 
     self.mesh = self.node:mesh_object("mesh") {
         mesh = "Shark.obj",
-        material = "Metal.mtl"
+        material = "Shark.mtl"
     }
     
     self.body = self.node:rigid_body()

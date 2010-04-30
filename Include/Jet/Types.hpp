@@ -52,6 +52,7 @@ namespace Jet {
     class Color;
     class Engine;
     class EngineListener;
+    class FractureObject;
     class Frustum;
     class Light;
     class Matrix;
@@ -64,6 +65,7 @@ namespace Jet {
     class Object;
     class Particle;
     class ParticleSystem;
+    class Plane;
     class Quad;
     class QuadChain;
     class QuadSet;
@@ -80,6 +82,7 @@ namespace Jet {
     typedef boost::intrusive_ptr<Camera> CameraPtr;
     typedef boost::intrusive_ptr<Engine> EnginePtr;
     typedef boost::intrusive_ptr<EngineListener> EngineListenerPtr;
+    typedef boost::intrusive_ptr<FractureObject> FractureObjectPtr;
     typedef boost::intrusive_ptr<Light> LightPtr;
     typedef boost::intrusive_ptr<Material> MaterialPtr;
     typedef boost::intrusive_ptr<Mesh> MeshPtr;

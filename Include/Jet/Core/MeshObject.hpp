@@ -42,7 +42,7 @@ public:
     virtual ~MeshObject() {}
     
     //! Returns the parent of this object.
-    Node* parent() const {
+    inline Node* parent() const {
         return parent_;
     }
     
@@ -63,7 +63,7 @@ public:
     
     //! Returns the shader parameter at the given location.
     //! @param name the param name
-    const boost::any& shader_param(const std::string& name) {
+    inline const boost::any& shader_param(const std::string& name) {
         return shader_param_[name];
     }
     

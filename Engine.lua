@@ -52,6 +52,11 @@ function Node:mesh_object(name)
     return table_syntax(node_mesh_object(self, name))
 end
 
+local node_fracture_object = engine.root.fracture_object;
+function Node:fracture_object(name)
+    return table_syntax(node_fracture_object(self, name))
+end
+
 local node_light = engine.root.light;
 function Node:light(name)
     return table_syntax(node_light(self, name))

@@ -28,6 +28,8 @@ namespace Jet { namespace Core {
     class AudioSource;
     class Camera;
     class Engine;
+    class FractureObject;
+    class InputSystem;
     class Light;
     class Material;
     class Mesh;
@@ -50,6 +52,8 @@ namespace Jet { namespace Core {
     typedef boost::intrusive_ptr<AudioSource> AudioSourcePtr;
     typedef boost::intrusive_ptr<Camera> CameraPtr;
     typedef boost::intrusive_ptr<Engine> EnginePtr;
+    typedef boost::intrusive_ptr<FractureObject> FractureObjectPtr;
+    typedef boost::intrusive_ptr<InputSystem> InputSystemPtr;
     typedef boost::intrusive_ptr<Light> LightPtr;
     typedef boost::intrusive_ptr<Material> MaterialPtr;
     typedef boost::intrusive_ptr<Mesh> MeshPtr;
@@ -74,5 +78,10 @@ namespace Jet { namespace Core {
         SPECULAR_MAP_SAMPLER = 1,
         NORMAL_MAP_SAMPLER = 2,
         SHADOW_MAP_SAMPLER = 3
+    };
+    
+    enum RenderPass {
+        SHADOW_PASS,
+        MAIN_PASS
     };
 }}

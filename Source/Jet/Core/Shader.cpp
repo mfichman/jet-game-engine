@@ -56,43 +56,7 @@ void Core::Shader::state(ResourceState state) {
 	
 	// Entering the SYNCED state
 	if (SYNCED == state) {
-		const GLchar* source;
-		
-		// Load vertex shader
-		source = &fsource_.front();
-		fshader_ = glCreateShader(GL_FRAGMENT_SHADER);
-		glShaderSource(fshader_, 1, &source, 0);
-		glCompileShader(fshader_);
-		
-		// Load fragment shader
-		source = &vsource_.front();
-		vshader_ = glCreateShader(GL_VERTEX_SHADER);
-		glShaderSource(vshader_, 1, &source, 0);
-		glCompileShader(vshader_);
-		
-		// Create the vertex program
-		program_ = glCreateProgram();
-		glAttachShader(program_, fshader_);
-		glAttachShader(program_, vshader_);
-		glLinkProgram(program_);
-		
-		// Check for errors
-		GLchar log[1024];
-		GLsizei length;
-		
-		// Fragment shader errors
-		glGetShaderInfoLog(fshader_, 1024, &length, log);
-		if (length) {
-			throw runtime_error("Fragment shader log: " + string(log, length));
-		}
-		
-		// Vertex shader errors
-		glGetShaderInfoLog(vshader_, 1024, &length, log);
-		if (length) {
-			throw runtime_error("Vertex shader log: " + string(log, length));
-		}
-		
-		tangent_attrib_ = glGetAttribLocation(program_, "tangent_in");
+		init_program();
 	}
 	
 	// Leaving the SYNCED state
@@ -114,6 +78,45 @@ void Core::Shader::state(ResourceState state) {
 	}
 	
 	state_ = state;
+}
+
+void Core::Shader::init_program() {
+	
+	// Load vertex shader
+	const GLchar* source = &fsource_.front();
+	fshader_ = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fshader_, 1, &source, 0);
+	glCompileShader(fshader_);
+	
+	// Load fragment shader
+	source = &vsource_.front();
+	vshader_ = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vshader_, 1, &source, 0);
+	glCompileShader(vshader_);
+	
+	// Create the vertex program
+	program_ = glCreateProgram();
+	glAttachShader(program_, fshader_);
+	glAttachShader(program_, vshader_);
+	glLinkProgram(program_);
+	
+	// Check for errors
+	GLchar log[1024];
+	GLsizei length;
+	
+	// Fragment shader errors
+	glGetShaderInfoLog(fshader_, 1024, &length, log);
+	if (length) {
+		throw runtime_error("Fragment shader log: " + string(log, length));
+	}
+	
+	// Vertex shader errors
+	glGetShaderInfoLog(vshader_, 1024, &length, log);
+	if (length) {
+		throw runtime_error("Vertex shader log: " + string(log, length));
+	}
+	
+	tangent_attrib_ = glGetAttribLocation(program_, "tangent_in");
 }
 
 void Core::Shader::read_source(const string& path, vector<char>& source) {
@@ -152,4 +155,8 @@ void Core::Shader::enabled(bool enabled) {
 	}
 	
 	enabled_ = enabled;
+}
+
+int32_t Core::Shader::uniform_location(const std::string& name) const {
+	return glGetUniformLocation(program_, name.c_str());
 }

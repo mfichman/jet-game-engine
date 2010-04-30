@@ -60,7 +60,16 @@ public:
     }
     
     //! Returns the viewing frustum
-    Frustum frustum() const;
+    inline Frustum view_frustum() const {
+        return compute_frustum(far_clipping_distance());
+    }
+    
+    //! Returns the shadow frustum
+    inline Frustum shadow_frustum() const {
+        real_t shadow_distance = engine_->option<real_t>("shadow_distance");
+        real_t far_distance = min(shadow_distance, far_clipping_distance());
+        return compute_frustum(far_distance);
+    }
     
     //! Sets the field of view
     inline void field_of_view(real_t fov) {
@@ -91,6 +100,8 @@ private:
         far_clipping_distance_(1000.0f) {
             
     }
+    
+    Frustum compute_frustum(real_t far_distance) const;
     
     Engine* engine_;
     Node* parent_;

@@ -46,6 +46,18 @@ public:
     
     //! Returns the node's current position.
     virtual const Vector& position() const=0;
+	
+	//! Returns the world position of the node (as of the last time it moved).
+	//! Note that this is updated once per frame, at the beginning of the
+	//! frame, and changing the position attribute will not immediately
+	//! affect the world position of the node.
+	virtual const Vector& world_position() const=0;
+	
+	//! Returns the world rotation of the node (as of the last time it moved).
+	//! Note that this is updated once per frame, at the beginning of the
+	//! frame, and changing the rotation attribute will not immedately
+	//! affect the world rotation of the node.
+	virtual const Quaternion& world_rotation() const=0;
     
     //! Creates a new node at the given index.  The position and rotation of
     //! the new node will be relative to this node.
@@ -53,33 +65,32 @@ public:
     //! parameter is zero then the object will be created at any free location
     virtual Node* node(const std::string& name)=0;
     
-    //! Creates a new model at the given index.  Models are used for rendering
+    //! Creates a new model.  Models are used for rendering
     //! static meshes with a material.
-    //! @param index the index where the new object will be placed; if this
-    //! parameter is zero then the object will be created at any free location
+	//! @param name the name of the new object
     virtual MeshObject* mesh_object(const std::string& name)=0;
+	
+	//! Creates a new fracturable model.
+	//! @param name the name of the new fracturable model
+	virtual FractureObject* fracture_object(const std::string& name)=0;
     
     //! Creates a new particle system at the given index.  Particle systems are
     //! used for fire, water, and other affects.
-    //! @param index the index where the new object will be placed; if this
-    //! parameter is zero then the object will be created at any free location
+	//! @param name the name of the new object
     virtual ParticleSystem* particle_system(const std::string& name)=0;
     
-    //! Creates a textured quad at the given index.  Textured quads can be used
+    //! Creates a textured quad.  Textured quads can be used
     //! for billboards.
-    //! @param index the index where the new object will be placed; if this
-    //! parameter is zero then the object will be created at any free location
+	//! @param name the name of the new object
     virtual QuadSet* quad_set(const std::string& name)=0;
     
-    //! Creates a quad chain at the given index.  Quad chains can be used for
+    //! Creates a quad chain.  Quad chains can be used for
     //! path effects, like tracers or condensation trails.
-    //! @param index the index where the new object will be placed; if this
-    //! parameter is zero then the object will be created at any free location
+	//! @param name the name of the new object
     virtual QuadChain* quad_chain(const std::string& name)=0;
     
-    //! Creates a light and attaches it at the given index.
-    //! @param index the index where the new object will be placed; if this
-    //! parameter is zero then the object will be created at any free location
+    //! Creates a light.
+	//! @param name the name of the new object
     virtual Light* light(const std::string& name)=0;
     
     //! Returns the rigid body attached to this node.

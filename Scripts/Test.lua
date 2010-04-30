@@ -19,7 +19,8 @@
 -- IN THE SOFTWARE.
 
 require 'Module'
-require 'Starship'
+require 'Shark'
+require 'Dagger'
 require 'Monkey'
 require 'Rock'
 require 'Box'
@@ -44,7 +45,7 @@ function Test:__init()
     -- Set up the camera
     print("Creating camera")
     self.camera_node = engine.root:node("camera")
-    self.camera_node.position = Vector(20, 0, 20)
+    self.camera_node.position = Vector(30, 0, 30)
     self.camera_node:look(Vector(0, 0, 0), Vector(0, 1, 0))
     self.camera = self.camera_node:camera() {
         active = true,
@@ -65,38 +66,38 @@ function Test:__init()
     
     -- Set up scene objects and apply some forces
     print("Creating objects")
-    self.s0 = Starship(engine.root, "s0")
-    self.s1 = Rock(engine.root, "s1")
+    self.s0 = Shark(engine.root, "s0")
+    self.s1 = Dagger(engine.root, "s1")
+    self.s1.node.position = Vector(-5, -5, 5)
     
     --self.s1.node.position = Vector(0, 0, 0)
     --self.s0.node.position = Vector(0, -10, 0)
     ---self.s0.body:apply_force(Vector(-15000, 30000, 0))
-    
+    math.randomseed(os.time())
 end
 
 function Test:on_destroy()
     print("Goodbye")
 end
 
-time = 0.
 function Test:on_update()
-    --self.plane_node.rotation = Quaternion(Vector(0, 1, 0), time)
-    time = time + 0.01
 end
 
 
 function Test:on_key_pressed(key, x, y)
-    
+
     if (key == 'q') then
         engine.running = false
     elseif (key == 's') then
-        engine.simulation_speed = 1.0/4.0
+        engine:option("simulation_speed", 1.0/4.0)
     elseif (key == 'r') then
+    
         self.s1.node.position = Vector(5, 0, 0)
         self.s1.body.linear_velocity = Vector(0, 0, 0)
-        self.s0.node.position = Vector(0, 5, 0)
+        self.s0.node.position = Vector(5, 0, 0)
         self.s0.body.linear_velocity = Vector(0, 0, 0)
-        self.s0.body:apply_force(Vector(1500, -3000, -1000))
+        self.s0.body:apply_force(Vector(1500, 0, 0))
+        self.s0.body:apply_torque(Vector(100, 0, 0))
     elseif (key == 'n') then
         engine:option("normal_mapping_enabled", not engine:option("normal_mapping_enabled"))
     elseif (key == 'p') then
@@ -105,14 +106,14 @@ function Test:on_key_pressed(key, x, y)
         engine:option("shadows_enabled", not engine:option("shadows_enabled"))
     elseif (key == 'm') then
     
-        if (engine:option("fullscreen")) then
+        if (engine:option("fullscreen_enabled")) then
             engine:option("display_width", 1024)
             engine:option("display_height", 768)
-            engine:option("fullscreen", false)
+            engine:option("fullscreen_enabled", false)
         else
             engine:option("display_width", 1680)
             engine:option("display_height", 1050)
-            engine:option("fullscreen", true)
+            engine:option("fullscreen_enabled", true)
         end
         
         engine:option("video_mode_synced", false)
@@ -120,5 +121,15 @@ function Test:on_key_pressed(key, x, y)
         self.plane.material.shader = "Default"
     elseif (key == 'y') then
         self.plane.material.shader = "Default2"
+    elseif (key == 'a') then
+        engine:option("fsaa_enabled", not engine:option("fsaa_enabled"));
+        engine:option("video_mode_synced", false)
+    elseif (key == 'f') then
+   
+        local n = Vector(math.random()*2-1, math.random()*2-1, math.random()*2-1)
+        self.s1.mesh:fracture(Plane(n.unit, Vector(0, 0.0, 0)))
+        local n = Vector(math.random()*2-1, math.random()*2-1, math.random()*2-1)
+        self.s1.mesh:fracture(Plane(n.unit, Vector(0, 0.0, 0)))
+        
     end
 end

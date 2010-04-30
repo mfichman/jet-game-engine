@@ -23,6 +23,7 @@
 
 #include <Jet/Types.hpp>
 #include <Jet/Vector.hpp>
+#include <Jet/Quaternion.hpp>
 #include <Jet/Frustum.hpp>
 
 namespace Jet {
@@ -69,6 +70,15 @@ public:
     //! Returns the inverse of this matrix.
     Matrix inverse() const;
     
+    //! Multiplies two matrices.
+    Matrix operator*(const Matrix& other) const;
+    
+    //! Transforms a vector.
+    Vector operator*(const Vector& other) const;
+    
+    //! Transforms the view frustum.
+    Frustum operator*(const Frustum& other) const;
+    
     //! Returns a pointer to the matrix data.
     inline operator const real_t*() const {
         return data;
@@ -83,43 +93,39 @@ public:
     inline real_t& operator[](const size_t& i) {
         return data[i];
     }
-    
-    //! Multiplies two matrices.
-    Matrix operator*(const Matrix& other) const;
-    
-    //! Transforms a vector.
-    Vector operator*(const Vector& other) const;
-    
-    //! Transforms the view frustum.
-    Frustum operator*(const Frustum& other) const;
+
     
     //! Returns the forward vector (i.e., along the positive z-axis)
-    Vector forward() const {
-        /*
-        0  4  8  12
-        1  5  9  13
-        2  6  10 14
-        3  7  11 15
-        */
-        // (0, 2) (1, 2) (2, 2)
+    inline Vector forward() const {
         return Vector(data[8], data[9], data[10]);
     }
     
     //! Returns the right vector (i.e., along the positive x-axis)
-    Vector right() const {
+    inline Vector right() const {
         return Vector(data[0], data[1], data[2]);
     }
     
     //! Returns the left vector (i.e., along the positive y-axis)
-    Vector up() const {
+    inline Vector up() const {
         return Vector(data[4], data[5], data[6]);
     }
     
     //! Returns the origin of the matrix translation
-    Vector origin() const {
+    inline Vector origin() const {
         return Vector(data[12], data[13], data[14]);
     }
     
+    //! Returns the rotation part of the matrix
+    inline Quaternion rotation() const {
+        return Quaternion(right(), up(), forward());
+    }
+    
+    /* Matrix layout:
+     * 0  4  8  12
+     * 1  5  9  13
+     * 2  6  10 14
+     * 3  7  11 15
+    */
     real_t data[16];
 };
     

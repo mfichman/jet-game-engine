@@ -50,21 +50,19 @@ public:
 		return enabled_;
 	}
 	
-	//! Returns the tangent attribute
-	inline int32_t tangent_attrib() const {
-		return tangent_attrib_;
-	}
-	
-	//! Returns the shader program
-	inline uint32_t program() const {
-		return program_;
-	}
-	
 	//! Returns the resource state of the shader
 	void state(ResourceState state);
 	
 	//! Turns this shader on or off
 	void enabled(bool enabled);
+		
+	//! Returns the tangent attribute
+	inline int32_t tangent_attrib() const {
+		return tangent_attrib_;
+	}
+	
+	//! Returns the uniform location of the given parameter.
+	int32_t uniform_location(const std::string& name) const;
     
 private:
     //! Creates a shader.
@@ -79,20 +77,17 @@ private:
 		tangent_attrib_(-1) {
 	}
 	
+	void init_program();
 	void read_source(const std::string& path, std::vector<char>& source);
 	
     Engine* engine_;
     std::string name_;
     ResourceState state_;
-	
 	uint32_t vshader_;
 	uint32_t fshader_;
 	uint32_t program_;
-	
 	bool enabled_;
-	
 	int32_t tangent_attrib_;
-	
 	std::vector<char> vsource_;
 	std::vector<char> fsource_;
     

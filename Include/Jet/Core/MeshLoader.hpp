@@ -21,50 +21,37 @@
  */  
 #pragma once
 
-#include <Jet/Types.hpp>
-#include <Jet/Vector.hpp>
+#include <Jet/Core/Types.hpp>
+#include <Jet/Core/Mesh.hpp>
+#include <vector>
+#include <map>
+#include <fstream>
 
-namespace Jet {
+namespace Jet { namespace Core {
 
-//! Represents a 3-component texcoord.
-//! @class Texcoord
-//! @brief 3-component texcoord.
-class BoundingBox {
+//! Loads mesh data from an OBJ file.
+//! @class Mesh
+//! @brief Loads mesh data from an OBJ file.
+class MeshLoader : public Object {
 public:
-    //! Creates a zero-size bounding box.
-    BoundingBox();
+    //! Creates a new mesh loader for the given mesh, and loads data into
+    //! that mesh.
+    //! @param mesh the mesh to loader
+    //! @param file path to the file to be loaded
+    MeshLoader(Mesh* mesh, const std::string& path);
     
-    //! Creates a bounding box from a frustum.
-    //! @param frustum the frustum to get the bounding box for.
-    BoundingBox(const Frustum& frustum);
-
-    //! Returns the width of the box
-    real_t width() const;
+private:
+	void read_face();
+	void insert_face(Vertex face[3]);
+	void compute_tangent(Vertex face[3], size_t j);
     
-    //! Returns the height of the box
-    real_t height() const;
-    
-    //! Returns the depth of the box
-    real_t depth() const;
-    
-    //! Returns the volume of the box.
-    real_t volume() const;
-    
-    //! Returns the half-extents of the box
-    Vector half_extents() const;
-    
-    //! Returns the origin of the box
-    Vector origin() const;
-    
-    //! Adds a point to the box, expanding it if necessary.
-    void point(const Vector& point);
-
-    real_t min_x;
-    real_t max_x;
-    real_t min_y;
-    real_t max_y;
-    real_t min_z;
-    real_t max_z;
+    MeshPtr mesh_;
+	std::map<Vertex, uint32_t> cache_;
+    std::ifstream in_;
+    std::string name_;
+    std::vector<Vector> position_;
+	std::vector<Vector> normal_;
+	std::vector<Texcoord> texcoord_;
 };
 
-}
+}}

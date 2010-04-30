@@ -24,8 +24,9 @@
 #include <Jet/Core/Types.hpp>
 #include <Jet/Core/Engine.hpp>
 #include <Jet/Core/RenderTarget.hpp>
-#include <Jet/MeshObject.hpp>
-#include <Jet/ParticleSystem.hpp>
+#include <Jet/Core/MeshObject.hpp>
+#include <Jet/Core/FractureObject.hpp>
+#include <Jet/Core/ParticleSystem.hpp>
 #include <vector>
 
 namespace Jet { namespace Core {
@@ -42,11 +43,15 @@ public:
 
     //! Destructor.
     virtual ~RenderSystem();
+    
+    //! Returns the current render pass
+    inline RenderPass render_pass() const {
+        return render_pass_;
+    }
 
 private:
     void on_init();
-    void on_update() {}
-    void on_post_update();
+    void on_update();
     void on_render();
     
     void init_default_states();
@@ -58,10 +63,15 @@ private:
     void generate_shadow_map(Light* light);
     void render_final(Light* light);
     void render_shadow_casters();
-    void render_visible_objects();
+    void render_visible_mesh_objects();
+    void render_visible_fracture_objects();
     void render_fullscreen_quad();
+    void push_modelview_matrix(const Matrix& matrix);
+    void pop_modelview_matrix();
+    void active_material(Material* material);
     
     static bool compare_mesh_objects(MeshObjectPtr o1, MeshObjectPtr o2);
+    static bool compare_fracture_objects(FractureObjectPtr o1, FractureObjectPtr o2);
     static bool compare_particle_systems(ParticleSystemPtr o1, ParticleSystemPtr o2);
     
     Engine* engine_;
@@ -74,7 +84,10 @@ private:
     RenderTargetPtr bloom_target2_;
     
     std::vector<MeshObjectPtr> mesh_objects_;
+    std::vector<FractureObjectPtr> fracture_objects_;
     std::vector<LightPtr> lights_;
+    Material* active_material_;
+    RenderPass render_pass_;
 };
 
 }}

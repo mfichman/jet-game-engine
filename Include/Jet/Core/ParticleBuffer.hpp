@@ -56,9 +56,10 @@ public:
     //! Sets the shader used by this particle buffer.
     void shader(Shader* shader);
     
-private:
-    
+    //! Flushes particles that are currently contained in the buffer
     void flush();
+    
+private:
     
     TexturePtr texture_;
     ShaderPtr shader_;

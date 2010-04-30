@@ -21,50 +21,22 @@
  */  
 #pragma once
 
-#include <Jet/Types.hpp>
-#include <Jet/Vector.hpp>
+#include <Jet/Core/Types.hpp>
+#include <Jet/Core/Material.hpp>
 
-namespace Jet {
+namespace Jet { namespace Core {
 
-//! Represents a 3-component texcoord.
-//! @class Texcoord
-//! @brief 3-component texcoord.
-class BoundingBox {
+//! Loads a material from a MTL file.
+//! @class MaterialLoader
+//! @brief Loads a material from a MTL file
+class MaterialLoader : public Jet::Object {
 public:
-    //! Creates a zero-size bounding box.
-    BoundingBox();
     
-    //! Creates a bounding box from a frustum.
-    //! @param frustum the frustum to get the bounding box for.
-    BoundingBox(const Frustum& frustum);
-
-    //! Returns the width of the box
-    real_t width() const;
-    
-    //! Returns the height of the box
-    real_t height() const;
-    
-    //! Returns the depth of the box
-    real_t depth() const;
-    
-    //! Returns the volume of the box.
-    real_t volume() const;
-    
-    //! Returns the half-extents of the box
-    Vector half_extents() const;
-    
-    //! Returns the origin of the box
-    Vector origin() const;
-    
-    //! Adds a point to the box, expanding it if necessary.
-    void point(const Vector& point);
-
-    real_t min_x;
-    real_t max_x;
-    real_t min_y;
-    real_t max_y;
-    real_t min_z;
-    real_t max_z;
+    //! Creates a new material loader that will load values in to the given
+    //! material.
+    //! @param material the material to load
+    //! @param path the path to the material file
+    MaterialLoader(Material* material, const std::string& path);
 };
 
-}
+}}

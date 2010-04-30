@@ -52,8 +52,11 @@ using namespace std;
 using namespace boost;
 
 Core::RenderSystem::RenderSystem(Engine* engine) :
-    engine_(engine) {
+    engine_(engine),
+	active_material_(0) {
 		
+	engine_->listener(this);	
+	
 	// Initialize SDL
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		throw runtime_error(string("SDL initialization failed: ") + SDL_GetError());
@@ -69,19 +72,31 @@ void Core::RenderSystem::init_window() {
     GLuint width = (GLuint)engine_->option<real_t>("display_width");
     GLuint height = (GLuint)engine_->option<real_t>("display_height");
     string title = engine_->option<string>("window_title");
-	bool fullscreen = engine_->option<bool>("fullscreen");
-	bool vsync = engine_->option<bool>("vsync");
+	bool fullscreen_enabled = engine_->option<bool>("fullscreen_enabled");
+	bool vsync_enabled = engine_->option<bool>("vsync_enabled");
+	bool fsaa_enabled = engine_->option<bool>("fsaa_enabled");
+	GLuint fsaa_samples = (GLuint)engine_->option<real_t>("fsaa_samples");
+	
+	if (fsaa_enabled) {
+		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, fsaa_samples);
+		glEnable(GL_MULTISAMPLE);
+	} else {
+		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
+		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
+		glDisable(GL_MULTISAMPLE);
+	}
 	
 	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
-	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, vsync);
+	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, vsync_enabled);
 	
 	uint32_t flags = SDL_OPENGL;
-	if (fullscreen) {
+	if (fullscreen_enabled) {
 		flags |= SDL_FULLSCREEN;
 	}
 	SDL_WM_SetCaption(title.c_str(), NULL);
@@ -192,18 +207,31 @@ void Core::RenderSystem::on_init() {
 	init_shadow_target();
 	
 	engine_->option("video_mode_synced", true);
-		//GLuint width = (GLuint)engine_->option<real_t>("display_width");
-		//GLuint height = (GLuint)engine_->option<real_t>("display_height");
+	//GLuint width = (GLuint)engine_->option<real_t>("display_width");
+	//GLuint height = (GLuint)engine_->option<real_t>("display_height");
     //color_target_.reset(new RenderTarget(width, height, false, 2));
 	//bloom_target1_.reset(new RenderTarget(width/8, height/8, false, 1));
 	//bloom_target2_.reset(new RenderTarget(width/8, height/8, false, 1));
+}
+
+void Core::RenderSystem::on_update() {
+		
+	// Clear the list of active mesh objects and lights
+	mesh_objects_.clear();
+	fracture_objects_.clear();
+	lights_.clear();
+	generate_render_list(static_cast<Core::Node*>(engine_->root()));
+	
+	// Sort the meshes by material
+	sort(mesh_objects_.begin(), mesh_objects_.end(), &RenderSystem::compare_mesh_objects);
+	sort(fracture_objects_.begin(), fracture_objects_.end(), &RenderSystem::compare_fracture_objects);
 }
 
 void Core::RenderSystem::on_render() {	
 	if (!engine_->camera()) {
 		return;
 	}
-	
+
 	// If the video mode has been marked as changed, then switch modes
 	if (!engine_->option<bool>("video_mode_synced")) {
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -252,18 +280,8 @@ void Core::RenderSystem::on_render() {
 	SDL_GL_SwapBuffers();
 }
 
-void Core::RenderSystem::on_post_update() {
-	mesh_objects_.clear();
-	lights_.clear();
-	
-	generate_render_list(static_cast<Core::Node*>(engine_->root()));
-	
-	// Sort the meshes by material
-	sort(mesh_objects_.begin(), mesh_objects_.end(), &RenderSystem::compare_mesh_objects);
-}
-
 void Core::RenderSystem::generate_shadow_map(Light* light) {    
-
+	render_pass_ = SHADOW_PASS;
 	Core::CameraPtr camera = static_cast<Core::Camera*>(engine_->camera());
 
 	
@@ -276,9 +294,7 @@ void Core::RenderSystem::generate_shadow_map(Light* light) {
 	
 	// Transform the view frustum into light space and calculate
 	// the bounding box 
-	Frustum frustum = camera->frustum();
-	frustum = matrix * frustum;
-	BoundingBox bounds(frustum);
+	BoundingBox bounds(matrix * camera->shadow_frustum());
 	
 	// Set up the projection matrix for the directional light
 	glMatrixMode(GL_PROJECTION);
@@ -319,6 +335,7 @@ void Core::RenderSystem::generate_shadow_map(Light* light) {
 }
 
 void Core::RenderSystem::render_final(Light* light) {
+	render_pass_ = MAIN_PASS;
    
 	Core::CameraPtr camera = static_cast<Core::Camera*>(engine_->camera());
 	Matrix matrix = camera->parent()->matrix();
@@ -362,7 +379,8 @@ void Core::RenderSystem::render_final(Light* light) {
     
     // Render to the back buffer.
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	render_visible_objects();
+	render_visible_mesh_objects();
+	render_visible_fracture_objects();
 	
 
 	/* TODO: Finish gaussian filter
@@ -398,15 +416,6 @@ void Core::RenderSystem::render_final(Light* light) {
 
 
 void Core::RenderSystem::generate_render_list(Core::Node* node) {
-	
-	// Calculate the transform for this node.
-	if (node->parent()) {
-		node->matrix(node->parent()->matrix() * Matrix(node->rotation(), node->position()));
-	} else {
-		node->matrix(Matrix(node->rotation(), node->position()));
-	}
-    
-	node->update();
 
 	// Iterate through all sub objects and add them to the appropriate
 	// render list as necessary
@@ -419,7 +428,12 @@ void Core::RenderSystem::generate_render_list(Core::Node* node) {
 			if (mesh_object->material() && mesh_object->mesh()) {
 				mesh_objects_.push_back(mesh_object);
 			}
-        } else if (typeid(Core::Light) == type) {
+        } else if (typeid(Core::FractureObject) == type) {
+			Core::FractureObject* fracture_object = static_cast<Core::FractureObject*>(i->get());
+			if (fracture_object->material() && fracture_object->mesh()) {
+				fracture_objects_.push_back(fracture_object);
+			}
+		} else if (typeid(Core::Light) == type) {
 			lights_.push_back(static_cast<Core::Light*>(i->get()));
 		}
     }
@@ -447,51 +461,106 @@ void Core::RenderSystem::render_shadow_casters() {
 			glPopMatrix();
 		}
 	}
+	
+	//glDisable(GL_CULL_FACE);
+	
+	// Render each visible mesh.  Only meshes block light;
+	// other geometry does not
+    for (vector<Core::FractureObjectPtr>::iterator i = fracture_objects_.begin(); i != fracture_objects_.end(); i++) {		
+		Core::FractureObjectPtr fracture_object = *i;
+		if (fracture_object->cast_shadows()) {
+
+			// Transform the modelview matrix using the node's transformation
+			// matrix
+			glMatrixMode(GL_MODELVIEW);
+			glPushMatrix();
+			glMultMatrixf(fracture_object->parent()->matrix());
+		
+			// Render the object with no materials/shaders for speed
+			fracture_object->render(0);
+		
+			// Pop the modelview matrix off the stack
+			glMatrixMode(GL_MODELVIEW);
+			glPopMatrix();
+		}
+	}
+	
+	//glEnable(GL_CULL_FACE);
 }
 
-void Core::RenderSystem::render_visible_objects() {
-    
-	Core::MaterialPtr material;
+void Core::RenderSystem::render_visible_mesh_objects() {
 	
 	// Render all MeshObjects
 	for (vector<Core::MeshObjectPtr>::iterator i = mesh_objects_.begin(); i != mesh_objects_.end(); i++) {
-		Core::MeshObjectPtr mesh_object = *i;
-		
-		// If the material is different from the current material, then disable
-		// the old material and enable the new material
-		if (mesh_object->material() != material) {
-			if (material) {
-				material->enabled(false);
-			}
-			material = mesh_object->material();
-			material->enabled(true);
-		}
-		
-		// Transform the modelview and texture matrices (for shadow mapping)
-		// using the node's transformation matrix
-        glMatrixMode(GL_MODELVIEW);
-        glPushMatrix();
-        glMultMatrixf(mesh_object->parent()->matrix());
-		glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_SAMPLER);
-		glMatrixMode(GL_TEXTURE);
-		glPushMatrix();
-		glMultMatrixf(mesh_object->parent()->matrix());
+		Core::MeshObject* mesh_object = i->get();
 		
 		// Enable the material and render the mesh
-		mesh_object->mesh()->render(material->shader());
-    
-		// Pop the modelview and texture matrices off the stack
-		glMatrixMode(GL_MODELVIEW);
-		glPopMatrix();
-		glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_SAMPLER);
-		glMatrixMode(GL_TEXTURE);
-		glPopMatrix();
+		active_material(mesh_object->material());
+		push_modelview_matrix(mesh_object->parent()->matrix());
+		mesh_object->mesh()->render(mesh_object->material()->shader());
+		pop_modelview_matrix();
+
 	}
 	
 	// Disable the last material
-	if (material) {
-		material->enabled(false);
+	active_material(0);
+}
+
+void Core::RenderSystem::render_visible_fracture_objects() {
+	
+	glDisable(GL_CULL_FACE);
+	
+	// Render all FractureObjects
+	for (vector<Core::FractureObjectPtr>::iterator i = fracture_objects_.begin(); i != fracture_objects_.end(); i++) {
+		Core::FractureObject* fracture_object = i->get();
+		
+		// Enable the material and render the mesh
+		active_material(fracture_object->material());
+		push_modelview_matrix(fracture_object->parent()->matrix());
+		fracture_object->render(fracture_object->material()->shader());
+		pop_modelview_matrix();
+
 	}
+	
+	glEnable(GL_CULL_FACE);
+	
+	// Disable the last material
+	active_material(0);
+}
+
+inline void Core::RenderSystem::active_material(Material* material) {
+	// If the material is different from the current material, then disable
+	// the old material and enable the new material
+	if (active_material_ != material) {
+		if (active_material_) {
+			active_material_->enabled(false);
+		}
+		active_material_ = material;
+		if (active_material_) {
+			active_material_->enabled(true);
+		}
+	}
+}
+
+inline void Core::RenderSystem::push_modelview_matrix(const Matrix& matrix) {
+	// Transform the modelview and texture matrices (for shadow mapping)
+	// using the node's transformation matrix
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glMultMatrixf(matrix);
+	glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_SAMPLER);
+	glMatrixMode(GL_TEXTURE);
+	glPushMatrix();
+	glMultMatrixf(matrix);
+}
+
+inline void Core::RenderSystem::pop_modelview_matrix() {
+	// Pop the modelview and texture matrices off the stack
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+	glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_SAMPLER);
+	glMatrixMode(GL_TEXTURE);
+	glPopMatrix();
 }
 
 void Core::RenderSystem::render_fullscreen_quad() {	
@@ -528,3 +597,6 @@ bool Core::RenderSystem::compare_mesh_objects(MeshObjectPtr o1, MeshObjectPtr o2
     return o1->material() < o2->material();
 }
 
+bool Core::RenderSystem::compare_fracture_objects(FractureObjectPtr o1, FractureObjectPtr o2) {
+    return o1->material() < o2->material();
+}

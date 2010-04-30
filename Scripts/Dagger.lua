@@ -20,14 +20,15 @@
 
 require 'Actor'
 
-class 'Box' (Actor)
+class 'Dagger' (Actor)
 
-function Box:__init(node, name)
+function Dagger:__init(node, name)
     Actor.__init(self, node, name)
 
-    self.mesh = self.node:mesh_object("mesh") {
-        mesh = "Box.obj",
-        material = "Dagger.mtl"
+    self.mesh = self.node:fracture_object("mesh") {
+        mesh = "Dagger.obj",
+        material = "Dagger.mtl",
+        fracture_count = 3
     }
     
     self.body = self.node:rigid_body()

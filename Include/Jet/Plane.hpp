@@ -26,45 +26,41 @@
 
 namespace Jet {
 
-//! Represents a 3-component texcoord.
-//! @class Texcoord
-//! @brief 3-component texcoord.
-class BoundingBox {
+//! Represents an infinite plane.
+//! @class Plane
+//! @brief An infinite plane
+class Plane {
 public:
-    //! Creates a zero-size bounding box.
-    BoundingBox();
+    //! Creates a plane with the normal vector (0, 1, 0) at the point (0, 0, 0)
+    Plane();
     
-    //! Creates a bounding box from a frustum.
-    //! @param frustum the frustum to get the bounding box for.
-    BoundingBox(const Frustum& frustum);
+    //! Creates a plane using the given normal vector and point.
+    //! @param normal the normal vector
+    //! @param point the point
+    Plane(const Vector& normal, const Vector& point);
+    
+    //! Creates a plane using three points.
+    Plane(const Vector& p1, const Vector& p2, const Vector& p3);
+    
+    //! Creates a plane from the plane equation coefficients.  They are used
+    //! in the following equation to form the plane:
+    //! ax + by + cz + d = 0
+    Plane(real_t a, real_t b, real_t c, real_t d);
+    
+    //! Returns the distance from the plane to the given vector.  If this value
+    //! is positive, then it is on the same side of the plane as the normal
+    //! vector.  Otherwise, it is on the opposite side.
+    //! @param vector the vector to test
+    real_t distance(const Vector& vector) const;
 
-    //! Returns the width of the box
-    real_t width() const;
-    
-    //! Returns the height of the box
-    real_t height() const;
-    
-    //! Returns the depth of the box
-    real_t depth() const;
-    
-    //! Returns the volume of the box.
-    real_t volume() const;
-    
-    //! Returns the half-extents of the box
-    Vector half_extents() const;
-    
-    //! Returns the origin of the box
-    Vector origin() const;
-    
-    //! Adds a point to the box, expanding it if necessary.
-    void point(const Vector& point);
-
-    real_t min_x;
-    real_t max_x;
-    real_t min_y;
-    real_t max_y;
-    real_t min_z;
-    real_t max_z;
+    /*
+     * The plane coefficients are used for the following equation:
+     * ax + by + cz + d = 0
+     */
+    real_t a;
+    real_t b;
+    real_t c;
+    real_t d;
 };
 
 }

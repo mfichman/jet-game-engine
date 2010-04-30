@@ -91,14 +91,9 @@ public:
 		return 1.0f/60.0f;
 	}
 	
-	//! The delta since the last physics step
-	inline real_t delta() const {
-		return delta_;
-	}
-	
-	//! Returns the simulation speed.
-	inline real_t simulation_speed() const {
-		return simulation_speed_;
+	//! The delta since the last render
+	inline real_t frame_delta() const {
+		return frame_delta_;
 	}
     
     //! Returns an engine option.  This method will return nil if the option
@@ -175,11 +170,6 @@ public:
         running_ = running;
     }
 	
-	//! Sets the simulation speed)
-	inline void simulation_speed(real_t speed) {
-		simulation_speed_ = speed;
-	}
-	
 	//! Sets the active camera.
 	inline void camera(Jet::Camera* camera) {
 		camera_ = camera;
@@ -214,6 +204,11 @@ public:
 	inline Iterator<std::pair<const std::string, Jet::ShaderPtr> > shaders() {
 		return Iterator<std::pair<const std::string, Jet::ShaderPtr> >(shader_.begin(), shader_.end());
 	}
+	
+	//! Returns an iterator to all listeners
+	inline Iterator<Jet::EngineListenerPtr> listeners() {
+		return Iterator<Jet::EngineListenerPtr>(listener_.begin(), listener_.end());
+	}
     
     //! Runs the engine through one complete loop.  Note that the engine may
     //! or may not actually do anything on a given loop, depending on the
@@ -236,36 +231,42 @@ public:
 	}
 
 private:
-	friend class PhysicsSystem;
+	
     std::string resolve_path(const std::string& path);
-    void update_delta();
+    void update_frame_delta();
+	void update_fps();
 	void init_systems();
 
-	
+	// Map containing engine options
 	std::map<std::string, boost::any> option_;
 
     Jet::NodePtr root_;
 	Jet::CameraPtr camera_;
 	Jet::ModulePtr module_;
 	
+	// Engine sub-systems
 	PhysicsSystemPtr physics_system_;
 	RenderSystemPtr render_system_;
 	ScriptSystemPtr script_system_;
+	InputSystemPtr input_system_;
     
+	// Resource descriptors
     std::map<std::string, Jet::MaterialPtr> material_;
     std::map<std::string, Jet::MeshPtr> mesh_;
     std::map<std::string, Jet::TexturePtr> texture_;
 	std::map<std::string, Jet::ShaderPtr> shader_;
-    
-    std::list<EngineListenerPtr> listener_;
     std::set<std::string> search_folder_;
     
+	// Listeners
+    std::list<EngineListenerPtr> listener_;
     
+    // Record-keeping values for timing statistics
     bool running_;
 	bool initialized_;
-    real_t accumulator_;
-    real_t delta_;
-	real_t simulation_speed_;
+    real_t frame_delta_;
+	unsigned fps_frame_count_;
+	real_t fps_elapsed_time_;
+	
 #ifdef WINDOWS
     float secs_per_count_;
     int64_t prev_time_;

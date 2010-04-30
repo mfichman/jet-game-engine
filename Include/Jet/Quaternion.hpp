@@ -51,6 +51,9 @@ public:
     //! @param y the y axis
     //! @param z the z axis
     Quaternion(const Vector& x, const Vector& y, const Vector& z);
+    
+    //! Creates a new quaternion.
+    Quaternion(const Matrix& matrix);
 
     //! Creates a new identity quaternion
     Quaternion();

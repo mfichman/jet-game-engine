@@ -70,6 +70,10 @@ public:
     //! @param index the index where the new object will be placed; if this
     //! parameter is zero then the object will be created at any free location
     Jet::MeshObject* mesh_object(const std::string& name);
+	
+	//! Creates a new fracturable model.
+	//! @param name the name of the new fracturable model
+	Jet::FractureObject* fracture_object(const std::string& name);
     
     //! Creates a new particle system at the given index.  Particle systems are
     //! used for fire, water, and other affects.
@@ -125,6 +129,23 @@ public:
         return position_;
     }
 	
+		
+	//! Returns the world position of the node (as of the last time it moved).
+	//! Note that this is updated once per frame, at the beginning of the
+	//! frame, and changing the position attribute will not immediately
+	//! affect the world position of the node.
+	inline const Vector& world_position() const {
+		return world_position_;
+	}
+	
+	//! Returns the world rotation of the node (as of the last time it moved).
+	//! Note that this is updated once per frame, at the beginning of the
+	//! frame, and changing the rotation attribute will not immedately
+	//! affect the world rotation of the node.
+	inline const Quaternion& world_rotation() const {
+		return world_rotation_;
+	}
+	
 	//! Returns the matrix for this node.
 	inline const Matrix& matrix() const {
 		return matrix_;
@@ -137,11 +158,6 @@ public:
 	//! Sets the rotation of the node.
     //! @param rotation the rotation of the node
 	void rotation(const Quaternion& rotation);
-	
-	//! Sets the matrix for this node.
-	inline void matrix(const Matrix& matrix) {
-		matrix_ = matrix;
-	}
     
     //! Adds a listener to this node.
     //! @param listener the node listener
@@ -171,6 +187,9 @@ public:
 	//! node has a rigid body attached.
 	void update();
 	
+	//! Called to update the transform of the node
+	void update_transform();
+	
 private:
     //! Creates a new node with no parent.
     //! @param engine the engine object
@@ -190,7 +209,8 @@ private:
 		parent_(parent),
 		rigid_body_(parent->rigid_body_),
 		shape_transform_(parent->shape_transform_),
-		destroyed_(false) {
+		destroyed_(false),
+		transform_dirty_(false) {
 	}
     
     //! Removes an object from this node.
@@ -210,6 +230,8 @@ private:
     Node* parent_;
     Vector position_;
     Quaternion rotation_;
+	Vector world_position_;
+	Quaternion world_rotation_;
 	Matrix matrix_;
     
     Jet::RigidBodyPtr rigid_body_;
@@ -219,6 +241,7 @@ private:
     std::vector<NodeListenerPtr> listener_;
 	btTransform shape_transform_;
     bool destroyed_;
+	bool transform_dirty_;
 
 	friend class Engine;
     friend class MeshObject;

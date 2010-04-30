@@ -43,8 +43,8 @@ static inline real_t rand_range2(const Range& range) {
 }
 
 void Core::ParticleSystem::render(Core::ParticleBuffer* buffer) {
-    time_ += engine_->delta();
-    accumulator_ += engine_->delta();
+    time_ += engine_->frame_delta();
+    accumulator_ += engine_->frame_delta();
     dead_particle_.clear();
     
     // Set the buffer's shader and pointer.  This may cause the
@@ -71,45 +71,58 @@ void Core::ParticleSystem::render(Core::ParticleBuffer* buffer) {
         
         // Set up initial parameters
         if (BOX_EMITTER == type_) {
-            real_t w = rand_range2(Range(0, 1));
-            real_t h = rand_range2(Range(0, 1));
-            real_t d = rand_range2(Range(0, 1));
-            p.initial_position.x = w * (width_.end - width_.begin);
-            p.initial_position.y = h * (height_.end - height_.begin);
-            p.initial_position.z = d * (depth_.end - depth_.begin);
-            
-            real_t speed = rand_range(emission_speed_);
-            p.velocity = Vector(w, h, d).unit() * speed;
+            init_particle_box(p);
             
         } else if (ELLIPSOID_EMITTER == type_) {
-            real_t phi = rand_range(Range(0.0f, PI));
-            real_t theta = rand_range(Range(0.0f, 2.0f*PI));
-            real_t a = rand_range(width_);
-            real_t b = rand_range(height_);
-            real_t c = rand_range(depth_);
-            p.initial_position.x = a * sinf(phi) * cosf(theta);
-            p.initial_position.y = b * sinf(phi) * sinf(theta);
-            p.initial_position.z = c * cosf(phi);
-            
-            real_t speed = rand_range(emission_speed_);
-            p.velocity.x = speed * sinf(phi) * cosf(theta);
-            p.velocity.y = speed * sinf(phi) * sinf(theta);
-            p.velocity.z = speed * cosf(phi);
+            init_particle_ellipsoid(p);
+
         } else if (POINT_EMITTER == type_) {
-            p.initial_position = Vector(0.0f, 0.0f, 0.0f);
-            
-            Vector forward = emission_direction_.unit();
-            Vector up = forward.orthogonal();
-            Vector right = forward.cross(up);
-            
-            real_t speed = rand_range(emission_speed_);
-            real_t beta = rand_range(Range(0.0f, 2.0f*PI));
-            real_t theta = PI / 180 * rand_range(emission_angle_);
-            Vector side = up * cosf(beta) + right * sinf(beta);
-            Vector direction = side * cosf(theta) + forward;
-            p.velocity = direction.unit() * speed;
+            init_particle_point(p);
         }
         
         accumulator_ -= emission_rate_;
     }
+}
+    
+void Core::ParticleSystem::init_particle_box(Particle& p) {
+    real_t w = rand_range2(Range(0, 1));
+    real_t h = rand_range2(Range(0, 1));
+    real_t d = rand_range2(Range(0, 1));
+    p.initial_position.x = w * (width_.end - width_.begin);
+    p.initial_position.y = h * (height_.end - height_.begin);
+    p.initial_position.z = d * (depth_.end - depth_.begin);
+    
+    real_t speed = rand_range(emission_speed_);
+    p.velocity = Vector(w, h, d).unit() * speed;
+}
+
+void Core::ParticleSystem::init_particle_ellipsoid(Particle& p) {
+    real_t phi = rand_range(Range(0.0f, PI));
+    real_t theta = rand_range(Range(0.0f, 2.0f*PI));
+    real_t a = rand_range(width_);
+    real_t b = rand_range(height_);
+    real_t c = rand_range(depth_);
+    p.initial_position.x = a * sinf(phi) * cosf(theta);
+    p.initial_position.y = b * sinf(phi) * sinf(theta);
+    p.initial_position.z = c * cosf(phi);
+    
+    real_t speed = rand_range(emission_speed_);
+    p.velocity.x = speed * sinf(phi) * cosf(theta);
+    p.velocity.y = speed * sinf(phi) * sinf(theta);
+    p.velocity.z = speed * cosf(phi);
+}
+
+void Core::ParticleSystem::init_particle_point(Particle& p) {
+    p.initial_position = Vector(0.0f, 0.0f, 0.0f);
+    
+    Vector forward = emission_direction_.unit();
+    Vector up = forward.orthogonal();
+    Vector right = forward.cross(up);
+    
+    real_t speed = rand_range(emission_speed_);
+    real_t beta = rand_range(Range(0.0f, 2.0f*PI));
+    real_t theta = PI / 180 * rand_range(emission_angle_);
+    Vector side = up * cosf(beta) + right * sinf(beta);
+    Vector direction = side * cosf(theta) + forward;
+    p.velocity = direction.unit() * speed;
 }
