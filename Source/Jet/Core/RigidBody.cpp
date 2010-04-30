@@ -41,6 +41,7 @@ Core::RigidBody::RigidBody(Engine* engine, Node* parent) :
     
     body_.reset(new btRigidBody(mass_, this, shape_.get()));
     body_->setUserPointer(this);
+    body_->setSleepingThresholds(0.3f, 0.1f);
     engine_->physics_system()->world()->addRigidBody(body_.get());
     
     update_collision_shapes();

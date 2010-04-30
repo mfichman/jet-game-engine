@@ -259,7 +259,17 @@ void Core::Node::render() {
 
 void Core::Node::update() {
 	
-	update_transform();
+	// Calculate the transform for this node if the transform is dirty.
+	if (transform_dirty_) {
+		
+		if (parent()) {
+			matrix_ = parent()->matrix() * Matrix(rotation_, position_);
+		} else {
+			matrix_ = Matrix(rotation_, position_);
+		}
+		world_position_ = matrix_.origin();
+		world_rotation_ = matrix_.rotation();
+	}
 	
 	// Update all child nodes, and their transforms
 	for (unordered_map<string, ObjectPtr>::iterator i = object_.begin(); i != object_.end(); i++) {
@@ -293,4 +303,18 @@ void Core::Node::update_transform() {
 		world_position_ = matrix_.origin();
 		world_rotation_ = matrix_.rotation();
 	}
+	
+	// Update all child nodes, and their transforms
+	for (unordered_map<string, ObjectPtr>::iterator i = object_.begin(); i != object_.end(); i++) {
+		const type_info& info = typeid(*i->second);
+		if (typeid(Node) == info) {
+			Node* node = static_cast<Node*>(i->second.get());
+			if (transform_dirty_) {
+				node->transform_dirty_ = true;
+			}
+			node->update_transform();
+		}
+	}
+	transform_dirty_ = false;
+	
 }

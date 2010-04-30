@@ -89,7 +89,7 @@ void Core::FractureObject::fracture_indices(const Plane& plane, const uint32_t* 
             b1.point(v0);
             b1.point(v1);
             b1.point(v2);
-        } else if (d0 >= 0 && d1 >= 0 && d2 >= 0) {
+        } else  {//if (d0 >= 0 && d1 >= 0 && d2 >= 0) {
             // If all the vertices are on the upper half-space created by the
             // plane, then push the indices to the second buffer
             index2.push_back(i0);
@@ -131,6 +131,7 @@ void Core::FractureObject::fracture_indices(const Plane& plane, const uint32_t* 
         clone->bounding_box_ = b2;
         clone->init_index_buffer();
         clone->parent()->rigid_body()->mass(m2);
+        clone->parent()->rigid_body()->linear_velocity(parent_->rigid_body()->linear_velocity());
     }
     
     // Initialize the index buffer for this object

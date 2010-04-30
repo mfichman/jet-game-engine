@@ -69,6 +69,11 @@ function Test:__init()
     self.s0 = Shark(engine.root, "s0")
     self.s1 = Dagger(engine.root, "s1")
     self.s1.node.position = Vector(-5, -5, 5)
+    self.s2 = Rock(engine.root, "s2")
+    self.s2.node.position = Vector(5, 5, 5)
+    self.s3 = Rock(engine.root, "s3")
+    self.s3.node.position = Vector(5, 0, 5)
+    
     
     --self.s1.node.position = Vector(0, 0, 0)
     --self.s0.node.position = Vector(0, -10, 0)
@@ -89,9 +94,12 @@ function Test:on_key_pressed(key, x, y)
     if (key == 'q') then
         engine.running = false
     elseif (key == 's') then
-        engine:option("simulation_speed", 1.0/4.0)
+        engine:option("simulation_speed", 1.0/30.0)
+    elseif (key == 't') then
+        self.s2.body:apply_torque(Vector(2000, 0, 0))
     elseif (key == 'r') then
-    
+        
+        
         self.s1.node.position = Vector(5, 0, 0)
         self.s1.body.linear_velocity = Vector(0, 0, 0)
         self.s0.node.position = Vector(5, 0, 0)

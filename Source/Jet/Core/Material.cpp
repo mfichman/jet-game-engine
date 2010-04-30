@@ -88,10 +88,10 @@ void Core::Material::enabled(bool enabled) {
 		}
 		
 		// Set up material colors	
-		glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_color());
-		glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_color());
-		glMaterialfv(GL_FRONT, GL_SPECULAR, specular_color());
-		glMaterialf(GL_FRONT, GL_SHININESS, shininess());
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient_color());
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse_color());
+		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular_color());
+		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shininess());
 	} else {
 		if (engine_->option<bool>("shaders_enabled")) {
 			// Disable the shader for this material

@@ -71,8 +71,16 @@ void Core::Texture::read_texture_data() {
 	// Load the image data
 	string file = engine_->resource_path(name_);
 	SDL_Surface* surface = IMG_Load(file.c_str());
-
-	if (surface->format->BitsPerPixel != 32) {
+	
+	// Check to make sure the image was supported
+	if (!surface) {
+		throw runtime_error("Unsupported image format: " + name_);
+	}
+	
+	// Check image format
+	bytes_per_pixel_ = surface->format->BytesPerPixel;
+	if (bytes_per_pixel_ != 3 && bytes_per_pixel_ != 4) {
+		SDL_FreeSurface(surface);
 		throw runtime_error("Invalid image format: " + name_);
 	}
 
@@ -97,7 +105,11 @@ void Core::Texture::init_texture() {
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 6.0);
 	
 	// Load the image
-	gluBuild2DMipmaps(GL_TEXTURE_2D, 3, width(), height(), GL_RGBA, GL_UNSIGNED_BYTE, data());		
+	if (3 == bytes_per_pixel_) {
+		gluBuild2DMipmaps(GL_TEXTURE_2D, 3, width(), height(), GL_RGB, GL_UNSIGNED_BYTE, data());
+	} else if (4 == bytes_per_pixel_) {
+		gluBuild2DMipmaps(GL_TEXTURE_2D, 3, width(), height(), GL_RGBA, GL_UNSIGNED_BYTE, data());
+	}
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 

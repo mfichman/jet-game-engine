@@ -69,14 +69,14 @@ public:
     //! @param width the new width
     inline void width(size_t width) {
 		width_ = width;
-		data_.resize(width_ * height_ * sizeof(uint32_t));
+		data_.resize(width_ * height_ * bytes_per_pixel_);
 	}
 
     //! Sets the height of the texture in pixels.
     //! @param height the new height
     inline void height(size_t height) {
 		height_ = height;
-		data_.resize(width_ * height_ * sizeof(uint32_t));
+		data_.resize(width_ * height_ * bytes_per_pixel_);
 	}
 	
 	//! Sets the resource state
@@ -106,6 +106,7 @@ private:
     size_t width_;
     size_t height_;
 	uint32_t texture_;
+	uint32_t bytes_per_pixel_;
 	
 
     friend class Engine;
