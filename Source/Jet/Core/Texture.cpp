@@ -79,7 +79,19 @@ void Core::Texture::read_texture_data() {
 	
 	// Check image format
 	bytes_per_pixel_ = surface->format->BytesPerPixel;
-	if (bytes_per_pixel_ != 3 && bytes_per_pixel_ != 4) {
+	if (4 == surface->format->BytesPerPixel) {
+		if (0xff == surface->format->Rmask) {
+			texture_format_ = GL_RGBA;
+		} else {
+			texture_format_ = GL_BGRA;
+		}
+	} else if (3 == surface->format->BytesPerPixel) {
+		if (0xff == surface->format->Rmask) {
+			texture_format_ = GL_RGB;
+		} else {
+			texture_format_ = GL_BGR;
+		}
+	} else {
 		SDL_FreeSurface(surface);
 		throw runtime_error("Invalid image format: " + name_);
 	}
@@ -104,12 +116,10 @@ void Core::Texture::init_texture() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 6.0);
 	
+
+
 	// Load the image
-	if (3 == bytes_per_pixel_) {
-		gluBuild2DMipmaps(GL_TEXTURE_2D, 3, width(), height(), GL_RGB, GL_UNSIGNED_BYTE, data());
-	} else if (4 == bytes_per_pixel_) {
-		gluBuild2DMipmaps(GL_TEXTURE_2D, 3, width(), height(), GL_RGBA, GL_UNSIGNED_BYTE, data());
-	}
+	gluBuild2DMipmaps(GL_TEXTURE_2D, 3, width(), height(), texture_format_, GL_UNSIGNED_BYTE, data());
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 

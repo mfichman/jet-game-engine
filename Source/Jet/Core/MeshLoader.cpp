@@ -23,6 +23,7 @@
 #include <Jet/Core/MeshLoader.hpp>
 #include <boost/lexical_cast.hpp>
 #include <sstream>
+#include <stdexcept>
  
 using namespace Jet;
 using namespace std;

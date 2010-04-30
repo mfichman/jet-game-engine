@@ -28,6 +28,7 @@
 #include <Jet/Quaternion.hpp>
 
 using namespace Jet;
+using namespace std;
 
 Core::RigidBody::RigidBody(Engine* engine, Node* parent) :
     engine_(engine),
@@ -85,26 +86,27 @@ void Core::RigidBody::update_collision_shapes() {
 void Core::RigidBody::attach_node(const btTransform& transform, Node* node) {
     node->rigid_body_ = this;
     
+	
     // Iterate through all child objects of "node".  For child MeshObjects,
 	// make sure they are attached to the rigid body.  For child Nodes, make
 	// sure that the node has a reference to the new rigid body.
-    for (Iterator<ObjectPtr> i = node->objects(); i; i++) {
-        const type_info& info = typeid(**i);
+    for (tr1::unordered_map<string, ObjectPtr>::iterator i = node->object_.begin(); i != node->object_.end(); i++) {
+        const type_info& info = typeid(*i->second);
         if (typeid(Node) == info) {
             // Add mesh objects connected to the child node
-            Node* node = static_cast<Node*>(i->get());
+            Node* node = static_cast<Node*>(i->second.get());
             btQuaternion rotation(node->rotation().x, node->rotation().y, node->rotation().z, node->rotation().w);
             btVector3 position(node->position().x, node->position().y, node->position().z);
             attach_node(transform * btTransform(rotation, position), node);
             
         } else if (typeid(MeshObject) == info) {
             // We found a mesh object, so add it to the rigid body
-            MeshObject* mesh_object = static_cast<MeshObject*>(i->get());
+            MeshObject* mesh_object = static_cast<MeshObject*>(i->second.get());
             attach_mesh_object(transform, mesh_object);
             
         } else if (typeid(FractureObject) == info) {
             // We found a fracture object, so add it to the rigid body
-            FractureObject* fracture_object = static_cast<FractureObject*>(i->get());
+            FractureObject* fracture_object = static_cast<FractureObject*>(i->second.get());
             attach_fracture_object(transform, fracture_object);
         }
     }

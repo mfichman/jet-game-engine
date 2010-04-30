@@ -45,7 +45,7 @@ void Core::Material::state(ResourceState state) {
 }
 
 void Core::Material::read_material_data() {
-	static const std::string& ext = ".mtl";
+	static const std::string ext = ".mtl";
     if ((name_.length() - name_.rfind(ext)) != ext.length()) {
         return;
     }
@@ -88,10 +88,10 @@ void Core::Material::enabled(bool enabled) {
 		}
 		
 		// Set up material colors	
-		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient_color());
-		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse_color());
-		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular_color());
-		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shininess());
+		glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_color());
+		glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_color());
+		glMaterialfv(GL_FRONT, GL_SPECULAR, specular_color());
+		glMaterialf(GL_FRONT, GL_SHININESS, shininess());
 	} else {
 		if (engine_->option<bool>("shaders_enabled")) {
 			// Disable the shader for this material

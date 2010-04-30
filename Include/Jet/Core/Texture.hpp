@@ -92,7 +92,9 @@ private:
 		state_(UNLOADED),
 		width_(0),
 		height_(0),
-		texture_(0) {
+		texture_(0),
+		bytes_per_pixel_(0),
+		texture_format_(0) {
 			
 	}
 	
@@ -107,6 +109,7 @@ private:
     size_t height_;
 	uint32_t texture_;
 	uint32_t bytes_per_pixel_;
+	uint32_t texture_format_;
 	
 
     friend class Engine;

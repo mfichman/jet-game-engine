@@ -77,14 +77,16 @@ void Core::RenderSystem::init_window() {
 	bool fsaa_enabled = engine_->option<bool>("fsaa_enabled");
 	GLuint fsaa_samples = (GLuint)engine_->option<real_t>("fsaa_samples");
 	
-	if (fsaa_enabled) {
-		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, fsaa_samples);
-		glEnable(GL_MULTISAMPLE);
-	} else {
-		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
-		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
-		glDisable(GL_MULTISAMPLE);
+	if (glewIsSupported("GL_ARB_multisample")) {
+		if (fsaa_enabled) {
+			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, fsaa_samples);
+			glEnable(GL_MULTISAMPLE);
+		} else {
+			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
+			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
+			glDisable(GL_MULTISAMPLE);
+		}
 	}
 	
 	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
