@@ -59,13 +59,17 @@ private:
 		self_["on_render"](self_);
 	}
 
-    inline void on_collision() {
-		self_["on_collision"](self_);
+	inline void on_collision(Jet::Node* node) {
+		self_["on_collision"](self_, node);
 	}
 
     inline void on_destroy() {
 		self_["on_destroy"](self_);
 		node_ = 0;
+	}
+
+	inline void on_fracture(Jet::Node* node) {
+		self_["on_fracture"](self_, node);
 	}
     
     Node* node_;

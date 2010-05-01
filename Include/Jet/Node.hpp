@@ -145,10 +145,14 @@ public:
     virtual void on_render()=0;
     
     //! Called when a colllision is detected by the physics engine.
-    virtual void on_collision()=0;
+    virtual void on_collision(Node* node)=0;
     
     //! Called when the node is destroyed.
     virtual void on_destroy()=0;
+
+	//! Called when a node is fractured from a child of this node.
+	//! @param node the node that fractured off of this node
+	virtual void on_fracture(Node* node)=0;
 };
 
 

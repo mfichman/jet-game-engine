@@ -45,6 +45,11 @@ public:
     inline Node* parent() const {
         return parent_;
     }
+
+	//! Returns the bounding box
+	inline const BoundingBox& bounding_box() const {
+		return bounding_box_;
+	}
     
     //! Returns the material used to render this object.
     inline Material* material() const {

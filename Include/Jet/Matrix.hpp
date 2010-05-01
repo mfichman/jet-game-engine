@@ -79,6 +79,9 @@ public:
     //! Transforms the view frustum.
     Frustum operator*(const Frustum& other) const;
     
+    //! Rotates a vector using the rotation part of this matrix.
+    Vector rotate(const Vector& other) const;
+    
     //! Returns a pointer to the matrix data.
     inline operator const real_t*() const {
         return data;

@@ -207,6 +207,18 @@ Vector Matrix::operator*(const Vector& v) const {
     return out;
 }
 
+Vector Matrix::rotate(const Vector& v) const {
+    Vector out;
+    
+    //real_t invw = 1.0f / (data[3]*v.x + data[7]*v.y + data[11]*v.z + data[15]);
+    
+    out.x = (data[0]*v.x + data[4]*v.y + data[8]*v.z);// + data[12])*invw;
+    out.y = (data[1]*v.x + data[5]*v.y + data[9]*v.z);// + data[13])*invw;
+    out.z = (data[2]*v.x + data[6]*v.y + data[10]*v.z);// + data[14])*invw;
+    
+    return out;
+}
+
 Frustum Matrix::operator*(const Frustum& f) const {
     Frustum out;
     

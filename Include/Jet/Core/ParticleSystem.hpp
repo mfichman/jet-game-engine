@@ -46,7 +46,7 @@ public:
     }
     
     //! Returns the life of this particle system.
-    inline const Range& life() const {
+    inline real_t life() const {
         return life_;
     }
     
@@ -94,7 +94,7 @@ public:
     }
     
     //! Sets the emission rate
-    inline real_t emission_rate() const {
+    inline const Range& emission_rate() const {
         return emission_rate_;
     }
     
@@ -107,7 +107,7 @@ public:
     //! Returns the maximum number of particles that can be active in the
     //! system at one time
     inline size_t quota() const {
-        return quota_;
+        return particle_.size();
     }
     
     //! Returns the texture in use for this particle system.
@@ -122,7 +122,7 @@ public:
     
     //! Sets the life of this particle system.
     //! @param life the min and max life of the particle system.
-    inline void life(const Range& life) {
+    inline void life(real_t life) {
         life_ = life;
     }
     
@@ -174,7 +174,7 @@ public:
     }
     
     //! Sets the emission rate
-    inline void emission_rate(real_t rate) {
+    inline void emission_rate(const Range& rate) {
         emission_rate_ = rate;
     }
     
@@ -186,7 +186,6 @@ public:
     //! Sets the maximum number of particles that can be active in the system
     //! at one time
     inline void quota(size_t quota) {
-        quota_ = quota;
         particle_.resize(quota);
         dead_particle_.clear();
     }
@@ -227,12 +226,13 @@ private:
     inline ParticleSystem(Engine* engine, Node* parent) :
         engine_(engine),
         parent_(parent),
-        quota_(1000),
+		life_(0.0f),
         accumulator_(0.0f),
-		type_(ELLIPSOID_EMITTER) {
+		type_(POINT_EMITTER),
+		next_emission_(0.0f) {
             
         shader("Particle");
-        particle_.resize(quota_);
+        particle_.resize(0);
     }
     
     void init_particle_box(Particle& p);
@@ -241,7 +241,7 @@ private:
     
     Engine* engine_;
     Node* parent_;
-    Range life_;
+    real_t life_;
     Range width_;
     Range height_;
     Range depth_;
@@ -249,15 +249,16 @@ private:
 	Range particle_size_;
     Range emission_speed_;
     Vector emission_direction_;
-    real_t emission_rate_;
+	Vector transformed_direction_;
+    Range emission_rate_;
     ParticleSystemType type_;
     Range emission_angle_;
-    size_t quota_;
     TexturePtr texture_;
     ShaderPtr shader_;
     std::vector<Particle> particle_;
     std::vector<Particle*> dead_particle_;
     real_t accumulator_;
+	real_t next_emission_;
     
     friend class Node;
     

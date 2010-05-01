@@ -186,6 +186,12 @@ public:
 	//! Called during a physics update.  This function is only called if the
 	//! node has a rigid body attached.
 	void update();
+
+	//! Called to notify of a fracture event.
+	void fracture(Jet::Node* node);
+
+	//! Called to notify of a collision event.
+	void collision(Jet::Node* node);
 	
 	//! Called to update the transform of the node
 	void update_transform();

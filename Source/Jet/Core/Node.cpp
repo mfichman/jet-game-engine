@@ -257,6 +257,18 @@ void Core::Node::render() {
 	}
 }
 
+void Core::Node::collision(Jet::Node* node) {
+    for (vector<NodeListenerPtr>::iterator i = listener_.begin(); i < listener_.end(); i++) {
+		(*i)->on_collision(node);
+	}
+}
+
+void Core::Node::fracture(Jet::Node* node) {
+    for (vector<NodeListenerPtr>::iterator i = listener_.begin(); i < listener_.end(); i++) {
+		(*i)->on_fracture(node);
+	}
+}
+
 void Core::Node::update() {
 	
 	// Calculate the transform for this node if the transform is dirty.

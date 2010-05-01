@@ -29,6 +29,7 @@
 #include <Jet/Color.hpp>
 #include <Jet/Plane.hpp>
 #include <Jet/Node.hpp>
+#include <Jet/BoundingBox.hpp>
 #include <Jet/MeshObject.hpp>
 #include <Jet/FractureObject.hpp>
 #include <Jet/ParticleSystem.hpp>
@@ -260,13 +261,30 @@ void Core::ScriptSystem::init_value_type_bindings() {
             .def_readwrite("a", &Plane::a)
             .def_readwrite("b", &Plane::b)
             .def_readwrite("c", &Plane::c)
-            .def_readwrite("d", &Plane::d)
+            .def_readwrite("d", &Plane::d),
+
+		luabind::class_<BoundingBox>("BoundingBox")
+			.def(luabind::constructor<>())
+			.property("width", &BoundingBox::width)
+			.property("height", &BoundingBox::height)
+			.property("depth", &BoundingBox::depth)
+			.property("volume", &BoundingBox::volume)
+			.property("half_extents", &BoundingBox::half_extents)
+			.property("origin", &BoundingBox::origin)
+			.def("point", &BoundingBox::point)
+			.def_readwrite("min_x", &BoundingBox::min_x)
+			.def_readwrite("min_y", &BoundingBox::min_y)
+			.def_readwrite("min_z", &BoundingBox::min_x)
+			.def_readwrite("max_x", &BoundingBox::max_x)
+			.def_readwrite("max_y", &BoundingBox::max_y)
+			.def_readwrite("max_z", &BoundingBox::max_z)
     ];
 }
     
     
 void Core::ScriptSystem::init_entity_type_bindings() {
-    
+    using namespace luabind;
+
     // Load value for entity types used by the engine
     luabind::module(env_) [     
         luabind::class_<Jet::Light, Jet::LightPtr>("Light")
@@ -325,12 +343,14 @@ void Core::ScriptSystem::init_entity_type_bindings() {
             .property("cast_shadows", (bool (Jet::FractureObject::*)() const)&Jet::FractureObject::cast_shadows, (void (Jet::FractureObject::*)(bool))&Jet::FractureObject::cast_shadows)
             .property("seal_fractures", (bool (Jet::FractureObject::*)() const)&Jet::FractureObject::seal_fractures, (void (Jet::FractureObject::*)(bool))&Jet::FractureObject::seal_fractures)
             .property("fracture_count", (size_t (Jet::FractureObject::*)() const)&Jet::FractureObject::fracture_count, (void (Jet::FractureObject::*)(size_t))&Jet::FractureObject::fracture_count)
-            .def("fracture", &Jet::FractureObject::fracture),
+			.property("bounding_box", &Jet::FractureObject::bounding_box)
+			.def("fracture", &Jet::FractureObject::fracture),
             
         luabind::class_<Jet::ParticleSystem, Jet::ParticleSystemPtr>("ParticleSystem")
             .property("parent", &Jet::ParticleSystem::parent)
-            .property("life", (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::life, (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::life)
-            .property("width", (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::width, (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::width)
+            .property("life", (real_t (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::life, (void (Jet::ParticleSystem::*)(real_t))&Jet::ParticleSystem::life)
+            .property("quota", (size_t (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::quota, (void (Jet::ParticleSystem::*)(size_t))&Jet::ParticleSystem::quota)
+			.property("width", (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::width, (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::width)
             .property("height", (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::height, (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::height)
             .property("depth", (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::depth, (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::depth)
             .property("emission_speed", (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::emission_speed, (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::emission_speed)
@@ -338,10 +358,11 @@ void Core::ScriptSystem::init_entity_type_bindings() {
             .property("particle_size", (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::particle_size, (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::particle_size)
 			.property("particle_life", (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::particle_life, (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::particle_life)
 			.property("emission_direction", (const Vector& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::emission_direction, (void (Jet::ParticleSystem::*)(const Vector&))&Jet::ParticleSystem::emission_direction)
-            .property("emission_rate", (real_t (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::emission_rate, (void (Jet::ParticleSystem::*)(real_t))&Jet::ParticleSystem::emission_rate)
+            .property("emission_rate", (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::emission_rate, (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::emission_rate)
             .property("emission_angle", (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::emission_angle, (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::emission_angle)
-            .property("texture", (Jet::Texture* (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::texture, (void (Jet::ParticleSystem::*)(const std::string&))&Jet::ParticleSystem::texture),
-        
+            .property("texture", (Jet::Texture* (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::texture, (void (Jet::ParticleSystem::*)(const std::string&))&Jet::ParticleSystem::texture)
+            .enum_("types") [ value("BOX_EMITTER", BOX_EMITTER), value("POINT_EMITTER", POINT_EMITTER), value("ELLIPSOID_EMITTER", ELLIPSOID_EMITTER) ],
+            
         luabind::class_<Jet::RigidBody, Jet::RigidBodyPtr>("RigidBody")
             .property("parent", &Jet::RigidBody::parent)
             .property("linear_velocity", (Vector (Jet::RigidBody::*)() const)&Jet::RigidBody::linear_velocity, (void (Jet::RigidBody::*)(const Vector&))&Jet::RigidBody::linear_velocity)

@@ -132,6 +132,7 @@ void Core::FractureObject::fracture_indices(const Plane& plane, const uint32_t* 
         clone->init_index_buffer();
         clone->parent()->rigid_body()->mass(m2);
         clone->parent()->rigid_body()->linear_velocity(parent_->rigid_body()->linear_velocity());
+		parent_->fracture(clone->parent());
     }
     
     // Initialize the index buffer for this object

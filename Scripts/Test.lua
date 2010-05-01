@@ -24,6 +24,7 @@ require 'Dagger'
 require 'Monkey'
 require 'Rock'
 require 'Box'
+require 'Explosion'
 
 class 'Test' (Module)
 
@@ -66,18 +67,18 @@ function Test:__init()
     
     -- Set up scene objects and apply some forces
     print("Creating objects")
-    self.s0 = Shark(engine.root, "s0")
+    --self.s0 = Shark(engine.root, "s0")
     self.s1 = Dagger(engine.root, "s1")
     self.s1.node.position = Vector(-5, -5, 5)
     self.s2 = Rock(engine.root, "s2")
     self.s2.node.position = Vector(5, 5, 5)
     self.s3 = Rock(engine.root, "s3")
-    self.s3.node.position = Vector(5, 0, 5)
+    self.s3.node.position = Vector(-10, 0, 5)
     
     
     self.s1.node.position = Vector(0, 0, 0)
-    self.s0.node.position = Vector(0, -10, 0)
-    self.s0.body:apply_force(Vector(-15000, 30000, 0))
+    --self.s0.node.position = Vector(0, -10, 0)
+    --self.s0.body:apply_force(Vector(-15000, 30000, 0))
     math.randomseed(os.time())
 end
 
@@ -106,8 +107,8 @@ function Test:on_key_pressed(key, x, y)
         
         self.s1.node.position = Vector(5, 0, 0)
         self.s1.body.linear_velocity = Vector(0, 0, 0)
-        self.s0.node.position = Vector(5, 0, 0)
-        self.s0.body.linear_velocity = Vector(0, 0, 0)
+       -- self.s0.node.position = Vector(5, 0, 0)
+       -- self.s0.body.linear_velocity = Vector(0, 0, 0)
         self.s2.node.position = Vector(5, 0, 0)
         self.s2.body.linear_velocity = Vector(0, 0, 0)
         self.s3.node.position = Vector(5, 0, 0)
@@ -141,6 +142,12 @@ function Test:on_key_pressed(key, x, y)
         engine:option("fsaa_enabled", not engine:option("fsaa_enabled"));
         engine:option("video_mode_synced", false)
     elseif (key == 'f') then
+   
+        if (not self.e) then
+            self.e = Explosion(engine.root, "e")
+        else
+            self.e:reset()
+        end
    
         local n = Vector(math.random()*2-1, math.random()*2-1, math.random()*2-1)
         self.s1.mesh:fracture(Plane(n.unit, Vector(0, 0.0, 0)))

@@ -43,7 +43,6 @@ static inline real_t rand_range2(const Range& range) {
 }
 
 void Core::ParticleSystem::render(Core::ParticleBuffer* buffer) {
-    accumulator_ += engine_->frame_delta();
     dead_particle_.clear();
     
     // Set the buffer's shader and pointer.  This may cause the
@@ -62,10 +61,19 @@ void Core::ParticleSystem::render(Core::ParticleBuffer* buffer) {
         }
     }
 
+	if (life_ <= 0.0f && life_ > -1.0f) {
+		return;
+	}
+	if (life_ > -1.0f) {
+		life_ = max(0.0f, life_ - engine_->frame_delta());
+	}
+
+	accumulator_ += engine_->frame_delta();
 	Vector origin = parent_->matrix().origin();
+	transformed_direction_ = parent_->matrix().rotate(emission_direction_).unit();
     
     // Spawn additional particles
-    while (accumulator_ > 1.0f/emission_rate_ && !dead_particle_.empty()) {
+    while (accumulator_ > next_emission_ && !dead_particle_.empty()) {
         Particle& p = *dead_particle_.back();
         dead_particle_.pop_back();
         p.init_time = engine_->frame_time();
@@ -85,7 +93,8 @@ void Core::ParticleSystem::render(Core::ParticleBuffer* buffer) {
         }
 		p.init_position += origin;
         
-        accumulator_ -= 1.0f/emission_rate_;
+        accumulator_ -= next_emission_;
+		next_emission_ = 1.0f/rand_range(emission_rate_);
     }
 }
     
@@ -120,7 +129,7 @@ void Core::ParticleSystem::init_particle_ellipsoid(Particle& p) {
 void Core::ParticleSystem::init_particle_point(Particle& p) {
     p.init_position = Vector(0.0f, 0.0f, 0.0f);
     
-    Vector forward = emission_direction_.unit();
+    Vector forward = transformed_direction_;
     Vector up = forward.orthogonal();
     Vector right = forward.cross(up);
     

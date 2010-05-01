@@ -31,21 +31,43 @@ function Dagger:__init(node, name)
         fracture_count = 3
     }
     
-    self.smoke = self.node:particle_system("smoke") {
+    self.spark_template = {
+        type = ParticleSystem.BOX_EMITTER,
         quota = 100,
-        texture = "Fire.png",
-        particle_life = Range(.5, .5),
-        particle_size = Range(3, 4),
-        life = Range(.5, .5),
-        width = Range(0, .5),
-        height = Range(0, .5),
-        depth = Range(0, .5),
-        emission_speed = Range(1, 3),
+        texture = "Electricity.png",
+        particle_life = Range(.1, .1),
+        particle_size = Range(4, 4),
+        life = -1,
+        width = Range(0, .35),
+        height = Range(0, .35),
+        depth = Range(0, .35),
+        emission_speed = Range(0, 0),
         emission_direction = Vector(0, 1, 0),
-        emission_angle = Range(0, 180),
-        emission_rate = 50
+        emission_angle = Range(0, 0),
+        emission_rate = Range(1, 20)
     }
     
     self.body = self.node:rigid_body()
     self.body.mass = 10.0
+end
+
+function Dagger:on_fracture(node)
+    self.node:particle_system("sparks")(self.spark_template)
+    self.node:particle_system("sparks").life = math.random() * 3 + 1
+    
+    --local bounding_box = node:fracture_object("fracture").bounding_box
+    --local sub_node = node:node("sparks")
+    --sub_node.position = bounding_box.origin;
+    node:particle_system("sparks")(self.spark_template)
+    node:particle_system("sparks").life = math.random() * 3 + 1
+    
+    --particle_system(self.spark_template)
+    --[[particle_system {
+        width = Range(0, bounding_box.width/4),
+        height = Range(0, bounding_box.height/4),
+        depth = Range(0, bounding_box.depth/4)
+    }
+    ]]
+    
+
 end

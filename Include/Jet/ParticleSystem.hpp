@@ -37,7 +37,7 @@ public:
     virtual Node* parent() const=0;
     
     //! Returns the life of this particle system.
-    virtual const Range& life() const=0;
+    virtual real_t life() const=0;
     
     //! Returns the width this particle system.  This describes the range of
     //! x-values that particles will be created at.
@@ -67,7 +67,7 @@ public:
     virtual const Range& emission_angle() const=0;
     
     //! Returns the emission rate of the particle system in particles/second.
-    virtual real_t emission_rate() const=0;
+    virtual const Range& emission_rate() const=0;
     
     //! Returns the particle system distribution type.  This can either be
     //! cubic or spherical.
@@ -85,7 +85,7 @@ public:
     
     //! Sets the life of this particle system.
     //! @param life the min and max life of the particle system.
-    virtual void life(const Range& life)=0;
+    virtual void life(real_t life)=0;
     
     //! Sets the range of x-values that particles will be created at.
     //! @param width the range of x-values
@@ -119,7 +119,7 @@ public:
     virtual void emission_angle(const Range& angle)=0;
     
     //! Sets the emission rate of the particle emitter in particles/second
-    virtual void emission_rate(real_t rate)=0;
+    virtual void emission_rate(const Range& rate)=0;
     
     //! Sets the particle system type.
     virtual void type(ParticleSystemType type)=0;
