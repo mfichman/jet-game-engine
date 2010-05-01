@@ -335,7 +335,9 @@ void Core::ScriptSystem::init_entity_type_bindings() {
             .property("depth", (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::depth, (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::depth)
             .property("emission_speed", (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::emission_speed, (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::emission_speed)
             .property("type", (Jet::ParticleSystemType (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::type, (void (Jet::ParticleSystem::*)(Jet::ParticleSystemType))&Jet::ParticleSystem::type)
-            .property("emission_direction", (const Vector& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::emission_direction, (void (Jet::ParticleSystem::*)(const Vector&))&Jet::ParticleSystem::emission_direction)
+            .property("particle_size", (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::particle_size, (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::particle_size)
+			.property("particle_life", (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::particle_life, (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::particle_life)
+			.property("emission_direction", (const Vector& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::emission_direction, (void (Jet::ParticleSystem::*)(const Vector&))&Jet::ParticleSystem::emission_direction)
             .property("emission_rate", (real_t (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::emission_rate, (void (Jet::ParticleSystem::*)(real_t))&Jet::ParticleSystem::emission_rate)
             .property("emission_angle", (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::emission_angle, (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::emission_angle)
             .property("texture", (Jet::Texture* (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::texture, (void (Jet::ParticleSystem::*)(const std::string&))&Jet::ParticleSystem::texture),

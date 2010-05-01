@@ -34,15 +34,16 @@ function Dagger:__init(node, name)
     self.smoke = self.node:particle_system("smoke") {
         quota = 100,
         texture = "Fire.png",
-        --shader=?
+        particle_life = Range(.5, .5),
+        particle_size = Range(3, 4),
         life = Range(.5, .5),
-        width = Range(0, 2),
-        height = Range(0, 2),
-        depth = Range(0, 2),
-        emission_speed = Range(1, 10),
+        width = Range(0, .5),
+        height = Range(0, .5),
+        depth = Range(0, .5),
+        emission_speed = Range(1, 3),
         emission_direction = Vector(0, 1, 0),
         emission_angle = Range(0, 180),
-        emission_rate = 1000
+        emission_rate = 50
     }
     
     self.body = self.node:rigid_body()

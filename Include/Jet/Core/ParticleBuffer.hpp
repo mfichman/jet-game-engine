@@ -71,9 +71,12 @@ private:
     size_t current_buffer_;
 	int32_t diffuse_map_loc_;
 	int32_t time_loc_;
+	int32_t scale_loc_;
 	int32_t init_position_attrib_;
 	int32_t init_velocity_attrib_;
 	int32_t init_time_attrib_;
+	int32_t init_size_attrib_;
+	int32_t init_rotation_attrib_;
 	int32_t life_attrib_;
 };
 

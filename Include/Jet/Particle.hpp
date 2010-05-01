@@ -42,6 +42,8 @@ public:
     Vector init_position;
 	Vector init_velocity;
     real_t init_time;
+	real_t init_size;
+	real_t init_rotation;
     real_t life;
 };
 

@@ -25,11 +25,25 @@ uniform sampler2D diffuse_map;
 
 
 varying float alpha;
+varying float rotation;
 
 void main() {
     
+    /*    float rot = 6.28 * color.a;
+    float x = tex.x - 0.5;
+    float y = tex.y - 0.5;
+    tex.x = x * cos(rot) - y * sin(rot) + 0.5;
+    tex.y = x * sin(rot) + y * cos(rot) + 0.5;
+    color *= tex2D(TextureSampler0, tex);
+    color.rgb *= 3.0f;
+    return color;*/
+
+    float x = gl_TexCoord[0].s - 0.5;
+    float y = gl_TexCoord[0].t - 0.5;
+    float s = x * cos(rotation) - y * sin(rotation) + 0.5;
+    float t = x * sin(rotation) + y * cos(rotation) + 0.5;
     
-    gl_FragColor = texture2D(diffuse_map, gl_TexCoord[0].st);
+    gl_FragColor = texture2D(diffuse_map, vec2(s, t));
     gl_FragColor.a *= alpha;
     
     //vec4(1.0, 0.0, 0.0, 1.0);

@@ -21,20 +21,28 @@
  */
 
 uniform float time;
+uniform float scale;
 
 attribute vec3 init_position;
 attribute vec3 init_velocity;
 attribute float init_time;
+attribute float init_size;
+attribute float init_rotation;
 attribute float life;
 
 varying float alpha;
+varying float rotation;
 
 void main() {
-    
+    //vs_out.size = g_fp.buffer_height * size / (1.0f + 8.0f * dist);
     float elapsed_time = time - init_time;
-    vec3 position = init_position + elapsed_time * init_velocity;
-    gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * vec4(position, 1.0);
-    gl_PointSize = 40.0;
+    vec3 world_position = init_position + elapsed_time * init_velocity;
+    vec4 view_position = gl_ModelViewMatrix * vec4(world_position, 1.0);
+    float dist = length(view_position.xyz);
+    
+    gl_Position = gl_ProjectionMatrix * view_position;
+    gl_PointSize = scale * init_size / (1.0 + dist);
     gl_TexCoord[0] = gl_MultiTexCoord0;
     alpha = clamp(1.0 - elapsed_time/life, 0.0, 1.0);
+    rotation = init_rotation;
 }

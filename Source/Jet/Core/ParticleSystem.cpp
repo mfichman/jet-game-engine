@@ -69,6 +69,9 @@ void Core::ParticleSystem::render(Core::ParticleBuffer* buffer) {
         Particle& p = *dead_particle_.back();
         dead_particle_.pop_back();
         p.init_time = engine_->frame_time();
+		p.init_size = rand_range(particle_size_);
+		p.init_rotation = rand_range(Range(0.0, PI));
+		p.life = rand_range(particle_life_);
         
         // Set up initial parameters
         if (BOX_EMITTER == type_) {
@@ -96,7 +99,6 @@ void Core::ParticleSystem::init_particle_box(Particle& p) {
     
     real_t speed = rand_range(emission_speed_);
     p.init_velocity = Vector(w, h, d).unit() * speed;
-	p.life = rand_range(life_);
 }
 
 void Core::ParticleSystem::init_particle_ellipsoid(Particle& p) {
@@ -113,7 +115,6 @@ void Core::ParticleSystem::init_particle_ellipsoid(Particle& p) {
     p.init_velocity.x = speed * sinf(phi) * cosf(theta);
     p.init_velocity.y = speed * sinf(phi) * sinf(theta);
     p.init_velocity.z = speed * cosf(phi);
-	p.life = rand_range(life_);
 }
 
 void Core::ParticleSystem::init_particle_point(Particle& p) {
@@ -129,5 +130,4 @@ void Core::ParticleSystem::init_particle_point(Particle& p) {
     Vector side = up * sinf(theta) + right * sinf(beta);
     Vector direction = side * cosf(theta) + forward;
     p.init_velocity = direction.unit() * speed;
-	p.life = rand_range(life_);
 }

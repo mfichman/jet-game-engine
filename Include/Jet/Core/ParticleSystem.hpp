@@ -67,6 +67,16 @@ public:
     inline const Range& depth() const {
         return depth_;
     }
+
+	//! Returns the particle life.
+	inline const Range& particle_life() const {
+		return particle_life_;
+	}
+
+	//! Returns the range in particle sizes.
+	inline const Range& particle_size() const {
+		return particle_size_;
+	}
     
     //! Returns the speed particles will be created with.
     inline const Range& emission_speed() const {
@@ -133,6 +143,18 @@ public:
     inline void depth(const Range& depth) {
         depth_ = depth;
     }
+
+	//! Sets the particle life.
+	//! @param life the range in particle lifetime
+	inline void particle_life(const Range& life) {
+		particle_life_ = life;
+	}
+
+	//! Sets the range in particle size.
+	//! @param size the range in particle sizes
+	inline void particle_size(const Range& size) {
+		particle_size_ = size;
+	}
     
     //! Sets the speed of created particles.
     //! @param speed the speed range
@@ -223,6 +245,8 @@ private:
     Range width_;
     Range height_;
     Range depth_;
+	Range particle_life_;
+	Range particle_size_;
     Range emission_speed_;
     Vector emission_direction_;
     real_t emission_rate_;

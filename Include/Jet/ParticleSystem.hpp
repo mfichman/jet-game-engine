@@ -50,6 +50,12 @@ public:
     //! Returns the depth of this particle system.  This describes the range of
     //! z-values that particles will be created at.
     virtual const Range& depth() const=0;
+
+	//! Returns the particle life.
+	virtual const Range& particle_life() const=0;
+
+	//! Returns the range in particle sizes.
+	virtual const Range& particle_size() const=0;
     
     //! Returns the speed particles will be created with.
     virtual const Range& emission_speed() const=0;
@@ -92,6 +98,14 @@ public:
     //! Sets the range z-values that particles will be created at.
     //! @param depth the range of z-values
     virtual void depth(const Range& depth)=0;
+
+	//! Sets the particle life.
+	//! @param life the range in particle lifetime
+	virtual void particle_life(const Range& life)=0;
+
+	//! Sets the range in particle size.
+	//! @param size the range in particle sizes
+	virtual void particle_size(const Range& size)=0;
     
     //! Sets the speed of created particles.
     //! @param speed the speed range
