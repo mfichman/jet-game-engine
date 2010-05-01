@@ -213,7 +213,13 @@ void Core::RenderSystem::on_init() {
 }
 
 void Core::RenderSystem::on_update() {
-		
+}
+
+void Core::RenderSystem::on_render() {	
+	if (!engine_->camera()) {
+		return;
+	}
+
 	// Clear the list of active mesh objects and lights
 	mesh_objects_.clear();
 	fracture_objects_.clear();
@@ -224,12 +230,6 @@ void Core::RenderSystem::on_update() {
 	// Sort the meshes by material
 	sort(mesh_objects_.begin(), mesh_objects_.end(), &RenderSystem::compare_mesh_objects);
 	sort(fracture_objects_.begin(), fracture_objects_.end(), &RenderSystem::compare_fracture_objects);
-}
-
-void Core::RenderSystem::on_render() {	
-	if (!engine_->camera()) {
-		return;
-	}
 
 	// If the video mode has been marked as changed, then switch modes
 	if (!engine_->option<bool>("video_mode_synced")) {

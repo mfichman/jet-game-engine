@@ -36,7 +36,7 @@ function Dagger:__init(node, name)
         quota = 100,
         texture = "Electricity.png",
         particle_life = Range(.1, .1),
-        particle_size = Range(4, 4),
+        particle_size = Range(3, 4),
         life = -1,
         width = Range(0, .35),
         height = Range(0, .35),
@@ -44,7 +44,7 @@ function Dagger:__init(node, name)
         emission_speed = Range(0, 0),
         emission_direction = Vector(0, 1, 0),
         emission_angle = Range(0, 0),
-        emission_rate = Range(1, 20)
+        emission_rate = Range(1, 70)
     }
     
     self.body = self.node:rigid_body()
@@ -53,21 +53,18 @@ end
 
 function Dagger:on_fracture(node)
     self.node:particle_system("sparks")(self.spark_template)
-    self.node:particle_system("sparks").life = math.random() * 3 + 1
+    self.node:particle_system("sparks").life = math.random() * 3 + 2
     
-    --local bounding_box = node:fracture_object("fracture").bounding_box
-    --local sub_node = node:node("sparks")
-    --sub_node.position = bounding_box.origin;
-    node:particle_system("sparks")(self.spark_template)
-    node:particle_system("sparks").life = math.random() * 3 + 1
-    
-    --particle_system(self.spark_template)
-    --[[particle_system {
+    local bounding_box = node:fracture_object("fracture").bounding_box
+    local particle_system = node:particle_system("sparks")(self.spark_template)
+
+    particle_system {
+        life = math.random() * 3 + 2,
         width = Range(0, bounding_box.width/4),
         height = Range(0, bounding_box.height/4),
         depth = Range(0, bounding_box.depth/4)
     }
-    ]]
+    
     
 
 end

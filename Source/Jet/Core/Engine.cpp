@@ -215,6 +215,8 @@ void Core::Engine::tick() {
 	// Update the delta since the last tick
     update_frame_delta();
 	update_fps();
+
+	input_system_->on_update();
     
 	// Run the fixed-time step portion of the game by calling on_update when
 	physics_system_->step();

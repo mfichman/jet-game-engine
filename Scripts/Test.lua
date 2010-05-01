@@ -98,7 +98,7 @@ function Test:on_key_pressed(key, x, y)
         if (engine:option("simulation_speed") < 1) then
             engine:option("simulation_speed", 1)
         else
-            engine:option("simulation_speed", 1/20)
+            engine:option("simulation_speed", 1/30)
         end
     elseif (key == 't') then
         self.s2.body:apply_torque(Vector(2000, 0, 0))
@@ -107,14 +107,10 @@ function Test:on_key_pressed(key, x, y)
         
         self.s1.node.position = Vector(5, 0, 0)
         self.s1.body.linear_velocity = Vector(0, 0, 0)
-       -- self.s0.node.position = Vector(5, 0, 0)
-       -- self.s0.body.linear_velocity = Vector(0, 0, 0)
         self.s2.node.position = Vector(5, 0, 0)
         self.s2.body.linear_velocity = Vector(0, 0, 0)
         self.s3.node.position = Vector(5, 0, 0)
         self.s3.body.linear_velocity = Vector(0, 0, 0)
-        self.s0.body:apply_force(Vector(1500, 0, 0))
-        self.s0.body:apply_torque(Vector(100, 0, 0))
     elseif (key == 'n') then
         engine:option("normal_mapping_enabled", not engine:option("normal_mapping_enabled"))
     elseif (key == 'p') then

@@ -143,6 +143,8 @@ void Core::FractureObject::fracture_indices(const Plane& plane, const uint32_t* 
     
     RigidBody* rigid_body = static_cast<RigidBody*>(parent_->rigid_body());
     rigid_body->update_collision_shapes();
+
+	cout << "FRACTURE" << endl;
 }
 
 Core::FractureObject* Core::FractureObject::create_clone() {
