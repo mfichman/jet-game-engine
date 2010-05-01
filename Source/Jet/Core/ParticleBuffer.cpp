@@ -21,6 +21,7 @@
  */
 
 #include <Jet/Core/ParticleBuffer.hpp>
+#include <Jet/Core/Engine.hpp>
 #include <Jet/Core/Texture.hpp>
 #include <Jet/Core/Shader.hpp>
 #ifdef WINDOWS
@@ -31,8 +32,10 @@
 #include <GL/gl.h>
   
 using namespace Jet;
-  
-Core::ParticleBuffer::ParticleBuffer(size_t size, size_t buffers) :
+using namespace std;
+
+Core::ParticleBuffer::ParticleBuffer(Engine* engine, size_t size, size_t buffers) :
+	engine_(engine),
     size_(size),
     current_buffer_(0) {
         
@@ -67,8 +70,12 @@ void Core::ParticleBuffer::texture(Texture* texture) {
         }
         
         texture_ = texture;
-        texture_->sampler(0);
+		if (texture_) {
+			texture_->sampler(0);
+			glUniform1i(diffuse_map_loc_, 0);
+		}
     }
+	
 }
 
 void Core::ParticleBuffer::shader(Shader* shader) {
@@ -82,9 +89,24 @@ void Core::ParticleBuffer::shader(Shader* shader) {
         }
         shader_ = shader;
         if (shader_) {
-            
+			shader_->state(SYNCED);
             shader_->enabled(true);
-        }
+			
+			diffuse_map_loc_ = shader_->uniform_location("diffuse_map");
+			time_loc_ = shader_->uniform_location("time");
+			init_position_attrib_ = shader_->attrib_location("init_position");
+			init_velocity_attrib_ = shader_->attrib_location("init_velocity");
+			init_time_attrib_ = shader_->attrib_location("init_time");
+			life_attrib_ = shader_->attrib_location("life");
+
+		} else {
+			diffuse_map_loc_ = -1;
+			time_loc_ = -1;
+			init_position_attrib_ = -1;
+			init_velocity_attrib_ = -1;
+			init_time_attrib_ = -1;
+			life_attrib_ = -1;
+		}
     }
 }
 
@@ -94,21 +116,46 @@ void Core::ParticleBuffer::flush() {
         particle_.clear();
         return;
     }
-    glEnable(GL_TEXTURE_2D);
+	if (particle_.size() <= 0) {
+		return;
+	}
+	
+	glPointSize(5000.0f);
+	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+	glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
+	glEnable(GL_BLEND);
+	glEnable(GL_POINT_SPRITE);
+	glDisable(GL_DEPTH_TEST);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+
+	glUniform1f(time_loc_, engine_->frame_time());
     
     // Bind and enable the vertex buffer.  Use the current buffer.
     glBindBuffer(GL_ARRAY_BUFFER, vbuffer_[current_buffer_]);
     glBufferSubData(GL_ARRAY_BUFFER, 0, particle_.size()*sizeof(Particle), &particle_.front());    
-    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableVertexAttribArray(init_position_attrib_);
+	glEnableVertexAttribArray(init_velocity_attrib_);
+	glEnableVertexAttribArray(init_time_attrib_);
+	glEnableVertexAttribArray(life_attrib_);
+	glVertexAttribPointer(init_position_attrib_, 3, GL_FLOAT, 1, sizeof(Particle), (void*)0);
+	glVertexAttribPointer(init_velocity_attrib_, 3, GL_FLOAT, 1, sizeof(Particle), (void*)(3*sizeof(GLfloat)));
+	glVertexAttribPointer(init_time_attrib_, 1, GL_FLOAT, 1, sizeof(Particle), (void*)(6*sizeof(GLfloat)));
+	glVertexAttribPointer(life_attrib_, 1, GL_FLOAT, 1, sizeof(Particle), (void*)(7*sizeof(GLfloat)));
    
     // Enable the particle texture and draw the particles
-    glVertexPointer(3, GL_FLOAT, sizeof(Particle), 0);
     glDrawArrays(GL_POINTS, 0, particle_.size());
-    glDisable(GL_TEXTURE_2D);
     
     // Disable the vertex buffer
+	glDisableVertexAttribArray(init_position_attrib_);
+	glDisableVertexAttribArray(init_velocity_attrib_);
+	glDisableVertexAttribArray(init_time_attrib_);
+	glDisableVertexAttribArray(life_attrib_);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glDisableClientState(GL_VERTEX_ARRAY);
+
+	// Reset blend states and depth buffer
+	glDisable(GL_BLEND);
+	glDisable(GL_POINT_SPRITE);
+	glEnable(GL_DEPTH_TEST);
     
     particle_.clear();
     

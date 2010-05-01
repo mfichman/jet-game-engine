@@ -65,7 +65,19 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\Source\Jet\Core\Camera.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\Source\Jet\Core\Engine.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Jet\Core\FractureObject.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Jet\Core\InputSystem.cpp"
 				>
 			</File>
 			<File
@@ -73,7 +85,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Source\Jet\Core\MaterialLoader.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\Source\Jet\Core\Mesh.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Jet\Core\MeshLoader.cpp"
 				>
 			</File>
 			<File
@@ -81,7 +101,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Source\Jet\Core\ParticleBuffer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Jet\Core\ParticleSystem.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\Source\Jet\Core\PhysicsSystem.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Jet\Core\RenderSystem.cpp"
 				>
 			</File>
 			<File
@@ -119,11 +151,11 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\Include\Jet\Core\AudioSource.hpp"
+				RelativePath="..\Include\Jet\AudioSource.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\AudioSource.hpp"
+				RelativePath="..\Include\Jet\Core\AudioSource.hpp"
 				>
 			</File>
 			<File
@@ -131,11 +163,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Core\Camera.hpp"
+				RelativePath="..\Include\Jet\Camera.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Camera.hpp"
+				RelativePath="..\Include\Jet\Core\Camera.hpp"
 				>
 			</File>
 			<File
@@ -151,11 +183,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Core\FractureObject.hpp"
+				RelativePath="..\Include\Jet\FractureObject.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\FractureObject.hpp"
+				RelativePath="..\Include\Jet\Core\FractureObject.hpp"
 				>
 			</File>
 			<File
@@ -179,11 +211,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Material.hpp"
+				RelativePath="..\Include\Jet\Core\Material.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Core\Material.hpp"
+				RelativePath="..\Include\Jet\Material.hpp"
 				>
 			</File>
 			<File
@@ -195,11 +227,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Core\Mesh.hpp"
+				RelativePath="..\Include\Jet\Mesh.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Mesh.hpp"
+				RelativePath="..\Include\Jet\Core\Mesh.hpp"
 				>
 			</File>
 			<File
@@ -207,11 +239,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\MeshObject.hpp"
+				RelativePath="..\Include\Jet\Core\MeshObject.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Core\MeshObject.hpp"
+				RelativePath="..\Include\Jet\MeshObject.hpp"
 				>
 			</File>
 			<File
@@ -219,11 +251,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Core\Node.hpp"
+				RelativePath="..\Include\Jet\Node.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Node.hpp"
+				RelativePath="..\Include\Jet\Core\Node.hpp"
 				>
 			</File>
 			<File
@@ -239,11 +271,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Core\ParticleSystem.hpp"
+				RelativePath="..\Include\Jet\ParticleSystem.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\ParticleSystem.hpp"
+				RelativePath="..\Include\Jet\Core\ParticleSystem.hpp"
 				>
 			</File>
 			<File
@@ -267,11 +299,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Core\QuadSet.hpp"
+				RelativePath="..\Include\Jet\QuadSet.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\QuadSet.hpp"
+				RelativePath="..\Include\Jet\Core\QuadSet.hpp"
 				>
 			</File>
 			<File
@@ -280,10 +312,6 @@
 			</File>
 			<File
 				RelativePath="..\Include\Jet\Range.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\Jet\Core\RenderSystem.cpp"
 				>
 			</File>
 			<File
@@ -315,11 +343,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Shader.hpp"
+				RelativePath="..\Include\Jet\Core\Shader.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Core\Shader.hpp"
+				RelativePath="..\Include\Jet\Shader.hpp"
 				>
 			</File>
 			<File
@@ -335,11 +363,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Types.hpp"
+				RelativePath="..\Include\Jet\Core\Types.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Core\Types.hpp"
+				RelativePath="..\Include\Jet\Types.hpp"
 				>
 			</File>
 			<File

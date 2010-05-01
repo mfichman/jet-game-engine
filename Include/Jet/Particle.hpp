@@ -34,13 +34,14 @@ class Particle {
 public:
     
     Particle() :
-        initial_time(0.0f) {
+        init_time(0.0f),
+		life(0.0f) {
             
     }
     
-    Vector initial_position;
-    real_t initial_time;
-    Vector velocity;
+    Vector init_position;
+	Vector init_velocity;
+    real_t init_time;
     real_t life;
 };
 

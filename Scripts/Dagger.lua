@@ -31,6 +31,20 @@ function Dagger:__init(node, name)
         fracture_count = 3
     }
     
+    self.smoke = self.node:particle_system("smoke") {
+        quota = 100,
+        texture = "Fire.png",
+        --shader=?
+        life = Range(.5, .5),
+        width = Range(0, 2),
+        height = Range(0, 2),
+        depth = Range(0, 2),
+        emission_speed = Range(1, 10),
+        emission_direction = Vector(0, 1, 0),
+        emission_angle = Range(0, 180),
+        emission_rate = 1000
+    }
+    
     self.body = self.node:rigid_body()
     self.body.mass = 10.0
 end

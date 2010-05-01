@@ -75,9 +75,9 @@ function Test:__init()
     self.s3.node.position = Vector(5, 0, 5)
     
     
-    --self.s1.node.position = Vector(0, 0, 0)
-    --self.s0.node.position = Vector(0, -10, 0)
-    ---self.s0.body:apply_force(Vector(-15000, 30000, 0))
+    self.s1.node.position = Vector(0, 0, 0)
+    self.s0.node.position = Vector(0, -10, 0)
+    self.s0.body:apply_force(Vector(-15000, 30000, 0))
     math.randomseed(os.time())
 end
 
@@ -94,7 +94,11 @@ function Test:on_key_pressed(key, x, y)
     if (key == 'q') then
         engine.running = false
     elseif (key == 's') then
-        engine:option("simulation_speed", 1.0/30.0)
+        if (engine:option("simulation_speed") < 1) then
+            engine:option("simulation_speed", 1)
+        else
+            engine:option("simulation_speed", 1/20)
+        end
     elseif (key == 't') then
         self.s2.body:apply_torque(Vector(2000, 0, 0))
     elseif (key == 'r') then
@@ -104,6 +108,10 @@ function Test:on_key_pressed(key, x, y)
         self.s1.body.linear_velocity = Vector(0, 0, 0)
         self.s0.node.position = Vector(5, 0, 0)
         self.s0.body.linear_velocity = Vector(0, 0, 0)
+        self.s2.node.position = Vector(5, 0, 0)
+        self.s2.body.linear_velocity = Vector(0, 0, 0)
+        self.s3.node.position = Vector(5, 0, 0)
+        self.s3.body.linear_velocity = Vector(0, 0, 0)
         self.s0.body:apply_force(Vector(1500, 0, 0))
         self.s0.body:apply_torque(Vector(100, 0, 0))
     elseif (key == 'n') then

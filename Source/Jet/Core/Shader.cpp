@@ -116,7 +116,6 @@ void Core::Shader::init_program() {
 		throw runtime_error("Vertex shader log: " + string(log, length));
 	}
 	
-	tangent_attrib_ = glGetAttribLocation(program_, "tangent_in");
 }
 
 void Core::Shader::read_source(const string& path, vector<char>& source) {
@@ -159,4 +158,8 @@ void Core::Shader::enabled(bool enabled) {
 
 int32_t Core::Shader::uniform_location(const std::string& name) const {
 	return glGetUniformLocation(program_, name.c_str());
+}
+
+int32_t Core::Shader::attrib_location(const std::string& name) const {
+	return glGetAttribLocation(program_, name.c_str());
 }

@@ -77,16 +77,10 @@ void Core::RenderSystem::init_window() {
 	bool fsaa_enabled = engine_->option<bool>("fsaa_enabled");
 	GLuint fsaa_samples = (GLuint)engine_->option<real_t>("fsaa_samples");
 	
-	if (glewIsSupported("GL_ARB_multisample")) {
-		if (fsaa_enabled) {
-			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, fsaa_samples);
-			glEnable(GL_MULTISAMPLE);
-		} else {
-			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
-			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
-			glDisable(GL_MULTISAMPLE);
-		}
+	if (fsaa_enabled) {
+		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, fsaa_samples);
+		glEnable(GL_MULTISAMPLE);
 	}
 	
 	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
@@ -107,13 +101,6 @@ void Core::RenderSystem::init_window() {
 		throw runtime_error(string("SDL initialization failed: ") + SDL_GetError());
 	}
     glViewport(0, 0, (uint32_t)width, (uint32_t)height);
-}
-	
-void Core::RenderSystem::init_shadow_target() {
-	if (engine_->option<bool>("shadows_enabled")) {
-		GLuint size = (GLuint)engine_->option<real_t>("shadow_texture_size");
-    	shadow_target_.reset(new RenderTarget(size, size, true, 1));
-	}
 }
 
 void Core::RenderSystem::init_extensions() {
@@ -206,7 +193,16 @@ void Core::RenderSystem::on_init() {
 	init_window();
 	init_extensions();
     init_default_states();
-	init_shadow_target();
+		
+	// Initialize shadow target
+	if (engine_->option<bool>("shadows_enabled")) {
+		GLuint size = (GLuint)engine_->option<real_t>("shadow_texture_size");
+    	shadow_target_.reset(new RenderTarget(size, size, true, 1));
+	}
+	
+	// Initialize particle buffer
+	particle_buffer_.reset(new ParticleBuffer(engine_));
+	
 	
 	engine_->option("video_mode_synced", true);
 	//GLuint width = (GLuint)engine_->option<real_t>("display_width");
@@ -221,6 +217,7 @@ void Core::RenderSystem::on_update() {
 	// Clear the list of active mesh objects and lights
 	mesh_objects_.clear();
 	fracture_objects_.clear();
+	particle_systems_.clear();
 	lights_.clear();
 	generate_render_list(static_cast<Core::Node*>(engine_->root()));
 	
@@ -251,6 +248,7 @@ void Core::RenderSystem::on_render() {
 			i->second->state(LOADED);
 		}
 		shadow_target_.reset();
+		particle_buffer_.reset();
 		on_init();
 	}
 	
@@ -383,6 +381,7 @@ void Core::RenderSystem::render_final(Light* light) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	render_visible_mesh_objects();
 	render_visible_fracture_objects();
+	render_visible_particle_systems();
 	
 
 	/* TODO: Finish gaussian filter
@@ -414,31 +413,6 @@ void Core::RenderSystem::render_final(Light* light) {
 	glDisable(GL_TEXTURE_2D);
 	glActiveTexture(GL_TEXTURE1);
 	glDisable(GL_TEXTURE_2D);*/
-}
-
-
-void Core::RenderSystem::generate_render_list(Core::Node* node) {
-
-	// Iterate through all sub objects and add them to the appropriate
-	// render list as necessary
-    for (Iterator<ObjectPtr> i = node->objects(); i; i++) {
-        const type_info& type = typeid(**i);
-        if (typeid(Core::Node) == type) {
-            generate_render_list(static_cast<Core::Node*>(i->get()));
-        } else if (typeid(Core::MeshObject) == type) {
-			Core::MeshObject* mesh_object = static_cast<Core::MeshObject*>(i->get());
-			if (mesh_object->material() && mesh_object->mesh()) {
-				mesh_objects_.push_back(mesh_object);
-			}
-        } else if (typeid(Core::FractureObject) == type) {
-			Core::FractureObject* fracture_object = static_cast<Core::FractureObject*>(i->get());
-			if (fracture_object->material() && fracture_object->mesh()) {
-				fracture_objects_.push_back(fracture_object);
-			}
-		} else if (typeid(Core::Light) == type) {
-			lights_.push_back(static_cast<Core::Light*>(i->get()));
-		}
-    }
 }
 
 void Core::RenderSystem::render_shadow_casters() {
@@ -530,6 +504,20 @@ void Core::RenderSystem::render_visible_fracture_objects() {
 	active_material(0);
 }
 
+
+void Core::RenderSystem::render_visible_particle_systems() {
+	
+	for (vector<Core::ParticleSystemPtr>::iterator i = particle_systems_.begin(); i != particle_systems_.end(); i++) {
+		Core::ParticleSystem* particle_system = i->get();
+		
+		// Render the particle system using the buffer
+		particle_system->render(particle_buffer_.get());
+	}
+	particle_buffer_->flush();
+	particle_buffer_->shader(0);
+	particle_buffer_->texture(0);
+}
+
 inline void Core::RenderSystem::active_material(Material* material) {
 	// If the material is different from the current material, then disable
 	// the old material and enable the new material
@@ -595,10 +583,53 @@ void Core::RenderSystem::render_fullscreen_quad() {
     
 }
 
+
+void Core::RenderSystem::generate_render_list(Core::Node* node) {
+
+	// Iterate through all sub objects and add them to the appropriate
+	// render list as necessary
+    for (Iterator<ObjectPtr> i = node->objects(); i; i++) {
+        const type_info& type = typeid(**i);
+        if (typeid(Core::Node) == type) {
+			// Recursively add nodes
+            generate_render_list(static_cast<Core::Node*>(i->get()));
+			
+        } else if (typeid(Core::MeshObject) == type) {
+			// Add mesh objects that have a valid material and mesh
+			Core::MeshObject* mesh_object = static_cast<Core::MeshObject*>(i->get());
+			if (mesh_object->material() && mesh_object->mesh()) {
+				mesh_objects_.push_back(mesh_object);
+			}
+			
+        } else if (typeid(Core::FractureObject) == type) {
+			// Add fracture objects with a valid material and mesh
+			Core::FractureObject* fracture_object = static_cast<Core::FractureObject*>(i->get());
+			if (fracture_object->material() && fracture_object->mesh()) {
+				fracture_objects_.push_back(fracture_object);
+			}
+			
+		} else if (typeid(Core::Light) == type) {
+			// Add all lights
+			lights_.push_back(static_cast<Core::Light*>(i->get()));
+			
+		} else if (typeid(Core::ParticleSystem) == type) {
+			// Add particle systems with a valid texture
+			Core::ParticleSystem* particle_system = static_cast<Core::ParticleSystem*>(i->get());
+			if (particle_system->texture()) {
+				particle_systems_.push_back(particle_system);
+			}
+		}
+    }
+}
+
 bool Core::RenderSystem::compare_mesh_objects(MeshObjectPtr o1, MeshObjectPtr o2) {
     return o1->material() < o2->material();
 }
 
 bool Core::RenderSystem::compare_fracture_objects(FractureObjectPtr o1, FractureObjectPtr o2) {
     return o1->material() < o2->material();
+}
+
+bool Core::RenderSystem::compare_particle_systems(ParticleSystemPtr o1, ParticleSystemPtr o2) {
+	return o1->texture() < o2->texture();
 }

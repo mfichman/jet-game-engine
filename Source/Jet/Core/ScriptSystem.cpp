@@ -329,16 +329,17 @@ void Core::ScriptSystem::init_entity_type_bindings() {
             
         luabind::class_<Jet::ParticleSystem, Jet::ParticleSystemPtr>("ParticleSystem")
             .property("parent", &Jet::ParticleSystem::parent)
-            .property("life", (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::life, (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::life)
-            .property("width", (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::width, (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::width)
-            .property("height", (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::height, (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::height)
-            .property("depth", (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::depth, (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::depth)
-            .property("emission_speed", (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::emission_speed, (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::emission_speed)
-            .property("type", (void (Jet::ParticleSystem::*)(Jet::ParticleSystemType))&Jet::ParticleSystem::type, (Jet::ParticleSystemType (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::type)
-            .property("emission_direction", (void (Jet::ParticleSystem::*)(const Vector&))&Jet::ParticleSystem::emission_direction, (const Vector& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::emission_direction)
-            .property("emission_rate", (void (Jet::ParticleSystem::*)(real_t))&Jet::ParticleSystem::emission_rate, (real_t (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::emission_rate)
-            .property("emission_angle", (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::emission_angle, (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::emission_angle),
-            
+            .property("life", (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::life, (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::life)
+            .property("width", (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::width, (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::width)
+            .property("height", (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::height, (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::height)
+            .property("depth", (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::depth, (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::depth)
+            .property("emission_speed", (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::emission_speed, (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::emission_speed)
+            .property("type", (Jet::ParticleSystemType (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::type, (void (Jet::ParticleSystem::*)(Jet::ParticleSystemType))&Jet::ParticleSystem::type)
+            .property("emission_direction", (const Vector& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::emission_direction, (void (Jet::ParticleSystem::*)(const Vector&))&Jet::ParticleSystem::emission_direction)
+            .property("emission_rate", (real_t (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::emission_rate, (void (Jet::ParticleSystem::*)(real_t))&Jet::ParticleSystem::emission_rate)
+            .property("emission_angle", (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::emission_angle, (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::emission_angle)
+            .property("texture", (Jet::Texture* (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::texture, (void (Jet::ParticleSystem::*)(const std::string&))&Jet::ParticleSystem::texture),
+        
         luabind::class_<Jet::RigidBody, Jet::RigidBodyPtr>("RigidBody")
             .property("parent", &Jet::RigidBody::parent)
             .property("linear_velocity", (Vector (Jet::RigidBody::*)() const)&Jet::RigidBody::linear_velocity, (void (Jet::RigidBody::*)(const Vector&))&Jet::RigidBody::linear_velocity)

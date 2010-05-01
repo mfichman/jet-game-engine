@@ -66,7 +66,9 @@ Core::Engine::Engine() :
     running_(true),
 	initialized_(false),
 	fps_frame_count_(0),
-	fps_elapsed_time_(0.0f) {
+	fps_elapsed_time_(0.0f),
+	frame_delta_(0.0f),
+	frame_time_(0.0f) {
 		
 	cout << "Starting kernel..." << endl;
 		
@@ -225,6 +227,8 @@ void Core::Engine::tick() {
 	if (module_) {
 		module_->on_render();
 	}
+	
+	frame_time_ += frame_delta_;
 }
 
 void Core::Engine::update_fps() {

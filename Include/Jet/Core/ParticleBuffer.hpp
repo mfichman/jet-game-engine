@@ -37,9 +37,10 @@ class ParticleBuffer : public Object {
 public:
     //! Constructor.  Creates a new particle buffer of the given size.
     //! When the particle buffer is full, it will be flushed
-    //! @param size the maximum number of particles in each draw batch
+    //! @param engine the engine object
+	//! @param size the maximum number of particles in each draw batch
     //! @param buffers the number of hardware buffers to use (for pipelining)
-    ParticleBuffer(size_t size=5000, size_t buffers=2);
+    ParticleBuffer(Engine* engine, size_t size=4096, size_t buffers=2);
     
     //! Destructor.
     ~ParticleBuffer();
@@ -61,12 +62,19 @@ public:
     
 private:
     
+	Engine* engine_;
     TexturePtr texture_;
     ShaderPtr shader_;
     std::vector<Particle> particle_;
     std::vector<uint32_t> vbuffer_;
     size_t size_;
     size_t current_buffer_;
+	int32_t diffuse_map_loc_;
+	int32_t time_loc_;
+	int32_t init_position_attrib_;
+	int32_t init_velocity_attrib_;
+	int32_t init_time_attrib_;
+	int32_t life_attrib_;
 };
 
 }}

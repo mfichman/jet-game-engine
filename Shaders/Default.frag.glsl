@@ -87,7 +87,7 @@ void main() {
 #ifdef SHADOW_MAP
     if (shadow_map_enabled) {
         vec4 shadow_coord = gl_TexCoord[1]/gl_TexCoord[1].w;
-        float depth = texture2D(shadow_map, shadow_coord.st).z + 0.0001;
+        float depth = texture2D(shadow_map, shadow_coord.st).z + 0.0005;
         if (depth < shadow_coord.z) {
             diffuse *= 0.4;
             specular *= 0.1;

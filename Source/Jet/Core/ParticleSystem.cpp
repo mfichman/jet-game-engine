@@ -43,31 +43,32 @@ static inline real_t rand_range2(const Range& range) {
 }
 
 void Core::ParticleSystem::render(Core::ParticleBuffer* buffer) {
-    time_ += engine_->frame_delta();
     accumulator_ += engine_->frame_delta();
     dead_particle_.clear();
     
     // Set the buffer's shader and pointer.  This may cause the
     // buffer to flush, but that's what we want.
-    buffer->shader(shader_.get());
+	buffer->shader(shader_.get());
     buffer->texture(texture_.get());
     
     // Add particles that are alive to the particle buffer, and
     // add dead particles to the free list
     for (size_t i = 0; i < particle_.size(); i++) {
         Particle& p = particle_[i];
-        if ((time_ - p.initial_time) > p.life || p.life <= 0.0f) {
+        if ((engine_->frame_time() - p.init_time) > p.life || p.life <= 0.0f) {
             dead_particle_.push_back(&p);
         } else {
             buffer->particle(p);
         }
     }
+
+	Vector origin = parent_->matrix().origin();
     
     // Spawn additional particles
     while (accumulator_ > 1.0f/emission_rate_ && !dead_particle_.empty()) {
         Particle& p = *dead_particle_.back();
         dead_particle_.pop_back();
-        p.initial_time = time_;
+        p.init_time = engine_->frame_time();
         
         // Set up initial parameters
         if (BOX_EMITTER == type_) {
@@ -79,8 +80,9 @@ void Core::ParticleSystem::render(Core::ParticleBuffer* buffer) {
         } else if (POINT_EMITTER == type_) {
             init_particle_point(p);
         }
+		p.init_position += origin;
         
-        accumulator_ -= emission_rate_;
+        accumulator_ -= 1.0f/emission_rate_;
     }
 }
     
@@ -88,12 +90,13 @@ void Core::ParticleSystem::init_particle_box(Particle& p) {
     real_t w = rand_range2(Range(0, 1));
     real_t h = rand_range2(Range(0, 1));
     real_t d = rand_range2(Range(0, 1));
-    p.initial_position.x = w * (width_.end - width_.begin);
-    p.initial_position.y = h * (height_.end - height_.begin);
-    p.initial_position.z = d * (depth_.end - depth_.begin);
+    p.init_position.x = w * (width_.end - width_.begin);
+    p.init_position.y = h * (height_.end - height_.begin);
+    p.init_position.z = d * (depth_.end - depth_.begin);
     
     real_t speed = rand_range(emission_speed_);
-    p.velocity = Vector(w, h, d).unit() * speed;
+    p.init_velocity = Vector(w, h, d).unit() * speed;
+	p.life = rand_range(life_);
 }
 
 void Core::ParticleSystem::init_particle_ellipsoid(Particle& p) {
@@ -102,27 +105,29 @@ void Core::ParticleSystem::init_particle_ellipsoid(Particle& p) {
     real_t a = rand_range(width_);
     real_t b = rand_range(height_);
     real_t c = rand_range(depth_);
-    p.initial_position.x = a * sinf(phi) * cosf(theta);
-    p.initial_position.y = b * sinf(phi) * sinf(theta);
-    p.initial_position.z = c * cosf(phi);
+    p.init_position.x = a * sinf(phi) * cosf(theta);
+    p.init_position.y = b * sinf(phi) * sinf(theta);
+    p.init_position.z = c * cosf(phi);
     
     real_t speed = rand_range(emission_speed_);
-    p.velocity.x = speed * sinf(phi) * cosf(theta);
-    p.velocity.y = speed * sinf(phi) * sinf(theta);
-    p.velocity.z = speed * cosf(phi);
+    p.init_velocity.x = speed * sinf(phi) * cosf(theta);
+    p.init_velocity.y = speed * sinf(phi) * sinf(theta);
+    p.init_velocity.z = speed * cosf(phi);
+	p.life = rand_range(life_);
 }
 
 void Core::ParticleSystem::init_particle_point(Particle& p) {
-    p.initial_position = Vector(0.0f, 0.0f, 0.0f);
+    p.init_position = Vector(0.0f, 0.0f, 0.0f);
     
     Vector forward = emission_direction_.unit();
     Vector up = forward.orthogonal();
     Vector right = forward.cross(up);
     
     real_t speed = rand_range(emission_speed_);
-    real_t beta = rand_range(Range(0.0f, 2.0f*PI));
+    real_t beta = PI / 180 * rand_range(emission_angle_);
     real_t theta = PI / 180 * rand_range(emission_angle_);
-    Vector side = up * cosf(beta) + right * sinf(beta);
+    Vector side = up * sinf(theta) + right * sinf(beta);
     Vector direction = side * cosf(theta) + forward;
-    p.velocity = direction.unit() * speed;
+    p.init_velocity = direction.unit() * speed;
+	p.life = rand_range(life_);
 }

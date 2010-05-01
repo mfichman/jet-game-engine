@@ -55,14 +55,12 @@ public:
 	
 	//! Turns this shader on or off
 	void enabled(bool enabled);
-		
-	//! Returns the tangent attribute
-	inline int32_t tangent_attrib() const {
-		return tangent_attrib_;
-	}
 	
 	//! Returns the uniform location of the given parameter.
 	int32_t uniform_location(const std::string& name) const;
+
+	//! Returns the attribute location of the given parameter.
+	int32_t attrib_location(const std::string& name) const;
     
 private:
     //! Creates a shader.
@@ -73,8 +71,7 @@ private:
 		vshader_(0),
 		fshader_(0),
 		program_(0),
-		enabled_(false),
-		tangent_attrib_(-1) {
+		enabled_(false) {
 	}
 	
 	void init_program();
@@ -87,7 +84,6 @@ private:
 	uint32_t fshader_;
 	uint32_t program_;
 	bool enabled_;
-	int32_t tangent_attrib_;
 	std::vector<char> vsource_;
 	std::vector<char> fsource_;
     

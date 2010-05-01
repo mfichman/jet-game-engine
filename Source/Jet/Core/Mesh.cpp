@@ -179,15 +179,17 @@ void Core::Mesh::render(Core::Shader* shader, uint32_t ibuffer, size_t nindices)
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	
 	if (shader && engine_->option<bool>("shaders_enabled")) {
 		// Enable tangent vectors
-		glEnableVertexAttribArray(shader->tangent_attrib());
-		glVertexAttribPointer(shader->tangent_attrib(), 3, GL_FLOAT, 1, sizeof(Vertex), (void*)(6*sizeof(GLfloat)));
+		GLint tangent_attrib = shader->attrib_location("tangent");
+		glEnableVertexAttribArray(tangent_attrib);
+		glVertexAttribPointer(tangent_attrib, 3, GL_FLOAT, 1, sizeof(Vertex), (void*)(6*sizeof(GLfloat)));
 	}
 
 	// Set up the buffer offsets (equivalent of FVF in D3D9)
 	// and then render the indexed buffers
-    glVertexPointer(3, GL_FLOAT, sizeof(Vertex), 0);
+    glVertexPointer(3, GL_FLOAT, sizeof(Vertex), (void*)0);
     glNormalPointer(GL_FLOAT, sizeof(Vertex), (void*)(3*sizeof(GLfloat)));
     glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), (void*)(9*sizeof(GLfloat)));
     glDrawElements(GL_TRIANGLES, nindices, GL_UNSIGNED_INT, (void*)0);
@@ -200,7 +202,8 @@ void Core::Mesh::render(Core::Shader* shader, uint32_t ibuffer, size_t nindices)
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	if (shader && engine_->option<bool>("shaders_enabled")) {
 		// Disable tangent vectors
-		glDisableVertexAttribArray(shader->tangent_attrib());
+		GLint tangent_attrib = shader->attrib_location("tangent");
+		glDisableVertexAttribArray(tangent_attrib);
 	}
 }
 

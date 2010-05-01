@@ -95,6 +95,11 @@ public:
 	inline real_t frame_delta() const {
 		return frame_delta_;
 	}
+	
+	//! Returns the frame time
+	inline real_t frame_time() const {
+		return frame_time_;
+	}
     
     //! Returns an engine option.  This method will return nil if the option
     //! cannot bet found.
@@ -264,6 +269,7 @@ private:
     bool running_;
 	bool initialized_;
     real_t frame_delta_;
+	real_t frame_time_;
 	unsigned fps_frame_count_;
 	real_t fps_elapsed_time_;
 	

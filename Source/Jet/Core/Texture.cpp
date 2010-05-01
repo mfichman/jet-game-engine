@@ -119,7 +119,7 @@ void Core::Texture::init_texture() {
 
 
 	// Load the image
-	gluBuild2DMipmaps(GL_TEXTURE_2D, 3, width(), height(), texture_format_, GL_UNSIGNED_BYTE, data());
+	gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, width(), height(), texture_format_, GL_UNSIGNED_BYTE, data());
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 

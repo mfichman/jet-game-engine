@@ -57,6 +57,11 @@ function Node:fracture_object(name)
     return table_syntax(node_fracture_object(self, name))
 end
 
+local node_particle_system = engine.root.particle_system;
+function Node:particle_system(name)
+    return table_syntax(node_particle_system(self, name))
+end
+
 local node_light = engine.root.light;
 function Node:light(name)
     return table_syntax(node_light(self, name))

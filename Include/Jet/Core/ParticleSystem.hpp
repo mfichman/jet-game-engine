@@ -206,8 +206,8 @@ private:
         engine_(engine),
         parent_(parent),
         quota_(1000),
-        time_(0.0f),
-        accumulator_(0.0f) {
+        accumulator_(0.0f),
+		type_(ELLIPSOID_EMITTER) {
             
         shader("Particle");
         particle_.resize(quota_);
@@ -233,7 +233,6 @@ private:
     ShaderPtr shader_;
     std::vector<Particle> particle_;
     std::vector<Particle*> dead_particle_;
-    real_t time_;
     real_t accumulator_;
     
     friend class Node;

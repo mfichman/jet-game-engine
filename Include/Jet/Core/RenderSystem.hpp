@@ -27,6 +27,7 @@
 #include <Jet/Core/MeshObject.hpp>
 #include <Jet/Core/FractureObject.hpp>
 #include <Jet/Core/ParticleSystem.hpp>
+#include <Jet/Core/ParticleBuffer.hpp>
 #include <vector>
 
 namespace Jet { namespace Core {
@@ -65,6 +66,7 @@ private:
     void render_shadow_casters();
     void render_visible_mesh_objects();
     void render_visible_fracture_objects();
+    void render_visible_particle_systems();
     void render_fullscreen_quad();
     void push_modelview_matrix(const Matrix& matrix);
     void pop_modelview_matrix();
@@ -83,8 +85,11 @@ private:
     RenderTargetPtr bloom_target1_;
     RenderTargetPtr bloom_target2_;
     
+    ParticleBufferPtr particle_buffer_;
+    
     std::vector<MeshObjectPtr> mesh_objects_;
     std::vector<FractureObjectPtr> fracture_objects_;
+    std::vector<ParticleSystemPtr> particle_systems_;
     std::vector<LightPtr> lights_;
     Material* active_material_;
     RenderPass render_pass_;
