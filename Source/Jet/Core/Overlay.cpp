@@ -47,6 +47,19 @@ void Core::Overlay::render() {
     glPushMatrix();
     glTranslatef(x_, y_, 0.0f);
     
+    render_background();
+    render_text();
+    
+    // Render children
+    for (unordered_map<string, OverlayPtr>::const_iterator i = overlay_.begin(); i != overlay_.end(); i++) {
+        i->second->render();
+    }
+    
+    glPopMatrix();
+    
+}
+
+void Core::Overlay::render_background() {
     if (background_) {
         background_->sampler(0);
         glEnable(GL_TEXTURE_2D);
@@ -64,12 +77,8 @@ void Core::Overlay::render() {
 
         glDisable(GL_TEXTURE_2D);
     }
-    
-    for (unordered_map<string, OverlayPtr>::const_iterator i = overlay_.begin(); i != overlay_.end(); i++) {
-        i->second->render();
-    }
-    
-    
-    glPopMatrix();
+}
+
+void Core::Overlay::render_text() {
     
 }

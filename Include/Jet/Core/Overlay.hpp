@@ -198,6 +198,9 @@ private:
             
     }
     
+    void render_background();
+    void render_text();
+    
     Engine* engine_;
     Overlay* parent_;
     std::tr1::unordered_map<std::string, OverlayPtr> overlay_;
