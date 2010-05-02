@@ -29,6 +29,7 @@ attribute float init_time;
 attribute float init_size;
 attribute float init_rotation;
 attribute float life;
+attribute float growth_rate;
 
 varying float alpha;
 varying float rotation;
@@ -41,7 +42,7 @@ void main() {
     float dist = length(view_position.xyz);
     
     gl_Position = gl_ProjectionMatrix * view_position;
-    gl_PointSize = scale * init_size / (1.0 + dist);
+    gl_PointSize = max(scale * init_size / (1.0 + dist) + growth_rate * elapsed_time, 0.0);
     gl_TexCoord[0] = gl_MultiTexCoord0;
     alpha = clamp(1.0 - elapsed_time/life, 0.0, 1.0);
     rotation = init_rotation;

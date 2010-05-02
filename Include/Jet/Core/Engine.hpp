@@ -55,7 +55,12 @@ public:
     inline Jet::Node* root() const { 
         return root_.get(); 
     }
+	
+	//! Returns the root overlay.
+	inline Jet::Overlay* overlay() const {
+		return overlay_.get();
         
+	}
 	//! Returns the active camera.
 	inline Jet::Camera* camera() const {
 		return camera_.get();
@@ -123,10 +128,14 @@ public:
     //! Returns the full path to the file using the given resource name.
     //! @param name the name of the resource
     std::string resource_path(const std::string& name) const;
+	
+	//! Returns the font with the given name.
+	//! @param name the name of the font
+	Jet::Font* font(const std::string& name);
 
     //! Returns the material with the given name.
     //! @param name the name of the material
-    Jet::Material* material(const std::string& type);
+    Jet::Material* material(const std::string& name);
 
     //! Returns the mesh with the given name.
     //! @param name the name of the mesh.
@@ -246,6 +255,7 @@ private:
 	std::map<std::string, boost::any> option_;
 
     Jet::NodePtr root_;
+	Jet::OverlayPtr overlay_;
 	Jet::CameraPtr camera_;
 	Jet::ModulePtr module_;
 	

@@ -203,8 +203,8 @@ private:
 		engine_(engine),
 		parent_(0),
 		shape_transform_(btTransform::getIdentity()),
-		destroyed_(false) {
-		
+		destroyed_(false),
+		transform_dirty_(true) {
 	}
     
     //! Creates a new node with a parent.
@@ -216,7 +216,7 @@ private:
 		rigid_body_(parent->rigid_body_),
 		shape_transform_(parent->shape_transform_),
 		destroyed_(false),
-		transform_dirty_(false) {
+		transform_dirty_(true) {
 	}
     
     //! Removes an object from this node.

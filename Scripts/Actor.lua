@@ -29,3 +29,6 @@ function Actor:on_render() end
 function Actor:on_collision(node) end
 function Actor:on_destroy() end
 function Actor:on_fracture(node) end
+function Actor:destroy()
+    self.node:destroy()
+end

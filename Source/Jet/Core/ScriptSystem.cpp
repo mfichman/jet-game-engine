@@ -326,7 +326,8 @@ void Core::ScriptSystem::init_entity_type_bindings() {
             .def("audio_source", &Jet::Node::audio_source)
             .def("camera", &Jet::Node::camera)
             .def("fracture_object", &Jet::Node::fracture_object)
-            .def("look", &Jet::Node::look),
+            .def("look", &Jet::Node::look)
+			.def("destroy", &Jet::Node::destroy),
             
         luabind::class_<Jet::MeshObject, Jet::MeshObjectPtr>("MeshObject")
             .property("parent", &Jet::MeshObject::parent)
@@ -360,7 +361,8 @@ void Core::ScriptSystem::init_entity_type_bindings() {
 			.property("emission_direction", (const Vector& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::emission_direction, (void (Jet::ParticleSystem::*)(const Vector&))&Jet::ParticleSystem::emission_direction)
             .property("emission_rate", (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::emission_rate, (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::emission_rate)
             .property("emission_angle", (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::emission_angle, (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::emission_angle)
-            .property("texture", (Jet::Texture* (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::texture, (void (Jet::ParticleSystem::*)(const std::string&))&Jet::ParticleSystem::texture)
+            .property("particle_growth_rate", (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::particle_growth_rate, (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::particle_growth_rate)
+			.property("texture", (Jet::Texture* (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::texture, (void (Jet::ParticleSystem::*)(const std::string&))&Jet::ParticleSystem::texture)
             .enum_("types") [ value("BOX_EMITTER", BOX_EMITTER), value("POINT_EMITTER", POINT_EMITTER), value("ELLIPSOID_EMITTER", ELLIPSOID_EMITTER) ],
             
         luabind::class_<Jet::RigidBody, Jet::RigidBodyPtr>("RigidBody")

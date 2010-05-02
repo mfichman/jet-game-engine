@@ -45,6 +45,7 @@ public:
 	real_t init_size;
 	real_t init_rotation;
     real_t life;
+	real_t growth_rate;
 };
 
 }

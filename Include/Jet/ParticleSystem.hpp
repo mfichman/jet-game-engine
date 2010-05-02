@@ -51,6 +51,9 @@ public:
     //! z-values that particles will be created at.
     virtual const Range& depth() const=0;
 
+	//! Returns the particle growth rate.
+	virtual const Range& particle_growth_rate() const=0;
+
 	//! Returns the particle life.
 	virtual const Range& particle_life() const=0;
 
@@ -98,6 +101,10 @@ public:
     //! Sets the range z-values that particles will be created at.
     //! @param depth the range of z-values
     virtual void depth(const Range& depth)=0;
+
+	//! Sets the particle growth rate.
+	//! @param rate the rate in pixels/second
+	virtual void particle_growth_rate(const Range& rate)=0;
 
 	//! Sets the particle life.
 	//! @param life the range in particle lifetime

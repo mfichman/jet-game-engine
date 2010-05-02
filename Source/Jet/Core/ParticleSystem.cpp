@@ -69,9 +69,8 @@ void Core::ParticleSystem::render(Core::ParticleBuffer* buffer) {
 	}
 
 	accumulator_ += engine_->frame_delta();
-	Vector origin = parent_->matrix().origin();
-	transformed_direction_ = parent_->matrix().rotate(emission_direction_).unit();
-    
+	real_t speed = engine_->option<real_t>("simulation_speed");
+ 
     // Spawn additional particles
     while (accumulator_ > next_emission_ && !dead_particle_.empty()) {
         Particle& p = *dead_particle_.back();
@@ -80,6 +79,7 @@ void Core::ParticleSystem::render(Core::ParticleBuffer* buffer) {
 		p.init_size = rand_range(particle_size_);
 		p.init_rotation = rand_range(Range(0.0, PI));
 		p.life = rand_range(particle_life_);
+		p.growth_rate = rand_range(particle_growth_rate_);
         
         // Set up initial parameters
         if (BOX_EMITTER == type_) {
@@ -91,7 +91,11 @@ void Core::ParticleSystem::render(Core::ParticleBuffer* buffer) {
         } else if (POINT_EMITTER == type_) {
             init_particle_point(p);
         }
-		p.init_position += origin;
+        p.init_position = parent_->matrix() * p.init_position;
+        p.init_velocity = parent_->matrix().rotate(p.init_velocity);
+		if (parent_->rigid_body_) {
+			p.init_velocity += parent_->rigid_body()->linear_velocity() * speed;
+		}
         
         accumulator_ -= next_emission_;
 		next_emission_ = 1.0f/rand_range(emission_rate_);
@@ -129,7 +133,7 @@ void Core::ParticleSystem::init_particle_ellipsoid(Particle& p) {
 void Core::ParticleSystem::init_particle_point(Particle& p) {
     p.init_position = Vector(0.0f, 0.0f, 0.0f);
     
-    Vector forward = transformed_direction_;
+    Vector forward = emission_direction_;
     Vector up = forward.orthogonal();
     Vector right = forward.cross(up);
     

@@ -35,6 +35,7 @@ namespace Jet { namespace Core {
     class Mesh;
     class MeshObject;
     class Node;
+    class Overlay;
     class ParticleBuffer;
     class ParticleSystem;
     class PhysicsSystem;
@@ -59,6 +60,7 @@ namespace Jet { namespace Core {
     typedef boost::intrusive_ptr<Mesh> MeshPtr;
     typedef boost::intrusive_ptr<MeshObject> MeshObjectPtr;
     typedef boost::intrusive_ptr<Node> NodePtr;
+    typedef boost::intrusive_ptr<Overlay> OverlayPtr;
     typedef boost::intrusive_ptr<ParticleSystem> ParticleSystemPtr;
     typedef boost::intrusive_ptr<ParticleBuffer> ParticleBufferPtr;
     typedef boost::intrusive_ptr<PhysicsSystem> PhysicsSystemPtr;
@@ -80,8 +82,5 @@ namespace Jet { namespace Core {
         SHADOW_MAP_SAMPLER = 3
     };
     
-    enum RenderPass {
-        SHADOW_PASS,
-        MAIN_PASS
-    };
+    enum RenderPass { SHADOW_PASS, MAIN_PASS };
 }}

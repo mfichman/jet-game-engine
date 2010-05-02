@@ -3,6 +3,8 @@
 #include <stdexcept>
 #include <SDL/SDL.h>
 
+#include <Jet/Overlay.hpp>
+
 using namespace std;
 
 int main(int argc, char** argv) {

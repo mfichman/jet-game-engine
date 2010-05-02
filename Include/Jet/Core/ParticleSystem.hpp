@@ -68,6 +68,11 @@ public:
         return depth_;
     }
 
+	//! Particle growth rate
+	inline const Range& particle_growth_rate() const {
+		return particle_growth_rate_;
+	}
+
 	//! Returns the particle life.
 	inline const Range& particle_life() const {
 		return particle_life_;
@@ -143,6 +148,11 @@ public:
     inline void depth(const Range& depth) {
         depth_ = depth;
     }
+
+	//! Sets the particle growth rate.
+	inline void particle_growth_rate(const Range& rate) {
+		particle_growth_rate_ = rate;
+	}
 
 	//! Sets the particle life.
 	//! @param life the range in particle lifetime
@@ -245,11 +255,11 @@ private:
     Range width_;
     Range height_;
     Range depth_;
+	Range particle_growth_rate_;
 	Range particle_life_;
 	Range particle_size_;
     Range emission_speed_;
     Vector emission_direction_;
-	Vector transformed_direction_;
     Range emission_rate_;
     ParticleSystemType type_;
     Range emission_angle_;

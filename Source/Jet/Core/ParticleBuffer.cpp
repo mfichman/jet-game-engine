@@ -101,6 +101,7 @@ void Core::ParticleBuffer::shader(Shader* shader) {
 			init_size_attrib_ = shader_->attrib_location("init_size");
 			init_rotation_attrib_ = shader_->attrib_location("init_rotation");
 			life_attrib_ = shader_->attrib_location("life");
+			growth_rate_attrib_ = shader->attrib_location("growth_rate");
 
 		} else {
 			diffuse_map_loc_ = -1;
@@ -111,6 +112,7 @@ void Core::ParticleBuffer::shader(Shader* shader) {
 			init_time_attrib_ = -1;
 			init_size_attrib_ = -1;
 			life_attrib_ = -1;
+			growth_rate_attrib_ = -1;
 		}
     }
 }
@@ -131,6 +133,7 @@ void Core::ParticleBuffer::flush() {
 	glEnable(GL_BLEND);
 	glEnable(GL_POINT_SPRITE);
 	glDepthMask(GL_FALSE);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); USE THIS FOR SMOKE
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
 	glUniform1f(time_loc_, engine_->frame_time());
@@ -145,12 +148,14 @@ void Core::ParticleBuffer::flush() {
 	glEnableVertexAttribArray(init_size_attrib_);
 	glEnableVertexAttribArray(init_rotation_attrib_);
 	glEnableVertexAttribArray(life_attrib_);
+	glEnableVertexAttribArray(growth_rate_attrib_);
 	glVertexAttribPointer(init_position_attrib_, 3, GL_FLOAT, 1, sizeof(Particle), (void*)0);
 	glVertexAttribPointer(init_velocity_attrib_, 3, GL_FLOAT, 1, sizeof(Particle), (void*)(3*sizeof(GLfloat)));
 	glVertexAttribPointer(init_time_attrib_, 1, GL_FLOAT, 1, sizeof(Particle), (void*)(6*sizeof(GLfloat)));
 	glVertexAttribPointer(init_size_attrib_, 1, GL_FLOAT, 1, sizeof(Particle), (void*)(7*sizeof(GLfloat)));
 	glVertexAttribPointer(init_rotation_attrib_, 1, GL_FLOAT, 1, sizeof(Particle), (void*)(8*sizeof(GLfloat)));
 	glVertexAttribPointer(life_attrib_, 1, GL_FLOAT, 1, sizeof(Particle), (void*)(9*sizeof(GLfloat)));
+	glVertexAttribPointer(growth_rate_attrib_, 1, GL_FLOAT, 1, sizeof(Particle), (void*)(10*sizeof(GLfloat)));
    
     // Enable the particle texture and draw the particles
     glDrawArrays(GL_POINTS, 0, particle_.size());
@@ -162,6 +167,7 @@ void Core::ParticleBuffer::flush() {
 	glDisableVertexAttribArray(init_size_attrib_);
 	glDisableVertexAttribArray(init_rotation_attrib_);
 	glDisableVertexAttribArray(life_attrib_);
+	glDisableVertexAttribArray(growth_rate_attrib_);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	// Reset blend states and depth buffer

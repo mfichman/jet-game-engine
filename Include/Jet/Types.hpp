@@ -52,6 +52,7 @@ namespace Jet {
     class Color;
     class Engine;
     class EngineListener;
+    class Font;
     class FractureObject;
     class Frustum;
     class Light;
@@ -63,6 +64,7 @@ namespace Jet {
     class Node;
     class NodeListener;
     class Object;
+    class Overlay;
     class Particle;
     class ParticleSystem;
     class Plane;
@@ -82,6 +84,7 @@ namespace Jet {
     typedef boost::intrusive_ptr<Camera> CameraPtr;
     typedef boost::intrusive_ptr<Engine> EnginePtr;
     typedef boost::intrusive_ptr<EngineListener> EngineListenerPtr;
+    typedef boost::intrusive_ptr<Font> FontPtr;
     typedef boost::intrusive_ptr<FractureObject> FractureObjectPtr;
     typedef boost::intrusive_ptr<Light> LightPtr;
     typedef boost::intrusive_ptr<Material> MaterialPtr;
@@ -91,6 +94,7 @@ namespace Jet {
     typedef boost::intrusive_ptr<Node> NodePtr;
     typedef boost::intrusive_ptr<NodeListener> NodeListenerPtr;
     typedef boost::intrusive_ptr<Object> ObjectPtr;
+    typedef boost::intrusive_ptr<Overlay> OverlayPtr;
     typedef boost::intrusive_ptr<ParticleSystem> ParticleSystemPtr;
     typedef boost::intrusive_ptr<QuadChain> QuadChainPtr;
     typedef boost::intrusive_ptr<RigidBody> RigidBodyPtr;
@@ -106,4 +110,6 @@ namespace Jet {
     enum PlaybackState { ONCE, REPEAT, STOP };
     enum ResourceState { UNLOADED, LOADED, SYNCED };
     enum SyncMode { STATIC_SYNC, DYNAMIC_SYNC };
+    enum LayoutMode { RELATIVE_LAYOUT, ABSOLUTE_LAYOUT };
+    enum Alignment { TOP, CENTER, BOTTOM, LEFT, RIGHT };
 }

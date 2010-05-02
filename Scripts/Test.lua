@@ -150,5 +150,9 @@ function Test:on_key_pressed(key, x, y)
         local n = Vector(math.random()*2-1, math.random()*2-1, math.random()*2-1)
         self.s1.mesh:fracture(Plane(n.unit, Vector(0, 0.0, 0)))
         
+    elseif( key == 'e') then
+        print(type(self.s3))
+        self.s3.node:destroy()
+        self.s3 = nil
     end
 end

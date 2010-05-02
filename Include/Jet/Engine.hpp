@@ -38,6 +38,10 @@ public:
     //! other objects to the scene.
     virtual Node* root() const=0;
 	
+	//! Returns the root overlay.  This overlay can be used to add other
+	//! overlays to the screen.
+	virtual Overlay* overlay() const=0;
+	
 	//! Returns the current module.
 	virtual Module* module() const=0;
         
@@ -48,6 +52,10 @@ public:
     //! the option could not be found.
     //! @param name the name of the option
     virtual const boost::any& option(const std::string& name) const=0;
+	
+	//! Returns the font with the given name.
+	//! @param name the name of the font.
+	virtual Font* font(const std::string& name)=0;
 
     //! Returns the material with the given name.
     //! @param name the name of the material

@@ -21,6 +21,7 @@
  */  
 
 #include <Jet/Core/RenderSystem.hpp>
+#include <Jet/Core/Overlay.hpp>
 #include <Jet/Core/RenderTarget.hpp>
 #include <Jet/Core/Light.hpp>
 #include <Jet/Core/MeshObject.hpp>
@@ -101,6 +102,10 @@ void Core::RenderSystem::init_window() {
 		throw runtime_error(string("SDL initialization failed: ") + SDL_GetError());
 	}
     glViewport(0, 0, (uint32_t)width, (uint32_t)height);
+
+	
+	engine_->overlay()->width((real_t)width);
+	engine_->overlay()->height((real_t)height);
 }
 
 void Core::RenderSystem::init_extensions() {
@@ -203,7 +208,6 @@ void Core::RenderSystem::on_init() {
 	// Initialize particle buffer
 	particle_buffer_.reset(new ParticleBuffer(engine_));
 	
-	
 	engine_->option("video_mode_synced", true);
 	//GLuint width = (GLuint)engine_->option<real_t>("display_width");
 	//GLuint height = (GLuint)engine_->option<real_t>("display_height");
@@ -275,6 +279,8 @@ void Core::RenderSystem::on_render() {
 		// TODO: render more than one light
         break;
     }
+
+	render_overlays();
 	
 	// Swap back buffer to front
 	SDL_GL_SwapBuffers();
@@ -516,6 +522,40 @@ void Core::RenderSystem::render_visible_particle_systems() {
 	particle_buffer_->flush();
 	particle_buffer_->shader(0);
 	particle_buffer_->texture(0);
+}
+
+void Core::RenderSystem::render_overlays() {
+	real_t width = engine_->option<real_t>("display_width");
+	real_t height = engine_->option<real_t>("display_height");
+	
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0.0f, width, height, 0.0f, 0.0f, 1.0f);
+	
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+	
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_LIGHTING);
+	glDisable(GL_CULL_FACE);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	
+	static_cast<Core::Overlay*>(engine_->overlay())->render();
+	
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+	
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_CULL_FACE);
+	glDisable(GL_BLEND);
+	
 }
 
 inline void Core::RenderSystem::active_material(Material* material) {

@@ -47,6 +47,7 @@
 #include <Jet/Core/QuadSet.hpp>
 #include <Jet/Core/RigidBody.hpp>
 #include <Jet/Core/Shader.hpp>
+#include <Jet/Core/Overlay.hpp>
 
 #include <Jet/Iterator.hpp>
 #include <fstream>
@@ -81,6 +82,7 @@ Core::Engine::Engine() :
         
 	// Create the root node of the scene graph
     root_ = new Core::Node(this);
+	overlay_ = new Core::Overlay(this);
 	
 	// Create subsystems and register them
 	render_system_ = new RenderSystem(this);
@@ -128,6 +130,10 @@ void Core::Engine::init_systems() {
 	for (list<EngineListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
 		(*i)->on_init();
 	}
+}
+
+Jet::Font* Core::Engine::font(const std::string& name) {
+	throw runtime_error("Not implemented");
 }
 
 Jet::Mesh* Core::Engine::mesh(const std::string& name) {

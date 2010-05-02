@@ -68,6 +68,7 @@ private:
     void render_visible_fracture_objects();
     void render_visible_particle_systems();
     void render_fullscreen_quad();
+    void render_overlays();
     void push_modelview_matrix(const Matrix& matrix);
     void pop_modelview_matrix();
     void active_material(Material* material);
