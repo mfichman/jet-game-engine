@@ -56,6 +56,10 @@ public:
 	//! Returns the font with the given name.
 	//! @param name the name of the font.
 	virtual Font* font(const std::string& name)=0;
+	
+	//! Returns the sound with the given name.
+	//! @param name the name of the sound.
+	virtual Sound* sound(const std::string& name)=0;
 
     //! Returns the material with the given name.
     //! @param name the name of the material

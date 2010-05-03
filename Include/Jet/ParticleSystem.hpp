@@ -74,7 +74,7 @@ public:
     
     //! Returns the particle system distribution type.  This can either be
     //! cubic or spherical.
-    virtual ParticleSystemType type() const=0;
+    virtual EmitterType type() const=0;
     
     //! Returns the maximum number of particles that can be active in the
     //! system at one time
@@ -129,7 +129,7 @@ public:
     virtual void emission_rate(const Range& rate)=0;
     
     //! Sets the particle system type.
-    virtual void type(ParticleSystemType type)=0;
+    virtual void type(EmitterType type)=0;
     
     //! Sets the maximum number of particles that can be active in the system
     //! at one time

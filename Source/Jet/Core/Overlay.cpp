@@ -43,9 +43,50 @@ Core::Overlay* Core::Overlay::overlay(const string& name) {
 }
 
 void Core::Overlay::render() {
+    real_t x;
+    real_t y;
+    
+    // Find the top-left corner of the overlay.  Depends on the horizontal
+    // alignment of the overlay.
+    if (LEFT == horizontal_alignment_) {
+        x = x_;
+    } else if (RIGHT == horizontal_alignment_) {
+        if (parent_) {
+            x = parent_->width() - width_ + x_;
+        } else {
+            x = engine_->option<real_t>("display_width") - width_ + x_;
+        }
+    } else {
+        if (parent_) {
+            x = (parent_->width() - width_) / 2.0f + x_;
+        } else {
+            x = (engine_->option<real_t>("display_width") - width_) / 2.0f + x_;
+        }
+    }
+    
+    // Find the top-right corner of the overlay.  Depends on the vertical
+    // alignment of the overlay.
+    if (TOP == vertical_alignment_) {
+        y = y_;
+    } else if (BOTTOM == vertical_alignment_) {
+        if (parent_) {
+            y = parent_->height() - height_ + y_;
+        } else {
+            y = engine_->option<real_t>("display_height") - height_ + y_;
+        }
+    } else {
+        if (parent_) {
+            y = (parent_->height() - height_) / 2.0f + y_;
+        } else {
+            y = (engine_->option<real_t>("display_height") - height_) / 2.0f + y_;
+        }
+    }
+    
+    // Now translate to the top-left corner of the overlay, and render
+    // the text and background image
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
-    glTranslatef(x_, y_, 0.0f);
+    glTranslatef(x, y, 0.0f);
     
     render_background();
     render_text();
@@ -81,4 +122,34 @@ void Core::Overlay::render_background() {
 
 void Core::Overlay::render_text() {
     
+}
+
+void Core::Overlay::delete_overlay(Overlay* overlay) {
+    OverlayPtr obj = overlay;
+    for (unordered_map<string, OverlayPtr>::iterator i = overlay_.begin(); i != overlay_.end(); i++) {
+        if (i->second == obj) {
+            overlay_.erase(i);
+            return;
+        }
+    }
+}
+
+void Core::Overlay::destroy() {
+    if (destroyed_) {
+        return;
+    } else {
+        destroyed_ = true;
+        
+        // Keep a reference to self.
+        OverlayPtr self(this);
+        
+        // Remove this node from the object
+        if (parent_) {
+            parent_->delete_overlay(this);
+        }
+        for (vector<OverlayListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
+            (*i)->on_destroy();
+        }
+        listener_.clear();
+    }
 }

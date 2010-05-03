@@ -23,6 +23,7 @@
 #include <Jet/Core/ScriptSystem.hpp>
 #include <Jet/Core/ScriptController.hpp>
 #include <Jet/Core/ScriptModule.hpp>
+#include <Jet/Overlay.hpp>
 #include <Jet/Vector.hpp>
 #include <Jet/Quaternion.hpp>
 #include <Jet/Range.hpp>
@@ -355,7 +356,7 @@ void Core::ScriptSystem::init_entity_type_bindings() {
             .property("height", (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::height, (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::height)
             .property("depth", (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::depth, (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::depth)
             .property("emission_speed", (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::emission_speed, (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::emission_speed)
-            .property("type", (Jet::ParticleSystemType (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::type, (void (Jet::ParticleSystem::*)(Jet::ParticleSystemType))&Jet::ParticleSystem::type)
+            .property("type", (Jet::EmitterType (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::type, (void (Jet::ParticleSystem::*)(Jet::EmitterType))&Jet::ParticleSystem::type)
             .property("particle_size", (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::particle_size, (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::particle_size)
 			.property("particle_life", (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::particle_life, (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::particle_life)
 			.property("emission_direction", (const Vector& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::emission_direction, (void (Jet::ParticleSystem::*)(const Vector&))&Jet::ParticleSystem::emission_direction)
@@ -363,7 +364,7 @@ void Core::ScriptSystem::init_entity_type_bindings() {
             .property("emission_angle", (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::emission_angle, (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::emission_angle)
             .property("particle_growth_rate", (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::particle_growth_rate, (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::particle_growth_rate)
 			.property("texture", (Jet::Texture* (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::texture, (void (Jet::ParticleSystem::*)(const std::string&))&Jet::ParticleSystem::texture)
-            .enum_("types") [ value("BOX_EMITTER", BOX_EMITTER), value("POINT_EMITTER", POINT_EMITTER), value("ELLIPSOID_EMITTER", ELLIPSOID_EMITTER) ],
+            .enum_("EmitterType") [ value("BOX_EMITTER", BOX_EMITTER), value("POINT_EMITTER", POINT_EMITTER), value("ELLIPSOID_EMITTER", ELLIPSOID_EMITTER) ],
             
         luabind::class_<Jet::RigidBody, Jet::RigidBodyPtr>("RigidBody")
             .property("parent", &Jet::RigidBody::parent)
@@ -377,6 +378,7 @@ void Core::ScriptSystem::init_entity_type_bindings() {
             
         luabind::class_<Jet::Engine, Jet::EnginePtr>("Engine")
             .property("root", &Jet::Engine::root)
+            .property("overlay", &Jet::Engine::overlay)
             .def("option", (void (Jet::Engine::*)(const std::string&, const boost::any&))&Jet::Engine::option)
             .def("option", (const boost::any& (Jet::Engine::*)(const std::string&) const)&Jet::Engine::option)
             .def("search_folder", &Jet::Engine::search_folder)
@@ -386,8 +388,22 @@ void Core::ScriptSystem::init_entity_type_bindings() {
             
         luabind::class_<Jet::Mesh, Jet::MeshPtr>("Mesh")
             .def("vertex", (void (Jet::Mesh::*)(size_t, const Vertex&))&Jet::Mesh::vertex)
-            .def("index", (void (Jet::Mesh::*)(size_t, uint32_t))&Jet::Mesh::index)
+            .def("index", (void (Jet::Mesh::*)(size_t, uint32_t))&Jet::Mesh::index),
             
-        
+        luabind::class_<Jet::Overlay, Jet::OverlayPtr>("Overlay")
+            .def("overlay", &Jet::Overlay::overlay)
+            .property("x", (real_t (Jet::Overlay::*)() const)&Jet::Overlay::x, (void (Jet::Overlay::*)(real_t))&Jet::Overlay::x)
+            .property("y", (real_t (Jet::Overlay::*)() const)&Jet::Overlay::y, (void (Jet::Overlay::*)(real_t))&Jet::Overlay::y)
+            .property("width", (real_t (Jet::Overlay::*)() const)&Jet::Overlay::width, (void (Jet::Overlay::*)(real_t))&Jet::Overlay::width)
+            .property("height", (real_t (Jet::Overlay::*)() const)&Jet::Overlay::height, (void (Jet::Overlay::*)(real_t))&Jet::Overlay::height)
+            .property("layout_mode", (LayoutMode (Jet::Overlay::*)() const)&Jet::Overlay::layout_mode, (void (Jet::Overlay::*)(LayoutMode))&Jet::Overlay::layout_mode)
+            .property("vertical_alignment", (Alignment (Jet::Overlay::*)() const)&Jet::Overlay::vertical_alignment, (void (Jet::Overlay::*)(Alignment))&Jet::Overlay::vertical_alignment)
+            .property("horizontal_alignment", (Alignment (Jet::Overlay::*)() const)&Jet::Overlay::horizontal_alignment, (void (Jet::Overlay::*)(Alignment))&Jet::Overlay::horizontal_alignment)
+            .property("text", (const std::string& (Jet::Overlay::*)() const)&Jet::Overlay::text, (void (Jet::Overlay::*)(const std::string&))&Jet::Overlay::text)
+            //.property("font", (Jet::Font* (Jet::Overlay::*)() const)&Jet::Overlay::font, (void (Jet::Overlay::*)(const std::string&))&Jet::Overlay::font)
+            .property("background", (Jet::Texture* (Jet::Overlay::*)() const)&Jet::Overlay::background, (void (Jet::Overlay::*)(const std::string&))&Jet::Overlay::background)
+            .enum_("Alignment") [ value("LEFT", LEFT), value("RIGHT", RIGHT), value("CENTER", CENTER), value("TOP", TOP), value("BOTTOM", BOTTOM) ]
+            .enum_("LayoutMode") [ value("RELATIVE", RELATIVE), value("ABSOLUTE", ABSOLUTE) ]
+            
     ];
 }

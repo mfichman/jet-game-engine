@@ -35,16 +35,16 @@ function Dagger:__init(node, name)
         type = ParticleSystem.BOX_EMITTER,
         quota = 100,
         texture = "Electricity.png",
-        particle_life = Range(.3, .3),
+        particle_life = Range(.1, .1),
         particle_size = Range(1, 3),
         life = -1,
         width = Range(0, .3),
-        height = Range(0, 1.1),
+        height = Range(0, .7),
         depth = Range(0, .2),
         emission_speed = Range(0, 0),
         emission_direction = Vector(0, 1, 0),
         emission_angle = Range(0, 0),
-        emission_rate = Range(0.7, 60)
+        emission_rate = Range(1, 90)
     }
 
     self.body = self.node:rigid_body()
@@ -57,4 +57,7 @@ function Dagger:on_fracture(node)
     
     node:particle_system("sparks")(self.spark_template)
     node:particle_system("sparks").life = math.random() * 3 + 2
+end
+
+function Dagger:on_collision(node)
 end

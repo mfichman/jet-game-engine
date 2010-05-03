@@ -65,6 +65,7 @@ namespace Jet {
     class NodeListener;
     class Object;
     class Overlay;
+    class OverlayListener;
     class Particle;
     class ParticleSystem;
     class Plane;
@@ -75,6 +76,7 @@ namespace Jet {
     class Range;
     class RigidBody;
     class Shader;
+    class Sound;
     class Texcoord;
     class Texture;
     class Vector;
@@ -95,10 +97,12 @@ namespace Jet {
     typedef boost::intrusive_ptr<NodeListener> NodeListenerPtr;
     typedef boost::intrusive_ptr<Object> ObjectPtr;
     typedef boost::intrusive_ptr<Overlay> OverlayPtr;
+    typedef boost::intrusive_ptr<OverlayListener> OverlayListenerPtr;
     typedef boost::intrusive_ptr<ParticleSystem> ParticleSystemPtr;
     typedef boost::intrusive_ptr<QuadChain> QuadChainPtr;
     typedef boost::intrusive_ptr<RigidBody> RigidBodyPtr;
     typedef boost::intrusive_ptr<Shader> ShaderPtr;
+    typedef boost::intrusive_ptr<Sound> SoundPtr;
     typedef boost::intrusive_ptr<Texture> TexturePtr;
     typedef boost::intrusive_ptr<QuadSet> QuadSetPtr;
 
@@ -106,8 +110,8 @@ namespace Jet {
     typedef void (*load_function_t)(Engine* engine);
     
     enum LightType { POINT_LIGHT, DIRECTIONAL_LIGHT };
-    enum ParticleSystemType { BOX_EMITTER, ELLIPSOID_EMITTER, POINT_EMITTER };
-    enum PlaybackState { ONCE, REPEAT, STOP };
+    enum EmitterType { BOX_EMITTER, ELLIPSOID_EMITTER, POINT_EMITTER };
+    enum PlaybackState { PLAY, STOP };
     enum ResourceState { UNLOADED, LOADED, SYNCED };
     enum SyncMode { STATIC_SYNC, DYNAMIC_SYNC };
     enum LayoutMode { RELATIVE_LAYOUT, ABSOLUTE_LAYOUT };

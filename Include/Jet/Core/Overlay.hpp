@@ -84,7 +84,7 @@ public:
     }
     
     //! Returns the horizontal alignment of the overlay.
-    inline Alignment horizontal_alingment() const {
+    inline Alignment horizontal_alignment() const {
         return horizontal_alignment_;
     }
     
@@ -137,7 +137,7 @@ public:
     }
     
     //! Sets the horizontal alignment of the overlay.
-    inline void horizontal_alingment(Alignment align) {
+    inline void horizontal_alignment(Alignment align) {
         horizontal_alignment_ = align;
     }
     
@@ -168,41 +168,57 @@ public:
         background(engine_->texture(name));
     }
     
+    //! Adds a listener to the overlay.
+    inline void listener(OverlayListener* listener) {
+        if (destroyed_) {
+			throw std::runtime_error("Attempted to add a listener to a node marked for deletion");
+		} else {
+			listener_.push_back(listener);
+		}
+    }
+    
     //! Renders this overlay.
     void render();
+    
+    //! Destroys this overlay.
+    void destroy();
     
 private:
     Overlay(Engine* engine) :
         engine_(engine),
         parent_(0),
+        destroyed_(false),
         x_(0.0f),
         y_(0.0f),
         width_(0.0f),
         height_(0.0f),
         layout_mode_(RELATIVE_LAYOUT),
         vertical_alignment_(TOP),
-        horizontal_alignment_(BOTTOM) {
+        horizontal_alignment_(LEFT) {
         
     }
     
     Overlay(Engine* engine, Overlay* parent) :
         engine_(engine),
         parent_(parent),
+        destroyed_(false),
         x_(0.0f),
         y_(0.0f),
         width_(0.0f),
         height_(0.0f),
         layout_mode_(RELATIVE_LAYOUT),
         vertical_alignment_(TOP),
-        horizontal_alignment_(BOTTOM) {
+        horizontal_alignment_(LEFT) {
             
     }
     
     void render_background();
     void render_text();
+    void delete_overlay(Overlay* overlay);
     
     Engine* engine_;
     Overlay* parent_;
+    bool destroyed_;
     std::tr1::unordered_map<std::string, OverlayPtr> overlay_;
     real_t x_;
     real_t y_;
@@ -214,6 +230,7 @@ private:
     std::string text_;
     //Font
     TexturePtr background_;
+    std::vector<OverlayListenerPtr> listener_;
     
     friend class Engine;
 };

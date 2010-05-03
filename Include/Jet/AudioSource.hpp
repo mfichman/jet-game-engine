@@ -34,7 +34,7 @@ public:
     
     //! Returns the clip playing at the given channel.
     //! @param chan the channel to use
-    virtual const std::string& clip(size_t chan) const=0;
+    virtual Sound* sound(size_t chan) const=0;
     
     //! Returns the state of the clip playing at the given channel.
     //! @param chan the channel to use
@@ -44,7 +44,13 @@ public:
     //! source.
     //! @param chan the channel to use
     //! @param name the name of the sound clip
-    virtual void clip(size_t chan, const std::string& name)=0;
+    virtual void sound(size_t chan, const std::string& name)=0;
+
+    //! Sets the sound clip for the given channel.
+    //! @param chan the channel to use
+    //! @param sound the sound clipe
+    virtual void sound(size_t chan, Sound* sound)=0;
+    
     
     //! Sets the mode of the given channel.
     //! @param chan the channel to use

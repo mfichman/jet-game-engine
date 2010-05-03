@@ -64,12 +64,11 @@ void Core::ParticleSystem::render(Core::ParticleBuffer* buffer) {
 	if (life_ <= 0.0f && life_ > -1.0f) {
 		return;
 	}
-	if (life_ > -1.0f) {
-		life_ = max(0.0f, life_ - engine_->frame_delta());
-	}
 
 	accumulator_ += engine_->frame_delta();
-	real_t speed = engine_->option<real_t>("simulation_speed");
+    if (life_ > -1.0f) {
+		life_ = max(0.0f, life_ - engine_->frame_delta());
+	}
  
     // Spawn additional particles
     while (accumulator_ > next_emission_ && !dead_particle_.empty()) {
@@ -94,7 +93,7 @@ void Core::ParticleSystem::render(Core::ParticleBuffer* buffer) {
         p.init_position = parent_->matrix() * p.init_position;
         p.init_velocity = parent_->matrix().rotate(p.init_velocity);
 		if (parent_->rigid_body_) {
-			p.init_velocity += parent_->rigid_body()->linear_velocity() * speed;
+			p.init_velocity += parent_->rigid_body()->linear_velocity();
 		}
         
         accumulator_ -= next_emission_;

@@ -23,7 +23,6 @@
 
 #include <Jet/Types.hpp>
 #include <Jet/Object.hpp>
-#include <vector>
 
 namespace Jet {
 

@@ -105,7 +105,7 @@ public:
     
     //! Returns the particle system distribution type.  This can either be
     //! cubic or spherical.
-    inline ParticleSystemType type() const {
+    inline EmitterType type() const {
         return type_;
     }
     
@@ -189,7 +189,7 @@ public:
     }
     
     //! Sets the particle system type.
-    inline void type(ParticleSystemType type) {
+    inline void type(EmitterType type) {
         type_ = type;
     }
     
@@ -261,7 +261,7 @@ private:
     Range emission_speed_;
     Vector emission_direction_;
     Range emission_rate_;
-    ParticleSystemType type_;
+    EmitterType type_;
     Range emission_angle_;
     TexturePtr texture_;
     ShaderPtr shader_;

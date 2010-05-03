@@ -20,34 +20,33 @@
  * IN THE SOFTWARE.
  */
 
-uniform float time;
-uniform float scale;
+#include <Jet/Rectangle.hpp>
 
-attribute vec3 init_position;
-attribute vec3 init_velocity;
-attribute float init_time;
-attribute float init_size;
-attribute float init_rotation;
-attribute float life;
-attribute float growth_rate;
+using namespace Jet;
 
-varying float alpha;
-varying float rotation;
-
-void main() {
-    //vs_out.size = g_fp.buffer_height * size / (1.0f + 8.0f * dist);
-    float elapsed_time = time - init_time;
-    vec3 world_position = init_position + elapsed_time * init_velocity;
-    vec4 view_position = gl_ModelViewMatrix * vec4(world_position, 1.0);
-    float dist = length(view_position.xyz);
+Rectangle::Rectangle() :
+    min_x(0.0f),
+    min_y(0.0f),
+    max_x(0.0f),
+    max_y(0.0f) {
     
-    float x = elapsed_time/life;
-    float f = 15.0 * sin(x) * exp(-6.0*x);
+}
+
+//! Creates a rectangle from a position and a width
+Rectangle::Rectangle(real_t x, real_t y, real_t width, real_t height) :
+    min_x(x),
+    min_y(y),
+    max_x(x + width),
+    max_y(y + height) {
     
-    gl_Position = gl_ProjectionMatrix * view_position;
-    gl_PointSize = max(scale * init_size / (1.0 + dist) + growth_rate * elapsed_time, 0.0);
-    gl_TexCoord[0] = gl_MultiTexCoord0;
-    //alpha = clamp(1.0 - elapsed_time/life, 0.0, 1.0);
-    alpha = clamp(f, 0.0, 1.0);
-    rotation = init_rotation;
+}
+
+//! Returns the width of the box
+real_t Rectangle::width() const {
+    return max_x - min_x;
+}
+
+//! Returns the height of the box
+real_t Rectangle::height() const {
+    return max_y - min_y;
 }

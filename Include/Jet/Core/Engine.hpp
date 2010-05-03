@@ -81,6 +81,11 @@ public:
 		return script_system_.get();
 	}
 	
+	//! Returns the audio system.
+	inline AudioSystem* audio_system() const {
+		return audio_system_.get();
+	}
+	
 	//! Returns the current module.
 	inline Module* module() const {
 		return module_.get();
@@ -98,7 +103,7 @@ public:
 	
 	//! The delta since the last render
 	inline real_t frame_delta() const {
-		return frame_delta_;
+		return frame_delta_ * option<real_t>("simulation_speed");
 	}
 	
 	//! Returns the frame time
@@ -132,7 +137,11 @@ public:
 	//! Returns the font with the given name.
 	//! @param name the name of the font
 	Jet::Font* font(const std::string& name);
-
+	
+	//! Returns the sound with the given name.
+	//! @param name the name of the sound.
+	Jet::Sound* sound(const std::string& name);
+	
     //! Returns the material with the given name.
     //! @param name the name of the material
     Jet::Material* material(const std::string& name);
@@ -264,8 +273,10 @@ private:
 	RenderSystemPtr render_system_;
 	ScriptSystemPtr script_system_;
 	InputSystemPtr input_system_;
+	AudioSystemPtr audio_system_;
     
 	// Resource descriptors
+	std::map<std::string, Jet::SoundPtr> sound_;
     std::map<std::string, Jet::MaterialPtr> material_;
     std::map<std::string, Jet::MeshPtr> mesh_;
     std::map<std::string, Jet::TexturePtr> texture_;

@@ -20,34 +20,42 @@
  * IN THE SOFTWARE.
  */
 
-uniform float time;
-uniform float scale;
+#include <Jet/Core/Sound.hpp>
+#include <Jet/Core/Engine.hpp>
+#include <Jet/Core/AudioSystem.hpp>
+#include <fmodex/fmod_errors.h>
 
-attribute vec3 init_position;
-attribute vec3 init_velocity;
-attribute float init_time;
-attribute float init_size;
-attribute float init_rotation;
-attribute float life;
-attribute float growth_rate;
+using namespace Jet;
+using namespace std;
 
-varying float alpha;
-varying float rotation;
 
-void main() {
-    //vs_out.size = g_fp.buffer_height * size / (1.0f + 8.0f * dist);
-    float elapsed_time = time - init_time;
-    vec3 world_position = init_position + elapsed_time * init_velocity;
-    vec4 view_position = gl_ModelViewMatrix * vec4(world_position, 1.0);
-    float dist = length(view_position.xyz);
+inline void fmod_check(FMOD_RESULT result) {
+    if (result != FMOD_OK) {
+        throw std::runtime_error(FMOD_ErrorString(result));
+    }
+}
+
+Core::Sound::~Sound() {
+    state(UNLOADED);
+}
+
+void Core::Sound::state(ResourceState state) {
+    if (state_ == state) {
+        return;
+    }
     
-    float x = elapsed_time/life;
-    float f = 15.0 * sin(x) * exp(-6.0*x);
+    if (UNLOADED == state_) {
+        string file = engine_->resource_path(name_);
+        
+        // Load the sound
+        FMOD_SYSTEM* system = engine_->audio_system()->system();
+        fmod_check(FMOD_System_CreateSound(system, file.c_str(), FMOD_HARDWARE|FMOD_3D, 0, &sound_));
+        fmod_check(FMOD_Sound_Set3DMinMaxDistance(sound_, 2.0f, 1000.0f));
+    }
     
-    gl_Position = gl_ProjectionMatrix * view_position;
-    gl_PointSize = max(scale * init_size / (1.0 + dist) + growth_rate * elapsed_time, 0.0);
-    gl_TexCoord[0] = gl_MultiTexCoord0;
-    //alpha = clamp(1.0 - elapsed_time/life, 0.0, 1.0);
-    alpha = clamp(f, 0.0, 1.0);
-    rotation = init_rotation;
+    if (UNLOADED == state) {
+        fmod_check(FMOD_Sound_Release(sound_));
+    }
+    
+    state_ = state;
 }

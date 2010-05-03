@@ -14,7 +14,7 @@ mesh:vertex(0, v);
 v.normal = Vector(0, 0, 1);
 v.tangent = Vector(0, 1, 0);
 v.position = Vector(10, 10, -2);
-v.texcoord = Texcoord(1, 1);
+v.texcoord = Texcoord(1, 1);..\binary\
 mesh:vertex(1, v);
 
 

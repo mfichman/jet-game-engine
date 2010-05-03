@@ -43,6 +43,11 @@ public:
     inline lua_State* env() const {
         return env_;
     }
+    
+    //! Returns memory used by Lua.
+    inline size_t memory_usage() const {
+        return lua_gc(env_, LUA_GCCOUNT, 0);
+    }
 
 private:
     void on_init();

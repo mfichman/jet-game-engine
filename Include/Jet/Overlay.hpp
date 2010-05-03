@@ -62,7 +62,7 @@ public:
     virtual Alignment vertical_alignment() const=0;
     
     //! Returns the horizontal alignment of the overlay.
-    virtual Alignment horizontal_alingment() const=0;
+    virtual Alignment horizontal_alignment() const=0;
     
     //! Returns the text that will be displayed by this overlay.
     virtual const std::string& text() const=0;
@@ -95,7 +95,7 @@ public:
     virtual void vertical_alignment(Alignment align)=0;
     
     //! Sets the horizontal alignment of the overlay.
-    virtual void horizontal_alingment(Alignment align)=0;
+    virtual void horizontal_alignment(Alignment align)=0;
     
     //! Sets the text attached to this overlay.
     virtual void text(const std::string& text)=0;
@@ -113,6 +113,33 @@ public:
     //! Sets the background texture by name.
     //! @param name the name of the texture to use
     virtual void background(const std::string& name)=0;
+    
+    //! Adds a listener to this overlay.
+    virtual void listener(OverlayListener* listener)=0;
+    
+    //! Destroys this overlay.
+    virtual void destroy()=0;
+};
+
+//! This class is used to register for events regarding an overlay.
+//! @class OverlayListener
+//! @brief Listens for overlay events.
+class OverlayListener : public Object {
+public:
+    //! Called when the mouse is pressed while over the overlay.
+    virtual void on_mouse_pressed()=0;
+    
+    //! Called when the mouse is released over the overlay.
+    virtual void on_mouse_released()=0;
+    
+    //! Called when the mouse enters the region of the overlay.
+    virtual void on_mouse_enter()=0;
+    
+    //! Called when the mouse exits the region of the overlay.
+    virtual void on_mouse_exit()=0;
+    
+    //! Called when the overlay is destroyed.
+    virtual void on_destroy()=0;
 };
 
 }

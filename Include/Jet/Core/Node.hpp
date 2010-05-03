@@ -221,10 +221,10 @@ private:
     
     //! Removes an object from this node.
     //! @param object the object to remove
-	void object_delete(Object* object);
+	void delete_object(Object* object);
     
     //! Addes a new object to the node.
-    void object(const std::string& name, Object* object);
+    void add_object(const std::string& name, Object* object);
 	
 	//! Recursively attaches a rigid body to this node and to all child nodes.
 	//! Note that if any child nodes have rigid bodies, they will be destroyed
@@ -257,6 +257,7 @@ private:
     friend class Light;
     friend class RigidBody;
     friend class AudioSource;
+	friend class AudioSystem;
 };
 
 }}

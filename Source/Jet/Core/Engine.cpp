@@ -36,7 +36,9 @@
 #include <Jet/Core/InputSystem.hpp>
 
 #include <Jet/Core/AudioSource.hpp>
+#include <Jet/Core/AudioSystem.hpp>
 #include <Jet/Core/Camera.hpp>
+#include <Jet/Core/Sound.hpp>
 #include <Jet/Core/Light.hpp>
 #include <Jet/Core/Material.hpp>
 #include <Jet/Core/Mesh.hpp>
@@ -89,6 +91,7 @@ Core::Engine::Engine() :
 	script_system_ = new ScriptSystem(this);
 	physics_system_ = new PhysicsSystem(this);
 	input_system_ = new InputSystem(this);
+	audio_system_ = new AudioSystem(this);
 	
 	// Platform-dependent timer code
 #ifdef WINDOWS
@@ -135,6 +138,18 @@ void Core::Engine::init_systems() {
 Jet::Font* Core::Engine::font(const std::string& name) {
 	throw runtime_error("Not implemented");
 }
+
+Jet::Sound* Core::Engine::sound(const std::string& name) {
+	map<string, Jet::SoundPtr>::iterator i = sound_.find(name);
+    if (i == sound_.end()) {
+        Core::SoundPtr sound(new Core::Sound(this, name));
+        sound_.insert(make_pair(name, sound));
+        return sound.get();
+	} else {
+		return i->second.get();
+	}
+}
+
 
 Jet::Mesh* Core::Engine::mesh(const std::string& name) {
     map<string, Jet::MeshPtr>::iterator i = mesh_.find(name);
@@ -236,7 +251,7 @@ void Core::Engine::tick() {
 		module_->on_render();
 	}
 	
-	frame_time_ += frame_delta_;
+	frame_time_ += frame_delta_ * option<real_t>("simulation_speed");
 }
 
 void Core::Engine::update_fps() {
@@ -244,7 +259,8 @@ void Core::Engine::update_fps() {
     fps_elapsed_time_ += frame_delta_;
     fps_frame_count_++;
     if (fps_elapsed_time_ > 0.1f) {
-        cout << fps_frame_count_/fps_elapsed_time_ << endl;
+        cout << fps_frame_count_/fps_elapsed_time_ << "\t";
+		cout << script_system_->memory_usage() << "K" << endl;
         fps_frame_count_ = 0;
         fps_elapsed_time_ = 0.0f;
     }

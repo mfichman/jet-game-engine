@@ -22,6 +22,7 @@
 
 #include <Jet/Core/PhysicsSystem.hpp>
 #include <Jet/Core/Node.hpp>
+#include <Jet/Core/RigidBody.hpp>
 #include <BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h>
 
 using namespace Jet;
@@ -48,12 +49,11 @@ Core::PhysicsSystem::~PhysicsSystem() {
 
 void Core::PhysicsSystem::step() {
     real_t gravity = engine_->option<real_t>("gravity");
-    real_t simulation_speed = engine_->option<real_t>("simulation_speed");
     world_->setGravity(btVector3(0.0f, -gravity, 0.0f));
     
     // Step simulation returns how many substeps were taken.  If at least one
     // substep was taken, then we have to update matrices for our objects.
-	world_->stepSimulation(engine_->frame_delta()*simulation_speed, 4, engine_->timestep());
+	world_->stepSimulation(engine_->frame_delta(), 4, engine_->timestep());
     Node* node = static_cast<Node*>(engine_->root());
     node->update_transform();
 }
@@ -92,6 +92,20 @@ void Core::PhysicsSystem::on_tick(btDynamicsWorld* world, btScalar step) {
     // Update the node
     Node* node = static_cast<Node*>(system->engine_->root());
     node->update();
+    
+    // Check for collisions
+    int nmanifolds = world->getDispatcher()->getNumManifolds();
+    for (int i = 0; i < nmanifolds; i++) {
+        btPersistentManifold* manifold = world->getDispatcher()->getManifoldByIndexInternal(i);
+        btCollisionObject* a = static_cast<btCollisionObject*>(manifold->getBody0());
+        btCollisionObject* b = static_cast<btCollisionObject*>(manifold->getBody1());
+
+        RigidBody* ca = static_cast<RigidBody*>(a->getUserPointer());
+        RigidBody* cb = static_cast<RigidBody*>(b->getUserPointer());
+
+        ca->parent()->collision(cb->parent());
+        cb->parent()->collision(ca->parent());
+    }
     
     return;
 }

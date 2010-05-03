@@ -29,8 +29,8 @@ function Explosion:__init(node, name)
         type = ParticleSystem.ELLIPSOID_EMITTER,
         quota = 100,
         texture = "BurstGold.png",
-        particle_life = Range(.35, .35),
-        particle_size = Range(9, 9),
+        particle_life = Range(.4, .4),
+        particle_size = Range(10, 10),
         life = .05,
         width = Range(0, 5),
         height = Range(0, 5),
@@ -67,7 +67,6 @@ function Explosion:__init(node, name)
         emission_rate = Range(300, 300)
     }
     
-    print "here"
 end
 
 function Explosion:reset()

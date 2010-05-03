@@ -62,7 +62,7 @@ Node* Core::Node::node(const std::string& name) {
         return dynamic_cast<Node*>(obj);
     } else {
         NodePtr node(new Core::Node(engine_, this));
-        object(name, node.get());
+        add_object(name, node.get());
         return node.get();
     }
 }
@@ -73,7 +73,7 @@ Light* Core::Node::light(const std::string& name) {
         return dynamic_cast<Light*>(obj);
     } else {
         LightPtr light(new Core::Light(this));
-        object(name, light.get());
+        add_object(name, light.get());
         return light.get();
     }
 }
@@ -84,7 +84,7 @@ MeshObject* Core::Node::mesh_object(const std::string& name) {
         return dynamic_cast<MeshObject*>(obj);
     } else {
         MeshObjectPtr mesh_object(new Core::MeshObject(engine_, this));
-        object(name, mesh_object.get());		
+        add_object(name, mesh_object.get());		
         return mesh_object.get();
     }
 }
@@ -95,7 +95,7 @@ FractureObject* Core::Node::fracture_object(const std::string& name) {
         return dynamic_cast<FractureObject*>(obj);
     } else {
         FractureObjectPtr fracture_object(new Core::FractureObject(engine_, this));
-        object(name, fracture_object.get());		
+        add_object(name, fracture_object.get());		
         return fracture_object.get();
     }
 }
@@ -106,7 +106,7 @@ ParticleSystem* Core::Node::particle_system(const std::string& name) {
         return dynamic_cast<ParticleSystem*>(obj);
     } else {
         ParticleSystemPtr psys(new Core::ParticleSystem(engine_, this));
-        object(name, psys.get());
+        add_object(name, psys.get());
         return psys.get();
     }
 }
@@ -117,7 +117,7 @@ QuadSet* Core::Node::quad_set(const std::string& name) {
         return dynamic_cast<QuadSet*>(obj);
     } else {
         QuadSetPtr quad_set(new Core::QuadSet(engine_, this));
-        object(name, quad_set.get());
+        add_object(name, quad_set.get());
         return quad_set.get();
     }
 }
@@ -128,7 +128,7 @@ QuadChain* Core::Node::quad_chain(const std::string& name) {
         return dynamic_cast<QuadChain*>(obj);
     } else {
         QuadChainPtr quad_chain(new Core::QuadChain(engine_, this));
-        object(name, quad_chain.get());
+        add_object(name, quad_chain.get());
         return quad_chain.get();
     }
 }
@@ -163,13 +163,13 @@ Camera* Core::Node::camera() {
 	return camera_.get();
 }
 
-void Core::Node::object(const std::string& name, Object* object) {
+void Core::Node::add_object(const std::string& name, Object* object) {
 	object_.insert(make_pair(name, object));
 }
 
-void Core::Node::object_delete(Object* object) {
+void Core::Node::delete_object(Object* object) {
     ObjectPtr obj = object;
-    for (tr1::unordered_map<string, ObjectPtr>::iterator i = object_.begin(); i != object_.end(); i++) {
+    for (unordered_map<string, ObjectPtr>::iterator i = object_.begin(); i != object_.end(); i++) {
         if (i->second == obj) {
             object_.erase(i);
             return;
@@ -241,10 +241,10 @@ void Core::Node::destroy() {
         
         // Remove this node from the parent
         if (parent_) {
-            parent_->object_delete(this);
+            parent_->delete_object(this);
             parent_ = 0;
         }
-        for (vector<NodeListenerPtr>::iterator i = listener_.begin(); i < listener_.end(); i++) {
+        for (vector<NodeListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
             (*i)->on_destroy();
         }
         listener_.clear(); // Break cycle between listeners and the node

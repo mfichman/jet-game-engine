@@ -21,8 +21,11 @@
 
 #include <Jet/Core/Types.hpp>
 #include <Jet/Core/Node.hpp>
+#include <Jet/Core/Engine.hpp>
+#include <Jet/Core/Sound.hpp>
 #include <Jet/AudioSource.hpp>
 #include <vector>
+#include <fmodex/fmod.h>
 
 namespace Jet { namespace Core {
 
@@ -39,41 +42,65 @@ public:
     
     //! Returns the clip playing at the given channel.
     //! @param chan the channel to use
-    inline const std::string& clip(size_t chan) const {
-        return clip_[chan];
+    inline Sound* sound(size_t chan) const {
+        return sound_[chan].get();
     }
     
     //! Returns the state of the clip playing at the given channel.
     //! @param chan the channel to use
     inline PlaybackState state(size_t chan) const {
-        return state_[chan];
+        if (chan >= channel_.size()) {
+            return STOP;
+        }
+        
+        if (!channel_[chan]) {
+            return STOP;
+        }
+        
+        return PLAY;
     }
     
     //! Sets the sound clip at the given index for the audio
     //! source.
     //! @param chan the channel to use
     //! @param name the name of the sound clip
-    inline void clip(size_t chan, const std::string& name) {
-        throw std::runtime_error("Not implemented");
+    inline void sound(size_t chan, const std::string& name) {
+        sound(chan, engine_->sound(name));
+    }
+    
+    //! Sets the sound clip at the given index for the audio
+    //! source.
+    //! @param chan the channel to use
+    //! @param sound the sound clip
+    inline void sound(size_t chan, Jet::Sound* sound) {
+        if (chan > sound_.size()) {
+            sound_.resize(chan + 1);
+            channel_.resize(chan + 1);
+        }
+        sound_[chan] = static_cast<Sound*>(sound);
     }
     
     //! Sets the mode of the given channel.
     //! @param chan the channel to use
     //! @param mode the audio state
-    inline void state(size_t chan, PlaybackState state) {
-        throw std::runtime_error("Not implemented");
-    }
+    void state(size_t chan, PlaybackState state);
+    
+    //! Sets the position of this audio system.
+    void position(const Vector& position);
+    
 private:
     inline AudioSource(Engine* engine, Node* parent) :
         engine_(engine),
         parent_(parent) {
         
     }
+    
+    static FMOD_RESULT F_CALLBACK on_channel_event(FMOD_CHANNEL* ch, FMOD_CHANNEL_CALLBACKTYPE type, void* data1, void* data2);
 
     Engine* engine_;
     Node* parent_;
-    std::vector<std::string> clip_;
-    std::vector<PlaybackState> state_;
+    std::vector<SoundPtr> sound_;
+    std::vector<FMOD_CHANNEL*> channel_;
     
     friend class Node;
 };
