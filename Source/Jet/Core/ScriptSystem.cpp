@@ -96,6 +96,27 @@ namespace luabind {
     };
 }
 
+namespace luabind {
+    
+    template <>
+    struct default_converter<Jet::Object*> : native_converter_base<Jet::Object*> {
+        static int compute_score(lua_State* env, int index) {
+            return 0;
+        }
+        
+        Jet::Object* from(lua_State* env, int index) {
+            return 0;
+        }
+        
+        void to(lua_State* env, Jet::Object* any) {
+            //lua_pushnil(env);
+            lua_pushstring(env, "hello, world!!");
+        }
+    };
+}
+
+
+
 Core::ScriptSystem::ScriptSystem(Engine* engine) :
     engine_(engine),
     env_(lua_open()) {
@@ -327,6 +348,7 @@ void Core::ScriptSystem::init_entity_type_bindings() {
             .def("audio_source", &Jet::Node::audio_source)
             .def("camera", &Jet::Node::camera)
             .def("fracture_object", &Jet::Node::fracture_object)
+            .def("object", &Jet::Node::object)
             .def("look", &Jet::Node::look)
 			.def("destroy", &Jet::Node::destroy),
             
@@ -345,7 +367,6 @@ void Core::ScriptSystem::init_entity_type_bindings() {
             .property("cast_shadows", (bool (Jet::FractureObject::*)() const)&Jet::FractureObject::cast_shadows, (void (Jet::FractureObject::*)(bool))&Jet::FractureObject::cast_shadows)
             .property("seal_fractures", (bool (Jet::FractureObject::*)() const)&Jet::FractureObject::seal_fractures, (void (Jet::FractureObject::*)(bool))&Jet::FractureObject::seal_fractures)
             .property("fracture_count", (size_t (Jet::FractureObject::*)() const)&Jet::FractureObject::fracture_count, (void (Jet::FractureObject::*)(size_t))&Jet::FractureObject::fracture_count)
-			.property("bounding_box", &Jet::FractureObject::bounding_box)
 			.def("fracture", &Jet::FractureObject::fracture),
             
         luabind::class_<Jet::ParticleSystem, Jet::ParticleSystemPtr>("ParticleSystem")

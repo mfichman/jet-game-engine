@@ -63,40 +63,40 @@ public:
     //! the new node will be relative to this node.
     //! @param index the index where the new object will be placed; if this
     //! parameter is zero then the object will be created at any free location
-    Jet::Node* node(const std::string& name);
+    Jet::Node* node(const std::string& name="");
     
     //! Creates a new model at the given index.  Models are used for rendering
     //! static meshes with a material.
     //! @param index the index where the new object will be placed; if this
     //! parameter is zero then the object will be created at any free location
-    Jet::MeshObject* mesh_object(const std::string& name);
+    Jet::MeshObject* mesh_object(const std::string& name="");
 	
 	//! Creates a new fracturable model.
 	//! @param name the name of the new fracturable model
-	Jet::FractureObject* fracture_object(const std::string& name);
+	Jet::FractureObject* fracture_object(const std::string& name="");
     
     //! Creates a new particle system at the given index.  Particle systems are
     //! used for fire, water, and other affects.
     //! @param index the index where the new object will be placed; if this
     //! parameter is zero then the object will be created at any free location
-    Jet::ParticleSystem* particle_system(const std::string& name);
+    Jet::ParticleSystem* particle_system(const std::string& name="");
     
     //! Creates a textured quad at the given index.  Textured quads can be used
     //! for billboards.
     //! @param index the index where the new object will be placed; if this
     //! parameter is zero then the object will be created at any free location
-    Jet::QuadSet* quad_set(const std::string& name);
+    Jet::QuadSet* quad_set(const std::string& name="");
     
     //! Creates a quad chain at the given index.  Quad chains can be used for
     //! path effects, like tracers or condensation trails.
     //! @param index the index where the new object will be placed; if this
     //! parameter is zero then the object will be created at any free location
-    Jet::QuadChain* quad_chain(const std::string& name);
+    Jet::QuadChain* quad_chain(const std::string& name="");
     
     //! Creates a light and attaches it at the given index.
     //! @param index the index where the new object will be placed; if this
     //! parameter is zero then the object will be created at any free location
-    Jet::Light* light(const std::string& name);
+    Jet::Light* light(const std::string& name="");
     
     //! Returns the rigid body attached to this node.
     Jet::RigidBody* rigid_body();
@@ -216,7 +216,8 @@ private:
 		rigid_body_(parent->rigid_body_),
 		shape_transform_(parent->shape_transform_),
 		destroyed_(false),
-		transform_dirty_(true) {
+		transform_dirty_(true),
+		auto_name_counter_(0) {
 	}
     
     //! Removes an object from this node.
@@ -248,6 +249,7 @@ private:
 	btTransform shape_transform_;
     bool destroyed_;
 	bool transform_dirty_;
+	size_t auto_name_counter_;
 
 	friend class Engine;
     friend class MeshObject;

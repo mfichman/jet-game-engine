@@ -216,25 +216,7 @@ void Core::RenderSystem::on_init() {
 	//bloom_target2_.reset(new RenderTarget(width/8, height/8, false, 1));
 }
 
-void Core::RenderSystem::on_update() {
-}
-
-void Core::RenderSystem::on_render() {	
-	if (!engine_->camera()) {
-		return;
-	}
-
-	// Clear the list of active mesh objects and lights
-	mesh_objects_.clear();
-	fracture_objects_.clear();
-	particle_systems_.clear();
-	lights_.clear();
-	generate_render_list(static_cast<Core::Node*>(engine_->root()));
-	
-	// Sort the meshes by material
-	sort(mesh_objects_.begin(), mesh_objects_.end(), &RenderSystem::compare_mesh_objects);
-	sort(fracture_objects_.begin(), fracture_objects_.end(), &RenderSystem::compare_fracture_objects);
-
+void Core::RenderSystem::check_video_mode() {
 	// If the video mode has been marked as changed, then switch modes
 	if (!engine_->option<bool>("video_mode_synced")) {
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -268,11 +250,34 @@ void Core::RenderSystem::on_render() {
 	} else {
 		shadow_target_.reset();
 	}
+}
+
+void Core::RenderSystem::on_update() {
+}
+
+void Core::RenderSystem::on_render() {	
+	if (!engine_->camera()) {
+		return;
+	}
+	
+	// Update the video mode if it has changed
+	check_video_mode();
+
+	// Clear the list of active mesh objects and lights
+	mesh_objects_.clear();
+	particle_systems_.clear();
+	lights_.clear();
+	generate_render_list(static_cast<Core::Node*>(engine_->root()));
+	
+	// Sort the meshes by material
+	sort(mesh_objects_.begin(), mesh_objects_.end(), &RenderSystem::compare_mesh_objects);
+	sort(particle_systems_.begin(), particle_systems_.end(), &RenderSystem::compare_particle_systems);
     
     // Render the scene once for each light
+	bool shaders_enabled = engine_->option<bool>("shaders_enabled");
+	bool shadows_enabled = engine_->option<bool>("shadows_enabled");
     for (vector<LightPtr>::iterator i = lights_.begin(); i != lights_.end(); i++) {
 		if (shaders_enabled && shadows_enabled) {
-
 			generate_shadow_map(i->get());
 		}
         render_final(i->get());
@@ -287,7 +292,6 @@ void Core::RenderSystem::on_render() {
 }
 
 void Core::RenderSystem::generate_shadow_map(Light* light) {    
-	render_pass_ = SHADOW_PASS;
 	Core::CameraPtr camera = static_cast<Core::Camera*>(engine_->camera());
 
 	
@@ -340,9 +344,7 @@ void Core::RenderSystem::generate_shadow_map(Light* light) {
 	
 }
 
-void Core::RenderSystem::render_final(Light* light) {
-	render_pass_ = MAIN_PASS;
-   
+void Core::RenderSystem::render_final(Light* light) {   
 	Core::CameraPtr camera = static_cast<Core::Camera*>(engine_->camera());
 	Matrix matrix = camera->parent()->matrix();
 	real_t width = engine_->option<real_t>("display_width");
@@ -386,39 +388,7 @@ void Core::RenderSystem::render_final(Light* light) {
     // Render to the back buffer.
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	render_visible_mesh_objects();
-	render_visible_fracture_objects();
 	render_visible_particle_systems();
-	
-
-	/* TODO: Finish gaussian filter
-	// Render the scene to the highpass and color buffers
-	color_target_->enabled(true);
-    render_visible_objects();
-	color_target_->enabled(false);
-
-	// Clear the texture matrix back to the identity
-	glMatrixMode(GL_TEXTURE);
-	glActiveTexture(GL_TEXTURE0);
-	glLoadIdentity();
-	
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	//color_target_->sampler(0, 0);
-	color_target_->sampler(0, 1);
-	glEnable(GL_TEXTURE_2D);
-
-	glDisable(GL_LIGHTING);
-	glDisable(GL_DEPTH_TEST);
-
-	render_fullscreen_quad();
-
-	glEnable(GL_LIGHTING);
-	glEnable(GL_DEPTH_TEST);
-
-	glActiveTexture(GL_TEXTURE0);
-	glDisable(GL_TEXTURE_2D);
-	glActiveTexture(GL_TEXTURE1);
-	glDisable(GL_TEXTURE_2D);*/
 }
 
 void Core::RenderSystem::render_shadow_casters() {
@@ -428,7 +398,7 @@ void Core::RenderSystem::render_shadow_casters() {
     for (vector<Core::MeshObjectPtr>::iterator i = mesh_objects_.begin(); i != mesh_objects_.end(); i++) {		
 		Core::MeshObjectPtr mesh_object = *i;
 		if (mesh_object->cast_shadows()) {
-
+			
 			// Transform the modelview matrix using the node's transformation
 			// matrix
 			glMatrixMode(GL_MODELVIEW);
@@ -443,73 +413,53 @@ void Core::RenderSystem::render_shadow_casters() {
 			glPopMatrix();
 		}
 	}
-	
-	//glDisable(GL_CULL_FACE);
-	
-	// Render each visible mesh.  Only meshes block light;
-	// other geometry does not
-    for (vector<Core::FractureObjectPtr>::iterator i = fracture_objects_.begin(); i != fracture_objects_.end(); i++) {		
-		Core::FractureObjectPtr fracture_object = *i;
-		if (fracture_object->cast_shadows()) {
-
-			// Transform the modelview matrix using the node's transformation
-			// matrix
-			glMatrixMode(GL_MODELVIEW);
-			glPushMatrix();
-			glMultMatrixf(fracture_object->parent()->matrix());
-		
-			// Render the object with no materials/shaders for speed
-			fracture_object->render(0);
-		
-			// Pop the modelview matrix off the stack
-			glMatrixMode(GL_MODELVIEW);
-			glPopMatrix();
-		}
-	}
-	
-	//glEnable(GL_CULL_FACE);
 }
 
 void Core::RenderSystem::render_visible_mesh_objects() {
+	Core::Material* material = 0;
 	
 	// Render all MeshObjects
 	for (vector<Core::MeshObjectPtr>::iterator i = mesh_objects_.begin(); i != mesh_objects_.end(); i++) {
 		Core::MeshObject* mesh_object = i->get();
+		Core::Mesh* mesh = mesh_object->mesh();
+		const Matrix& matrix = mesh_object->parent()->matrix();
+		
+		// Switch materials if necessary
+		if (material != mesh_object->material()) {
+			if (material) {
+				material->enabled(false);
+			}
+			material = mesh_object->material();
+			material->enabled(true);
+		}
+		
+		// Transform the modelview and texture matrices (for shadow mapping)
+		// using the node's transformation matrix
+		glMatrixMode(GL_MODELVIEW);
+		glPushMatrix();
+		glMultMatrixf(matrix);
+		glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_SAMPLER);
+		glMatrixMode(GL_TEXTURE);
+		glPushMatrix();
+		glMultMatrixf(matrix);
 		
 		// Enable the material and render the mesh
-		active_material(mesh_object->material());
-		push_modelview_matrix(mesh_object->parent()->matrix());
-		mesh_object->mesh()->render(mesh_object->material()->shader());
-		pop_modelview_matrix();
-
+		mesh->render(material->shader());
+		
+		    
+		// Pop the modelview and texture matrices off the stack
+		glMatrixMode(GL_MODELVIEW);
+		glPopMatrix();
+		glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_SAMPLER);
+		glMatrixMode(GL_TEXTURE);
+		glPopMatrix();
 	}
 	
 	// Disable the last material
-	active_material(0);
-}
-
-void Core::RenderSystem::render_visible_fracture_objects() {
-	
-	glDisable(GL_CULL_FACE);
-	
-	// Render all FractureObjects
-	for (vector<Core::FractureObjectPtr>::iterator i = fracture_objects_.begin(); i != fracture_objects_.end(); i++) {
-		Core::FractureObject* fracture_object = i->get();
-		
-		// Enable the material and render the mesh
-		active_material(fracture_object->material());
-		push_modelview_matrix(fracture_object->parent()->matrix());
-		fracture_object->render(fracture_object->material()->shader());
-		pop_modelview_matrix();
-
+	if (material) {
+		material->enabled(false);
 	}
-	
-	glEnable(GL_CULL_FACE);
-	
-	// Disable the last material
-	active_material(0);
 }
-
 
 void Core::RenderSystem::render_visible_particle_systems() {
 	
@@ -556,41 +506,6 @@ void Core::RenderSystem::render_overlays() {
 	glEnable(GL_CULL_FACE);
 	glDisable(GL_BLEND);
 	
-}
-
-inline void Core::RenderSystem::active_material(Material* material) {
-	// If the material is different from the current material, then disable
-	// the old material and enable the new material
-	if (active_material_ != material) {
-		if (active_material_) {
-			active_material_->enabled(false);
-		}
-		active_material_ = material;
-		if (active_material_) {
-			active_material_->enabled(true);
-		}
-	}
-}
-
-inline void Core::RenderSystem::push_modelview_matrix(const Matrix& matrix) {
-	// Transform the modelview and texture matrices (for shadow mapping)
-	// using the node's transformation matrix
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glMultMatrixf(matrix);
-	glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_SAMPLER);
-	glMatrixMode(GL_TEXTURE);
-	glPushMatrix();
-	glMultMatrixf(matrix);
-}
-
-inline void Core::RenderSystem::pop_modelview_matrix() {
-	// Pop the modelview and texture matrices off the stack
-	glMatrixMode(GL_MODELVIEW);
-	glPopMatrix();
-	glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_SAMPLER);
-	glMatrixMode(GL_TEXTURE);
-	glPopMatrix();
 }
 
 void Core::RenderSystem::render_fullscreen_quad() {	
@@ -641,14 +556,7 @@ void Core::RenderSystem::generate_render_list(Core::Node* node) {
 				mesh_objects_.push_back(mesh_object);
 			}
 			
-        } else if (typeid(Core::FractureObject) == type) {
-			// Add fracture objects with a valid material and mesh
-			Core::FractureObject* fracture_object = static_cast<Core::FractureObject*>(i->get());
-			if (fracture_object->material() && fracture_object->mesh()) {
-				fracture_objects_.push_back(fracture_object);
-			}
-			
-		} else if (typeid(Core::Light) == type) {
+        } else if (typeid(Core::Light) == type) {
 			// Add all lights
 			lights_.push_back(static_cast<Core::Light*>(i->get()));
 			
@@ -663,10 +571,6 @@ void Core::RenderSystem::generate_render_list(Core::Node* node) {
 }
 
 bool Core::RenderSystem::compare_mesh_objects(MeshObjectPtr o1, MeshObjectPtr o2) {
-    return o1->material() < o2->material();
-}
-
-bool Core::RenderSystem::compare_fracture_objects(FractureObjectPtr o1, FractureObjectPtr o2) {
     return o1->material() < o2->material();
 }
 

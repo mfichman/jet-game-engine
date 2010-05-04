@@ -35,9 +35,6 @@ class FractureObject : public Object {
 public:    
     //! Returns the parent of this object.
     virtual Node* parent() const=0;
-
-	//! Returns the bounding box
-	virtual const BoundingBox& bounding_box() const=0;
     
     //! Returns the material used to render this object.
     virtual Material* material() const=0;

@@ -25,6 +25,7 @@
 #include <Jet/Core/Node.hpp>
 #include <Jet/Core/Mesh.hpp>
 #include <Jet/Core/Material.hpp>
+#include <Jet/Core/MeshObject.hpp>
 #include <Jet/FractureObject.hpp>
 #include <vector>
 
@@ -45,25 +46,20 @@ public:
     inline Node* parent() const {
         return parent_;
     }
-
-	//! Returns the bounding box
-	inline const BoundingBox& bounding_box() const {
-		return bounding_box_;
-	}
     
     //! Returns the material used to render this object.
     inline Material* material() const {
-        return material_.get();
+        return mesh_object_->material();
     }
     
     //! Returns the mesh used to render this object.
     inline Mesh* mesh() const {
-        return mesh_.get();
+        return mesh_object_->mesh();
     }
     
     //! Returns true if this object casts shadows.
     inline bool cast_shadows() const {
-        return cast_shadows_;
+        return mesh_object_->cast_shadows();
     }
     
     //! Returns whether or not fractures to this object will be sealed or
@@ -76,52 +72,36 @@ public:
     inline size_t fracture_count() const {
         return fracture_count_;
     }
-    
-    //! Returns the shape of this object.  May return null if no mesh is
-    //! and this fracture object doesn't have its own ibuffer.
-    inline btCollisionShape* shape() {
-        if (ibuffer_) {
-            return &shape_;
-        } else if (mesh_) {
-            mesh_->state(SYNCED);
-            return mesh_->shape();
-        } else {
-            return 0;
-        }
-    }
+
     
     //! Sets the material used to render this object.
     //! @param material a pointer to the material
     inline void material(Jet::Material* material) {
-        material_ = static_cast<Material*>(material);
+        mesh_object_->material(material);
     }
     
     //! Sets the mesh used to render this object.
     //! @param mesh the mesh
     inline void mesh(Jet::Mesh* mesh) {
-        if (ibuffer_) {
-            throw std::runtime_error("The mesh for a fracture object can't be changed after fracture() is called");
-        } else {
-            mesh_ = static_cast<Mesh*>(mesh);
-        }
+        mesh_object_->mesh(mesh);
     }
 
     //! Sets the material used to render this object by name.
     //! @param name the name of the material
     inline void material(const std::string& name) {
-        material(static_cast<Material*>(engine_->material(name)));
+        mesh_object_->material(name);
     }
     
     //! Sets the mesh used to render this object by name.
     //! @param name the name of the mesh
     inline void mesh(const std::string& name) {
-        mesh(static_cast<Mesh*>(engine_->mesh(name)));
+        mesh_object_->mesh(name);
     }
     
     //! Sets whether or not this object casts shadows.
     //! @param shadows true if the object should cast shadows
     inline void cast_shadows(bool shadows) {
-        cast_shadows_ = shadows;
+        mesh_object_->cast_shadows(shadows);
     }
     
     //! Returns whether or not fractures to this object will be sealed or
@@ -152,36 +132,25 @@ public:
     //! @param plane the plane to split the object along
     void fracture(const Plane& plane);
     
-    //! Renders this fracture object with the given shader
-    void render(Shader* shader);
-    
 private:
     inline FractureObject(Engine* engine, Node* parent) :
         engine_(engine),
         parent_(parent),
-        cast_shadows_(true),
         seal_fractures_(false),
-        fracture_count_(0),
-        ibuffer_(0) {
+        fracture_count_(0) {
             
+            
+        mesh_object_ = static_cast<MeshObject*>(parent_->mesh_object());
     }
     
     FractureObject* create_clone();
-    void init_index_buffer();
-    void update_collision_shape();
-    void fracture_indices(const Plane& plane, const uint32_t* indices, size_t count);
+    void fracture_indices(const Plane& plane);
     
     Engine* engine_;
     Node* parent_;
-	MaterialPtr material_;
-    MeshPtr mesh_;
-    bool cast_shadows_;
+    MeshObjectPtr mesh_object_;
     bool seal_fractures_;
     size_t fracture_count_;
-    uint32_t ibuffer_;
-    std::vector<uint32_t> index_;
-    btConvexHullShape shape_;
-    BoundingBox bounding_box_;
     
     friend class Node;
 };

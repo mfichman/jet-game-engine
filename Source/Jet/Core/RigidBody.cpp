@@ -104,10 +104,6 @@ void Core::RigidBody::attach_node(const btTransform& transform, Node* node) {
             MeshObject* mesh_object = static_cast<MeshObject*>(i->second.get());
             attach_mesh_object(transform, mesh_object);
             
-        } else if (typeid(FractureObject) == info) {
-            // We found a fracture object, so add it to the rigid body
-            FractureObject* fracture_object = static_cast<FractureObject*>(i->second.get());
-            attach_fracture_object(transform, fracture_object);
         }
     }
 }
@@ -123,14 +119,5 @@ void Core::RigidBody::attach_mesh_object(const btTransform& transform, MeshObjec
         // This is for triangle mesh shapes
         shape_->addChildShape(transform, mesh->shape());
     }
-}
-
-void Core::RigidBody::attach_fracture_object(const btTransform& transform, FractureObject* fracture_object) {
-    // Attach the given mesh object to the node, using the local
-    // transform. 
-    btCollisionShape* shape = fracture_object->shape();
-    if (shape) {
-        shape_->addChildShape(transform, shape);
-    } 
 }
 

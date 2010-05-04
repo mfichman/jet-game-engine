@@ -63,35 +63,35 @@ public:
     //! the new node will be relative to this node.
     //! @param index the index where the new object will be placed; if this
     //! parameter is zero then the object will be created at any free location
-    virtual Node* node(const std::string& name)=0;
+    virtual Node* node(const std::string& name="")=0;
     
     //! Creates a new model.  Models are used for rendering
     //! static meshes with a material.
 	//! @param name the name of the new object
-    virtual MeshObject* mesh_object(const std::string& name)=0;
+    virtual MeshObject* mesh_object(const std::string& name="")=0;
 	
 	//! Creates a new fracturable model.
 	//! @param name the name of the new fracturable model
-	virtual FractureObject* fracture_object(const std::string& name)=0;
+	virtual FractureObject* fracture_object(const std::string& name="")=0;
     
     //! Creates a new particle system at the given index.  Particle systems are
     //! used for fire, water, and other affects.
 	//! @param name the name of the new object
-    virtual ParticleSystem* particle_system(const std::string& name)=0;
+    virtual ParticleSystem* particle_system(const std::string& name="")=0;
     
     //! Creates a textured quad.  Textured quads can be used
     //! for billboards.
 	//! @param name the name of the new object
-    virtual QuadSet* quad_set(const std::string& name)=0;
+    virtual QuadSet* quad_set(const std::string& name="")=0;
     
     //! Creates a quad chain.  Quad chains can be used for
     //! path effects, like tracers or condensation trails.
 	//! @param name the name of the new object
-    virtual QuadChain* quad_chain(const std::string& name)=0;
+    virtual QuadChain* quad_chain(const std::string& name="")=0;
     
     //! Creates a light.
 	//! @param name the name of the new object
-    virtual Light* light(const std::string& name)=0;
+    virtual Light* light(const std::string& name="")=0;
     
     //! Returns the rigid body attached to this node.
     virtual RigidBody* rigid_body()=0;

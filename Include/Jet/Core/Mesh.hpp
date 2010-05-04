@@ -40,6 +40,27 @@ namespace Jet { namespace Core {
 //! @brief Class to hold mesh geometry for rendering.
 class Mesh : public Jet::Mesh {
 public:
+	Mesh(Engine* engine, const std::string& name) :
+		engine_(engine),
+		name_(name),
+		state_(UNLOADED),
+		vbuffer_(0),
+		ibuffer_(0),
+		nindices_(0),
+		sync_mode_(STATIC_SYNC) {
+	}
+	
+	Mesh(Engine* engine, Mesh* parent) :
+		engine_(engine),
+		parent_(parent),
+		name_(parent_->name_ + "#"),
+		state_(UNLOADED),
+		vbuffer_(parent->vbuffer_),
+		ibuffer_(0),
+		nindices_(0),
+		sync_mode_(STATIC_SYNC) {
+	}
+	
 
 	//! Destructor.
 	virtual ~Mesh();
@@ -48,34 +69,23 @@ public:
     //! resizes the buffer as needed.
     //! @param i the index of the vertex
     //! @param vertex the vertex to add.
-    inline void vertex(size_t i, const Vertex& vertex) {
-		if (i >= vertex_.size()) {
-			vertex_count(i + 1);
-		}
-		vertex_[i] = vertex;
-		if (SYNCED == state_) {
-			state(LOADED);
-		}
-	}
+    void vertex(size_t i, const Vertex& vertex);
+	
 
     //! Sets an index that is part of this mesh.  This method dynamically
     //! resizes the buffer as needed.
     //! @param i the index of the index.
     //! @param index the index to add
-    inline void index(size_t i, uint32_t index) {
-		if (i >= index_.size()) {
-			index_count(i + 1);
-		}
-		index_[i] = index;
-		if (SYNCED == state_) {
-			state(LOADED);
-		}
-	}
+    void index(size_t i, uint32_t index);
 
     //! Returns a vertex that is part of this mesh
     //! @param i the index of the vertex in the vertex buffer
     inline const Vertex& vertex(size_t i) const {
-        return vertex_[i];
+		if (parent_) {
+			return parent_->vertex(i);
+		} else {
+			return vertex_[i];
+		}
     }
 
     //! Returns an index that is part of this mesh.
@@ -107,7 +117,11 @@ public:
 
     //! Returns a pointer to the beginning of the vertex buffer.
     inline const Vertex* vertex_data() const {
-        return vertex_.size() ? &vertex_.front() : 0;
+		if (parent_) {
+			return parent_->vertex_data();
+		} else {
+			return vertex_.size() ? &vertex_.front() : 0;
+		}
     }
 
     //! Returns a pointer to the beginning of the index buffer.
@@ -117,7 +131,11 @@ public:
 
     //! Returns the number of vertices.
     inline size_t vertex_count() const {
-        return vertex_.size();
+		if (parent_) {
+			return parent_->vertex_count();
+ 		} else {
+			return vertex_.size();
+		}
     }
 
     //! Returns the number of indices.
@@ -129,16 +147,6 @@ public:
 	inline btCollisionShape* shape() {
 		return &shape_;
 	}
-	
-	//! Returns the bounding box shape
-	inline btCollisionShape* bounding_shape() {
-		return &bounding_shape_;
-	}
-	
-	//! Returns the origin of the mesh
-	inline Vector origin() const {
-		return bounding_box_.origin();
-	}
 
 	//! Sets the sync mode of this mesh.
 	void sync_mode(SyncMode sync_mode) {
@@ -148,26 +156,18 @@ public:
 	//! Sets the resource state
 	void state(ResourceState state);
 	
-	//! Renders this mesh
-	inline void render(Shader* shader) {
-		render(shader, ibuffer_, nindices_);
-	}
-	
 	//! Renders this mesh using an ibuffer subset.
 	//! @param shader the shader to use
-	//! @param ibuffer an OpenGL index buffer that is a subset
-	//! of the index buffer attached to this mesh
-	//! @param nindices how many indices to render
-	void render(Shader* shader, uint32_t ibuffer, size_t nindices);
+	void render(Shader* shader);
     
-private:
-    Mesh(Engine* engine, const std::string& name);
-	
+private:	
 	void read_mesh_data();
 	void init_hardware_buffers();
+	void free_hardware_buffers();
 	void update_collision_shape();
     
     Engine* engine_;
+	MeshPtr parent_;
 	std::string name_;
 	ResourceState state_;
     std::vector<Vertex> vertex_;
@@ -177,11 +177,7 @@ private:
 	uint32_t nindices_;
 	SyncMode sync_mode_;
 	btConvexHullShape shape_;
-	btBoxShape bounding_shape_;
 	BoundingBox bounding_box_;
-	
-
-    friend class Engine;
 };
 
 }}

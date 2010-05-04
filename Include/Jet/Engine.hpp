@@ -107,6 +107,11 @@ public:
     //! @param name the name of the option
     //! @param value the value of the option
     virtual void option(const std::string& name, const boost::any& value)=0;
+	
+	//! Sets a new object creator function
+	//! @param name the name of the object type.
+	//! @param funct a pointer to the constructor function
+	//virtual void constructor(const std::string& name, constructor_t funct)=0;
     
     //! Runs the engine through one complete loop.  Note that the engine may
     //! or may not actually do anything on a given loop, depending on the

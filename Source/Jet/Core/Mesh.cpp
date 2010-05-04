@@ -38,17 +38,6 @@ using namespace std;
 using namespace boost;
 
 
-Core::Mesh::Mesh(Engine* engine, const std::string& name) :
-	engine_(engine),
-	name_(name),
-	state_(UNLOADED),
-	vbuffer_(0),
-	ibuffer_(0),
-	nindices_(0),
-	sync_mode_(STATIC_SYNC),
-	bounding_shape_(btVector3(0.0f, 0.0f, 0.0f)) {
-}
-
 Core::Mesh::~Mesh() {
 	
 	// Free the buffer from memory
@@ -66,7 +55,6 @@ void Core::Mesh::state(ResourceState state) {
 		read_mesh_data();
 	}
 	
-	
 	// Entering the SYNCED state
 	if (SYNCED == state) {		
 
@@ -76,12 +64,7 @@ void Core::Mesh::state(ResourceState state) {
 
 	// Leaving the SYNCED state
 	if (SYNCED == state_) {
-		// Free the vertex buffers
-		glDeleteBuffers(1, &vbuffer_);
-		glDeleteBuffers(1, &ibuffer_);
-		vbuffer_ = 0;
-		ibuffer_ = 0;
-		nindices_ = 0;
+		free_hardware_buffers();
 	}
 	
 	// Entering the unloaded state
@@ -93,11 +76,24 @@ void Core::Mesh::state(ResourceState state) {
 	state_ = state;
 }
 
+void Core::Mesh::free_hardware_buffers() {
+		// Free the vertex buffers
+	if (!parent_) {
+		glDeleteBuffers(1, &vbuffer_);
+		vbuffer_ = 0;
+	}
+	glDeleteBuffers(1, &ibuffer_);
+	ibuffer_ = 0;
+	nindices_ = 0;
+}
+
 void Core::Mesh::init_hardware_buffers() {
-	assert(!ibuffer_ && !vbuffer_);
+	assert(!ibuffer_);
 	
 	// Create index and vertex buffers
-	glGenBuffers(1, &vbuffer_);
+	if (!parent_) {
+		glGenBuffers(1, &vbuffer_);
+	}
 	glGenBuffers(1, &ibuffer_);
 
 	// Choose the appropriate buffer mode.  TODO: Calling glBufferData
@@ -109,10 +105,12 @@ void Core::Mesh::init_hardware_buffers() {
 		mode = GL_DYNAMIC_DRAW;
 	}
 	
-	// Copy vertex data to graphics card
-	glBindBuffer(GL_ARRAY_BUFFER, vbuffer_);
-	glBufferData(GL_ARRAY_BUFFER, vertex_count()*sizeof(Vertex), vertex_data(), mode);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	if (!parent_) {
+		// Copy vertex data to graphics card
+		glBindBuffer(GL_ARRAY_BUFFER, vbuffer_);
+		glBufferData(GL_ARRAY_BUFFER, vertex_count()*sizeof(Vertex), vertex_data(), mode);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
 
 	// Copy index data to graphics card
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibuffer_);
@@ -146,14 +144,6 @@ void Core::Mesh::update_collision_shape() {
 	for (int i = 0; i < shape_hull.numVertices(); i++) {
 		shape_.addPoint(shape_hull.getVertexPointer()[i]);
 	}
-	
-	// Generate the bounding shape
-	bounding_box_ = BoundingBox();
-	for (vector<Vertex>::iterator i = vertex_.begin(); i != vertex_.end(); i++) {
-		bounding_box_.point(i->position);
-	}
-	btVector3 half_extents(bounding_box_.half_extents().x, bounding_box_.half_extents().y, bounding_box_.half_extents().z);
-	bounding_shape_ = btBoxShape(half_extents);
 }
 
 void Core::Mesh::read_mesh_data() {
@@ -170,12 +160,16 @@ void Core::Mesh::read_mesh_data() {
 }
 
 
-void Core::Mesh::render(Core::Shader* shader, uint32_t ibuffer, size_t nindices) {
+void Core::Mesh::render(Core::Shader* shader) {
+	// Make sure that all vertex data is synchronized
 	state(SYNCED);
+	if (parent_) {
+		parent_->state(SYNCED);
+	}
 	
 	// Bind and enable the vertex and index buffers
 	glBindBuffer(GL_ARRAY_BUFFER, vbuffer_);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibuffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibuffer_);
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -192,7 +186,7 @@ void Core::Mesh::render(Core::Shader* shader, uint32_t ibuffer, size_t nindices)
     glVertexPointer(3, GL_FLOAT, sizeof(Vertex), (void*)0);
     glNormalPointer(GL_FLOAT, sizeof(Vertex), (void*)(3*sizeof(GLfloat)));
     glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), (void*)(9*sizeof(GLfloat)));
-    glDrawElements(GL_TRIANGLES, nindices, GL_UNSIGNED_INT, (void*)0);
+    glDrawElements(GL_TRIANGLES, nindices_, GL_UNSIGNED_INT, (void*)0);
 
 	// Disable index and vertex buffers
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -207,22 +201,40 @@ void Core::Mesh::render(Core::Shader* shader, uint32_t ibuffer, size_t nindices)
 	}
 }
 
+ void Core::Mesh::vertex(size_t i, const Vertex& vertex) {
+	if (parent_) {
+		throw std::runtime_error("Vertex data is read-only");
+	} else {
+		if (i >= vertex_.size()) {
+			vertex_count(i + 1);
+		}
+		vertex_[i] = vertex;
+	}
+}
+
+//! Sets an index that is part of this mesh.  This method dynamically
+//! resizes the buffer as needed.
+//! @param i the index of the index.
+//! @param index the index to add
+void Core::Mesh::index(size_t i, uint32_t index) {
+	if (i >= index_.size()) {
+		index_count(i + 1);
+	}
+	index_[i] = index;
+}
+
 void Core::Mesh::index_count(size_t size) {
 	if (size != index_.size()) {
 		index_.resize(size);
-		
-		if (SYNCED == state_) {
-			state(LOADED);
-		}
 	}
 }
 
 void Core::Mesh::vertex_count(size_t size) {
+	if (parent_) {
+		throw runtime_error("Vertex data is read-only");
+	}
+	
 	if (size != vertex_.size()) {
 		vertex_.resize(size);
-		
-		if (SYNCED == state_) {
-			state(LOADED);
-		}
 	}
 }

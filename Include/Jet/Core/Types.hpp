@@ -30,6 +30,7 @@ namespace Jet { namespace Core {
     class Camera;
     class Engine;
     class FractureObject;
+    class FractalPlanet;
     class InputSystem;
     class Light;
     class Material;
@@ -57,6 +58,7 @@ namespace Jet { namespace Core {
     typedef boost::intrusive_ptr<Camera> CameraPtr;
     typedef boost::intrusive_ptr<Engine> EnginePtr;
     typedef boost::intrusive_ptr<FractureObject> FractureObjectPtr;
+    typedef boost::intrusive_ptr<FractalPlanet> FractalPlanetPtr;
     typedef boost::intrusive_ptr<InputSystem> InputSystemPtr;
     typedef boost::intrusive_ptr<Light> LightPtr;
     typedef boost::intrusive_ptr<Material> MaterialPtr;

@@ -108,6 +108,7 @@ namespace Jet {
 
     typedef float real_t;
     typedef void (*load_function_t)(Engine* engine);
+    typedef Object* (*constructor_t)(Engine* engine, Node* node);
     
     enum LightType { POINT_LIGHT, DIRECTIONAL_LIGHT };
     enum EmitterType { BOX_EMITTER, ELLIPSOID_EMITTER, POINT_EMITTER };

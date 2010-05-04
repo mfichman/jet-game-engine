@@ -35,6 +35,7 @@
 #include <stdexcept>
 #include <boost/iterator/transform_iterator.hpp>
 #include <boost/function.hpp>
+#include <boost/lexical_cast.hpp>
 
 using namespace Jet;
 using namespace std;
@@ -134,6 +135,10 @@ QuadChain* Core::Node::quad_chain(const std::string& name) {
 }
 
 Object* Core::Node::object(const std::string& name)  {
+	if (name.empty()) {
+		return 0;
+	}
+	
     unordered_map<string, ObjectPtr>::const_iterator i = object_.find(name);
     if (i == object_.end()) {
         return 0;
@@ -164,7 +169,12 @@ Camera* Core::Node::camera() {
 }
 
 void Core::Node::add_object(const std::string& name, Object* object) {
-	object_.insert(make_pair(name, object));
+	if (name.empty()) {
+		string auto_name = "__" + lexical_cast<string>(auto_name_counter_++);
+		object_.insert(make_pair(auto_name, object));
+	} else {
+		object_.insert(make_pair(name, object));
+	}
 }
 
 void Core::Node::delete_object(Object* object) {

@@ -136,7 +136,6 @@ private:
     void getWorldTransform(btTransform& transform) const;
     void setWorldTransform(const btTransform& transform);
     void attach_mesh_object(const btTransform& trans, MeshObject* mesh_object);
-    void attach_fracture_object(const btTransform& trans, FractureObject* fracture_object);
     void attach_node(const btTransform& transform, Node* node);
     
     Engine* engine_;
