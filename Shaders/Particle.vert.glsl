@@ -42,7 +42,13 @@ void main() {
     float dist = length(view_position.xyz);
     
     float x = elapsed_time/life;
-    float f = 15.0 * sin(x) * exp(-6.0*x);
+    //float h = 1.0 - pow(x, 2.0);
+    //float g = 1.0 - pow(x - 1.0, 4.0);
+    //float f = min(h, g);
+    
+    //pow(x-1.0, 2.0) -
+    float f = (-exp((x+0.03)/1.5)-exp(-60.0*(x+0.03)/1.5)+0.2*exp(2.2*(x+0.03)/1.5)+1.08)*4.5;
+    //float f = 18.0 * sin(x) * exp(-6.0*x);
     
     gl_Position = gl_ProjectionMatrix * view_position;
     gl_PointSize = max(scale * init_size / (1.0 + dist) + growth_rate * elapsed_time, 0.0);

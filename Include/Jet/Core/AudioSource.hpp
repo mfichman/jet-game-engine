@@ -34,7 +34,7 @@ namespace Jet { namespace Core {
 //! @brief Emits positional audio.
 class AudioSource : public Jet::AudioSource {
 public:
-    AudioSource(Engine* engine, Node* parent) :
+    inline AudioSource(Engine* engine, Node* parent) :
         engine_(engine),
         parent_(parent) {
         

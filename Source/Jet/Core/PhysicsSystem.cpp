@@ -47,7 +47,7 @@ Core::PhysicsSystem::~PhysicsSystem() {
     
 }
 
-void Core::PhysicsSystem::step() {
+void Core::PhysicsSystem::on_tick() {
     real_t gravity = engine_->option<real_t>("gravity");
     world_->setGravity(btVector3(0.0f, -gravity, 0.0f));
     
@@ -60,9 +60,6 @@ void Core::PhysicsSystem::step() {
 
 void Core::PhysicsSystem::on_init() {
     std::cout << "Initializing physics system" << std::endl;
-}
-
-void Core::PhysicsSystem::on_update() {
 }
 
 void Core::PhysicsSystem::on_tick(btDynamicsWorld* world, btScalar step) {

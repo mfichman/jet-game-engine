@@ -89,8 +89,8 @@ Core::Engine::Engine() :
 	// Create subsystems and register them
 	render_system_ = new RenderSystem(this);
 	script_system_ = new ScriptSystem(this);
-	physics_system_ = new PhysicsSystem(this);
 	input_system_ = new InputSystem(this);
+	physics_system_ = new PhysicsSystem(this);
 	audio_system_ = new AudioSystem(this);
 	
 	// Platform-dependent timer code
@@ -246,8 +246,10 @@ void Core::Engine::tick() {
     update_frame_delta();
 	update_fps();
     
-	// Run the fixed-time step portion of the game by calling on_update when
-	physics_system_->step();
+	// Run the tick callback
+	for (list<EngineListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
+		(*i)->on_tick();
+	}
     
     // Fire render event
     for (list<EngineListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {

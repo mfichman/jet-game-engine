@@ -212,10 +212,6 @@ void Core::Mesh::render(Core::Shader* shader) {
 	}
 }
 
-//! Sets an index that is part of this mesh.  This method dynamically
-//! resizes the buffer as needed.
-//! @param i the index of the index.
-//! @param index the index to add
 void Core::Mesh::index(size_t i, uint32_t index) {
 	if (i >= index_.size()) {
 		index_count(i + 1);
@@ -237,4 +233,34 @@ void Core::Mesh::vertex_count(size_t size) {
 	if (size != vertex_.size()) {
 		vertex_.resize(size);
 	}
+}
+
+//! Returns a vertex that is part of this mesh
+//! @param i the index of the vertex in the vertex buffer
+const Vertex& Core::Mesh::vertex(size_t i) const {
+	if (parent_) {
+		return parent_->vertex(i);
+	} else {
+		return vertex_[i];
+	}
+}
+
+//! Returns an index that is part of this mesh.
+//! @param i the index of the index in the index buffer
+uint32_t Core::Mesh::index(size_t i) const {
+	return index_[i];
+}
+
+//! Returns a pointer to the beginning of the vertex buffer.
+const Vertex* Core::Mesh::vertex_data() const {
+	if (parent_) {
+		return parent_->vertex_data();
+	} else {
+		return vertex_.size() ? &vertex_.front() : 0;
+	}
+}
+
+//! Returns a pointer to the beginning of the index buffer.
+const uint32_t* Core::Mesh::index_data() const {
+	return index_.size() ? &index_.front() : 0;
 }

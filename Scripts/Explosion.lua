@@ -27,35 +27,35 @@ function Explosion:__init(node, name)
     
     self.explosion = self.node:particle_system("explosion") {
         type = ParticleSystem.ELLIPSOID_EMITTER,
-        quota = 100,
+        quota = 60,
         texture = "BurstGold.png",
-        particle_life = Range(.4, .4),
-        particle_size = Range(10, 10),
-        life = .05,
-        width = Range(0, 5),
-        height = Range(0, 5),
-        depth = Range(0, 5),
+        particle_life = Range(.35, .35),
+        particle_size = Range(9, 9),
+        life = .08,
+        width = Range(.2, 6),
+        height = Range(.2, 6),
+        depth = Range(.2, 6),
         emission_speed = Range(.8, .8),
-        emission_rate = Range(300, 300)
+        emission_rate = Range(500, 500)
     }
     
     self.sparks = self.node:particle_system("sparks") {
         type = ParticleSystem.ELLIPSOID_EMITTER,
-        quota = 8,
+        quota = 9,
         texture = "IncandescentGold.png",
-        particle_life = Range(.5, .5),
+        particle_life = Range(.6, .6),
         particle_size = Range(.8, .8),
         life = .01,
-        width = Range(0, 0),
-        height = Range(0, 0),
-        depth = Range(0, 0),
+        width = Range(.8, .8),
+        height = Range(.8, .8),
+        depth = Range(.8, .8),
         emission_speed = Range(30, 40),
         emission_rate = Range(1000, 1000)
     }
     
     self.smoke = self.node:particle_system("smoke") {
         type = ParticleSystem.ELLIPSOID_EMITTER,
-        quota = 3,
+        quota = 2,
         texture = "SmokeWhite.png",
         particle_life = Range(1, 1),
         particle_size = Range(9, 10),

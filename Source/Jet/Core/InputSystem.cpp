@@ -44,7 +44,7 @@ void Core::InputSystem::on_init() {
     SDL_EnableUNICODE(true);
 }
 
-void Core::InputSystem::on_update() {
+void Core::InputSystem::on_tick() {
     SDL_Event evt;
     while(SDL_PollEvent(&evt)) {
         switch (evt.type) {

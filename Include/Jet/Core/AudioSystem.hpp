@@ -44,6 +44,7 @@ public:
     }
 
 private:
+    void on_tick() {}
     void on_init() {}
     void on_update();
     void on_render() {}

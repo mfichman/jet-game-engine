@@ -61,6 +61,9 @@ public:
 	
 	//! True if the material receives shadows.
 	virtual bool receive_shadows() const=0;
+	
+	//! True if the material is double-sided.
+	virtual bool double_sided() const=0;
     
     //! Returns the state of the resource.
     virtual ResourceState state() const=0;
@@ -103,6 +106,9 @@ public:
 	
 	//! True if the material receives shadows.
 	virtual void receive_shadows(bool receive)=0;
+	
+	//! True if the material is double-sided.
+	virtual void double_sided(bool double_sided)=0;
     
     //! Sets the diffuse texture map by name.
     //! @param name texture map name

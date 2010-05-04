@@ -40,7 +40,7 @@ namespace Jet { namespace Core {
 //! @brief Class to hold mesh geometry for rendering.
 class Mesh : public Jet::Mesh {
 public:
-	Mesh(Engine* engine, const std::string& name) :
+	inline Mesh(Engine* engine, const std::string& name) :
 		engine_(engine),
 		name_(name),
 		state_(UNLOADED),
@@ -50,7 +50,7 @@ public:
 		sync_mode_(STATIC_SYNC) {
 	}
 	
-	Mesh(Engine* engine, Mesh* parent) :
+	inline Mesh(Engine* engine, Mesh* parent) :
 		engine_(engine),
 		parent_(parent),
 		name_(parent_->name_ + "#"),
@@ -71,7 +71,6 @@ public:
     //! @param vertex the vertex to add.
     void vertex(size_t i, const Vertex& vertex);
 	
-
     //! Sets an index that is part of this mesh.  This method dynamically
     //! resizes the buffer as needed.
     //! @param i the index of the index.
@@ -80,19 +79,11 @@ public:
 
     //! Returns a vertex that is part of this mesh
     //! @param i the index of the vertex in the vertex buffer
-    inline const Vertex& vertex(size_t i) const {
-		if (parent_) {
-			return parent_->vertex(i);
-		} else {
-			return vertex_[i];
-		}
-    }
+    const Vertex& vertex(size_t i) const;
 
     //! Returns an index that is part of this mesh.
     //! @param i the index of the index in the index buffer
-    inline uint32_t index(size_t i) const {
-        return index_[i];
-    }
+    uint32_t index(size_t i) const;
 	
 	//! Sets the number of vertices in this mesh
 	void vertex_count(size_t size);
@@ -111,31 +102,19 @@ public:
 	}
   
     //! Returns the name of the mesh.
-    const std::string& name() const {
+    inline const std::string& name() const {
         return name_;
     }
 
     //! Returns a pointer to the beginning of the vertex buffer.
-    inline const Vertex* vertex_data() const {
-		if (parent_) {
-			return parent_->vertex_data();
-		} else {
-			return vertex_.size() ? &vertex_.front() : 0;
-		}
-    }
+    const Vertex* vertex_data() const;
 
     //! Returns a pointer to the beginning of the index buffer.
-    inline const uint32_t* index_data() const {
-        return index_.size() ? &index_.front() : 0;
-    }
+    const uint32_t* index_data() const;
 
     //! Returns the number of vertices.
     inline size_t vertex_count() const {
-		if (parent_) {
-			return parent_->vertex_count();
- 		} else {
-			return vertex_.size();
-		}
+		return parent_? parent_->vertex_count() : vertex_.size();
     }
 
     //! Returns the number of indices.
@@ -149,7 +128,7 @@ public:
 	}
 
 	//! Sets the sync mode of this mesh.
-	void sync_mode(SyncMode sync_mode) {
+	inline void sync_mode(SyncMode sync_mode) {
 		sync_mode_ = sync_mode;
 	}
 	

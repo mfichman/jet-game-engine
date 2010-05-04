@@ -137,6 +137,9 @@ public:
 	//! Called when the engine is initialized
 	virtual void on_init()=0;
 	
+	//! Called at the beginning of a tick.
+	virtual void on_tick()=0;
+	
     //! Called for each physics update.
     virtual void on_update()=0;
     

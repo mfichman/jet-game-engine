@@ -41,6 +41,7 @@ public:
 		shininess_(40.0f),
 		enabled_(false),
 		receive_shadows_(true),
+		double_sided_(true),
 		diffuse_map_loc_(-1),
 		specular_map_loc_(-1),
 		normal_map_loc_(-1),
@@ -97,6 +98,11 @@ public:
 	//! Returns true if the material receives shadows.
 	inline bool receive_shadows() const {
 		return receive_shadows_;
+	}
+	
+	//! REturns true if the material is double-sided.
+	inline bool double_sided() const {
+		return double_sided_;
 	}
 	
 	//! Returns the resource state.
@@ -165,6 +171,11 @@ public:
 	inline void receive_shadows(bool receive) {
 		receive_shadows_ = receive;
 	}
+	
+	//! True if the material is double-sided.
+	inline void double_sided(bool double_sided) {
+		double_sided_ = double_sided;
+	}
     
     //! Sets the diffuse texture map by name.
     //! @param name texture map name
@@ -215,6 +226,7 @@ private:
 	real_t shininess_;
 	bool enabled_;
 	bool receive_shadows_;
+	bool double_sided_;
 	
 	
 	// Shader uniform variable handles
