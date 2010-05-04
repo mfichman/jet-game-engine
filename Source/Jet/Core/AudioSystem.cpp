@@ -70,10 +70,8 @@ void Core::AudioSystem::on_update() {
         Vector up = matrix.up();
         Vector forward = matrix.forward();
         Vector origin = matrix.origin();
-        Vector velocity;
-        if (node->rigid_body_) {
-            velocity = node->rigid_body()->linear_velocity();
-        }
+        Vector velocity = node->linear_velocity();
+        
         FMOD_VECTOR* u = (FMOD_VECTOR*)&up;
         FMOD_VECTOR* f = (FMOD_VECTOR*)&forward;
         FMOD_VECTOR* v = (FMOD_VECTOR*)&velocity;

@@ -159,7 +159,10 @@ public:
     //! load the underlying resource if load is set to true.
     //! @param name the name of the texture
     Jet::Shader* shader(const std::string& name);
-
+	
+	//! Returns the constructor function for the given type.
+	//! @param type the type
+	constructor_t constructor(const std::string& type);
 
     //! Adds a listener, which listens for engine events.
     //! @param listener the engine listener.
@@ -196,6 +199,13 @@ public:
 	//! Sets the active camera.
 	inline void camera(Jet::Camera* camera) {
 		camera_ = camera;
+	}
+	
+	//! Sets a new object creator function
+	//! @param type the name of the object type.
+	//! @param funct a pointer to the constructor function
+	inline void constructor(const std::string& type, constructor_t funct) {
+		constructor_[type] = funct;
 	}
 	
     //! Sets an engine option.  For a list of possible options, see the
@@ -281,6 +291,7 @@ private:
     std::map<std::string, Jet::MeshPtr> mesh_;
     std::map<std::string, Jet::TexturePtr> texture_;
 	std::map<std::string, Jet::ShaderPtr> shader_;
+	std::map<std::string, constructor_t> constructor_;
     std::set<std::string> search_folder_;
     
 	// Listeners

@@ -38,6 +38,12 @@ namespace Jet { namespace Core {
 //! @brief Displays an instanced mesh.
 class MeshObject : public Jet::MeshObject {
 public:
+	inline MeshObject(Engine* engine, Node* parent) :
+		engine_(engine),
+		parent_(parent),
+		cast_shadows_(true) {
+	}
+	
     //! Destructor.
     virtual ~MeshObject() {}
     
@@ -114,13 +120,7 @@ public:
         shader_param_[name] = param;
     }
     
-private:
-    inline MeshObject(Engine* engine, Node* parent) :
-		engine_(engine),
-		parent_(parent),
-		cast_shadows_(true) {
-	}
-    
+private:    
     Engine* engine_;
     Node* parent_;
 	MaterialPtr material_;
@@ -129,9 +129,6 @@ private:
     bool cast_shadows_;
 	uint32_t index_buffer_;
 	size_t index_count_;
-
-    friend class Engine;
-	friend class Node;
 };
 
 }}

@@ -38,9 +38,9 @@ public:
     //! Destructor.
     ~InputSystem();
 
-    void on_update();
 private:
     void on_init();
+    void on_update();
     void on_render() {}
     
     void on_keyboard(char key);

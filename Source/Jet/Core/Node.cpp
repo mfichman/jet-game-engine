@@ -168,6 +168,17 @@ Camera* Core::Node::camera() {
 	return camera_.get();
 }
 
+Object* Core::Node::extension(const std::string& name, const std::string& type) {
+	Object* obj = object(name);
+    if (obj) {
+		return obj;
+    } else {
+		ObjectPtr object = engine_->constructor(name)(engine_, this);
+        add_object(name, object.get());
+        return object.get();
+    }
+}
+
 void Core::Node::add_object(const std::string& name, Object* object) {
 	if (name.empty()) {
 		string auto_name = "__" + lexical_cast<string>(auto_name_counter_++);

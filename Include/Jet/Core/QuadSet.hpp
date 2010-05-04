@@ -32,6 +32,11 @@ namespace Jet { namespace Core {
 //! Generates particle effects.
 class QuadSet : public Jet::QuadSet {
 public:
+    // Creates a new quad set with the given parent node.
+    inline QuadSet(Engine* engine, Node* parent) :
+        engine_(engine),
+        parent_(parent) {
+    }
     
     //! Returns the parent node.
     inline Node* parent() const {
@@ -61,18 +66,11 @@ public:
         throw std::runtime_error("Not implemented");
     }
     
-private:
-    inline QuadSet(Engine* engine, Node* parent) :
-        engine_(engine),
-        parent_(parent) {
-    }
-    
+private:    
     Engine* engine_;
     Node* parent_;
     std::vector<Quad> quad_;
     std::vector<Vertex> vertex_;
-
-    friend class Node;
 };
 
 }}

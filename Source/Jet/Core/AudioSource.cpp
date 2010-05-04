@@ -32,6 +32,26 @@ inline void fmod_check(FMOD_RESULT result) {
     }
 }
 
+inline PlaybackState Core::AudioSource::state(size_t chan) const {
+    if (chan >= channel_.size()) {
+        return STOP;
+    }
+    
+    if (!channel_[chan]) {
+        return STOP;
+    }
+    
+    return PLAY;
+}
+
+void Core::AudioSource::sound(size_t chan, Jet::Sound* sound) {
+    if (chan > sound_.size()) {
+        sound_.resize(chan + 1);
+        channel_.resize(chan + 1);
+    }
+    sound_[chan] = static_cast<Sound*>(sound);
+}
+
 void Core::AudioSource::state(size_t chan, PlaybackState state) {
     if (chan > channel_.size()) {
         sound_.resize(chan + 1);

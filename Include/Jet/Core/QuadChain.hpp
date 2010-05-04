@@ -32,6 +32,12 @@ namespace Jet { namespace Core {
 //! Used for trailer effects.
 class QuadChain : public Jet::QuadChain {
 public:
+    // Creates a new quad chain with the given parent node.
+    inline QuadChain(Engine* engine, Node* parent) :
+        engine_(engine),
+        parent_(parent) {
+            
+    }
     
     //! Destructor.
     virtual ~QuadChain() {}
@@ -52,17 +58,9 @@ public:
     }
     
 private:
-    inline QuadChain(Engine* engine, Node* parent) :
-        engine_(engine),
-        parent_(parent) {
-            
-    }
-    
     Engine* engine_;
     Node* parent_;
     std::vector<Vertex> vertex_;
-
-    friend class Node;
 };
 
 }}

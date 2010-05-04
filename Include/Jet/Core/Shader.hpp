@@ -32,6 +32,16 @@ namespace Jet { namespace Core {
 //! @brief Shader.
 class Shader : public Jet::Shader {
 public:
+	//! Creates a shader.
+    inline Shader(Engine* engine, const std::string& name) :
+		engine_(engine),
+		name_(name),
+		state_(UNLOADED),
+		vshader_(0),
+		fshader_(0),
+		program_(0),
+		enabled_(false) {
+	}
 	
 	virtual ~Shader();
     
@@ -62,18 +72,7 @@ public:
 	//! Returns the attribute location of the given parameter.
 	int32_t attrib_location(const std::string& name) const;
     
-private:
-    //! Creates a shader.
-    inline Shader(Engine* engine, const std::string& name) :
-		engine_(engine),
-		name_(name),
-		state_(UNLOADED),
-		vshader_(0),
-		fshader_(0),
-		program_(0),
-		enabled_(false) {
-	}
-	
+private:	
 	void init_program();
 	void read_source(const std::string& path, std::vector<char>& source);
 	

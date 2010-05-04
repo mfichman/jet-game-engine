@@ -38,6 +38,15 @@ namespace Jet { namespace Core {
 //! @brief Displays an fracturable instanced mesh.
 class FractureObject : public Jet::FractureObject {
 public:
+    inline FractureObject(Engine* engine, Node* parent) :
+        engine_(engine),
+        parent_(parent),
+        seal_fractures_(false),
+        fracture_count_(0) {
+            
+            
+        mesh_object_ = static_cast<MeshObject*>(parent_->mesh_object());
+    }
     
     //! Destroys this fracture object
     ~FractureObject();
@@ -132,17 +141,7 @@ public:
     //! @param plane the plane to split the object along
     void fracture(const Plane& plane);
     
-private:
-    inline FractureObject(Engine* engine, Node* parent) :
-        engine_(engine),
-        parent_(parent),
-        seal_fractures_(false),
-        fracture_count_(0) {
-            
-            
-        mesh_object_ = static_cast<MeshObject*>(parent_->mesh_object());
-    }
-    
+private:    
     FractureObject* create_clone();
     void fracture_indices(const Plane& plane);
     

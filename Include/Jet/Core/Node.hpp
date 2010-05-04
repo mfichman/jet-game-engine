@@ -55,7 +55,30 @@ namespace Jet { namespace Core {
 //! @class Node
 //! @brief Represents a node in the scene graph.
 class Node : public Jet::Node {
-public:    
+public:
+	//! Creates a new node with no parent.
+    //! @param engine the engine object
+	inline Node(Engine* engine) :
+		engine_(engine),
+		parent_(0),
+		shape_transform_(btTransform::getIdentity()),
+		destroyed_(false),
+		transform_dirty_(true) {
+	}
+    
+    //! Creates a new node with a parent.
+    //! @param engine the engine object
+    //! @param parent the parent
+	inline Node(Engine* engine, Node* parent) :
+		engine_(engine),
+		parent_(parent),
+		rigid_body_(parent->rigid_body_),
+		shape_transform_(parent->shape_transform_),
+		destroyed_(false),
+		transform_dirty_(true),
+		auto_name_counter_(0) {
+	}
+	
     //! Destructor.
     virtual ~Node();
 	
@@ -107,6 +130,11 @@ public:
 	//! Returns the camera.
 	Jet::Camera* camera();
     
+	//! Creates and returns an extension object, if it doesn't already exist.
+	//! @param name the name of the extension object
+	//! @param type the type of the object
+	Jet::Object* extension(const std::string& type, const std::string& name);
+	
     //! Returns a component that is attached to this node.
     //! @param name the name of the component
     Jet::Object* object(const std::string& name);
@@ -128,6 +156,15 @@ public:
     inline const Vector& position() const {
         return position_;
     }
+	
+	//! Returns the linear velocity.
+	inline Vector linear_velocity() const {
+		if (rigid_body_) {
+			return rigid_body_->linear_velocity();
+		} else {
+			return Vector();
+		}
+	}
 	
 		
 	//! Returns the world position of the node (as of the last time it moved).
@@ -196,30 +233,7 @@ public:
 	//! Called to update the transform of the node
 	void update_transform();
 	
-private:
-    //! Creates a new node with no parent.
-    //! @param engine the engine object
-	inline Node(Engine* engine) :
-		engine_(engine),
-		parent_(0),
-		shape_transform_(btTransform::getIdentity()),
-		destroyed_(false),
-		transform_dirty_(true) {
-	}
-    
-    //! Creates a new node with a parent.
-    //! @param engine the engine object
-    //! @param parent the parent
-	inline Node(Engine* engine, Node* parent) :
-		engine_(engine),
-		parent_(parent),
-		rigid_body_(parent->rigid_body_),
-		shape_transform_(parent->shape_transform_),
-		destroyed_(false),
-		transform_dirty_(true),
-		auto_name_counter_(0) {
-	}
-    
+private:    
     //! Removes an object from this node.
     //! @param object the object to remove
 	void delete_object(Object* object);
@@ -250,16 +264,8 @@ private:
     bool destroyed_;
 	bool transform_dirty_;
 	size_t auto_name_counter_;
-
-	friend class Engine;
-    friend class MeshObject;
-    friend class ParticleSystem;
-    friend class QuadSet;
-    friend class QuadChain;
-    friend class Light;
-    friend class RigidBody;
-    friend class AudioSource;
-	friend class AudioSystem;
+	
+	friend class RigidBody;
 };
 
 }}

@@ -34,6 +34,19 @@ namespace Jet { namespace Core {
 //! Generates a planet.
 class FractalPlanet : public Object {
 public:
+    inline FractalPlanet(Engine* engine, Node* parent) :
+        engine_(engine),
+        parent_(parent),
+        seed_(0),
+        roughness_(0.5),
+        ring_count_(32),
+        division_count_(32),
+        detail_level_count_(5) {
+            
+        //mesh_object_ = parent_->mesh_object("planet");
+       // mesh_ = new Mesh(engine, "planet");
+    }
+    
     //! Returns the parent of this planet.
     inline Node* parent() const {
         return parent_;
@@ -121,20 +134,7 @@ public:
         detail_level_count_ = count;
     }
     
-private:
-    FractalPlanet(Engine* engine, Node* parent) :
-        engine_(engine),
-        parent_(parent),
-        seed_(0),
-        roughness_(0.5),
-        ring_count_(32),
-        division_count_(32),
-        detail_level_count_(5) {
-            
-        //mesh_object_ = parent_->mesh_object("planet");
-       // mesh_ = new Mesh(engine, "planet");
-    }
-    
+private:    
     void generate_mesh();
     void generate_quad(uint32_t quad[4], size_t level);
     

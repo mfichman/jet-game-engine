@@ -34,6 +34,24 @@ namespace Jet { namespace Core {
 //! @brief Specifies the color and texture properties of an object.
 class Material : public Jet::Material {
 public:
+	inline Material(Engine* engine, const std::string& name) :
+		engine_(engine),
+		name_(name),
+		state_(UNLOADED),
+		shininess_(40.0f),
+		enabled_(false),
+		receive_shadows_(true),
+		diffuse_map_loc_(-1),
+		specular_map_loc_(-1),
+		normal_map_loc_(-1),
+		shadow_map_loc_(-1),
+		diffuse_map_enabled_(-1),
+		specular_map_enabled_(-1),
+		normal_map_enabled_(-1),
+		shadow_map_enabled_(-1) {
+			
+		shader("Default");
+	}
     
     //! Returns the ambient color.
     inline const Color& ambient_color() const {
@@ -179,26 +197,7 @@ public:
 	//! Binds this material.
 	void enabled(bool enabled);
     
-private:
-    inline Material(Engine* engine, const std::string& name) :
-		engine_(engine),
-		name_(name),
-		state_(UNLOADED),
-		shininess_(40.0f),
-		enabled_(false),
-		receive_shadows_(true),
-		diffuse_map_loc_(-1),
-		specular_map_loc_(-1),
-		normal_map_loc_(-1),
-		shadow_map_loc_(-1),
-		diffuse_map_enabled_(-1),
-		specular_map_enabled_(-1),
-		normal_map_enabled_(-1),
-		shadow_map_enabled_(-1) {
-			
-		shader("Default");
-	}
-	
+private:	
 	void read_material_data();
 	void begin_shader();
 	void begin_fixed_pipeline();
@@ -228,8 +227,6 @@ private:
 	int32_t specular_map_enabled_;
 	int32_t normal_map_enabled_;
 	int32_t shadow_map_enabled_;
-    
-    friend class Engine;
 };
 
 }}

@@ -32,6 +32,12 @@ namespace Jet { namespace Core {
 //! @brief Directional or omni-directional point light.
 class Light : public Jet::Light {
 public:
+    inline Light(Node* parent) :
+        parent_(parent),
+        type_(DIRECTIONAL_LIGHT),
+        cast_shadows_(true) {
+            
+    }
     
     //! Returns the parent node.
     inline Node* parent() const {
@@ -98,14 +104,7 @@ public:
         cast_shadows_ = cast_shadows;
     }
 
-private:
-    inline Light(Node* parent) :
-        parent_(parent),
-        type_(DIRECTIONAL_LIGHT),
-        cast_shadows_(true) {
-            
-    }
-    
+private:    
     Node* parent_;
     Color ambient_color_;
     Color diffuse_color_;
@@ -113,8 +112,6 @@ private:
     Vector direction_;
     LightType type_;
     bool cast_shadows_;
-    
-    friend class Node;
 };
 
 }}

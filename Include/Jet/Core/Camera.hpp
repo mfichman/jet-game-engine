@@ -34,6 +34,14 @@ namespace Jet { namespace Core {
 //! @brief Controls the viewpoint.
 class Camera : public Jet::Camera {
 public:
+    inline Camera(Engine* engine, Node* parent) :
+        engine_(engine),
+        parent_(parent),
+        field_of_view_(45.0f),
+        near_clipping_distance_(0.1f),
+        far_clipping_distance_(1000.0f) {
+            
+    }
     
     //! Returns the parent node.
     inline Node* parent() const {
@@ -96,16 +104,7 @@ public:
         near_clipping_distance_ = distance;
     }
 
-private:
-    Camera(Engine* engine, Node* parent) :
-        engine_(engine),
-        parent_(parent),
-        field_of_view_(45.0f),
-        near_clipping_distance_(0.1f),
-        far_clipping_distance_(1000.0f) {
-            
-    }
-    
+private:    
     Frustum compute_frustum(real_t far_distance) const;
     
     Engine* engine_;
@@ -113,8 +112,6 @@ private:
     real_t field_of_view_;
     real_t near_clipping_distance_;
     real_t far_clipping_distance_;
-    
-    friend class Node;
 };
 
 }}

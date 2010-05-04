@@ -38,6 +38,8 @@ namespace Jet { namespace Core {
 //! @brief Physical simulation with collisions.
 class RigidBody : public Jet::RigidBody, public btMotionState {
 public:
+    //! Creates a new rigid body with the given parent node.
+    RigidBody(Engine* engine, Node* parent);
     
     //! Destructor
     virtual ~RigidBody();
@@ -83,56 +85,30 @@ public:
 
     //! Applies a force to the object, relative to the world coordinates.
     //! @param v the force to apply
-    inline void apply_force(const Vector& v) {
-		body_->activate(true);
-        body_->applyCentralForce(btVector3(v.x, v.y, v.z));
-    }
+    void apply_force(const Vector& v);
 
     //! Applies a torque to the object, relative to the world coordinates.
     //! @param v the torque to apply
-    inline void apply_torque(const Vector& v) {
-        body_->applyTorque(btVector3(v.x, v.y, v.z));
-    }
+    void apply_torque(const Vector& v);
 
     //! Applies a force to the object, relative to the parent scene node's
     //! coordinates.
     //! @param v the force to apply
-    inline void apply_local_force(const Vector& v) {
-        btTransform transform = body_->getCenterOfMassTransform();
-        transform.setOrigin(btVector3(0.0f, 0.0f, 0.0f));
-        btVector3 force = transform * btVector3(v.x, v.y, v.z);
-        body_->applyCentralForce(force);
-    }
+    void apply_local_force(const Vector& v);
 
     //! Applies a torque to the object, relative to the parent scene node's
     //! coordinates.
     //! @param v the torque to apply
-    inline void apply_local_torque(const Vector& v) {
-        btTransform transform = body_->getCenterOfMassTransform();
-        transform.setOrigin(btVector3(0.0f, 0.0f, 0.0f));
-        btVector3 torque = transform * btVector3(v.x, v.y, v.z);
-        body_->applyTorque(torque);
-    }
+    void apply_local_torque(const Vector& v);
     
     //! Sets the mass of the rigid body.
-    inline void mass(real_t mass) {
-        mass_ = mass;
-        btVector3 inertia(0.0f, 0.0f, 0.0f);
-        shape_->calculateLocalInertia(mass, inertia);
-        body_->setMassProps(mass, inertia);
-        body_->updateInertiaTensor();
-        body_->activate(true);
-        engine_->physics_system()->world()->removeCollisionObject(body_.get());
-        engine_->physics_system()->world()->addRigidBody(body_.get());
-    }
+    void mass(real_t mass);
     
     //! Updates the collision shapes attached to this rigid body
     void update_collision_shapes();
   
     
-private:
-    RigidBody(Engine* engine, Node* parent);
-    
+private:    
     void getWorldTransform(btTransform& transform) const;
     void setWorldTransform(const btTransform& transform);
     void attach_mesh_object(const btTransform& trans, MeshObject* mesh_object);
@@ -144,7 +120,7 @@ private:
 
     std::auto_ptr<btRigidBody> body_;
     std::auto_ptr<btCompoundShape> shape_;
-
+    
     friend class Node;
 };
 

@@ -34,6 +34,11 @@ namespace Jet { namespace Core {
 //! @brief Emits positional audio.
 class AudioSource : public Jet::AudioSource {
 public:
+    AudioSource(Engine* engine, Node* parent) :
+        engine_(engine),
+        parent_(parent) {
+        
+    }
     
     //! Returns the parent node
     inline Node* parent() const {
@@ -48,17 +53,7 @@ public:
     
     //! Returns the state of the clip playing at the given channel.
     //! @param chan the channel to use
-    inline PlaybackState state(size_t chan) const {
-        if (chan >= channel_.size()) {
-            return STOP;
-        }
-        
-        if (!channel_[chan]) {
-            return STOP;
-        }
-        
-        return PLAY;
-    }
+    PlaybackState state(size_t chan) const;
     
     //! Sets the sound clip at the given index for the audio
     //! source.
@@ -72,13 +67,7 @@ public:
     //! source.
     //! @param chan the channel to use
     //! @param sound the sound clip
-    inline void sound(size_t chan, Jet::Sound* sound) {
-        if (chan > sound_.size()) {
-            sound_.resize(chan + 1);
-            channel_.resize(chan + 1);
-        }
-        sound_[chan] = static_cast<Sound*>(sound);
-    }
+    void sound(size_t chan, Jet::Sound* sound);
     
     //! Sets the mode of the given channel.
     //! @param chan the channel to use
@@ -88,21 +77,13 @@ public:
     //! Sets the position of this audio system.
     void position(const Vector& position);
     
-private:
-    inline AudioSource(Engine* engine, Node* parent) :
-        engine_(engine),
-        parent_(parent) {
-        
-    }
-    
+private:    
     static FMOD_RESULT F_CALLBACK on_channel_event(FMOD_CHANNEL* ch, FMOD_CHANNEL_CALLBACKTYPE type, void* data1, void* data2);
 
     Engine* engine_;
     Node* parent_;
     std::vector<SoundPtr> sound_;
     std::vector<FMOD_CHANNEL*> channel_;
-    
-    friend class Node;
 };
 
 }}

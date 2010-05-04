@@ -40,6 +40,36 @@ namespace Jet { namespace Core {
 //! @brief Renders buttons, text, etc. on screen
 class Overlay : public Jet::Overlay {
 public:
+    //! Creates a new overlay for the given engine.  This overlay will have no
+    //! parent, so it should be the root.
+    Overlay(Engine* engine) :
+        engine_(engine),
+        parent_(0),
+        destroyed_(false),
+        x_(0.0f),
+        y_(0.0f),
+        width_(0.0f),
+        height_(0.0f),
+        layout_mode_(RELATIVE_LAYOUT),
+        vertical_alignment_(TOP),
+        horizontal_alignment_(LEFT) {
+        
+    }
+    
+    //! Creates a new overlay for the engine, with the given parent.
+    Overlay(Engine* engine, Overlay* parent) :
+        engine_(engine),
+        parent_(parent),
+        destroyed_(false),
+        x_(0.0f),
+        y_(0.0f),
+        width_(0.0f),
+        height_(0.0f),
+        layout_mode_(RELATIVE_LAYOUT),
+        vertical_alignment_(TOP),
+        horizontal_alignment_(LEFT) {
+            
+    }
     
     //! Returns the parent overlay.
     inline Overlay* parent() const {
@@ -183,35 +213,7 @@ public:
     //! Destroys this overlay.
     void destroy();
     
-private:
-    Overlay(Engine* engine) :
-        engine_(engine),
-        parent_(0),
-        destroyed_(false),
-        x_(0.0f),
-        y_(0.0f),
-        width_(0.0f),
-        height_(0.0f),
-        layout_mode_(RELATIVE_LAYOUT),
-        vertical_alignment_(TOP),
-        horizontal_alignment_(LEFT) {
-        
-    }
-    
-    Overlay(Engine* engine, Overlay* parent) :
-        engine_(engine),
-        parent_(parent),
-        destroyed_(false),
-        x_(0.0f),
-        y_(0.0f),
-        width_(0.0f),
-        height_(0.0f),
-        layout_mode_(RELATIVE_LAYOUT),
-        vertical_alignment_(TOP),
-        horizontal_alignment_(LEFT) {
-            
-    }
-    
+private:    
     void render_background();
     void render_text();
     void delete_overlay(Overlay* overlay);
@@ -231,8 +233,6 @@ private:
     //Font
     TexturePtr background_;
     std::vector<OverlayListenerPtr> listener_;
-    
-    friend class Engine;
 };
 
 }}

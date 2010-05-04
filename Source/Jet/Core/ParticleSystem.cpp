@@ -92,9 +92,7 @@ void Core::ParticleSystem::render(Core::ParticleBuffer* buffer) {
         }
         p.init_position = parent_->matrix() * p.init_position;
         p.init_velocity = parent_->matrix().rotate(p.init_velocity);
-		if (parent_->rigid_body_) {
-			p.init_velocity += parent_->rigid_body()->linear_velocity();
-		}
+		p.init_velocity += parent_->linear_velocity();
         
         accumulator_ -= next_emission_;
 		next_emission_ = 1.0f/rand_range(emission_rate_);

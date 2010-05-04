@@ -195,6 +195,15 @@ Jet::Shader* Core::Engine::shader(const std::string& name) {
 	}
 }
 
+constructor_t Core::Engine::constructor(const std::string& type) {
+	map<string, constructor_t>::iterator i = constructor_.find(type);
+    if (i == constructor_.end()) {
+        throw runtime_error("Constructor not found: " + type);
+	} else {
+		return i->second;
+	}
+}
+
 std::string Core::Engine::resource_path(const std::string& name) const {
     for (set<string>::const_iterator i = search_folder_.begin(); i != search_folder_.end(); i++) {
 		string path = *i + "/" + name;
@@ -236,8 +245,6 @@ void Core::Engine::tick() {
 	// Update the delta since the last tick
     update_frame_delta();
 	update_fps();
-
-	input_system_->on_update();
     
 	// Run the fixed-time step portion of the game by calling on_update when
 	physics_system_->step();

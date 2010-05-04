@@ -32,6 +32,14 @@ namespace Jet { namespace Core {
 //! @brief Class to hold sound data.
 class Sound : public Jet::Sound {
 public:
+    //! Creates a new sound with the given name.
+    inline Sound(Engine* engine, const std::string& name) :
+		engine_(engine),
+		name_(name),
+		state_(UNLOADED),
+        sound_(0) {
+			
+	}
     
     //! Destroys the sound.
     virtual ~Sound();
@@ -54,15 +62,7 @@ public:
 	//! Returns the resource state of the shader
 	void state(ResourceState state);
     
-private:
-    inline Sound(Engine* engine, const std::string& name) :
-		engine_(engine),
-		name_(name),
-		state_(UNLOADED),
-        sound_(0) {
-			
-	}
-    
+private:    
     Engine* engine_;
     std::string name_;
     ResourceState state_;

@@ -101,6 +101,11 @@ public:
 	
 	//! Returns the camera attached to this node.
 	virtual Camera* camera()=0;
+	
+	//! Creates and returns an extension object, if it doesn't already exist.
+	//! @param name the name of the extension object
+	//! @param type the type of the object
+	virtual Object* extension(const std::string& type, const std::string& name="")=0;
     
     //! Returns a component that is attached to this node.
     //! @param name the name of the component

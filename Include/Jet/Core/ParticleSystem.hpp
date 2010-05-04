@@ -36,6 +36,17 @@ namespace Jet { namespace Core {
 //! Generates particle effects.
 class ParticleSystem : public Jet::ParticleSystem {
 public:
+    inline ParticleSystem(Engine* engine, Node* parent) :
+        engine_(engine),
+        parent_(parent),
+		life_(0.0f),
+        accumulator_(0.0f),
+		type_(POINT_EMITTER),
+		next_emission_(0.0f) {
+            
+        shader("Particle");
+        particle_.resize(0);
+    }
     
     //! Destructor.
     virtual ~ParticleSystem() {}
@@ -232,19 +243,7 @@ public:
     //! Renders this particle system using the given particle buffer
     void render(ParticleBuffer* buffer);
     
-private:
-    inline ParticleSystem(Engine* engine, Node* parent) :
-        engine_(engine),
-        parent_(parent),
-		life_(0.0f),
-        accumulator_(0.0f),
-		type_(POINT_EMITTER),
-		next_emission_(0.0f) {
-            
-        shader("Particle");
-        particle_.resize(0);
-    }
-    
+private:    
     void init_particle_box(Particle& p);
     void init_particle_ellipsoid(Particle& p);
     void init_particle_point(Particle& p);
@@ -268,10 +267,7 @@ private:
     std::vector<Particle> particle_;
     std::vector<Particle*> dead_particle_;
     real_t accumulator_;
-	real_t next_emission_;
-    
-    friend class Node;
-    
+	real_t next_emission_;    
 };
 
 }}

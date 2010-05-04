@@ -32,6 +32,19 @@ namespace Jet { namespace Core {
 //! @brief Class to hold texture data.
 class Texture : public Jet::Texture {
 public:
+	///! Creates a new texture with the given name.
+	inline Texture(Engine* engine, const std::string& name) :
+		engine_(engine),
+		name_(name),
+		state_(UNLOADED),
+		width_(0),
+		height_(0),
+		texture_(0),
+		bytes_per_pixel_(0),
+		texture_format_(0) {
+			
+	}
+	
     //! Destructor.
     virtual ~Texture();
 
@@ -85,19 +98,7 @@ public:
 	//! Sets the sampler this texture is bound to.
 	void sampler(uint32_t sampler);
 
-private:
-	inline Texture(Engine* engine, const std::string& name) :
-		engine_(engine),
-		name_(name),
-		state_(UNLOADED),
-		width_(0),
-		height_(0),
-		texture_(0),
-		bytes_per_pixel_(0),
-		texture_format_(0) {
-			
-	}
-	
+private:	
 	void read_texture_data();
 	void init_texture();
     
