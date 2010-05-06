@@ -7,7 +7,20 @@
 
 using namespace std;
 
+
+struct Blah {
+	~Blah() {
+		cout << "blah" << endl;
+	}
+};
+
 int main(int argc, char** argv) {
+	
+	Blah blah;
+	
+#if defined(WINDOWS) && defined(DEBUG_)
+	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+#endif
     try {        
         Jet::EnginePtr engine(Jet::Engine::create()); 
         

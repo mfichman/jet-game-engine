@@ -69,6 +69,7 @@ void Core::Material::shader(Jet::Shader* shader) {
 		specular_map_enabled_ = shader_->uniform_location("specular_map_enabled");
 		normal_map_enabled_ = shader_->uniform_location("normal_map_enabled");
 		shadow_map_enabled_ = shader_->uniform_location("shadow_map_enabled");
+		shadow_distance_loc_ = shader_->uniform_location("shadow_distance");
 	}
 }
 
@@ -149,6 +150,7 @@ void Core::Material::begin_shader() {
 		// shadows
 		glUniform1i(shadow_map_loc_, SHADOW_MAP_SAMPLER);
 		glUniform1i(shadow_map_enabled_, (bool)receive_shadows_);
+		glUniform1f(shadow_distance_loc_, engine_->option<real_t>("shadow_distance"));
 	} else {
 		glUniform1i(shadow_map_enabled_, false);
 	}

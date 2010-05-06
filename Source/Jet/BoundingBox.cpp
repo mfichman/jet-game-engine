@@ -28,21 +28,21 @@ using namespace Jet;
     
 BoundingBox::BoundingBox() :
     min_x(FLT_MAX),
-    max_x(FLT_MIN),
+    max_x(-FLT_MAX),
     min_y(FLT_MAX),
-    max_y(FLT_MIN),
+    max_y(-FLT_MAX),
     min_z(FLT_MAX),
-    max_z(FLT_MIN) {
+    max_z(-FLT_MAX) {
         
 }
 
 BoundingBox::BoundingBox(const Frustum& frustum) :
     min_x(FLT_MAX),
-    max_x(FLT_MIN),
+    max_x(-FLT_MAX),
     min_y(FLT_MAX),
-    max_y(FLT_MIN),
+    max_y(-FLT_MAX),
     min_z(FLT_MAX),
-    max_z(FLT_MIN) {
+    max_z(-FLT_MAX) {
         
     point(frustum.near_top_left);
     point(frustum.near_top_right);
@@ -84,19 +84,22 @@ void BoundingBox::point(const Vector& point) {
     // Check to see if the added point expands the bounding box.
     if (point.x < min_x) {
         min_x = point.x;
-    } else if (point.x > max_x) {
+    } 
+	if (point.x > max_x) {
         max_x = point.x;
     }
     
     if (point.y < min_y) {
         min_y = point.y;
-    } else if (point.y > max_y) {
+    }
+	if (point.y > max_y) {
         max_y = point.y;   
     }
     
     if (point.z < min_z) {
         min_z = point.z;
-    } else if (point.z > max_z) {
+    }
+	if (point.z > max_z) {
         max_z = point.z;
     }
 }

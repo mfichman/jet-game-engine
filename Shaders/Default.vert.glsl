@@ -47,12 +47,12 @@ void main() {
     v.x = dot(gl_LightSource[0].position.xyz, t);
     v.y = dot(gl_LightSource[0].position.xyz, b);
     v.z = dot(gl_LightSource[0].position.xyz, n);
-    light_dir = normalize(v);
+    light_dir = v;
     
     v.x = dot(eye_dir, t);
     v.y = dot(eye_dir, b);
     v.z = dot(eye_dir, n);
-    eye_dir = normalize(v);
+    eye_dir = v;
     
 #ifdef SHADOW_MAP
     if (shadow_map_enabled) {

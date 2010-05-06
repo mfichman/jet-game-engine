@@ -49,8 +49,8 @@ void Core::InputSystem::on_tick() {
     while(SDL_PollEvent(&evt)) {
         switch (evt.type) {
             case SDL_QUIT: engine_->running(false); break;
-            case SDL_KEYDOWN: on_keyboard(evt.key.keysym.unicode & 0x7F); break;
-            case SDL_KEYUP: on_keyboard_up(evt.key.keysym.unicode & 0x7F); break;
+            case SDL_KEYDOWN: on_keyboard(SDL_GetKeyName(evt.key.keysym.sym)); break;
+            case SDL_KEYUP: on_keyboard_up(SDL_GetKeyName(evt.key.keysym.sym)); break;
             case SDL_MOUSEBUTTONDOWN: on_mouse(evt.button.button, evt.button.x, evt.button.y); break;
             case SDL_MOUSEBUTTONUP: on_mouse_up(evt.button.button, evt.button.x, evt.button.y); break;
         }
@@ -58,7 +58,7 @@ void Core::InputSystem::on_tick() {
 
 }
 
-void Core::InputSystem::on_keyboard(char key) {
+void Core::InputSystem::on_keyboard(const std::string& key) {
     Module* module = engine_->module();
     if (module) {
         int x, y;
@@ -69,12 +69,11 @@ void Core::InputSystem::on_keyboard(char key) {
         real_t ypos = 2.0f*(real_t)y/height - 1.0f;
         xpos = max(-1.0f, min(1.0f, xpos));
         ypos = max(-1.0f, min(1.0f, ypos));
-        char str[2] = { key, 0 };
-        module->on_key_pressed(str, xpos, ypos);
+        module->on_key_pressed(key, xpos, ypos);
     }
 }
 
-void Core::InputSystem::on_keyboard_up(char key) {
+void Core::InputSystem::on_keyboard_up(const std::string& key) {
     Module* module = engine_->module();
     if (module) {
         int x, y;
@@ -85,8 +84,7 @@ void Core::InputSystem::on_keyboard_up(char key) {
         real_t ypos = 2.0f*(real_t)y/height - 1.0f;
         xpos = max(-1.0f, min(1.0f, xpos));
         ypos = max(-1.0f, min(1.0f, ypos));
-        char str[2] = { key, 0 };
-        module->on_key_released(str, xpos, ypos);
+        module->on_key_released(key, xpos, ypos);
     }
 }
 

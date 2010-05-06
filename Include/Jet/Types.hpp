@@ -23,6 +23,8 @@
 
 #ifdef WINDOWS
 #include <cstdint>
+#include <cstdlib>
+#include <crtdbg.h>
 #else
 #include <stdint.h>
 #endif

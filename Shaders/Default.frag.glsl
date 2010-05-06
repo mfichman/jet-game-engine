@@ -26,11 +26,13 @@ uniform sampler2D normal_map;
 uniform sampler2D shadow_map;
 uniform samplerCube environment_map;
 uniform int light_count;
+uniform float shadow_distance;
 
 uniform bool diffuse_map_enabled;
 uniform bool specular_map_enabled;
 uniform bool normal_map_enabled;
 uniform bool shadow_map_enabled;
+
 
 #define NORMAL_MAP
 #define SHADOW_MAP
@@ -59,8 +61,8 @@ void main() {
         vec3 r = reflect(v, n);
     
         // Calculate diffuse and specular coefficients
-        float kd = max(0.0, dot(l, n));
-        float ks = pow(max(0.0, dot(l, r)), gl_FrontMaterial.shininess);
+        float kd = max(0.0, dot(-l, n));
+        float ks = pow(max(0.0, dot(-l, r)), gl_FrontMaterial.shininess);
             
         // Calculate ambient, diffuse, and specular light
         diffuse += kd * gl_LightSource[i].diffuse;
@@ -87,10 +89,13 @@ void main() {
 #ifdef SHADOW_MAP
     if (shadow_map_enabled) {
         vec4 shadow_coord = gl_TexCoord[1]/gl_TexCoord[1].w;
-        float depth = texture2D(shadow_map, shadow_coord.st).z + 0.0005;
-        if (depth < shadow_coord.z) {
-            diffuse *= 0.4;
-            specular *= 0.1;
+        float depth = texture2D(shadow_map, shadow_coord.st).z;
+        float ratio = length(eye_dir)/shadow_distance;
+        if (depth < shadow_coord.z && ratio < 1.0) {
+            
+            
+            diffuse *= 0.4;//ratio*ratio;
+            specular *= 0.1;//ratio*ratio;
         }
     }
 #endif

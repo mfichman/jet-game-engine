@@ -62,6 +62,10 @@ Core::AudioSystem::~AudioSystem() {
     }
 }
 
+void Core::AudioSystem::on_init() {
+    cout << "Initializing audio system" << endl;
+}
+
 void Core::AudioSystem::on_update() {
     if (engine_->camera()) {
         Node* node = static_cast<Node*>(engine_->camera()->parent());

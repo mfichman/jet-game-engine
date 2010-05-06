@@ -297,10 +297,10 @@ void Core::RenderSystem::generate_shadow_map(Light* light) {
 	
 	// Generate an orthogonal basis (rotation matrix) for the
 	// directional light
-	Vector forward = light->direction().unit();
+	Vector forward = -light->direction().unit();
 	Vector up = forward.orthogonal();
 	Vector right = forward.cross(up);
-	Matrix matrix(right, up, forward);
+	Matrix matrix(right, -up, forward);
 	
 	// Transform the view frustum into light space and calculate
 	// the bounding box 
@@ -319,10 +319,12 @@ void Core::RenderSystem::generate_shadow_map(Light* light) {
     // Render to the front buffer
     shadow_target_->enabled(true);
     glDisable(GL_LIGHTING);
+	glCullFace(GL_FRONT);
     render_shadow_casters();
     shadow_target_->enabled(false);
     glEnable(GL_LIGHTING);
-        
+    glCullFace(GL_BACK);
+		
     // Initialize the texture matrix for transforming the shadow map
     // coordinates
     Matrix light_bias(
@@ -392,6 +394,7 @@ void Core::RenderSystem::render_final(Light* light) {
 }
 
 void Core::RenderSystem::render_shadow_casters() {
+	
 
 	// Render each visible mesh.  Only meshes block light;
 	// other geometry does not

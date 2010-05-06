@@ -40,7 +40,7 @@ function Test:__init()
         ambient_color = Color(.3, .3, .3, 1),
         diffuse_color = Color(1, 1, 1, 1),
         specular_color = Color(1, 1, 1, 1),
-        direction = Vector(0, 0, 1)
+        direction = Vector(0, 0, -1)
     }
     
     -- Set up the camera
@@ -80,6 +80,8 @@ function Test:__init()
     --self.s0.node.position = Vector(0, -10, 0)
     --self.s0.body:apply_force(Vector(-15000, 30000, 0))
     math.randomseed(os.time())
+    
+    self.camera_velocity = Vector()
 end
 
 function Test:on_destroy()
@@ -87,10 +89,14 @@ function Test:on_destroy()
 end
 
 function Test:on_update()
+    self.camera_node.position = self.camera_velocity + self.camera_node.position
+    self.camera_node:look(Vector(0, 0, 0), Vector(0, 1, 0))
 end
 
 
 function Test:on_key_pressed(key, x, y)
+
+    print(key)
 
     if (key == 'q') then
         engine.running = false
@@ -102,9 +108,7 @@ function Test:on_key_pressed(key, x, y)
         end
     elseif (key == 't') then
         self.s2.body:apply_torque(Vector(2000, 0, 0))
-    elseif (key == 'r') then
-        
-        
+    elseif (key == 'r') then        
         self.s1.node.position = Vector(5, 0, 0)
         self.s1.body.linear_velocity = Vector(0, 0, 0)
         self.s2.node.position = Vector(5, 0, 0)
@@ -150,9 +154,31 @@ function Test:on_key_pressed(key, x, y)
         local n = Vector(math.random()*2-1, math.random()*2-1, math.random()*2-1)
         self.s1.mesh:fracture(Plane(n.unit, Vector(0, 0.0, 0)))
         
-    elseif( key == 'e') then
+    elseif (key == 'e') then
         print(type(self.s3))
         self.s3.node:destroy()
         self.s3 = nil
+    elseif (key == 'j') then
+        self.camera_velocity = self.camera_velocity + Vector(-1, 0, 0)
+    elseif (key == 'l') then
+        self.camera_velocity = self.camera_velocity + Vector(1, 0, 0)
+    elseif (key == 'i') then
+        self.camera_velocity = self.camera_velocity + Vector(0, 1, 0)
+    elseif (key == 'k') then
+        self.camera_velocity = self.camera_velocity + Vector(0, -1, 0)
     end
+end
+
+function Test:on_key_released(key, x, y)
+    if (key == 'j') then
+        self.camera_velocity = self.camera_velocity + Vector(1, 0, 0)
+    elseif (key == 'l') then
+        self.camera_velocity = self.camera_velocity + Vector(-1, 0, 0)
+    elseif (key == 'i') then
+        self.camera_velocity = self.camera_velocity + Vector(0, -1, 0)
+    elseif (key == 'k') then
+        self.camera_velocity = self.camera_velocity + Vector(0, 1, 0)
+    end
+    
+    print(key)
 end

@@ -18,6 +18,8 @@ set(LIB_DIRS ${LIB_DIRS} C:\\Libraries\\Debug)
 set(LIB_DIRS ${LIB_DIRS} D:\\Libraries\\Debug)
 add_definitions(/DWINDOWS)
 add_definitions(/D_SCL_SECURE_NO_WARNINGS)
+add_definitions(/D_DEBUG)
+add_definitions(/D_CRTDBG_MAP_ALLOC)
 endif()
 
 if(UNIX AND APPLE)

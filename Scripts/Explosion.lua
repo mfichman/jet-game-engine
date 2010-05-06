@@ -27,15 +27,15 @@ function Explosion:__init(node, name)
     
     self.explosion = self.node:particle_system("explosion") {
         type = ParticleSystem.ELLIPSOID_EMITTER,
-        quota = 60,
+        quota = 80,
         texture = "BurstGold.png",
         particle_life = Range(.35, .35),
         particle_size = Range(9, 9),
-        life = .08,
-        width = Range(.2, 6),
-        height = Range(.2, 6),
-        depth = Range(.2, 6),
-        emission_speed = Range(.8, .8),
+        life = .07,
+        width = Range(.3, 6),
+        height = Range(.3, 6),
+        depth = Range(.3, 6),
+        emission_speed = Range(.5, .5),
         emission_rate = Range(500, 500)
     }
     

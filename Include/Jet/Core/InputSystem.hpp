@@ -44,8 +44,8 @@ private:
     void on_update() {}
     void on_render() {}
     
-    void on_keyboard(char key);
-    void on_keyboard_up(char key);
+	void on_keyboard(const std::string& key);
+    void on_keyboard_up(const std::string& key);
     void on_special(int key, int x, int y);
     void on_special_up(int key, int x, int y);
     void on_mouse(int button, int x, int y);

@@ -88,10 +88,10 @@ Core::Engine::Engine() :
 	
 	// Create subsystems and register them
 	render_system_ = new RenderSystem(this);
-	script_system_ = new ScriptSystem(this);
 	input_system_ = new InputSystem(this);
 	physics_system_ = new PhysicsSystem(this);
 	audio_system_ = new AudioSystem(this);
+	script_system_ = new ScriptSystem(this);
 	
 	// Platform-dependent timer code
 #ifdef WINDOWS
