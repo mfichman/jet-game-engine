@@ -96,6 +96,7 @@ void Core::Texture::read_texture_data() {
 		throw runtime_error("Invalid image format: " + name_);
 	}
 
+	// Set the width and height of the texture, then copy all the texture data
 	width(surface->w);
 	height(surface->h);
 	memcpy(data(), surface->pixels, data_.size());
@@ -112,12 +113,10 @@ void Core::Texture::init_texture() {
 	//! Set texture sampling parameters; we use mip filtering
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 6.0);
 	
-
-
 	// Load the image
 	gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, width(), height(), texture_format_, GL_UNSIGNED_BYTE, data());
 	glBindTexture(GL_TEXTURE_2D, 0);

@@ -43,7 +43,6 @@ public:
 private:
 	void read_face();
 	void insert_face(Vertex face[3]);
-	void compute_tangent(Vertex face[3], size_t j);
     
     MeshPtr mesh_;
 	std::map<Vertex, uint32_t> cache_;

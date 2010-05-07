@@ -67,6 +67,13 @@ public:
         return !this->operator==(other);
     }
 
+	inline Texcoord operator+(const Texcoord& other) const {
+		return Texcoord(u + other.u, v + other.v);
+	}
+
+	inline Texcoord operator*(float scale) const {
+		return Texcoord(u * scale, v * scale);
+	}
 
     float u;
     float v;

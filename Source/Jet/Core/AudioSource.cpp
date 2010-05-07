@@ -33,18 +33,24 @@ inline void fmod_check(FMOD_RESULT result) {
 }
 
 inline PlaybackState Core::AudioSource::state(size_t chan) const {
+    
+    // If the channel is not allocated, then stop
     if (chan >= channel_.size()) {
         return STOP;
     }
     
+    // If the channel is set to null, then the audio has stopped.
     if (!channel_[chan]) {
         return STOP;
     }
     
+    // Otherwise, the audio is playing and the channel is allocated
     return PLAY;
 }
 
 void Core::AudioSource::sound(size_t chan, Jet::Sound* sound) {
+    // If we don't have enough space, then allocate another slot in the set
+    // of vectors for this channel.
     if (chan > sound_.size()) {
         sound_.resize(chan + 1);
         channel_.resize(chan + 1);
@@ -53,20 +59,26 @@ void Core::AudioSource::sound(size_t chan, Jet::Sound* sound) {
 }
 
 void Core::AudioSource::state(size_t chan, PlaybackState state) {
+    // If we don't have enough space, then allocate another slot in the set
+    // of vectors for this channel.
     if (chan > channel_.size()) {
         sound_.resize(chan + 1);
         channel_.resize(chan + 1);
     }
     
+    // If the state is the same, quit (idempotence)
     if (AudioSource::state(chan) == state) {
         return;
     }
     
     if (STOP == state && channel_[chan]) {
+        // Stop the clip
         fmod_check(FMOD_Channel_Stop(channel_[chan]));
     }
     
     if (PLAY == state && sound_[chan] && !channel_[chan]) {
+        // Make sure the sound is loaded, and that the channel is not in use.
+        // Then play the sound and register callbacks
         sound_[chan]->state(SYNCED);
         FMOD_SYSTEM* system = engine_->audio_system()->system();
         FMOD_SOUND* sound = sound_[chan]->sound();

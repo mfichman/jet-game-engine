@@ -44,6 +44,7 @@
 #include <Jet/Mesh.hpp>
 #include <Jet/AudioSource.hpp>
 #include <Jet/Texture.hpp>
+#include <Jet/FractalPlanet.hpp>
 #include <Jet/Shader.hpp>
 #include <luabind/luabind.hpp>
 #include <luabind/adopt_policy.hpp>
@@ -346,15 +347,16 @@ void Core::ScriptSystem::init_entity_type_bindings() {
             .property("position", (const Vector& (Jet::Node::*)() const)&Jet::Node::position, (void (Jet::Node::*)(const Vector&))&Jet::Node::position)
             .property("rotation", (const Quaternion& (Jet::Node::*)() const)&Jet::Node::rotation, (void (Jet::Node::*)(const Quaternion&))&Jet::Node::rotation)
             .def("node", &Jet::Node::node)
-            .def("mesh_object", &Jet::Node::object<Jet::MeshObject>)
-            .def("particle_system", &Jet::Node::object<Jet::ParticleSystem>)
-            .def("quad_set", &Jet::Node::object<Jet::QuadSet>)
-            .def("quad_chain", &Jet::Node::object<Jet::QuadChain>)
-            .def("light", &Jet::Node::object<Jet::Light>)
+            .def("mesh_object", &Jet::Node::mesh_object)
+            .def("particle_system", &Jet::Node::particle_system)
+            .def("quad_set", &Jet::Node::quad_set)
+            .def("quad_chain", &Jet::Node::quad_chain)
+            .def("light", &Jet::Node::light)
             .def("rigid_body", &Jet::Node::rigid_body)
             .def("audio_source", &Jet::Node::audio_source)
-            .def("camera", &Jet::Node::object<Jet::Camera>)
-            .def("fracture_object", &Jet::Node::object<Jet::FractureObject>)
+            .def("camera", &Jet::Node::camera)
+            .def("fracture_object", &Jet::Node::fracture_object)
+            .def("fractal_planet", &Jet::Node::fractal_planet)
             .def("look", &Jet::Node::look)
 			.def("destroy", &Jet::Node::destroy),
             
@@ -409,13 +411,15 @@ void Core::ScriptSystem::init_entity_type_bindings() {
             .def("option", (void (Jet::Engine::*)(const std::string&, const boost::any&))&Jet::Engine::option)
             .def("option", (const boost::any& (Jet::Engine::*)(const std::string&) const)&Jet::Engine::option)
             .def("search_folder", &Jet::Engine::search_folder)
-            .def("mesh", &Jet::Engine::mesh)
+			.def("mesh", (Jet::Mesh* (Jet::Engine::*)(const std::string&))&Jet::Engine::mesh)
             .def("material", &Jet::Engine::material)
             .property("running", (bool (Jet::Engine::*)() const)&Jet::Engine::running, (void (Jet::Engine::*)(bool))&Jet::Engine::running),
             
         luabind::class_<Jet::Mesh, Jet::MeshPtr>("Mesh")
             .def("vertex", (void (Jet::Mesh::*)(size_t, const Vertex&))&Jet::Mesh::vertex)
             .def("index", (void (Jet::Mesh::*)(size_t, uint32_t))&Jet::Mesh::index),
+            
+        luabind::class_<Jet::FractalPlanet, Jet::FractalPlanetPtr>("FractalPlanet"),
             
         luabind::class_<Jet::Overlay, Jet::OverlayPtr>("Overlay")
             .def("overlay", &Jet::Overlay::overlay)

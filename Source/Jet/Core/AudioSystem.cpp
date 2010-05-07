@@ -69,12 +69,11 @@ void Core::AudioSystem::on_update() {
         // Get the forward, up, velocity and origin vectors for the
         // listener.  The listener is assumed to be located at the same
         // coordinates as the current camera.
-        Matrix matrix = node->matrix();
+        const Matrix& matrix = node->matrix();
         Vector up = matrix.up();
         Vector forward = matrix.forward();
         Vector origin = matrix.origin();
         Vector velocity = node->linear_velocity();
-        
 
         FMOD_VECTOR* u = (FMOD_VECTOR*)&up;
         FMOD_VECTOR* f = (FMOD_VECTOR*)&forward;

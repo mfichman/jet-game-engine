@@ -33,12 +33,15 @@ Core::PhysicsSystem::PhysicsSystem(Engine* engine) :
         
     engine_->listener(this);
         
+    // Blah blah blah config blah blah
     config_.reset(new btDefaultCollisionConfiguration);
     dispatcher_.reset(new btCollisionDispatcher(config_.get()));
     broadphase_.reset(new btDbvtBroadphase);
     solver_.reset(new btSequentialImpulseConstraintSolver);
 	world_.reset(new btDiscreteDynamicsWorld(dispatcher_.get(), broadphase_.get(), solver_.get(), config_.get()));
 	world_->setGravity(btVector3(0.0f, -10.0f, 0.0f));
+    
+    // Enable the pre-tick callback
     world_->setInternalTickCallback(&Core::PhysicsSystem::on_tick, this, true);
     btGImpactCollisionAlgorithm::registerAlgorithm(dispatcher_.get());    
 }
@@ -54,8 +57,6 @@ void Core::PhysicsSystem::on_tick() {
     // Step simulation returns how many substeps were taken.  If at least one
     // substep was taken, then we have to update matrices for our objects.
 	world_->stepSimulation(engine_->frame_delta(), 4, engine_->timestep());
-    Node* node = static_cast<Node*>(engine_->root());
-    node->update_transform();
 }
 
 void Core::PhysicsSystem::on_init() {
@@ -86,9 +87,8 @@ void Core::PhysicsSystem::on_tick(btDynamicsWorld* world, btScalar step) {
         system->engine_->module()->on_update();
     }
     
-    // Update the node
-    Node* node = static_cast<Node*>(system->engine_->root());
-    node->update();
+    // Update the nodes
+    static_cast<Node*>(system->engine_->root())->update();
     
     // Check for collisions
     int nmanifolds = world->getDispatcher()->getNumManifolds();

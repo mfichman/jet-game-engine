@@ -69,7 +69,8 @@ public:
 		parent_(0),
 		shape_transform_(btTransform::getIdentity()),
 		destroyed_(false),
-		transform_dirty_(true) {
+		transform_modified_count_(1),
+		transform_update_count_(0) {
 	}
     
     //! Creates a new node with a parent.
@@ -81,7 +82,8 @@ public:
 		rigid_body_(parent->rigid_body_),
 		shape_transform_(parent->shape_transform_),
 		destroyed_(false),
-		transform_dirty_(true),
+		transform_modified_count_(1),
+		transform_update_count_(0),
 		auto_name_counter_(0) {
 	}
 	
@@ -92,59 +94,47 @@ public:
     //! the new node will be relative to this node.
     //! @param index the index where the new object will be placed; if this
     //! parameter is zero then the object will be created at any free location
-    Jet::Node* node(const std::string& name="") {
-		return Jet::Node::object<Jet::Node>(name);
-	}
+    Jet::Node* node(const std::string& name="");
     
     //! Creates a new model at the given index.  Models are used for rendering
     //! static meshes with a material.
     //! @param index the index where the new object will be placed; if this
     //! parameter is zero then the object will be created at any free location
-    Jet::MeshObject* mesh_object(const std::string& name="") {
-		return Jet::Node::object<Jet::MeshObject>(name);
-	}
+    Jet::MeshObject* mesh_object(const std::string& name="");
 	
 	//! Creates a new fracturable model.
 	//! @param name the name of the new fracturable model
-	Jet::FractureObject* fracture_object(const std::string& name="") {
-		return Jet::Node::object<Jet::FractureObject>(name);
-	}
+	Jet::FractureObject* fracture_object(const std::string& name="");
+	
+	//! Creates a new fractal planet terrain.
+	//! @param name the name of the fractal planet
+	Jet::FractalPlanet* fractal_planet(const std::string& name="");
     
     //! Creates a new particle system at the given index.  Particle systems are
     //! used for fire, water, and other affects.
     //! @param index the index where the new object will be placed; if this
     //! parameter is zero then the object will be created at any free location
-    Jet::ParticleSystem* particle_system(const std::string& name="") {
-		return Jet::Node::object<Jet::ParticleSystem>(name);
-	}
+    Jet::ParticleSystem* particle_system(const std::string& name="");
     
     //! Creates a textured quad at the given index.  Textured quads can be used
     //! for billboards.
     //! @param index the index where the new object will be placed; if this
     //! parameter is zero then the object will be created at any free location
-    Jet::QuadSet* quad_set(const std::string& name="") {
-		return Jet::Node::object<Jet::QuadSet>(name);
-	}
+    Jet::QuadSet* quad_set(const std::string& name="");
     
     //! Creates a quad chain at the given index.  Quad chains can be used for
     //! path effects, like tracers or condensation trails.
     //! @param index the index where the new object will be placed; if this
     //! parameter is zero then the object will be created at any free location
-    Jet::QuadChain* quad_chain(const std::string& name="") {
-		return Jet::Node::object<Jet::QuadChain>(name);
-	}
+    Jet::QuadChain* quad_chain(const std::string& name="");
     
     //! Creates a light and attaches it at the given index.
     //! @param index the index where the new object will be placed; if this
     //! parameter is zero then the object will be created at any free location
-    Jet::Light* light(const std::string& name="") {
-		return Jet::Node::object<Jet::Light>(name);
-	}
+    Jet::Light* light(const std::string& name="");
 	
 	//! Returns the camera.
-	Jet::Camera* camera(const std::string& name="") {
-		return Jet::Node::object<Jet::Camera>(name);
-	}
+	Jet::Camera* camera(const std::string& name="");
     
     //! Returns the rigid body attached to this node.
     Jet::RigidBody* rigid_body();
@@ -178,16 +168,6 @@ public:
     inline const Vector& position() const {
         return position_;
     }
-	
-	//! Returns the linear velocity.
-	inline Vector linear_velocity() const {
-		if (rigid_body_) {
-			return rigid_body_->linear_velocity();
-		} else {
-			return Vector();
-		}
-	}
-	
 		
 	//! Returns the world position of the node (as of the last time it moved).
 	//! Note that this is updated once per frame, at the beginning of the
@@ -209,6 +189,9 @@ public:
 	inline const Matrix& matrix() const {
 		return matrix_;
 	}
+	
+	//! Returns the linear velocity.
+	Vector linear_velocity() const;
 
 	//! Sets the position of the node.
     //! @param position the position of the node
@@ -220,13 +203,7 @@ public:
     
     //! Adds a listener to this node.
     //! @param listener the node listener
-    inline void listener(NodeListener* listener) {
-		if (destroyed_) {
-			throw std::runtime_error("Attempted to add a listener to a node marked for deletion");
-		} else {
-			listener_.push_back(listener);
-		}
-    }
+    void listener(NodeListener* listener);
     
     //! Orients this node to point at the given position.
     //! @param target the vector to look at
@@ -252,15 +229,22 @@ public:
 	//! Called to notify of a collision event.
 	void collision(Jet::Node* node);
 	
-	//! Called to update the transform of the node
-	void update_transform();
+	//! Called once per game loop.  This is called before the
+	//! render event, which also happens once per game loop.
+	void tick();
 	
-	//! Returns the object with the given name.  If the typeid does not match,
-	//! the method throws an exception.  If the object does not exist, the
-	//! object will be created using the given typeid.
-	Object* object(const std::type_info& type, const std::string& name);
+private:
+	//! Returns an object of the given type.
+	template <typename T>
+	T* get_object(const std::string& name) {
+		T* obj = dynamic_cast<T*>(object(name));
+		if (!obj) {
+			obj = new T(engine_, this);
+			add_object(name, obj);
+		}
+		return obj;
+	}
 	
-private:    
     //! Removes an object from this node.
     //! @param object the object to remove
 	void delete_object(Object* object);
@@ -268,11 +252,8 @@ private:
     //! Addes a new object to the node.
     void add_object(const std::string& name, Object* object);
 	
-	//! Recursively attaches a rigid body to this node and to all child nodes.
-	//! Note that if any child nodes have rigid bodies, they will be destroyed
-	//! and the new rigid body will become the rigid body for that node.
-	//! @param node the node to attach the body to
-	void update_collision_shapes();
+	//! Updates this node's internal matrix transform.
+	void update_transform();
   
 	Engine* engine_;
     Node* parent_;
@@ -288,7 +269,8 @@ private:
     std::vector<NodeListenerPtr> listener_;
 	btTransform shape_transform_;
     bool destroyed_;
-	bool transform_dirty_;
+	size_t transform_modified_count_;
+	size_t transform_update_count_;
 	size_t auto_name_counter_;
 	
 	friend class RigidBody;

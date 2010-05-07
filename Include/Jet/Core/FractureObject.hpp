@@ -48,9 +48,6 @@ public:
         mesh_object_ = static_cast<MeshObject*>(parent_->mesh_object());
     }
     
-    //! Destroys this fracture object
-    ~FractureObject();
-    
     //! Returns the parent of this object.
     inline Node* parent() const {
         return parent_;

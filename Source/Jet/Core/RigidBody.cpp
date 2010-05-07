@@ -70,7 +70,7 @@ void Core::RigidBody::setWorldTransform(const btTransform& transform) {
     
     parent_->rotation_ = Quaternion(rotation.w(), rotation.x(), rotation.y(), rotation.z());
     parent_->position_ = Vector(position.x(), position.y(), position.z());
-    parent_->transform_dirty_ = true;
+    parent_->transform_modified_count_++;
 }
 
 void Core::RigidBody::update_collision_shapes() {
@@ -121,22 +121,15 @@ void Core::RigidBody::attach_mesh_object(const btTransform& transform, MeshObjec
     }
 }
 
-//! Applies a force to the object, relative to the world coordinates.
-//! @param v the force to apply
 void Core::RigidBody::apply_force(const Vector& v) {
     body_->activate(true);
     body_->applyCentralForce(btVector3(v.x, v.y, v.z));
 }
 
-//! Applies a torque to the object, relative to the world coordinates.
-//! @param v the torque to apply
 void Core::RigidBody::apply_torque(const Vector& v) {
     body_->applyTorque(btVector3(v.x, v.y, v.z));
 }
 
-//! Applies a force to the object, relative to the parent scene node's
-//! coordinates.
-//! @param v the force to apply
 void Core::RigidBody::apply_local_force(const Vector& v) {
     btTransform transform = body_->getCenterOfMassTransform();
     transform.setOrigin(btVector3(0.0f, 0.0f, 0.0f));
@@ -144,9 +137,6 @@ void Core::RigidBody::apply_local_force(const Vector& v) {
     body_->applyCentralForce(force);
 }
 
-//! Applies a torque to the object, relative to the parent scene node's
-//! coordinates.
-//! @param v the torque to apply
 void Core::RigidBody::apply_local_torque(const Vector& v) {
     btTransform transform = body_->getCenterOfMassTransform();
     transform.setOrigin(btVector3(0.0f, 0.0f, 0.0f));
@@ -154,7 +144,6 @@ void Core::RigidBody::apply_local_torque(const Vector& v) {
     body_->applyTorque(torque);
 }
 
-//! Sets the mass of the rigid body.
 void Core::RigidBody::mass(float mass) {
     mass_ = mass;
     btVector3 inertia(0.0f, 0.0f, 0.0f);

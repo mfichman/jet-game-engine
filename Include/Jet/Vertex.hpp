@@ -48,6 +48,24 @@ public:
 	inline bool operator!=(const Vertex& other) const {
 		return !this->operator==(other);
 	}
+
+	inline Vertex operator+(const Vertex& other) const {
+		Vertex out;
+		out.position = position + other.position;
+		out.normal = normal + other.normal;
+		out.tangent = tangent + other.tangent;
+		out.texcoord = texcoord + other.texcoord;
+		return out;
+	}
+
+	inline Vertex operator*(float scale) const {
+		Vertex out;
+		out.position = position * scale;
+		out.normal = normal * scale;
+		out.tangent = tangent * scale;
+		out.texcoord = texcoord * scale;
+		return out;
+	}
     
     Vector position;
     Vector normal;

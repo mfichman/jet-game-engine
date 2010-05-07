@@ -42,10 +42,13 @@ Frustum Core::Camera::compute_frustum(float far_distance) const {
     float fh = far_distance * tang; // Height of the far plane
     float fw = fh * ratio; // Width of the near plane
     
+    // Get "look at" vectors.  The AT vector is simply a vector somewhere
+    // along the local +z axis for the camera.
     Vector eye = matrix.origin();
     Vector at = matrix * Vector(0.0, 0.0, 1.0f);
     Vector up = matrix.up();
-    
+       
+    // Construct orthogonal basis.
     Vector z = (eye - at).unit();
     Vector x = (up.cross(z)).unit();
     Vector y = z.cross(x);

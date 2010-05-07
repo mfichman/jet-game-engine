@@ -20,6 +20,7 @@
  * IN THE SOFTWARE.
  */  
 
+#include <crtdbg.h>
 #include <Jet/Core/Mesh.hpp>
 #include <Jet/Core/Engine.hpp>
 #include <Jet/Core/Shader.hpp>
@@ -56,10 +57,10 @@ void Core::Mesh::state(ResourceState state) {
 	}
 	
 	// Entering the SYNCED state
-	if (SYNCED == state) {		
-
-		init_hardware_buffers();
+	if (SYNCED == state) {
+		update_tangents();
 		update_collision_shape();
+		init_hardware_buffers();
 	}
 
 	// Leaving the SYNCED state
@@ -77,24 +78,22 @@ void Core::Mesh::state(ResourceState state) {
 }
 
 void Core::Mesh::free_hardware_buffers() {
-		// Free the vertex buffers
+	assert(ibuffer_ && vbuffer_);
+	
+	// Free the vertex buffers
 	if (!parent_) {
+		// If the mesh has no parent, then the vertex buffer is owned by
+		// this mesh.
 		glDeleteBuffers(1, &vbuffer_);
-		vbuffer_ = 0;
 	}
 	glDeleteBuffers(1, &ibuffer_);
 	ibuffer_ = 0;
+	vbuffer_ = 0;
 	nindices_ = 0;
 }
 
 void Core::Mesh::init_hardware_buffers() {
-	assert(!ibuffer_);
-	
-	// Create index and vertex buffers
-	if (!parent_) {
-		glGenBuffers(1, &vbuffer_);
-	}
-	glGenBuffers(1, &ibuffer_);
+	assert(!ibuffer_ && !vbuffer_);	
 
 	// Choose the appropriate buffer mode.  TODO: Calling glBufferData
 	// below may be destructive in terms of performance; investigate
@@ -107,17 +106,64 @@ void Core::Mesh::init_hardware_buffers() {
 	
 	if (!parent_) {
 		// Copy vertex data to graphics card
+		glGenBuffers(1, &vbuffer_);
 		glBindBuffer(GL_ARRAY_BUFFER, vbuffer_);
 		glBufferData(GL_ARRAY_BUFFER, vertex_count()*sizeof(Vertex), vertex_data(), mode);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	} else {
+		parent_->state(SYNCED);
+		vbuffer_ = parent_->vbuffer_;
 	}
 
 	// Copy index data to graphics card
+	glGenBuffers(1, &ibuffer_);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibuffer_);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_count()*sizeof(uint32_t), index_data(), mode);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	nindices_ = index_count();
+}
+
+//! Updates tangent vectors for the mesh
+void Core::Mesh::update_tangents() {
+	// Only update tangents if the node owns the vertex buffer,
+	// i.e., if it doesn't have a parent.
+	if (!parent_) {
+		// Initialize all tangents to zero for the whole mesh
+		for (size_t i = 0; i < vertex_.size(); i++) {
+			vertex_[i].tangent = Vector();
+		}
+		
+		// Iterate through faces and add each face's contribution to
+		// the tangents of its vertices
+		for (size_t i = 2; i < index_.size(); i += 3) {
+			Vertex& p0 = vertex_[index_[i-2]];
+			Vertex& p1 = vertex_[index_[i-1]];
+			Vertex& p2 = vertex_[index_[i-0]];
+			
+			// Tangent calculation
+			Vector d1 = p1.position - p0.position;
+			Vector d2 = p2.position - p1.position;
+			const Texcoord& tex0 = p0.texcoord;
+			const Texcoord& tex1 = p1.texcoord;
+			const Texcoord& tex2 = p2.texcoord;
+			float s1 = tex1.u - tex0.u;
+			float t1 = tex1.v - tex0.v;
+			float s2 = tex2.u - tex0.u;
+			float t2 = tex2.v - tex0.v;
+			float a = 1/(s1*t2 - s2*t1);
+			
+			// Add tangent contribution
+			p0.tangent += ((d1*t2 - d2*t1)*a).unit();
+			p1.tangent += ((d1*t2 - d2*t1)*a).unit();
+			p2.tangent += ((d1*t2 - d2*t1)*a).unit();
+		}
+		
+		// Normalize all the tangents
+		for (size_t i = 0; i < vertex_.size(); i++) {
+			vertex_[i].tangent = vertex_[i].tangent.unit();
+		}
+	}
 }
 
 void Core::Mesh::update_collision_shape() {
@@ -148,7 +194,8 @@ void Core::Mesh::update_collision_shape() {
 
 void Core::Mesh::read_mesh_data() {
 	static const string ext = ".obj";
-    if ((name_.length() - name_.rfind(ext)) != ext.length()) {
+	size_t pos = name_.rfind(ext);
+	if (pos == string::npos || (name_.length() - pos) != ext.length()) {
         // This mesh has no associated data if it doesn't end with
 		// the extension .obj.  It may be a custom user mesh.
 		return;
@@ -158,7 +205,6 @@ void Core::Mesh::read_mesh_data() {
 	string file = engine_->resource_path(name_);
 	MeshLoader(this, file);
 }
-
 
 void Core::Mesh::render(Core::Shader* shader) {
 	// Make sure that all vertex data is synchronized
@@ -235,8 +281,6 @@ void Core::Mesh::vertex_count(size_t size) {
 	}
 }
 
-//! Returns a vertex that is part of this mesh
-//! @param i the index of the vertex in the vertex buffer
 const Vertex& Core::Mesh::vertex(size_t i) const {
 	if (parent_) {
 		return parent_->vertex(i);
@@ -245,13 +289,18 @@ const Vertex& Core::Mesh::vertex(size_t i) const {
 	}
 }
 
-//! Returns an index that is part of this mesh.
-//! @param i the index of the index in the index buffer
+Vertex& Core::Mesh::vertex(size_t i) {
+	if (parent_) {
+		return parent_->vertex(i);
+	} else {
+		return vertex_[i];
+	}
+}
+
 uint32_t Core::Mesh::index(size_t i) const {
 	return index_[i];
 }
 
-//! Returns a pointer to the beginning of the vertex buffer.
 const Vertex* Core::Mesh::vertex_data() const {
 	if (parent_) {
 		return parent_->vertex_data();
@@ -260,7 +309,6 @@ const Vertex* Core::Mesh::vertex_data() const {
 	}
 }
 
-//! Returns a pointer to the beginning of the index buffer.
 const uint32_t* Core::Mesh::index_data() const {
 	return index_.size() ? &index_.front() : 0;
 }

@@ -55,29 +55,33 @@ public:
 	
 	//! Returns the font with the given name.
 	//! @param name the name of the font.
-	virtual Font* font(const std::string& name)=0;
+	virtual Font* font(const std::string& name="")=0;
 	
 	//! Returns the sound with the given name.
 	//! @param name the name of the sound.
-	virtual Sound* sound(const std::string& name)=0;
+	virtual Sound* sound(const std::string& name="")=0;
 
     //! Returns the material with the given name.
     //! @param name the name of the material
-    virtual Material* material(const std::string& type)=0;
+    virtual Material* material(const std::string& name="")=0;
 
     //! Returns the mesh with the given name.
     //! @param name the name of the mesh.
-    virtual Mesh* mesh(const std::string& name)=0;
+    virtual Mesh* mesh(const std::string& name="")=0;
+	
+	//! Creates a new mesh using the given mesh's vertex data.
+	//! Index data is not copied, and the mesh will be anonymous
+	virtual Mesh* mesh(Mesh* mesh)=0;
 
     //! Returns the given texture descriptor.  This function will attempt to
     //! load the underlying resource if load is set to true.
     //! @param name the name of the texture
-    virtual Texture* texture(const std::string& name)=0;
+    virtual Texture* texture(const std::string& name="")=0;
     
     //! Returns the given shader descriptor.  This function will attempt to
     //! load the underlying resource if load is set to true.
     //! @param name the name of the texture
-    virtual Shader* shader(const std::string& name)=0;
+    virtual Shader* shader(const std::string& name="")=0;
     
     //! Returns the full path to the file using the given resource name.
     //! @param name the name of the resource

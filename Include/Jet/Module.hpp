@@ -77,6 +77,9 @@ public:
     
     //! Called when the module is destroyed.
     virtual void on_destroy()=0;
+    
+    //! Called once per frame.
+    virtual void on_tick(float delta)=0;
 };
 
 }

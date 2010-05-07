@@ -34,15 +34,10 @@
 using namespace Jet;
 using namespace std;
 
-Core::FractureObject::~FractureObject() {
-}
-
 void Core::FractureObject::fracture(const Plane& plane) {
     Mesh* mesh = mesh_object_->mesh();
     
-    if (fracture_count_ <= 0) {
-        return;
-    } else if (mesh) {
+    if (mesh && fracture_count_ > 0) {
         mesh->state(SYNCED);
         
         // Here, we will begin the fracture.  The object must have a mesh
@@ -56,8 +51,8 @@ void Core::FractureObject::fracture_indices(const Plane& plane) {
     Mesh* mesh = mesh_object_->mesh();
     
     // Create two new anonymous meshes for the pieces that splinter off
-    MeshPtr mesh1 = new Mesh(engine_, mesh);
-    MeshPtr mesh2 = new Mesh(engine_, mesh);
+	Jet::MeshPtr mesh1 = engine_->mesh(mesh);
+	Jet::MeshPtr mesh2 = engine_->mesh(mesh);
     
     Box b1;
     Box b2;

@@ -32,19 +32,23 @@ namespace Jet { namespace Core {
 //! Renders a planet that becomes more detailed as the camera approaches it.
 //! @class FractalPlanet
 //! Generates a planet.
-class FractalPlanet : public Object {
+class FractalPlanet : public Jet::FractalPlanet {
 public:
     inline FractalPlanet(Engine* engine, Node* parent) :
         engine_(engine),
         parent_(parent),
         seed_(0),
-        roughness_(0.5),
+        roughness_(1.0f),
         ring_count_(32),
         division_count_(32),
         detail_level_count_(5) {
             
-        //mesh_object_ = parent_->mesh_object("planet");
-       // mesh_ = new Mesh(engine, "planet");
+        mesh_object_ = static_cast<MeshObject*>(parent_->mesh_object());
+        mesh_ = static_cast<Mesh*>(engine_->mesh());
+        mesh_object_->mesh(mesh_.get());
+        mesh_object_->material("Rock.mtl");
+        
+        generate_mesh();
     }
     
     //! Returns the parent of this planet.
@@ -104,15 +108,15 @@ public:
     
     //! Sets the orbit material.  This is the material visible from orbit.
     //! @param material the material
-    inline void orbit_material(Material* material) {
-        orbit_material_ = material;
+    inline void orbit_material(Jet::Material* material) {
+        orbit_material_ = static_cast<Material*>(material);
     }
     
     //! Returns the ground texture.  This is the material visible from
     //! the ground.
     //! @param material the material
-    inline void ground_material(Material* material) {
-        ground_material_ = material;
+    inline void ground_material(Jet::Material* material) {
+        ground_material_ = static_cast<Material*>(material);
     }
     
     //! Sets the number of rings used to generate the planet sphere.
@@ -134,9 +138,20 @@ public:
         detail_level_count_ = count;
     }
     
-private:    
+private:
+    //! Generates the mesh vertices at a level of detail appropriate for the
+    //! distance to the camera.
     void generate_mesh();
-    void generate_quad(uint32_t quad[4], size_t level);
+    
+    //! Generates a fractal quad using the given quad corners of the tile
+    //! and the given detail level.
+    void generate_quad(Vertex quad[4], size_t level);
+
+	//! Generates the fractal noise for the quad.
+	void generate_fractal(size_t offset, size_t level);
+
+	//! Recalculates all normals.
+	void recalculate_normals();
     
     Engine* engine_;
     Node* parent_;

@@ -125,9 +125,9 @@ void Core::Overlay::render_text() {
 }
 
 void Core::Overlay::delete_overlay(Overlay* overlay) {
-    OverlayPtr obj = overlay;
+    // Search through the has table to find the overlay
     for (unordered_map<string, OverlayPtr>::iterator i = overlay_.begin(); i != overlay_.end(); i++) {
-        if (i->second == obj) {
+        if (i->second == overlay) {
             overlay_.erase(i);
             return;
         }
@@ -147,9 +147,13 @@ void Core::Overlay::destroy() {
         if (parent_) {
             parent_->delete_overlay(this);
         }
+        
+        // Motify listeners.
         for (vector<OverlayListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
             (*i)->on_destroy();
         }
+        
+        // Break cycle with listeners.
         listener_.clear();
     }
 }

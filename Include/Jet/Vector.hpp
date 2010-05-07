@@ -82,6 +82,9 @@ public:
     //! @param other another vector
     Vector operator/(const Vector& other) const;
 
+	//! Scalar division of each component.
+	Vector operator/(float s) const;
+
     //! Negates this vector
     Vector operator-() const;
 

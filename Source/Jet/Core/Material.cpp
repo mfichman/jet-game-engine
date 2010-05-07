@@ -46,10 +46,12 @@ void Core::Material::state(ResourceState state) {
 
 void Core::Material::read_material_data() {
 	static const std::string ext = ".mtl";
-    if ((name_.length() - name_.rfind(ext)) != ext.length()) {
-        return;
+    size_t pos = name_.rfind(ext);
+	if (pos == string::npos || (name_.length() - pos) != ext.length()) {    
+		return;
     }
 	
+	// Find the path to the file, and then use the material loader.
 	string file = engine_->resource_path(name_);
 	MaterialLoader(this, file);
 }
@@ -83,11 +85,16 @@ void Core::Material::enabled(bool enabled) {
 		state(SYNCED);
 		
 		if (engine_->option<bool>("shaders_enabled")) {
+			// Enable the material using the shader.
 			begin_shader();
 		} else {
+			// Enable the material using the fixed pipeline
 			begin_fixed_pipeline();		
 		}
 		
+		// Double-sided materials should have BOTH sides of the triangles
+		// rendered.  This decreases performance, but is needed for some
+		// things (like fracture meshes).
 		if (double_sided_) {
 			glDisable(GL_CULL_FACE);
 		}
@@ -98,6 +105,8 @@ void Core::Material::enabled(bool enabled) {
 		glMaterialfv(GL_FRONT, GL_SPECULAR, specular_color());
 		glMaterialf(GL_FRONT, GL_SHININESS, shininess());
 	} else {
+		
+		// Reset culling to default
 		if (double_sided_) {
 			glEnable(GL_CULL_FACE);
 		}
@@ -129,6 +138,7 @@ void Core::Material::begin_shader() {
 		glUniform1i(diffuse_map_enabled_, false);
 	}
 
+	// Specular mapping must be enabled to use a specular map in the shader
 	if (specular_map_ && engine_->option<bool>("specular_mapping_enabled")) {
 		specular_map_->sampler(SPECULAR_MAP_SAMPLER);
 		glUniform1i(specular_map_loc_, SPECULAR_MAP_SAMPLER);
@@ -137,6 +147,7 @@ void Core::Material::begin_shader() {
 		glUniform1i(specular_map_enabled_, false);
 	}
 	
+	// Normal mapping must be enabled to use a normal map in the shader
 	if (normal_map_ && engine_->option<bool>("normal_mapping_enabled")) {
 		normal_map_->sampler(NORMAL_MAP_SAMPLER);
 		glUniform1i(normal_map_loc_, NORMAL_MAP_SAMPLER);
@@ -157,6 +168,8 @@ void Core::Material::begin_shader() {
 }
 
 void Core::Material::begin_fixed_pipeline() {
+	// Disable all textures except for the texture we need for
+	// the diffuse texture map.
 	glActiveTexture(GL_TEXTURE1);
 	glDisable(GL_TEXTURE_2D);
 	glActiveTexture(GL_TEXTURE2);

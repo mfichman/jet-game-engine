@@ -136,29 +136,33 @@ public:
 	
 	//! Returns the font with the given name.
 	//! @param name the name of the font
-	Jet::Font* font(const std::string& name);
+	Jet::Font* font(const std::string& name="");
 	
 	//! Returns the sound with the given name.
 	//! @param name the name of the sound.
-	Jet::Sound* sound(const std::string& name);
+	Jet::Sound* sound(const std::string& name="");
 	
     //! Returns the material with the given name.
     //! @param name the name of the material
-    Jet::Material* material(const std::string& name);
+    Jet::Material* material(const std::string& name="");
 
     //! Returns the mesh with the given name.
     //! @param name the name of the mesh.
-    Jet::Mesh* mesh(const std::string& name);
+    Jet::Mesh* mesh(const std::string& name="");
+	
+	//! Returns the mesh with the given name.
+    //! @param name the name of the mesh.
+    Jet::Mesh* mesh(Jet::Mesh* mesh);
 
     //! Returns the given texture descriptor.  This function will attempt to
     //! load the underlying resource if load is set to true.
     //! @param name the name of the texture
-    Jet::Texture* texture(const std::string& name);
+    Jet::Texture* texture(const std::string& name="");
     
     //! Returns the given shader descriptor.  This function will attempt to
     //! load the underlying resource if load is set to true.
     //! @param name the name of the texture
-    Jet::Shader* shader(const std::string& name);
+    Jet::Shader* shader(const std::string& name="");
 
     //! Adds a listener, which listens for engine events.
     //! @param listener the engine listener.
@@ -292,6 +296,7 @@ private:
 	float frame_time_;
 	unsigned fps_frame_count_;
 	float fps_elapsed_time_;
+	size_t auto_name_counter_;;
 	
 #ifdef WINDOWS
     float secs_per_count_;

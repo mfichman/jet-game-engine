@@ -62,7 +62,7 @@ void main() {
     
         // Calculate diffuse and specular coefficients
         float kd = max(0.0, dot(-l, n));
-        float ks = pow(max(0.0, dot(-l, r)), gl_FrontMaterial.shininess);
+        float ks = pow(max(0.0, dot(l, r)), gl_FrontMaterial.shininess);
             
         // Calculate ambient, diffuse, and specular light
         diffuse += kd * gl_LightSource[i].diffuse;
@@ -89,7 +89,7 @@ void main() {
 #ifdef SHADOW_MAP
     if (shadow_map_enabled) {
         vec4 shadow_coord = gl_TexCoord[1]/gl_TexCoord[1].w;
-        float depth = texture2D(shadow_map, shadow_coord.st).z;
+        float depth = texture2D(shadow_map, shadow_coord.st).z + 0.005;
         float ratio = length(eye_dir)/shadow_distance;
         if (depth < shadow_coord.z && ratio < 1.0) {
             
@@ -101,5 +101,4 @@ void main() {
 #endif
     
     gl_FragColor = vec4(ambient + diffuse + specular);
-
 }

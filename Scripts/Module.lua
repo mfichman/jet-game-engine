@@ -34,3 +34,4 @@ function Module:on_init() end
 function Module:on_update() end
 function Module:on_render() end
 function Module:on_destroy() end
+function Module:on_tick(delta) end

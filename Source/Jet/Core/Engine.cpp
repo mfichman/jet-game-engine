@@ -28,6 +28,7 @@
 #include <dlfcn.h>
 #endif
 #include <boost/filesystem/operations.hpp>
+#include <boost/lexical_cast.hpp>
 #include <SDL/SDL_image.h>
 
 #include <Jet/Core/RenderSystem.hpp>
@@ -71,7 +72,8 @@ Core::Engine::Engine() :
 	fps_frame_count_(0),
 	fps_elapsed_time_(0.0f),
 	frame_delta_(0.0f),
-	frame_time_(0.0f) {
+	frame_time_(0.0f),
+	auto_name_counter_(0) {
 		
 	cout << "Starting kernel..." << endl;
 		
@@ -152,6 +154,13 @@ Jet::Sound* Core::Engine::sound(const std::string& name) {
 
 
 Jet::Mesh* Core::Engine::mesh(const std::string& name) {
+	if (name.empty()) {
+		string name = "__" + lexical_cast<string>(auto_name_counter_++);
+		Core::MeshPtr mesh(new Core::Mesh(this, name));
+		mesh_.insert(make_pair(name, mesh));
+		return mesh.get();
+	}
+	
     map<string, Jet::MeshPtr>::iterator i = mesh_.find(name);
     if (i == mesh_.end()) {
         Core::MeshPtr mesh(new Core::Mesh(this, name));
@@ -160,6 +169,14 @@ Jet::Mesh* Core::Engine::mesh(const std::string& name) {
 	} else {
 		return i->second.get();
 	}
+}
+
+Jet::Mesh* Core::Engine::mesh(Jet::Mesh* parent) {
+	string name = "__" + lexical_cast<string>(auto_name_counter_++);
+	
+    Core::MeshPtr mesh(new Core::Mesh(this, name, static_cast<Mesh*>(parent)));
+    mesh_.insert(make_pair(name, mesh));
+    return mesh.get();
 }
 
 Jet::Texture* Core::Engine::texture(const std::string& name) {
@@ -241,12 +258,15 @@ void Core::Engine::tick() {
 	for (list<EngineListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
 		(*i)->on_tick();
 	}
+	if (module_) {
+		module_->on_tick(frame_delta());
+	}
+	static_cast<Core::Node*>(root())->tick();
     
     // Fire render event
     for (list<EngineListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
         (*i)->on_render();
-    }
-	
+	}
 	if (module_) {
 		module_->on_render();
 	}
@@ -268,6 +288,9 @@ void Core::Engine::update_fps() {
 
 
 void Core::Engine::update_frame_delta() {
+	// Query the counter, and initialize it.  If this is the first time the
+	// function is being called, set the "previous" time equal to the current
+	// time so that there is not a huge lag for the first frame.
 #ifdef WINDOWS
 	::int64_t current_time = 0;
     QueryPerformanceCounter((LARGE_INTEGER*)&current_time);

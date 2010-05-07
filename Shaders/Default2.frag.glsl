@@ -71,7 +71,7 @@ void main() {
         // Calculate view, light, and reflection vectors
         vec3 v = normalize(view);
         vec3 l = normalize(light);
-        vec3 r = reflect(v, n);
+        vec3 r = reflect(-v, n);
     
         // Calculate diffuse and specular coefficients
 		float ndotl = dot(l, n);

@@ -285,6 +285,7 @@ void Core::RenderSystem::on_render() {
         break;
     }
 
+	// Render overlays on top of the screen (may need to clear z-buffer...)
 	render_overlays();
 	
 	// Swap back buffer to front
@@ -293,7 +294,6 @@ void Core::RenderSystem::on_render() {
 
 void Core::RenderSystem::generate_shadow_map(Light* light) {    
 	Core::CameraPtr camera = static_cast<Core::Camera*>(engine_->camera());
-
 	
 	// Generate an orthogonal basis (rotation matrix) for the
 	// directional light
@@ -346,11 +346,13 @@ void Core::RenderSystem::generate_shadow_map(Light* light) {
 	
 }
 
-void Core::RenderSystem::render_final(Light* light) {   
+void Core::RenderSystem::render_final(Light* light) {	
 	Core::CameraPtr camera = static_cast<Core::Camera*>(engine_->camera());
 	Matrix matrix = camera->parent()->matrix();
 	float width = engine_->option<float>("display_width");
 	float height = engine_->option<float>("display_height");
+	
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
     // Set up the projection matrix
     glMatrixMode(GL_PROJECTION);
@@ -388,7 +390,6 @@ void Core::RenderSystem::render_final(Light* light) {
 	}
     
     // Render to the back buffer.
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	render_visible_mesh_objects();
 	render_visible_particle_systems();
 }

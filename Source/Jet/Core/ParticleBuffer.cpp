@@ -80,14 +80,19 @@ void Core::ParticleBuffer::texture(Texture* texture) {
 
 void Core::ParticleBuffer::shader(Shader* shader) {
     if (shader_ != shader) {
-        
+        // If the shader has changed, then flush the current particle buffer.
         if (particle_.size() > 0) {
             flush();
         }
+        
+        // Disable the current shader
         if (shader_) {
             shader_->enabled(false);
         }
         shader_ = shader;
+        
+        // Enable the new shader, and read the new uniform locations for
+        // the particle system attributes
         if (shader_) {
 			shader_->state(SYNCED);
             shader_->enabled(true);
@@ -102,18 +107,7 @@ void Core::ParticleBuffer::shader(Shader* shader) {
 			init_rotation_attrib_ = shader_->attrib_location("init_rotation");
 			life_attrib_ = shader_->attrib_location("life");
 			growth_rate_attrib_ = shader->attrib_location("growth_rate");
-
-		} else {
-			diffuse_map_loc_ = -1;
-			time_loc_ = -1;
-			scale_loc_ = -1;
-			init_position_attrib_ = -1;
-			init_velocity_attrib_ = -1;
-			init_time_attrib_ = -1;
-			init_size_attrib_ = -1;
-			life_attrib_ = -1;
-			growth_rate_attrib_ = -1;
-		}
+        }
     }
 }
 

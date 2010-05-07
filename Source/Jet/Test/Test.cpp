@@ -9,7 +9,7 @@ using namespace std;
 
 int main(int argc, char** argv) {
 	
-#if defined(WINDOWS) && defined(DEBUG_)
+#if defined(WINDOWS) && defined(_DEBUG)
 	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 #endif
     try {        

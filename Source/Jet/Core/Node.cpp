@@ -30,6 +30,7 @@
 #include <Jet/Core/QuadChain.hpp>
 #include <Jet/Core/QuadSet.hpp>
 #include <Jet/Core/RigidBody.hpp>
+#include <Jet/Core/FractalPlanet.hpp>
 #include <Jet/Core/FractureObject.hpp>
 
 #include <stdexcept>
@@ -43,25 +44,32 @@ using namespace std::tr1;
 using namespace boost;
 
 template <typename K, typename V>
-V& get_value(const std::pair<K, V>& p) { 
+V& get_value(const std::pair<K, V>& p) {
+	// Small transform function used for transforming the object
+	// itrator.
     return const_cast<V&>(p.second); 
 }
 
 Core::Node::~Node() {
 	if (!destroyed_) {
+		// If the node hasn't been destroyed, then mark it as destroyed
+		// and notify all the listeners to the node.  This case can
+		// happen if the parent node is destroyed.
 		destroyed_ = true;
 		for (vector<NodeListenerPtr>::iterator i = listener_.begin(); i < listener_.end(); i++) {
             (*i)->on_destroy();
         }
 	}
-	listener_.clear();
 }
 
 Object* Core::Node::object(const std::string& name)  {
+	// Find the given object.  Empty names are invalid, so return
+	// null for the empty string.
 	if (name.empty()) {
 		return 0;
 	}
 	
+	// Search for the object, and return 0 if it wasn't found.
     unordered_map<string, ObjectPtr>::const_iterator i = object_.find(name);
     if (i == object_.end()) {
         return 0;
@@ -71,6 +79,10 @@ Object* Core::Node::object(const std::string& name)  {
 }
 
 RigidBody* Core::Node::rigid_body() {
+	// Create the rigid body if it hasn't been loaded yet.  Note that when the
+	// rigid body is created, shape transforms are also updated for collision
+	// detection.  Thus, all geometry must be attached BEFORE the rigid body
+	// is created.
 	if (!rigid_body_) {
 		rigid_body_ = new RigidBody(engine_, this);
 	}
@@ -78,6 +90,7 @@ RigidBody* Core::Node::rigid_body() {
 }
 
 AudioSource* Core::Node::audio_source() {
+	// Create the audio source if it hasn't been loaded yet.
     if (!audio_source_) {
         audio_source_ = new AudioSource(engine_, this);
     }
@@ -85,6 +98,8 @@ AudioSource* Core::Node::audio_source() {
 }
 
 void Core::Node::add_object(const std::string& name, Object* object) {
+	// Add the given object to the node.  If the name is the empty string,
+	// then auto-generate a name using the automatic name counter.
 	if (name.empty()) {
 		string auto_name = "__" + lexical_cast<string>(auto_name_counter_++);
 		object_.insert(make_pair(auto_name, object));
@@ -94,64 +109,57 @@ void Core::Node::add_object(const std::string& name, Object* object) {
 }
 
 void Core::Node::delete_object(Object* object) {
-    ObjectPtr obj = object;
+	// Search through the map linearly and find the object to delete it.
+	// Linear performance is acceptable given that nodes don't generally have
+	// many children, and deletes are infrequent.
     for (unordered_map<string, ObjectPtr>::iterator i = object_.begin(); i != object_.end(); i++) {
-        if (i->second == obj) {
+        if (i->second == object) {
             object_.erase(i);
             return;
         }
     }
 }
 
-//! Returns the object with the given name.  If the typeid does not match,
-//! the method throws an exception.  If the object does not exist, the
-//! object will be created using the given typeid.
-Object* Core::Node::object(const std::type_info& type, const std::string& name) {
-	if (typeid(Jet::RigidBody) == type) {
-		if (!rigid_body_) {
-			rigid_body_ = new Core::RigidBody(engine_, this);
-		}
-		return rigid_body_.get();
-	} else if (typeid(Jet::AudioSource) == type) {
-		if (!audio_source_) {
-			audio_source_ = new Core::AudioSource(engine_, this);
-		}
-		return audio_source_.get();
-	}
-	
-	Object* obj = object(name);
-	if (!obj) {
-		if (typeid(Jet::Node) == type) {
-			obj = new Core::Node(engine_, this);
-		} else if (typeid(Jet::MeshObject) == type) {
-			obj = new Core::MeshObject(engine_, this);
-		} else if (typeid(Jet::FractureObject) == type) {
-			obj = new Core::FractureObject(engine_, this);
-		} else if (typeid(Jet::ParticleSystem) == type) {
-			obj = new Core::ParticleSystem(engine_, this);
-		} else if (typeid(Jet::QuadSet) == type) {
-			obj = new Core::QuadSet(engine_, this);
-		} else if (typeid(Jet::QuadChain) == type) {
-			obj = new Core::QuadChain(engine_, this);
-		} else if (typeid(Jet::Light) == type) {
-			obj = new Core::Light(this);
-		} else if (typeid(Jet::Camera) == type) {
-			obj = new Core::Camera(engine_, this);
-		}
-		
-		if (!obj) {
-			throw runtime_error("Could not create object: " + name);
-		} else {
-			add_object(name, obj);
-		}
-	} else if (!type.before(typeid(obj))) {
-		throw runtime_error("Invalid object type: " + name);
-	}
-	
-	return obj;
+Jet::Node* Core::Node::node(const std::string& name) {
+	return get_object<Core::Node>(name);
+}
+
+Jet::MeshObject* Core::Node::mesh_object(const std::string& name) {
+	return get_object<Core::MeshObject>(name);
+}
+
+Jet::FractureObject* Core::Node::fracture_object(const std::string& name) {
+	return get_object<Core::FractureObject>(name);
+}
+
+Jet::FractalPlanet* Core::Node::fractal_planet(const std::string& name) {
+	return get_object<Core::FractalPlanet>(name);
+}
+
+Jet::ParticleSystem* Core::Node::particle_system(const std::string& name) {
+	return get_object<Core::ParticleSystem>(name);
+}
+
+Jet::QuadSet* Core::Node::quad_set(const std::string& name) {
+	return get_object<Core::QuadSet>(name);
+}
+
+Jet::QuadChain* Core::Node::quad_chain(const std::string& name) {
+	return get_object<Core::QuadChain>(name);
+}
+
+Jet::Light* Core::Node::light(const std::string& name) {
+	return get_object<Core::Light>(name);
+}
+
+Jet::Camera* Core::Node::camera(const std::string& name) {
+	return get_object<Core::Camera>(name);
 }
 
 Iterator<ObjectPtr> Core::Node::objects() const {
+	// Transform the unordered map iterator to a generic iterator over
+	// all objects attached to this node.  This hides implementation details
+	// about the node class.
 	typedef unordered_map<string, ObjectPtr> map_t;
 	typedef boost::function<map_t::mapped_type& (const map_t::value_type&)> fun_t;
 	typedef transform_iterator<fun_t, map_t::const_iterator> itr_t;
@@ -163,13 +171,34 @@ Iterator<ObjectPtr> Core::Node::objects() const {
 	return Iterator<ObjectPtr>(begin, end);
 }
 
+void Core::Node::listener(NodeListener* listener) {
+	// Add the listener if the node hasn't been destroyed already.  This keeps
+	// listeners from being added while the node is being reclaimed.
+	if (destroyed_) {
+		throw std::runtime_error("Attempted to add a listener to a node marked for deletion");
+	} else {
+		listener_.push_back(listener);
+	}
+}
+
+Vector Core::Node::linear_velocity() const {
+	// Return the linear velocity of the rigid body.  Return a zero vector
+	// if this mesh does not have a rigid body.
+	if (rigid_body_) {
+		return rigid_body_->linear_velocity();
+	} else {
+		return Vector();
+	}
+}
 
 void Core::Node::position(const Vector& position) {
-	if (position_ == position) {
-		return;
-	} else {
+	if (position_ != position) {
+		// Set the new position and mark the transform as dirty
 		position_ = position;
-		transform_dirty_ = true;
+		transform_modified_count_++;
+		
+		// If the rigid body exists, and this node is the parent of the
+		// rigid body, then set the transform for the rigid body.
 		if (rigid_body_ && rigid_body_->parent() == this) {
 			RigidBody* rigid_body = static_cast<RigidBody*>(rigid_body_.get());
 			btTransform transform = rigid_body->body_->getCenterOfMassTransform();
@@ -180,11 +209,13 @@ void Core::Node::position(const Vector& position) {
 }
 
 void Core::Node::rotation(const Quaternion& rotation) {
-	if (rotation == rotation_) {
-		return;
-	} else {
+	if (rotation != rotation_) {
+		// Set the new rotation and mark the transform as dirty
 		rotation_ = rotation;
-		transform_dirty_ = true;
+		transform_modified_count_++;
+		
+		// If the rigid body exists, and this node is the parent of the
+		// rigid body, then set the transform for the rigid body.
 		if (rigid_body_ && rigid_body_->parent() == this) {
 			RigidBody* rigid_body = static_cast<RigidBody*>(rigid_body_.get());
 			btTransform transform = rigid_body->body_->getCenterOfMassTransform();
@@ -203,10 +234,8 @@ void Core::Node::look(const Vector& target, const Vector& up) {
 }
 
 void Core::Node::destroy() {
-    if (destroyed_) {
-        return;
-    } else {
-        destroyed_ = true;
+    if (!destroyed_) {
+		destroyed_ = true;
         
         // Keep a reference to this node until the end of this function,
         // because all references to this node may be released before
@@ -218,26 +247,36 @@ void Core::Node::destroy() {
             parent_->delete_object(this);
             parent_ = 0;
         }
+		
+		// Notify all listeners that this node will be deleted.
         for (vector<NodeListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
             (*i)->on_destroy();
         }
-        listener_.clear(); // Break cycle between listeners and the node
+		
+		// Break cycle between listeners and the node.  If the listeners have
+		// a strong reference to this node, they will still be reclaimed
+		// properly.
+        listener_.clear(); 
     }
 }
 
 void Core::Node::render() {
+	// Handle a render event by notifying all listeners
     for (vector<NodeListenerPtr>::iterator i = listener_.begin(); i < listener_.end(); i++) {
 		(*i)->on_render();
 	}
 }
 
 void Core::Node::collision(Jet::Node* node) {
+	// Handle a collision event by notifying all listeners
     for (vector<NodeListenerPtr>::iterator i = listener_.begin(); i < listener_.end(); i++) {
 		(*i)->on_collision(node);
 	}
 }
 
 void Core::Node::fracture(Jet::Node* node) {
+	// Handle a fracture event (i.e., a new node is created using this
+	// node as a template of some kind)
     for (vector<NodeListenerPtr>::iterator i = listener_.begin(); i < listener_.end(); i++) {
 		(*i)->on_fracture(node);
 	}
@@ -246,40 +285,64 @@ void Core::Node::fracture(Jet::Node* node) {
 void Core::Node::update() {
 	
 	// Calculate the transform for this node if the transform is dirty.
-	if (transform_dirty_) {
-		
-		if (parent()) {
-			matrix_ = parent()->matrix() * Matrix(rotation_, position_);
-		} else {
-			matrix_ = Matrix(rotation_, position_);
-		}
-		world_position_ = matrix_.origin();
-		world_rotation_ = matrix_.rotation();
-	}
+	update_transform();
 	
 	// Update all child nodes, and their transforms
 	for (unordered_map<string, ObjectPtr>::iterator i = object_.begin(); i != object_.end(); i++) {
 		const type_info& info = typeid(*i->second);
 		if (typeid(Node) == info) {
 			Node* node = static_cast<Node*>(i->second.get());
-			if (transform_dirty_) {
-				node->transform_dirty_ = true;
-			}
 			node->update();
 		}
 	}
-	transform_dirty_ = false;
 	
+	// Notify listeners that an update is happening
 	for (vector<NodeListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
 		(*i)->on_update();
 	}
 }
 
-void Core::Node::update_transform() {
+void Core::Node::tick() {
 		
 	// Calculate the transform for this node if the transform is dirty.
-	if (transform_dirty_) {
-		
+	update_transform();
+	
+	// Update all child nodes, and their transforms
+	for (unordered_map<string, ObjectPtr>::iterator i = object_.begin(); i != object_.end(); i++) {
+		const type_info& info = typeid(*i->second);
+		if (typeid(Node) == info) {
+			Node* node = static_cast<Node*>(i->second.get());
+			node->tick();
+		}
+	}
+	
+	// Notify all listeners that a tick is happening
+	for (vector<NodeListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
+		(*i)->on_tick(engine_->frame_delta());
+	}
+}
+
+void Core::Node::update_transform() {
+	bool needs_update = true;
+	
+	if (parent_ && parent_->transform_update_count_ != transform_modified_count_) {
+		// If the parent transform has been recalculated more times than
+		// the node's data hs been modified, then we know that our
+		// transform is ut of date.  Therefore, we set the transform counts
+		// equal to the parent node count and recalculate our
+		transform_update_count_ = parent_->transform_update_count_;
+		transform_modified_count_ = parent_->transform_modified_count_;
+		needs_update = true;
+	} else if (transform_update_count_ != transform_modified_count_) {
+		// If the node has been modified since the last update, then we
+		// need to update the transform.
+		transform_update_count_ = transform_modified_count_;
+		needs_update = true;
+	}
+	
+	// Calculate the absolute transform for this node in world space (i.e., not
+	// relative to the parent)
+	if (needs_update) {
 		if (parent()) {
 			matrix_ = parent()->matrix() * Matrix(rotation_, position_);
 		} else {
@@ -287,19 +350,6 @@ void Core::Node::update_transform() {
 		}
 		world_position_ = matrix_.origin();
 		world_rotation_ = matrix_.rotation();
+		transform_update_count_ = transform_modified_count_;
 	}
-	
-	// Update all child nodes, and their transforms
-	for (unordered_map<string, ObjectPtr>::iterator i = object_.begin(); i != object_.end(); i++) {
-		const type_info& info = typeid(*i->second);
-		if (typeid(Node) == info) {
-			Node* node = static_cast<Node*>(i->second.get());
-			if (transform_dirty_) {
-				node->transform_dirty_ = true;
-			}
-			node->update_transform();
-		}
-	}
-	transform_dirty_ = false;
-	
 }

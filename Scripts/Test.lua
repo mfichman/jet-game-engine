@@ -40,7 +40,7 @@ function Test:__init()
         ambient_color = Color(.3, .3, .3, 1),
         diffuse_color = Color(1, 1, 1, 1),
         specular_color = Color(1, 1, 1, 1),
-        direction = Vector(0, 0, -1)
+        direction = Vector(-1, 0, -1)
     }
     
     -- Set up the camera
@@ -64,6 +64,10 @@ function Test:__init()
         material = "Metal.mtl"
     }
     self.plane_node:rigid_body()
+    --[[
+    self.planet_node = engine.root:node("planet")
+    self.planet = self.planet_node:fractal_planet("planet")
+    self.planet_node:rigid_body()]]
     
     -- Set up scene objects and apply some forces
     print("Creating objects")
@@ -95,8 +99,6 @@ end
 
 
 function Test:on_key_pressed(key, x, y)
-
-    print(key)
 
     if (key == 'q') then
         engine.running = false
@@ -166,6 +168,10 @@ function Test:on_key_pressed(key, x, y)
         self.camera_velocity = self.camera_velocity + Vector(0, 1, 0)
     elseif (key == 'k') then
         self.camera_velocity = self.camera_velocity + Vector(0, -1, 0)
+    elseif (key == 'u') then
+        self.camera_velocity = self.camera_velocity + Vector(0, 0, -1)
+    elseif (key == 'o') then
+        self.camera_velocity = self.camera_velocity + Vector(0, 0, 1)
     end
 end
 
@@ -178,6 +184,10 @@ function Test:on_key_released(key, x, y)
         self.camera_velocity = self.camera_velocity + Vector(0, -1, 0)
     elseif (key == 'k') then
         self.camera_velocity = self.camera_velocity + Vector(0, 1, 0)
+    elseif (key == 'u') then
+        self.camera_velocity = self.camera_velocity + Vector(0, 0, 1)
+    elseif (key == 'o') then
+        self.camera_velocity = self.camera_velocity + Vector(0, 0, -1)
     end
     
     print(key)

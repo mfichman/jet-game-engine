@@ -83,6 +83,7 @@ void Core::MeshLoader::read_face() {
             throw runtime_error("Invalid OBJ file: " + name_);
         }
         
+        // Process the position of the vertex
         if (!i1.empty()) {
             size_t j = lexical_cast<size_t>(i1) - 1;
             if (j >= position_.size()) {
@@ -91,6 +92,8 @@ void Core::MeshLoader::read_face() {
                 face[i].position = position_[j];
             }
         }
+        
+        // Process the texcoord of the vertex
         if (!i2.empty()) {
             size_t j = lexical_cast<size_t>(i2) - 1;
             if (j >= texcoord_.size()) {
@@ -99,6 +102,8 @@ void Core::MeshLoader::read_face() {
                 face[i].texcoord = texcoord_[j];
             }
         }
+        
+        // Process the normal of the vertex
         if (!i3.empty()) {
             size_t j = lexical_cast<size_t>(i3) - 1;
             if (j > normal_.size()) {
@@ -117,8 +122,7 @@ void Core::MeshLoader::insert_face(Vertex face[3]) {
 	
 	// Add vertices to the buffer
 	for (int i = 0; i < 3; i++) {
-		// Calculate tangent
-		compute_tangent(face, i);
+        // Search for the vertex in the cache
 		map<Vertex, uint32_t>::iterator j = cache_.find(face[i]);
         size_t index = 0;
 		if (j == cache_.end()) {
@@ -127,35 +131,10 @@ void Core::MeshLoader::insert_face(Vertex face[3]) {
 			index = mesh_->vertex_count();
 			cache_.insert(make_pair(face[i], index));
 		} else {
-			// Vertex was found, so use the existing index.  Update
-			// the tangent vector so that we can average the tangent
-			// vector later
+			// Vertex was found, so use the existing index. 
             index = j->second;
-            face[i].tangent += mesh_->vertex(index).tangent;
 		}
         mesh_->vertex(index, face[i]);
         mesh_->index(mesh_->index_count(), index);
 	}
-}
-
-void Core::MeshLoader::compute_tangent(Vertex face[3], size_t j) {
-	// Calculate binormals
-	Vertex& p0 = face[j];
-	Vertex& p1 = face[(j+1)%3];
-	Vertex& p2 = face[(j+2)%3];
-	
-    Vector d1 = p1.position - p0.position;
-    Vector d2 = p2.position - p1.position;
-    const Texcoord& tex0 = p0.texcoord;
-    const Texcoord& tex1 = p1.texcoord;
-    const Texcoord& tex2 = p2.texcoord;
-    float s1 = tex1.u - tex0.u;
-    float t1 = tex1.v - tex0.v;
-    float s2 = tex2.u - tex0.u;
-    float t2 = tex2.v - tex0.v;
-
-    float a = 1/(s1*t2 - s2*t1);
-    p0.tangent = p0.tangent + ((d1*t2 - d2*t1)*a).unit();
-	p1.tangent = p1.tangent + ((d1*t2 - d2*t1)*a).unit();
-	p2.tangent = p2.tangent + ((d1*t2 - d2*t1)*a).unit();
 }

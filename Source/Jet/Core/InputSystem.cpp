@@ -46,6 +46,8 @@ void Core::InputSystem::on_init() {
 }
 
 void Core::InputSystem::on_tick() {
+    // Poll for events, and then notify the current game module if a key
+    // is pressed or a mouse butt is clicked.
     SDL_Event evt;
     while(SDL_PollEvent(&evt)) {
         switch (evt.type) {
@@ -56,7 +58,6 @@ void Core::InputSystem::on_tick() {
             case SDL_MOUSEBUTTONUP: on_mouse_up(evt.button.button, evt.button.x, evt.button.y); break;
         }
     }
-
 }
 
 void Core::InputSystem::on_keyboard(const std::string& key) {
@@ -107,6 +108,8 @@ void Core::InputSystem::on_joystick(int button, int x, int y, int z) {
 }
 
 Point Core::InputSystem::normalized_mouse(int x, int y) {
+    // Normalize the position of the mouse so that it is between -1 and 1.
+    // (-1, -1) corresponds to the top-left corner of the screen.
     Point point;
     float width = any_cast<float>(engine_->option("display_width"));
     float height = any_cast<float>(engine_->option("display_height"));

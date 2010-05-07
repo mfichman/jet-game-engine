@@ -86,6 +86,10 @@ Vector Vector::operator-() const {
     return Vector(-x, -y, -z);
 }
 
+Vector Vector::operator/(float s) const {
+	return Vector(x/s, y/s, z/s);
+}
+
 Vector Vector::operator*(float s) const {
     return Vector(s*x, s*y, s*z);
 }

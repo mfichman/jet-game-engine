@@ -50,12 +50,12 @@ public:
 		sync_mode_(STATIC_SYNC) {
 	}
 	
-	inline Mesh(Engine* engine, Mesh* parent) :
+	inline Mesh(Engine* engine, const std::string& name, Mesh* parent) :
 		engine_(engine),
 		parent_(parent),
-		name_(parent_->name_ + "#"),
+		name_(name),
 		state_(UNLOADED),
-		vbuffer_(parent->vbuffer_),
+		vbuffer_(0),
 		ibuffer_(0),
 		nindices_(0),
 		sync_mode_(STATIC_SYNC) {
@@ -80,6 +80,9 @@ public:
     //! Returns a vertex that is part of this mesh
     //! @param i the index of the vertex in the vertex buffer
     const Vertex& vertex(size_t i) const;
+
+	//! Returns a reference to a vertex that is part of this mesh.
+	Vertex& vertex(size_t i);
 
     //! Returns an index that is part of this mesh.
     //! @param i the index of the index in the index buffer
@@ -144,6 +147,7 @@ private:
 	void init_hardware_buffers();
 	void free_hardware_buffers();
 	void update_collision_shape();
+	void update_tangents();
     
     Engine* engine_;
 	MeshPtr parent_;

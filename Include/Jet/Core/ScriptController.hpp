@@ -72,6 +72,10 @@ private:
 		self_["on_fracture"](self_, node);
 	}
     
+    inline void on_tick(float delta) {
+        self_["on_tick"](self_, delta);
+    }
+    
     Node* node_;
     luabind::object self_;
     

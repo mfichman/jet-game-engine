@@ -73,6 +73,10 @@ public:
 	//! Creates a new fracturable model.
 	//! @param name the name of the new fracturable model
 	virtual FractureObject* fracture_object(const std::string& name="")=0;
+	
+	//! Creates a new fractal planet terrain.
+	//! @param name the name of the fractal planet
+	virtual FractalPlanet* fractal_planet(const std::string& name="")=0;
     
     //! Creates a new particle system at the given index.  Particle systems are
     //! used for fire, water, and other affects.
@@ -128,11 +132,6 @@ public:
 	//! graph immediately, but won't be garbage collected until all references
 	//! to the node are destroyed.
 	virtual void destroy()=0;
-	
-	//! Returns the object with the given name.  If the typeid does not match,
-	//! the method throws an exception.  If the object does not exist, the
-	//! object will be created using the given typeid.
-	virtual Object* object(const std::type_info& type, const std::string& name)=0;
 };
 
 
@@ -159,6 +158,12 @@ public:
 	//! Called when a node is fractured from a child of this node.
 	//! @param node the node that fractured off of this node
 	virtual void on_fracture(Node* node)=0;
+	
+	//! Called once per frame.  The value passed in is the game
+	//! time elapsed since the last frame.  Note that this will
+	//! not be a realtime value if the game is running in slow
+	//! motion.
+	virtual void on_tick(float delta)=0;
 };
 
 
