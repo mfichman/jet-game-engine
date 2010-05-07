@@ -40,7 +40,7 @@ Range::Range() :
         
 }
 
-Range::Range(real_t begin, real_t end) :
+Range::Range(float begin, float end) :
     begin(begin),
     end(end) {
         

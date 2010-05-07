@@ -25,6 +25,12 @@
 #include <Jet/Node.hpp>
 #include <Jet/RigidBody.hpp>
 #include <Jet/AudioSource.hpp>
+#include <Jet/MeshObject.hpp>
+#include <Jet/ParticleSystem.hpp>
+#include <Jet/Light.hpp>
+#include <Jet/QuadSet.hpp>
+#include <Jet/QuadChain.hpp>
+#include <Jet/FractureObject.hpp>
 #include <Jet/Camera.hpp>
 #include <Jet/Quaternion.hpp>
 #include <Jet/Vector.hpp>
@@ -86,49 +92,65 @@ public:
     //! the new node will be relative to this node.
     //! @param index the index where the new object will be placed; if this
     //! parameter is zero then the object will be created at any free location
-    Jet::Node* node(const std::string& name="");
+    Jet::Node* node(const std::string& name="") {
+		return Jet::Node::object<Jet::Node>(name);
+	}
     
     //! Creates a new model at the given index.  Models are used for rendering
     //! static meshes with a material.
     //! @param index the index where the new object will be placed; if this
     //! parameter is zero then the object will be created at any free location
-    Jet::MeshObject* mesh_object(const std::string& name="");
+    Jet::MeshObject* mesh_object(const std::string& name="") {
+		return Jet::Node::object<Jet::MeshObject>(name);
+	}
 	
 	//! Creates a new fracturable model.
 	//! @param name the name of the new fracturable model
-	Jet::FractureObject* fracture_object(const std::string& name="");
+	Jet::FractureObject* fracture_object(const std::string& name="") {
+		return Jet::Node::object<Jet::FractureObject>(name);
+	}
     
     //! Creates a new particle system at the given index.  Particle systems are
     //! used for fire, water, and other affects.
     //! @param index the index where the new object will be placed; if this
     //! parameter is zero then the object will be created at any free location
-    Jet::ParticleSystem* particle_system(const std::string& name="");
+    Jet::ParticleSystem* particle_system(const std::string& name="") {
+		return Jet::Node::object<Jet::ParticleSystem>(name);
+	}
     
     //! Creates a textured quad at the given index.  Textured quads can be used
     //! for billboards.
     //! @param index the index where the new object will be placed; if this
     //! parameter is zero then the object will be created at any free location
-    Jet::QuadSet* quad_set(const std::string& name="");
+    Jet::QuadSet* quad_set(const std::string& name="") {
+		return Jet::Node::object<Jet::QuadSet>(name);
+	}
     
     //! Creates a quad chain at the given index.  Quad chains can be used for
     //! path effects, like tracers or condensation trails.
     //! @param index the index where the new object will be placed; if this
     //! parameter is zero then the object will be created at any free location
-    Jet::QuadChain* quad_chain(const std::string& name="");
+    Jet::QuadChain* quad_chain(const std::string& name="") {
+		return Jet::Node::object<Jet::QuadChain>(name);
+	}
     
     //! Creates a light and attaches it at the given index.
     //! @param index the index where the new object will be placed; if this
     //! parameter is zero then the object will be created at any free location
-    Jet::Light* light(const std::string& name="");
+    Jet::Light* light(const std::string& name="") {
+		return Jet::Node::object<Jet::Light>(name);
+	}
+	
+	//! Returns the camera.
+	Jet::Camera* camera(const std::string& name="") {
+		return Jet::Node::object<Jet::Camera>(name);
+	}
     
     //! Returns the rigid body attached to this node.
     Jet::RigidBody* rigid_body();
     
     //! Returns the audio source attached to this node.
     Jet::AudioSource* audio_source();
-	
-	//! Returns the camera.
-	Jet::Camera* camera();
     
 	//! Creates and returns an extension object, if it doesn't already exist.
 	//! @param name the name of the extension object
@@ -233,6 +255,11 @@ public:
 	//! Called to update the transform of the node
 	void update_transform();
 	
+	//! Returns the object with the given name.  If the typeid does not match,
+	//! the method throws an exception.  If the object does not exist, the
+	//! object will be created using the given typeid.
+	Object* object(const std::type_info& type, const std::string& name);
+	
 private:    
     //! Removes an object from this node.
     //! @param object the object to remove
@@ -257,7 +284,6 @@ private:
     
     Jet::RigidBodyPtr rigid_body_;
     Jet::AudioSourcePtr audio_source_;
-	Jet::CameraPtr camera_;
     std::tr1::unordered_map<std::string, ObjectPtr> object_;
     std::vector<NodeListenerPtr> listener_;
 	btTransform shape_transform_;

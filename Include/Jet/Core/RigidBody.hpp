@@ -62,7 +62,7 @@ public:
     }
     
     //! Returns the mass
-    inline real_t mass() const {
+    inline float mass() const {
         return mass_;
     }
 
@@ -102,7 +102,7 @@ public:
     void apply_local_torque(const Vector& v);
     
     //! Sets the mass of the rigid body.
-    void mass(real_t mass);
+    void mass(float mass);
     
     //! Updates the collision shapes attached to this rigid body
     void update_collision_shapes();
@@ -116,7 +116,7 @@ private:
     
     Engine* engine_;
     Node* parent_;
-    real_t mass_;
+    float mass_;
 
     std::auto_ptr<btRigidBody> body_;
     std::auto_ptr<btCompoundShape> shape_;

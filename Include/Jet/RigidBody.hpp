@@ -47,7 +47,7 @@ public:
     virtual Vector angular_velocity() const=0;
     
     //! Returns the mass fo the object
-    virtual real_t mass() const=0;
+    virtual float mass() const=0;
 
     //! Sets the linear velocity of the object.
     //! @param v the new linear velocity
@@ -76,7 +76,7 @@ public:
     virtual void apply_local_torque(const Vector& v)=0;
     
     //! Sets the mass of the rigid body.
-    virtual void mass(real_t mass)=0;
+    virtual void mass(float mass)=0;
 };
 
 

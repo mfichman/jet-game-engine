@@ -27,7 +27,7 @@
 #include <Jet/Core/MeshObject.hpp>
 #include <Jet/Core/Camera.hpp>
 #include <Jet/Matrix.hpp>
-#include <Jet/BoundingBox.hpp>
+#include <Jet/Box.hpp>
 #include <Jet/Frustum.hpp>
 
 #ifdef WINDOWS
@@ -70,13 +70,13 @@ Core::RenderSystem::~RenderSystem() {
 
 void Core::RenderSystem::init_window() {
 	std::cout << "Initializing render system" << std::endl;
-    GLuint width = (GLuint)engine_->option<real_t>("display_width");
-    GLuint height = (GLuint)engine_->option<real_t>("display_height");
+    GLuint width = (GLuint)engine_->option<float>("display_width");
+    GLuint height = (GLuint)engine_->option<float>("display_height");
     string title = engine_->option<string>("window_title");
 	bool fullscreen_enabled = engine_->option<bool>("fullscreen_enabled");
 	bool vsync_enabled = engine_->option<bool>("vsync_enabled");
 	bool fsaa_enabled = engine_->option<bool>("fsaa_enabled");
-	GLuint fsaa_samples = (GLuint)engine_->option<real_t>("fsaa_samples");
+	GLuint fsaa_samples = (GLuint)engine_->option<float>("fsaa_samples");
 	
 	if (fsaa_enabled) {
 		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
@@ -104,8 +104,8 @@ void Core::RenderSystem::init_window() {
     glViewport(0, 0, (uint32_t)width, (uint32_t)height);
 
 	
-	engine_->overlay()->width((real_t)width);
-	engine_->overlay()->height((real_t)height);
+	engine_->overlay()->width((float)width);
+	engine_->overlay()->height((float)height);
 }
 
 void Core::RenderSystem::init_extensions() {
@@ -201,7 +201,7 @@ void Core::RenderSystem::on_init() {
 		
 	// Initialize shadow target
 	if (engine_->option<bool>("shadows_enabled")) {
-		GLuint size = (GLuint)engine_->option<real_t>("shadow_texture_size");
+		GLuint size = (GLuint)engine_->option<float>("shadow_texture_size");
     	shadow_target_.reset(new RenderTarget(size, size, true, 1));
 	}
 	
@@ -209,8 +209,8 @@ void Core::RenderSystem::on_init() {
 	particle_buffer_.reset(new ParticleBuffer(engine_));
 	
 	engine_->option("video_mode_synced", true);
-	//GLuint width = (GLuint)engine_->option<real_t>("display_width");
-	//GLuint height = (GLuint)engine_->option<real_t>("display_height");
+	//GLuint width = (GLuint)engine_->option<float>("display_width");
+	//GLuint height = (GLuint)engine_->option<float>("display_height");
     //color_target_.reset(new RenderTarget(width, height, false, 2));
 	//bloom_target1_.reset(new RenderTarget(width/8, height/8, false, 1));
 	//bloom_target2_.reset(new RenderTarget(width/8, height/8, false, 1));
@@ -244,7 +244,7 @@ void Core::RenderSystem::check_video_mode() {
 	bool shadows_enabled = engine_->option<bool>("shadows_enabled");
 	if (shaders_enabled && shadows_enabled) {
 		if (!shadow_target_) {
-			GLuint size = (GLuint)engine_->option<real_t>("shadow_texture_size");
+			GLuint size = (GLuint)engine_->option<float>("shadow_texture_size");
 			shadow_target_.reset(new RenderTarget(size, size, true, 1));
 		}
 	} else {
@@ -304,7 +304,7 @@ void Core::RenderSystem::generate_shadow_map(Light* light) {
 	
 	// Transform the view frustum into light space and calculate
 	// the bounding box 
-	BoundingBox bounds(matrix * camera->shadow_frustum());
+	Box bounds(matrix * camera->shadow_frustum());
 	
 	// Set up the projection matrix for the directional light
 	glMatrixMode(GL_PROJECTION);
@@ -349,8 +349,8 @@ void Core::RenderSystem::generate_shadow_map(Light* light) {
 void Core::RenderSystem::render_final(Light* light) {   
 	Core::CameraPtr camera = static_cast<Core::Camera*>(engine_->camera());
 	Matrix matrix = camera->parent()->matrix();
-	real_t width = engine_->option<real_t>("display_width");
-	real_t height = engine_->option<real_t>("display_height");
+	float width = engine_->option<float>("display_width");
+	float height = engine_->option<float>("display_height");
 	
     // Set up the projection matrix
     glMatrixMode(GL_PROJECTION);
@@ -478,8 +478,8 @@ void Core::RenderSystem::render_visible_particle_systems() {
 }
 
 void Core::RenderSystem::render_overlays() {
-	real_t width = engine_->option<real_t>("display_width");
-	real_t height = engine_->option<real_t>("display_height");
+	float width = engine_->option<float>("display_width");
+	float height = engine_->option<float>("display_height");
 	
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();

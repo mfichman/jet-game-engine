@@ -34,23 +34,23 @@ namespace Jet {
 //! @brief RGBA color value.
 class Color {
 public:
-    //! Creates a new color, initialized to black.
-    Color();
-
     //! Creates a new color.
     //! @param red red component
     //! @param blue blue component
     //! @param green green component
     //! @param alpha alpha component
-    Color(real_t red, real_t blue, real_t green, real_t alpha);
+    Color(float red, float blue, float green, float alpha);
+    
+    //! Creates a new color, initialized to black.
+    Color();
     
     //! Returns a pointer to the internal float data of this color
-    inline operator const real_t*() const {
+    inline operator const float*() const {
         return &red;
     }
     
     //! Returns a pointer to the internal float data of this color
-    inline operator real_t*() {
+    inline operator float*() {
         return &red;
     }
     
@@ -60,10 +60,10 @@ public:
     //! Stream operator.
     friend std::istream& ::operator>>(std::istream& in, Color& color);
 
-    real_t red;
-    real_t blue;
-    real_t green;
-    real_t alpha;
+    float red;
+    float blue;
+    float green;
+    float alpha;
 };
 
 }

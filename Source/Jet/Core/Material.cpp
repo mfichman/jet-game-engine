@@ -150,7 +150,7 @@ void Core::Material::begin_shader() {
 		// shadows
 		glUniform1i(shadow_map_loc_, SHADOW_MAP_SAMPLER);
 		glUniform1i(shadow_map_enabled_, (bool)receive_shadows_);
-		glUniform1f(shadow_distance_loc_, engine_->option<real_t>("shadow_distance"));
+		glUniform1f(shadow_distance_loc_, engine_->option<float>("shadow_distance"));
 	} else {
 		glUniform1i(shadow_map_enabled_, false);
 	}

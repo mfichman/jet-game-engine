@@ -33,7 +33,7 @@ Rectangle::Rectangle() :
 }
 
 //! Creates a rectangle from a position and a width
-Rectangle::Rectangle(real_t x, real_t y, real_t width, real_t height) :
+Rectangle::Rectangle(float x, float y, float width, float height) :
     min_x(x),
     min_y(y),
     max_x(x + width),
@@ -42,11 +42,11 @@ Rectangle::Rectangle(real_t x, real_t y, real_t width, real_t height) :
 }
 
 //! Returns the width of the box
-real_t Rectangle::width() const {
+float Rectangle::width() const {
     return max_x - min_x;
 }
 
 //! Returns the height of the box
-real_t Rectangle::height() const {
+float Rectangle::height() const {
     return max_y - min_y;
 }

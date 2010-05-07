@@ -52,6 +52,8 @@ private:
     void on_mouse_up(int button, int x, int y);
     void on_joystick(int button, int x, int y, int z);
     
+    Point normalized_mouse(int x, int y);
+    
     Engine* engine_;
 };
 

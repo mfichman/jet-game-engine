@@ -54,17 +54,17 @@ public:
     }
     
     //! Returns the forward vector
-    inline real_t field_of_view() const {
+    inline float field_of_view() const {
         return field_of_view_;
     }
     
     //! Returns the clipping distance
-    inline real_t far_clipping_distance() const {
+    inline float far_clipping_distance() const {
         return far_clipping_distance_;
     }
     
     //! Returns the clipping distance
-    inline real_t near_clipping_distance() const {
+    inline float near_clipping_distance() const {
         return near_clipping_distance_;
     }
     
@@ -75,17 +75,17 @@ public:
     
     //! Returns the shadow frustum
     inline Frustum shadow_frustum() const {
-        real_t shadow_distance = engine_->option<real_t>("shadow_distance");
+        float shadow_distance = engine_->option<float>("shadow_distance");
 #ifdef WINDOWS
-        real_t far_distance = min(shadow_distance, far_clipping_distance());
+        float far_distance = min(shadow_distance, far_clipping_distance());
 #else
-        real_t far_distance = std::min(shadow_distance, far_clipping_distance());
+        float far_distance = std::min(shadow_distance, far_clipping_distance());
 #endif
         return compute_frustum(far_distance);
     }
     
     //! Sets the field of view
-    inline void field_of_view(real_t fov) {
+    inline void field_of_view(float fov) {
         field_of_view_ = fov;
     }
     
@@ -95,23 +95,23 @@ public:
     }
     
     //! Sets the clipping distance
-    inline void far_clipping_distance(real_t distance) {
+    inline void far_clipping_distance(float distance) {
         far_clipping_distance_ = distance;
     }
     
     //! Sets the clipping distance
-    inline void near_clipping_distance(real_t distance) {
+    inline void near_clipping_distance(float distance) {
         near_clipping_distance_ = distance;
     }
 
 private:    
-    Frustum compute_frustum(real_t far_distance) const;
+    Frustum compute_frustum(float far_distance) const;
     
     Engine* engine_;
     Node* parent_;
-    real_t field_of_view_;
-    real_t near_clipping_distance_;
-    real_t far_clipping_distance_;
+    float field_of_view_;
+    float near_clipping_distance_;
+    float far_clipping_distance_;
 };
 
 }}

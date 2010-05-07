@@ -24,7 +24,7 @@
 
 using namespace Jet;
 
-Quad::Quad(const Vector& normal, const Vector& up, real_t width, real_t height) :
+Quad::Quad(const Vector& normal, const Vector& up, float width, float height) :
     normal(normal),
     up(up),
     width(width),

@@ -155,7 +155,7 @@ void Core::RigidBody::apply_local_torque(const Vector& v) {
 }
 
 //! Sets the mass of the rigid body.
-void Core::RigidBody::mass(real_t mass) {
+void Core::RigidBody::mass(float mass) {
     mass_ = mass;
     btVector3 inertia(0.0f, 0.0f, 0.0f);
     shape_->calculateLocalInertia(mass, inertia);

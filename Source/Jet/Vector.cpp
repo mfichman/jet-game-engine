@@ -26,7 +26,7 @@
 using namespace Jet;
 using namespace std;
 
-Vector::Vector(real_t x, real_t y, real_t z) : 
+Vector::Vector(float x, float y, float z) : 
     x(x),
     y(y),
     z(z) {
@@ -38,24 +38,24 @@ Vector::Vector() :
     z(0) {
 }
 
-real_t Vector::length() const {
+float Vector::length() const {
     return sqrtf(length2());
 }
 
-real_t Vector::length2() const {
+float Vector::length2() const {
     return x*x + y*y + z*z;
 }
 
-real_t Vector::distance(const Vector& other) const {
+float Vector::distance(const Vector& other) const {
     return sqrtf(distance2(other));
 }
 
-real_t Vector::distance2(const Vector& other) const {
+float Vector::distance2(const Vector& other) const {
     Vector sub = other - (*this);
     return sub.length2();
 }
 
-real_t Vector::dot(const Vector& other) const {
+float Vector::dot(const Vector& other) const {
     return x*other.x + y*other.y + z*other.z;
 }
 
@@ -86,7 +86,7 @@ Vector Vector::operator-() const {
     return Vector(-x, -y, -z);
 }
 
-Vector Vector::operator*(real_t s) const {
+Vector Vector::operator*(float s) const {
     return Vector(s*x, s*y, s*z);
 }
 
@@ -111,7 +111,7 @@ Vector Vector::project(const Vector& other) const {
 }
 
 Vector Vector::unit() const {
-    real_t norm = length();
+    float norm = length();
     return Vector(x/norm, y/norm, z/norm);
 }
 

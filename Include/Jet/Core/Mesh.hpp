@@ -24,7 +24,7 @@
 #include <Jet/Core/Types.hpp>
 #include <Jet/Mesh.hpp>
 #include <Jet/Vertex.hpp>
-#include <Jet/BoundingBox.hpp>
+#include <Jet/Box.hpp>
 #include <vector>
 #include <map>
 #include <iostream>
@@ -156,7 +156,7 @@ private:
 	uint32_t nindices_;
 	SyncMode sync_mode_;
 	btConvexHullShape shape_;
-	BoundingBox bounding_box_;
+	Box bounding_box_;
 };
 
 }}

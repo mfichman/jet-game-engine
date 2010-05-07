@@ -57,7 +57,7 @@ public:
     }
     
     //! Returns the life of this particle system.
-    inline real_t life() const {
+    inline float life() const {
         return life_;
     }
     
@@ -138,7 +138,7 @@ public:
     
     //! Sets the life of this particle system.
     //! @param life the min and max life of the particle system.
-    inline void life(real_t life) {
+    inline void life(float life) {
         life_ = life;
     }
     
@@ -250,7 +250,7 @@ private:
     
     Engine* engine_;
     Node* parent_;
-    real_t life_;
+    float life_;
     Range width_;
     Range height_;
     Range depth_;
@@ -266,8 +266,8 @@ private:
     ShaderPtr shader_;
     std::vector<Particle> particle_;
     std::vector<Particle*> dead_particle_;
-    real_t accumulator_;
-	real_t next_emission_;    
+    float accumulator_;
+	float next_emission_;    
 };
 
 }}

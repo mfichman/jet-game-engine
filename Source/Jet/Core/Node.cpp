@@ -57,83 +57,6 @@ Core::Node::~Node() {
 	listener_.clear();
 }
 
-Node* Core::Node::node(const std::string& name) {
-    Object* obj = object(name);
-    if (obj) {
-        return dynamic_cast<Node*>(obj);
-    } else {
-        NodePtr node(new Core::Node(engine_, this));
-        add_object(name, node.get());
-        return node.get();
-    }
-}
-
-Light* Core::Node::light(const std::string& name) {
-    Object* obj = object(name);
-    if (obj) {
-        return dynamic_cast<Light*>(obj);
-    } else {
-        LightPtr light(new Core::Light(this));
-        add_object(name, light.get());
-        return light.get();
-    }
-}
-
-MeshObject* Core::Node::mesh_object(const std::string& name) {
-    Object* obj = object(name);
-    if (obj) {
-        return dynamic_cast<MeshObject*>(obj);
-    } else {
-        MeshObjectPtr mesh_object(new Core::MeshObject(engine_, this));
-        add_object(name, mesh_object.get());		
-        return mesh_object.get();
-    }
-}
-
-FractureObject* Core::Node::fracture_object(const std::string& name) {
-    Object* obj = object(name);
-    if (obj) {
-        return dynamic_cast<FractureObject*>(obj);
-    } else {
-        FractureObjectPtr fracture_object(new Core::FractureObject(engine_, this));
-        add_object(name, fracture_object.get());		
-        return fracture_object.get();
-    }
-}
-
-ParticleSystem* Core::Node::particle_system(const std::string& name) {
-    Object* obj = object(name);
-    if (obj) {
-        return dynamic_cast<ParticleSystem*>(obj);
-    } else {
-        ParticleSystemPtr psys(new Core::ParticleSystem(engine_, this));
-        add_object(name, psys.get());
-        return psys.get();
-    }
-}
-
-QuadSet* Core::Node::quad_set(const std::string& name) {
-    Object* obj = object(name);
-    if (obj) {
-        return dynamic_cast<QuadSet*>(obj);
-    } else {
-        QuadSetPtr quad_set(new Core::QuadSet(engine_, this));
-        add_object(name, quad_set.get());
-        return quad_set.get();
-    }
-}
-
-QuadChain* Core::Node::quad_chain(const std::string& name) {
-    Object* obj = object(name);
-    if (obj) {
-        return dynamic_cast<QuadChain*>(obj);
-    } else {
-        QuadChainPtr quad_chain(new Core::QuadChain(engine_, this));
-        add_object(name, quad_chain.get());
-        return quad_chain.get();
-    }
-}
-
 Object* Core::Node::object(const std::string& name)  {
 	if (name.empty()) {
 		return 0;
@@ -161,24 +84,6 @@ AudioSource* Core::Node::audio_source() {
     return audio_source_.get();
 }
 
-Camera* Core::Node::camera() {
-	if (!camera_) {
-		camera_ = new Camera(engine_, this);
-	}
-	return camera_.get();
-}
-
-Object* Core::Node::extension(const std::string& name, const std::string& type) {
-	Object* obj = object(name);
-    if (obj) {
-		return obj;
-    } else {
-		ObjectPtr object = engine_->constructor(name)(engine_, this);
-        add_object(name, object.get());
-        return object.get();
-    }
-}
-
 void Core::Node::add_object(const std::string& name, Object* object) {
 	if (name.empty()) {
 		string auto_name = "__" + lexical_cast<string>(auto_name_counter_++);
@@ -196,6 +101,54 @@ void Core::Node::delete_object(Object* object) {
             return;
         }
     }
+}
+
+//! Returns the object with the given name.  If the typeid does not match,
+//! the method throws an exception.  If the object does not exist, the
+//! object will be created using the given typeid.
+Object* Core::Node::object(const std::type_info& type, const std::string& name) {
+	if (typeid(Jet::RigidBody) == type) {
+		if (!rigid_body_) {
+			rigid_body_ = new Core::RigidBody(engine_, this);
+		}
+		return rigid_body_.get();
+	} else if (typeid(Jet::AudioSource) == type) {
+		if (!audio_source_) {
+			audio_source_ = new Core::AudioSource(engine_, this);
+		}
+		return audio_source_.get();
+	}
+	
+	Object* obj = object(name);
+	if (!obj) {
+		if (typeid(Jet::Node) == type) {
+			obj = new Core::Node(engine_, this);
+		} else if (typeid(Jet::MeshObject) == type) {
+			obj = new Core::MeshObject(engine_, this);
+		} else if (typeid(Jet::FractureObject) == type) {
+			obj = new Core::FractureObject(engine_, this);
+		} else if (typeid(Jet::ParticleSystem) == type) {
+			obj = new Core::ParticleSystem(engine_, this);
+		} else if (typeid(Jet::QuadSet) == type) {
+			obj = new Core::QuadSet(engine_, this);
+		} else if (typeid(Jet::QuadChain) == type) {
+			obj = new Core::QuadChain(engine_, this);
+		} else if (typeid(Jet::Light) == type) {
+			obj = new Core::Light(this);
+		} else if (typeid(Jet::Camera) == type) {
+			obj = new Core::Camera(engine_, this);
+		}
+		
+		if (!obj) {
+			throw runtime_error("Could not create object: " + name);
+		} else {
+			add_object(name, obj);
+		}
+	} else if (!type.before(typeid(obj))) {
+		throw runtime_error("Invalid object type: " + name);
+	}
+	
+	return obj;
 }
 
 Iterator<ObjectPtr> Core::Node::objects() const {
@@ -320,7 +273,6 @@ void Core::Node::update() {
 	for (vector<NodeListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
 		(*i)->on_update();
 	}
-	
 }
 
 void Core::Node::update_transform() {

@@ -195,15 +195,6 @@ Jet::Shader* Core::Engine::shader(const std::string& name) {
 	}
 }
 
-constructor_t Core::Engine::constructor(const std::string& type) {
-	map<string, constructor_t>::iterator i = constructor_.find(type);
-    if (i == constructor_.end()) {
-        throw runtime_error("Constructor not found: " + type);
-	} else {
-		return i->second;
-	}
-}
-
 std::string Core::Engine::resource_path(const std::string& name) const {
     for (set<string>::const_iterator i = search_folder_.begin(); i != search_folder_.end(); i++) {
 		string path = *i + "/" + name;
@@ -260,7 +251,7 @@ void Core::Engine::tick() {
 		module_->on_render();
 	}
 	
-	frame_time_ += frame_delta_ * option<real_t>("simulation_speed");
+	frame_time_ += frame_delta_ * option<float>("simulation_speed");
 }
 
 void Core::Engine::update_fps() {

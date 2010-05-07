@@ -43,8 +43,8 @@ Core::Overlay* Core::Overlay::overlay(const string& name) {
 }
 
 void Core::Overlay::render() {
-    real_t x;
-    real_t y;
+    float x;
+    float y;
     
     // Find the top-left corner of the overlay.  Depends on the horizontal
     // alignment of the overlay.
@@ -54,13 +54,13 @@ void Core::Overlay::render() {
         if (parent_) {
             x = parent_->width() - width_ + x_;
         } else {
-            x = engine_->option<real_t>("display_width") - width_ + x_;
+            x = engine_->option<float>("display_width") - width_ + x_;
         }
     } else {
         if (parent_) {
             x = (parent_->width() - width_) / 2.0f + x_;
         } else {
-            x = (engine_->option<real_t>("display_width") - width_) / 2.0f + x_;
+            x = (engine_->option<float>("display_width") - width_) / 2.0f + x_;
         }
     }
     
@@ -72,13 +72,13 @@ void Core::Overlay::render() {
         if (parent_) {
             y = parent_->height() - height_ + y_;
         } else {
-            y = engine_->option<real_t>("display_height") - height_ + y_;
+            y = engine_->option<float>("display_height") - height_ + y_;
         }
     } else {
         if (parent_) {
             y = (parent_->height() - height_) / 2.0f + y_;
         } else {
-            y = (engine_->option<real_t>("display_height") - height_) / 2.0f + y_;
+            y = (engine_->option<float>("display_height") - height_) / 2.0f + y_;
         }
     }
     

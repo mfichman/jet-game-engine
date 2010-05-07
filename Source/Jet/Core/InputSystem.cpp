@@ -22,6 +22,7 @@
 
 #include <Jet/Core/InputSystem.hpp>
 #include <Jet/Core/Engine.hpp>
+#include <Jet/Point.hpp>
 #include <SDL/SDL.h>
 #include <cmath>
 
@@ -63,13 +64,7 @@ void Core::InputSystem::on_keyboard(const std::string& key) {
     if (module) {
         int x, y;
         SDL_GetMouseState(&x, &y);
-        real_t width = any_cast<real_t>(engine_->option("display_width"));
-        real_t height = any_cast<real_t>(engine_->option("display_height"));
-        real_t xpos = 2.0f*(real_t)x/width - 1.0f;
-        real_t ypos = 2.0f*(real_t)y/height - 1.0f;
-        xpos = max(-1.0f, min(1.0f, xpos));
-        ypos = max(-1.0f, min(1.0f, ypos));
-        module->on_key_pressed(key, xpos, ypos);
+        module->on_key_pressed(key, normalized_mouse(x, y));
     }
 }
 
@@ -78,13 +73,7 @@ void Core::InputSystem::on_keyboard_up(const std::string& key) {
     if (module) {
         int x, y;
         SDL_GetMouseState(&x, &y);
-        real_t width = any_cast<real_t>(engine_->option("display_width"));
-        real_t height = any_cast<real_t>(engine_->option("display_height"));
-        real_t xpos = 2.0f*(real_t)x/width - 1.0f;
-        real_t ypos = 2.0f*(real_t)y/height - 1.0f;
-        xpos = max(-1.0f, min(1.0f, xpos));
-        ypos = max(-1.0f, min(1.0f, ypos));
-        module->on_key_released(key, xpos, ypos);
+        module->on_key_released(key, normalized_mouse(x, y));
     }
 }
 
@@ -99,32 +88,32 @@ void Core::InputSystem::on_special_up(int key, int x, int y) {
 void Core::InputSystem::on_mouse(int button, int x, int y) {
     Module* module = engine_->module();
     if (module) {
-        real_t width = any_cast<real_t>(engine_->option("display_width"));
-        real_t height = any_cast<real_t>(engine_->option("display_height"));
-        real_t xpos = 2.0f*(real_t)x/width - 1.0f;
-        real_t ypos = 2.0f*(real_t)y/height - 1.0f;
-        xpos = max(-1.0f, min(1.0f, xpos));
-        ypos = max(-1.0f, min(1.0f, ypos));
-        module->on_button_pressed(button, xpos, ypos);
+        module->on_button_pressed(button, normalized_mouse(x, y));
     }
 }
 
 void Core::InputSystem::on_mouse_up(int button, int x, int y) {
     Module* module = engine_->module();
     if (module) {
-        real_t width = any_cast<real_t>(engine_->option("display_width"));
-        real_t height = any_cast<real_t>(engine_->option("display_height"));
-        real_t xpos = 2.0f*(real_t)x/width - 1.0f;
-        real_t ypos = 2.0f*(real_t)y/height - 1.0f;
-        xpos = max(-1.0f, min(1.0f, xpos));
-        ypos = max(-1.0f, min(1.0f, ypos));
-        module->on_button_released(button, xpos, ypos);
+        module->on_button_released(button, normalized_mouse(x, y));
     }
 }
 
 void Core::InputSystem::on_joystick(int button, int x, int y, int z) {
     /*Module* module = system_->engine_->module();
     if (module) {
-        module->on_joystick(button, (real_t)x/1000.0f, (real_t)y/1000.0f, (real_t)z/1000.0f);
+        module->on_joystick(button, (float)x/1000.0f, (float)y/1000.0f, (float)z/1000.0f);
     }*/
+}
+
+Point Core::InputSystem::normalized_mouse(int x, int y) {
+    Point point;
+    float width = any_cast<float>(engine_->option("display_width"));
+    float height = any_cast<float>(engine_->option("display_height"));
+    point.x = 2.0f*(float)x/width - 1.0f;
+    point.y = 2.0f*(float)y/height - 1.0f;
+    point.y = max(-1.0f, min(1.0f, point.x));
+    point.x = max(-1.0f, min(1.0f, point.y));
+    
+    return point;
 }

@@ -33,39 +33,38 @@ public:
     
     //! Called when a key is pressed.
     //! @param key the key
-    //! @param x the x value of the mouse position in the range (-1.0, 1.0)
-    //! @param y the y value of the mouse position in the range (-1.0, 1.0)
-    virtual void on_key_pressed(const std::string& key, real_t x, real_t y)=0;
+    //! @param point the x and y values of the mouse position in the normalized
+    //! range (-1.0, 1.0)
+    virtual void on_key_pressed(const std::string& key, const Point& point)=0;
     
     //! Called when the key is released.
     //! @param key the key
-    //! @param x the x value of the mouse position in the range (-1.0, 1.0)
-    //! @param y the y value of the mouse position in the range (-1.0, 1.0)
-    virtual void on_key_released(const std::string& key, real_t x, real_t y)=0;
+    //! @param point the x and y values of the mouse position in the normalized
+    //! range (-1.0, 1.0)
+    virtual void on_key_released(const std::string& key, const Point& point)=0;
        
      //! Called when the button is pressed.
     //! @param button the button
-    //! @param x the x value of the mouse position in the range (-1.0, 1.0)
-    //! @param y the y value of the mouse position in the range (-1.0, 1.0)
-    virtual void on_button_pressed(uint32_t button, real_t x, real_t y)=0;
+    //! @param point the x and y values of the mouse position in the normalized
+    //! range (-1.0, 1.0)
+    virtual void on_button_pressed(uint32_t button, const Point& point)=0;
     
     //! Called when the button is released.
     //! @param button the button
-    //! @param x the x value of the mouse position in the range (-1.0, 1.0)
-    //! @param y the y value of the mouse position in the range (-1.0, 1.0)
-    virtual void on_button_released(uint32_t button, real_t x, real_t y)=0;
+    //! @param point the x and y values of the mouse position in the normalized
+    //! range (-1.0, 1.0)
+    virtual void on_button_released(uint32_t button, const Point& point)=0;
     
     //! Called when the mouse movies.
-    //! @param x the x value of the mouse position in the range (-1.0, 1.0)
-    //! @param y the y value of the mouse position in the range (-1.0, 1.0)
-    virtual void on_mouse_motion(real_t x, real_t y)=0;
+    //! @param point the x and y values of the mouse position in the normalized
+    //! range (-1.0, 1.0)
+    virtual void on_mouse_motion(const Point& point)=0;
     
     //! Called when the button is released.
     //! @param button the button
-    //! @param x the x-axis position of the joystick in the range (-1.0, 1.0)
-    //! @param y the y-axis position of the joystick in the range (-1.0, 1.0)
-    //! @param z the x-axis position of the joystick in the range (-1.0, 1.0)
-    virtual void on_joystick(uint32_t button, real_t x, real_t y, real_t z)=0;
+    //! @param axes the x, y and z-axis positions of the joystick in the
+    //! range (-1.0, 1.0)
+    virtual void on_joystick(uint32_t button, const Vector& axes)=0;
     
     //! Called when the module is created.
     virtual void on_init()=0;

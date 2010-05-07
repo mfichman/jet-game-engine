@@ -149,12 +149,12 @@ void Core::MeshLoader::compute_tangent(Vertex face[3], size_t j) {
     const Texcoord& tex0 = p0.texcoord;
     const Texcoord& tex1 = p1.texcoord;
     const Texcoord& tex2 = p2.texcoord;
-    real_t s1 = tex1.u - tex0.u;
-    real_t t1 = tex1.v - tex0.v;
-    real_t s2 = tex2.u - tex0.u;
-    real_t t2 = tex2.v - tex0.v;
+    float s1 = tex1.u - tex0.u;
+    float t1 = tex1.v - tex0.v;
+    float s2 = tex2.u - tex0.u;
+    float t2 = tex2.v - tex0.v;
 
-    real_t a = 1/(s1*t2 - s2*t1);
+    float a = 1/(s1*t2 - s2*t1);
     p0.tangent = p0.tangent + ((d1*t2 - d2*t1)*a).unit();
 	p1.tangent = p1.tangent + ((d1*t2 - d2*t1)*a).unit();
 	p2.tangent = p2.tangent + ((d1*t2 - d2*t1)*a).unit();

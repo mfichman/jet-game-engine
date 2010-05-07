@@ -66,7 +66,6 @@ function Explosion:__init(node, name)
         emission_speed = Range(.6, .6),
         emission_rate = Range(300, 300)
     }
-    
 end
 
 function Explosion:reset()

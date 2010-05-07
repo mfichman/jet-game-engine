@@ -29,16 +29,16 @@ using namespace std;
 
 Quaternion Quaternion::IDENTITY;
 
-Quaternion::Quaternion(real_t w, real_t x, real_t y, real_t z) : 
+Quaternion::Quaternion(float w, float x, float y, float z) : 
     w(w),
     x(x),
     y(y),
     z(z) {
 }
 
-Quaternion::Quaternion(const Vector& axis, real_t angle) {
-    real_t halfAngle = 0.5f*angle;
-    real_t sin = sinf(halfAngle);
+Quaternion::Quaternion(const Vector& axis, float angle) {
+    float halfAngle = 0.5f*angle;
+    float sin = sinf(halfAngle);
     w = cosf(halfAngle);
     x = sin*axis.x;
     y = sin*axis.y;
@@ -46,7 +46,7 @@ Quaternion::Quaternion(const Vector& axis, real_t angle) {
 }
 
 Quaternion::Quaternion(const Vector& xaxis, const Vector& yaxis, const Vector& zaxis) {
-    real_t kRot[3][3];
+    float kRot[3][3];
     kRot[0][0] = xaxis.x;
     kRot[1][0] = xaxis.y;
     kRot[2][0] = xaxis.z;
@@ -59,8 +59,8 @@ Quaternion::Quaternion(const Vector& xaxis, const Vector& yaxis, const Vector& z
     kRot[1][2] = zaxis.y;
     kRot[2][2] = zaxis.z;
 
-    real_t fTrace = kRot[0][0]+kRot[1][1]+kRot[2][2];
-    real_t fRoot;
+    float fTrace = kRot[0][0]+kRot[1][1]+kRot[2][2];
+    float fRoot;
 
     if (fTrace > 0.0) {
         // |w| > 1/2, may as well choose w > 1/2
@@ -82,7 +82,7 @@ Quaternion::Quaternion(const Vector& xaxis, const Vector& yaxis, const Vector& z
         size_t k = s_iNext[j];
 
         fRoot = sqrtf(kRot[i][i]-kRot[j][j]-kRot[k][k] + 1.0f);
-        real_t* apkQuat[3] = { &x, &y, &z };
+        float* apkQuat[3] = { &x, &y, &z };
         *apkQuat[i] = 0.5f*fRoot;
         fRoot = 0.5f/fRoot;
         w = (kRot[k][j]-kRot[j][k])*fRoot;
@@ -99,11 +99,11 @@ Quaternion::Quaternion() :
 }
 
   
-real_t Quaternion::length() const {
+float Quaternion::length() const {
     return sqrtf(length2());
 }
 
-real_t Quaternion::length2() const {
+float Quaternion::length2() const {
     return w*w + x*x + y*y + z*z;
 }
 
@@ -124,7 +124,7 @@ Quaternion Quaternion::operator*(const Quaternion& other) const {
 }
 
 Quaternion Quaternion::inverse() const {
-    real_t norm = length2();
+    float norm = length2();
     if (norm > 0) {
         return Quaternion(w/norm, -x/norm, -y/norm, -z/norm);
     } else {
@@ -132,11 +132,11 @@ Quaternion Quaternion::inverse() const {
     }
 }
 
-real_t Quaternion::dot(const Quaternion& other) const {
+float Quaternion::dot(const Quaternion& other) const {
     return w*other.w + x*other.x + y*other.y + z*other.z;
 }
 
-Quaternion Quaternion::operator*(real_t s) const {
+Quaternion Quaternion::operator*(float s) const {
     return Quaternion(w*s, x*s, y*s, z*s);
 }
 
@@ -145,12 +145,12 @@ Quaternion Quaternion::operator-() const {
 }
 
 Quaternion Quaternion::unit() const {
-    real_t norm = length();
+    float norm = length();
     return Quaternion(w/norm, x/norm, y/norm, z/norm);
 }
 
-Quaternion Quaternion::slerp(const Quaternion& other, real_t alpha) const {
-    real_t cos = this->dot(other);
+Quaternion Quaternion::slerp(const Quaternion& other, float alpha) const {
+    float cos = this->dot(other);
     Quaternion rkt;
 
     if (cos < 0) {
@@ -161,11 +161,11 @@ Quaternion Quaternion::slerp(const Quaternion& other, real_t alpha) const {
     }
 
     if (abs(cos) < 1 - 1e-03) {
-        real_t sin = sqrtf(1 - cos*cos);
-        real_t angle = atan2f(sin, cos);
-        real_t inv_sin = 1/sin;
-        real_t coeff0 = sinf((1-alpha) * angle) * inv_sin;
-        real_t coeff1 = sinf(alpha * angle) * inv_sin;
+        float sin = sqrtf(1 - cos*cos);
+        float angle = atan2f(sin, cos);
+        float inv_sin = 1/sin;
+        float coeff0 = sinf((1-alpha) * angle) * inv_sin;
+        float coeff1 = sinf(alpha * angle) * inv_sin;
         return (*this)*coeff0 + rkt*coeff1;
     } else {
         rkt = (*this)*(1-alpha) + rkt*alpha;

@@ -49,7 +49,7 @@
 
 namespace Jet {
     class AudioSource;
-    class BoundingBox;
+    class Box;
     class Camera;
     class Color;
     class Engine;
@@ -71,6 +71,7 @@ namespace Jet {
     class Particle;
     class ParticleSystem;
     class Plane;
+    class Point;
     class Quad;
     class QuadChain;
     class QuadSet;
@@ -107,11 +108,7 @@ namespace Jet {
     typedef boost::intrusive_ptr<Sound> SoundPtr;
     typedef boost::intrusive_ptr<Texture> TexturePtr;
     typedef boost::intrusive_ptr<QuadSet> QuadSetPtr;
-
-    typedef float real_t;
-    typedef void (*load_function_t)(Engine* engine);
-    typedef Object* (*constructor_t)(Engine* engine, Node* node);
-    
+ 
     enum LightType { POINT_LIGHT, DIRECTIONAL_LIGHT };
     enum EmitterType { BOX_EMITTER, ELLIPSOID_EMITTER, POINT_EMITTER };
     enum PlaybackState { PLAY, STOP };

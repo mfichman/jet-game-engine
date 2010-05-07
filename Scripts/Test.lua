@@ -48,7 +48,7 @@ function Test:__init()
     self.camera_node = engine.root:node("camera")
     self.camera_node.position = Vector(20, 0, 20)
     self.camera_node:look(Vector(0, 0, 0), Vector(0, 1, 0))
-    self.camera = self.camera_node:camera() {
+    self.camera = self.camera_node:camera("camera") {
         active = true,
         field_of_view = 45,
         far_clipping_distance = 1000,
@@ -150,9 +150,9 @@ function Test:on_key_pressed(key, x, y)
         end
    
         local n = Vector(math.random()*2-1, math.random()*2-1, math.random()*2-1)
-        self.s1.mesh:fracture(Plane(n.unit, Vector(0, 0.0, 0)))
+        self.s1.mesh:fracture(Plane(n.unit, Vector(0, 0, 0)))
         local n = Vector(math.random()*2-1, math.random()*2-1, math.random()*2-1)
-        self.s1.mesh:fracture(Plane(n.unit, Vector(0, 0.0, 0)))
+        self.s1.mesh:fracture(Plane(n.unit, Vector(0, 0, 0)))
         
     elseif (key == 'e') then
         print(type(self.s3))

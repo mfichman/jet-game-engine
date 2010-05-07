@@ -97,17 +97,17 @@ public:
 	}
 	
 	//! Returns the fixed timestep
-	inline real_t timestep() const {
+	inline float timestep() const {
 		return 1.0f/60.0f;
 	}
 	
 	//! The delta since the last render
-	inline real_t frame_delta() const {
-		return frame_delta_ * option<real_t>("simulation_speed");
+	inline float frame_delta() const {
+		return frame_delta_ * option<float>("simulation_speed");
 	}
 	
 	//! Returns the frame time
-	inline real_t frame_time() const {
+	inline float frame_time() const {
 		return frame_time_;
 	}
     
@@ -159,10 +159,6 @@ public:
     //! load the underlying resource if load is set to true.
     //! @param name the name of the texture
     Jet::Shader* shader(const std::string& name);
-	
-	//! Returns the constructor function for the given type.
-	//! @param type the type
-	constructor_t constructor(const std::string& type);
 
     //! Adds a listener, which listens for engine events.
     //! @param listener the engine listener.
@@ -199,13 +195,6 @@ public:
 	//! Sets the active camera.
 	inline void camera(Jet::Camera* camera) {
 		camera_ = camera;
-	}
-	
-	//! Sets a new object creator function
-	//! @param type the name of the object type.
-	//! @param funct a pointer to the constructor function
-	inline void constructor(const std::string& type, constructor_t funct) {
-		constructor_[type] = funct;
 	}
 	
     //! Sets an engine option.  For a list of possible options, see the
@@ -291,7 +280,6 @@ private:
     std::map<std::string, Jet::MeshPtr> mesh_;
     std::map<std::string, Jet::TexturePtr> texture_;
 	std::map<std::string, Jet::ShaderPtr> shader_;
-	std::map<std::string, constructor_t> constructor_;
     std::set<std::string> search_folder_;
     
 	// Listeners
@@ -300,10 +288,10 @@ private:
     // Record-keeping values for timing statistics
     bool running_;
 	bool initialized_;
-    real_t frame_delta_;
-	real_t frame_time_;
+    float frame_delta_;
+	float frame_time_;
 	unsigned fps_frame_count_;
-	real_t fps_elapsed_time_;
+	float fps_elapsed_time_;
 	
 #ifdef WINDOWS
     float secs_per_count_;

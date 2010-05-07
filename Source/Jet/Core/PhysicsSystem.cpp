@@ -48,7 +48,7 @@ Core::PhysicsSystem::~PhysicsSystem() {
 }
 
 void Core::PhysicsSystem::on_tick() {
-    real_t gravity = engine_->option<real_t>("gravity");
+    float gravity = engine_->option<float>("gravity");
     world_->setGravity(btVector3(0.0f, -gravity, 0.0f));
     
     // Step simulation returns how many substeps were taken.  If at least one

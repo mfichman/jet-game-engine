@@ -19,30 +19,31 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */  
+#pragma once
 
-#include <Jet/Color.hpp>
+#include <Jet/Types.hpp>
+#include <iostream>
 
-using namespace Jet;
-using namespace std;
+std::ostream& operator<<(std::ostream& out, const Jet::Point& point);
+std::istream& operator>>(std::istream& in, Jet::Point& point);
 
-Color::Color() :
-    red(0.0f),
-    blue(0.0f),
-    green(0.0f),
-    alpha(1.0f) {
-}
+namespace Jet {
 
-Color::Color(float red, float blue, float green, float alpha) :
-    red(red),
-    blue(blue),
-    green(green),
-    alpha(alpha) {
-}
+//! Represents a 2-component point.
+//! @class Point
+//! @brief 3-component point.
+class Point {
+public:
+    //! Creates a new point with the given components.
+    //! @param x x component
+    //! @param y y component
+    Point(float x, float y);
+    
+    //! Creates a point at (0, 0)
+    Point();
 
-ostream& operator<<(ostream& out, const Color& color) {
-    return out << color.red << " " << color.blue << " " << color.green << " " << color.alpha;
-}
+    float x;
+    float y;
+};
 
-istream& operator>>(istream& in, Color& color) {
-    return in >> color.red >> color.blue >> color.green >> color.alpha;
 }

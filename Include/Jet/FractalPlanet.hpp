@@ -39,7 +39,7 @@ public:
     
     //! Returns the roughness of the planet.  0 is the smoothest, and 1 is the
     //! roughest.
-    virtual real_t roughness() const=0;
+    virtual float roughness() const=0;
     
     //! Returns the orbit material.
     virtual Material* orbit_material() const=0;
@@ -64,7 +64,7 @@ public:
     //! Sets the roughness of the planet.  0 is the smoothest, and 1 is the
     //! roughest.
     //! @param roughness the roughness parameter
-    virtual void roughness(real_t roughness)=0;
+    virtual void roughness(float roughness)=0;
     
     //! Sets the orbit material.  This is the material visible from orbit.
     //! @param material the material

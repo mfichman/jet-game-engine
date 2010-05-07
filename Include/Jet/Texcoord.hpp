@@ -38,7 +38,7 @@ public:
     //! Creates a new texcoord with the given components.
     //! @param u u component
     //! @param v v component
-    Texcoord(real_t u, real_t v);
+    Texcoord(float u, float v);
 
     //! Creates a new vector.
     Texcoord();
@@ -50,14 +50,14 @@ public:
     friend std::istream& ::operator>>(std::istream& in, Texcoord& texcoord);
 
     inline bool operator<(const Texcoord& other) const {
-        static real_t epsilon = 0.0000001f;
+        static float epsilon = 0.0000001f;
         if (abs(u - other.u) < epsilon) return u < other.u;
         if (abs(v - other.v) < epsilon) return v < other.v;
         return false;
     }
 
     inline bool operator==(const Texcoord& other) const {
-        static real_t epsilon = 0.0000001f;
+        static float epsilon = 0.0000001f;
         if (abs(u - other.u) > epsilon) return false;
         if (abs(v - other.v) > epsilon) return false;
         return true;
@@ -68,8 +68,8 @@ public:
     }
 
 
-    real_t u;
-    real_t v;
+    float u;
+    float v;
 };
 
 }

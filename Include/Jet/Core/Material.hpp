@@ -92,7 +92,7 @@ public:
     }
 	
 	//! Returns the specular shininess.
-	inline real_t shininess() const {
+	inline float shininess() const {
 		return shininess_;
 	}
 	
@@ -164,7 +164,7 @@ public:
     void shader(Jet::Shader* shader);
 	
 	//! Sets the specular shininess.
-	inline void shininess(real_t shininess) {
+	inline void shininess(float shininess) {
 		shininess_ = shininess;
 	}
 	
@@ -224,7 +224,7 @@ private:
     TexturePtr specular_map_;
     TexturePtr normal_map_;
     ShaderPtr shader_;
-	real_t shininess_;
+	float shininess_;
 	bool enabled_;
 	bool receive_shadows_;
 	bool double_sided_;

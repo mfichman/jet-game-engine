@@ -28,19 +28,19 @@ using namespace std;
 
 #define JET_RADIANS(x) ((x)*3.14f/180.0f)
 
-Frustum Core::Camera::compute_frustum(real_t far_distance) const {
+Frustum Core::Camera::compute_frustum(float far_distance) const {
     // Ge the height, width, and shadow distance of the frustum
     const Matrix& matrix = parent_->matrix();
-    real_t width = engine_->option<real_t>("display_width");
-	real_t height = engine_->option<real_t>("display_height");
+    float width = engine_->option<float>("display_width");
+	float height = engine_->option<float>("display_height");
     
     // Find the width and height of the near and far planes
-    real_t ratio = width/height;
-    real_t tang = tanf(JET_RADIANS(field_of_view()) * 0.5f);
-    real_t nh = near_clipping_distance() * tang; // Height of the near plane
-    real_t nw = nh * ratio; // Width of the near plane
-    real_t fh = far_distance * tang; // Height of the far plane
-    real_t fw = fh * ratio; // Width of the near plane
+    float ratio = width/height;
+    float tang = tanf(JET_RADIANS(field_of_view()) * 0.5f);
+    float nh = near_clipping_distance() * tang; // Height of the near plane
+    float nw = nh * ratio; // Width of the near plane
+    float fh = far_distance * tang; // Height of the far plane
+    float fw = fh * ratio; // Width of the near plane
     
     Vector eye = matrix.origin();
     Vector at = matrix * Vector(0.0, 0.0, 1.0f);

@@ -41,16 +41,16 @@ public:
     virtual Overlay* overlay(const std::string& name)=0;
     
     //! Returns the x-coordinate of the top-left corner of the overlay.
-    virtual real_t x() const=0;
+    virtual float x() const=0;
     
     //! Returns the y-coordinate of the top-left corner of the overlay.
-    virtual real_t y() const=0;
+    virtual float y() const=0;
     
     //! Returns the width of the overlay.
-    virtual real_t width() const=0;
+    virtual float width() const=0;
     
     //! Returns the height of the overlay.
-    virtual real_t height() const=0;
+    virtual float height() const=0;
     
     //! Returns the layout mode of the overlay.  The layout mode can be either
     //! absolute (in which case, the x, y, width and height attributes are in
@@ -74,16 +74,16 @@ public:
     virtual Texture* background() const=0;
     
     //! Sets the x-coordinate of the top-left corner of the overlay.
-    virtual void x(real_t x)=0;
+    virtual void x(float x)=0;
     
     //! Sets the y-coordinate of the top-left corner of the overlay.
-    virtual void y(real_t y)=0;
+    virtual void y(float y)=0;
     
     //! Sets the width of the overlay.
-    virtual void width(real_t width)=0;
+    virtual void width(float width)=0;
     
     //! Sets the height of the overlay.
-    virtual void height(real_t height)=0;
+    virtual void height(float height)=0;
     
     //! Sets the layout mode of the overlay.  The layout mode can be either
     //! absolute (in which case, the x, y, width and height attributes are in

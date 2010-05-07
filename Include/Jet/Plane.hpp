@@ -45,22 +45,22 @@ public:
     //! Creates a plane from the plane equation coefficients.  They are used
     //! in the following equation to form the plane:
     //! ax + by + cz + d = 0
-    Plane(real_t a, real_t b, real_t c, real_t d);
+    Plane(float a, float b, float c, float d);
     
     //! Returns the distance from the plane to the given vector.  If this value
     //! is positive, then it is on the same side of the plane as the normal
     //! vector.  Otherwise, it is on the opposite side.
     //! @param vector the vector to test
-    real_t distance(const Vector& vector) const;
+    float distance(const Vector& vector) const;
 
     /*
      * The plane coefficients are used for the following equation:
      * ax + by + cz + d = 0
      */
-    real_t a;
-    real_t b;
-    real_t c;
-    real_t d;
+    float a;
+    float b;
+    float c;
+    float d;
 };
 
 }

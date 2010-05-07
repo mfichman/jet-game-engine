@@ -41,15 +41,15 @@ Core::MaterialLoader::MaterialLoader(Material* material, const std::string& file
             string line;
             getline(in, line);
         } else if (command == "Ka") {
-			real_t red, blue, green;
+			float red, blue, green;
 			in >> red >> blue >> green;
 			material->ambient_color(Color(red, blue, green, 1.0f));  
 		} else if (command == "Kd") {
-			real_t red, blue, green;
+			float red, blue, green;
 			in >> red >> blue >> green;
 			material->diffuse_color(Color(red, blue, green, 1.0f)); 
 		} else if (command == "Ks") {
-			real_t red, blue, green;
+			float red, blue, green;
 			in >> red >> blue >> green;
 			material->specular_color(Color(red, blue, green, 1.0f)); 
 		} else if (command == "map_Kd") {
@@ -65,7 +65,7 @@ Core::MaterialLoader::MaterialLoader(Material* material, const std::string& file
 			in >> value;
 			material->normal_map(value);
 		} else if (command == "Ns") {
-			real_t value;
+			float value;
 			in >> value;
 			material->shininess(value);
 		}

@@ -38,13 +38,13 @@ public:
     virtual Node* parent() const=0;
     
     //! Returns the field of view
-    virtual real_t field_of_view() const=0;
+    virtual float field_of_view() const=0;
     
     //! Returns the clipping distance
-    virtual real_t far_clipping_distance() const=0;
+    virtual float far_clipping_distance() const=0;
     
     //! Returns the clipping distance
-    virtual real_t near_clipping_distance() const=0;
+    virtual float near_clipping_distance() const=0;
     
     //! Returns true if this is the active camera.
     virtual bool active() const=0;
@@ -58,13 +58,13 @@ public:
     virtual Frustum shadow_frustum() const=0;
     
     //! Sets the field of view
-    virtual void field_of_view(real_t fov)=0;
+    virtual void field_of_view(float fov)=0;
     
     //! Sets the clipping distance
-    virtual void far_clipping_distance(real_t distance)=0;
+    virtual void far_clipping_distance(float distance)=0;
 
     //! Sets the clipping distance
-    virtual void near_clipping_distance(real_t distance)=0;
+    virtual void near_clipping_distance(float distance)=0;
 
     // Makes the camera active.
     virtual void active(bool active)=0;

@@ -68,7 +68,7 @@ function Node:light(name)
 end
 
 local node_camera = engine.root.camera;
-function Node:camera()
-    return table_syntax(node_camera(self))
+function Node:camera(name)
+    return table_syntax(node_camera(self, name))
 end
 

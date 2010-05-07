@@ -38,7 +38,7 @@ public:
     //! @param up the direction the quad is oriented along the y-axis
     //! @param width the width of the quad
     //! @param height the height of the quad
-    Quad(const Vector& normal, const Vector& up, real_t width, real_t height);
+    Quad(const Vector& normal, const Vector& up, float width, float height);
 
     //! Comparison operator.
     inline bool operator<(const Quad& other) const {
@@ -58,8 +58,8 @@ public:
     
     Vector normal;
     Vector up;
-    real_t width;
-    real_t height;
+    float width;
+    float height;
 };
 
 }

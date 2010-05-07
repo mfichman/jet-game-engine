@@ -38,14 +38,14 @@ public:
     //! Creates a new matrix using the given array of floats in row-major
     //! order (same as OpenGL).
     //! @param data the array
-    Matrix(const real_t data[16]);
+    Matrix(const float data[16]);
     
     //! Creates a new matrix from a list of floats.
     //! @param floats
-    Matrix(real_t m00, real_t m01, real_t m02, real_t m03,
-           real_t m10, real_t m11, real_t m12, real_t m13,
-           real_t m20, real_t m21, real_t m22, real_t m23,
-           real_t m30, real_t m31, real_t m32, real_t m33);
+    Matrix(float m00, float m01, float m02, float m03,
+           float m10, float m11, float m12, float m13,
+           float m20, float m21, float m22, float m23,
+           float m30, float m31, float m32, float m33);
     
     //! Creates a new combined rotation and translation matrix from
     //! a quaternion and a vector.
@@ -83,17 +83,17 @@ public:
     Vector rotate(const Vector& other) const;
     
     //! Returns a pointer to the matrix data.
-    inline operator const real_t*() const {
+    inline operator const float*() const {
         return data;
     }
     
     //! Returns a pointer to the matrix data.
-    inline operator real_t*() {
+    inline operator float*() {
         return data;
     }
     
     //! Returns an element of the data array
-    inline real_t& operator[](const size_t& i) {
+    inline float& operator[](const size_t& i) {
         return data[i];
     }
 
@@ -129,7 +129,7 @@ public:
      * 2  6  10 14
      * 3  7  11 15
     */
-    real_t data[16];
+    float data[16];
 };
     
 }

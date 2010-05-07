@@ -45,39 +45,39 @@ private:
     //! @param key the key
     //! @param x the x value of the mouse position in the range (-1.0, 1.0)
     //! @param y the y value of the mouse position in the range (-1.0, 1.0)
-    void on_key_pressed(const std::string& key, real_t x, real_t y) {
-        self_["on_key_pressed"](self_, key, x, y);
+    void on_key_pressed(const std::string& key, const Point& point) {
+        self_["on_key_pressed"](self_, key, point);
     }
     
     //! Called when the key is released.
     //! @param key the key
     //! @param x the x value of the mouse position in the range (-1.0, 1.0)
     //! @param y the y value of the mouse position in the range (-1.0, 1.0)
-    void on_key_released(const std::string& key, real_t x, real_t y) {
-        self_["on_key_released"](self_, key, x, y);    
+    void on_key_released(const std::string& key, const Point& point) {
+        self_["on_key_released"](self_, key, point);    
     }
     
     //! Called when the button is pressed.
     //! @param button the button
     //! @param x the x value of the mouse position in the range (-1.0, 1.0)
     //! @param y the y value of the mouse position in the range (-1.0, 1.0)
-    void on_button_pressed(uint32_t button, real_t x, real_t y) {
-        self_["on_button_pressed"](self_, button, x, y);
+    void on_button_pressed(uint32_t button, const Point& point) {
+        self_["on_button_pressed"](self_, button, point);
     }
     
     //! Called when the button is released.
     //! @param button the button
     //! @param x the x value of the mouse position in the range (-1.0, 1.0)
     //! @param y the y value of the mouse position in the range (-1.0, 1.0)
-    void on_button_released(uint32_t button, real_t x, real_t y) {
-        self_["on_button_released"](self_, button, x, y);
+    void on_button_released(uint32_t button, const Point& point) {
+        self_["on_button_released"](self_, button, point);
     }
     
     //! Called when the mouse movies.
     //! @param x the x value of the mouse position in the range (-1.0, 1.0)
     //! @param y the y value of the mouse position in the range (-1.0, 1.0)
-    void on_mouse_motion(real_t x, real_t y) {
-        self_["on_mouse_motion"](self_, x, y);
+    void on_mouse_motion(const Point& point) {
+        self_["on_mouse_motion"](self_, point);
     }
     
     //! Called when the button is released.
@@ -85,8 +85,8 @@ private:
     //! @param x the x-axis position of the joystick in the range (-1.0, 1.0)
     //! @param y the y-axis position of the joystick in the range (-1.0, 1.0)
     //! @param z the x-axis position of the joystick in the range (-1.0, 1.0)
-    void on_joystick(uint32_t button, real_t x, real_t y, real_t z) {
-        self_["on_joystick"](self_, button, x, y, z);
+    void on_joystick(uint32_t button, const Vector& axes) {
+        self_["on_joystick"](self_, button, axes);
     }
     
     //! Called when the ScriptModule is created.

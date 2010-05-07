@@ -59,8 +59,8 @@ void Core::FractureObject::fracture_indices(const Plane& plane) {
     MeshPtr mesh1 = new Mesh(engine_, mesh);
     MeshPtr mesh2 = new Mesh(engine_, mesh);
     
-    BoundingBox b1;
-    BoundingBox b2;
+    Box b1;
+    Box b2;
 
     // Loop through each face, and divide them using the plane.  Some vertices
     // will go to one mesh, some will go to the other
@@ -71,9 +71,9 @@ void Core::FractureObject::fracture_indices(const Plane& plane) {
         const Vector& v0 = mesh->vertex(i0).position;
         const Vector& v1 = mesh->vertex(i1).position;
         const Vector& v2 = mesh->vertex(i2).position;
-        real_t d0 = plane.distance(v0);
-        real_t d1 = plane.distance(v1);
-        real_t d2 = plane.distance(v2);
+        float d0 = plane.distance(v0);
+        float d1 = plane.distance(v1);
+        float d2 = plane.distance(v2);
         
         
         if (d0 <= 0 && d1 <= 0 && d2 <= 0) {
@@ -100,13 +100,13 @@ void Core::FractureObject::fracture_indices(const Plane& plane) {
     // Get the volume of bounding box to decide which half of the mesh is
     // bigger.  The bigger half stays with the current fracture object and the
     // smaller half goes with the new fracture object.
-    real_t v1 = b1.volume();
-    real_t v2 = b2.volume();
+    float v1 = b1.volume();
+    float v2 = b2.volume();
 
     // Sets the mass of the rigid bodies
-    real_t mass = parent_->rigid_body()->mass();
-    real_t m1 = v1 * mass / (v1 + v2);
-    real_t m2 = v2 * mass / (v1 + v2);
+    float mass = parent_->rigid_body()->mass();
+    float m1 = v1 * mass / (v1 + v2);
+    float m2 = v2 * mass / (v1 + v2);
     
     // Swap the mesh halves if v1 is smaller than v2 (index1 should always
     // have the largest mesh)
@@ -136,15 +136,13 @@ void Core::FractureObject::fracture_indices(const Plane& plane) {
 }
 
 Core::FractureObject* Core::FractureObject::create_clone() {
-    static char blah = 'a';
-    
+
     // Create a new node and fracture object
     Node* node = static_cast<Node*>(parent_->parent()->node());
     FractureObject* clone = static_cast<FractureObject*>(node->fracture_object());
-  
-    // TODO: HACK HACK HACK.  Anonymous nodes needed
-    blah++;
 
+    // Copy attributes from the original fracture object to the new fracture
+    // object.  Also copy position and rotation of the parent node
     clone->material(material());
     clone->fracture_count(fracture_count());
     clone->cast_shadows(cast_shadows());

@@ -87,6 +87,4 @@ namespace Jet { namespace Core {
         NORMAL_MAP_SAMPLER = 2,
         SHADOW_MAP_SAMPLER = 3
     };
-    
-    enum RenderPass { SHADOW_PASS, MAIN_PASS };
 }}

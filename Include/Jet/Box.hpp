@@ -29,26 +29,26 @@ namespace Jet {
 //! Represents a 3-component texcoord.
 //! @class Texcoord
 //! @brief 3-component texcoord.
-class BoundingBox {
+class Box {
 public:
     //! Creates a zero-size bounding box.
-    BoundingBox();
+    Box();
     
     //! Creates a bounding box from a frustum.
     //! @param frustum the frustum to get the bounding box for.
-    BoundingBox(const Frustum& frustum);
+    Box(const Frustum& frustum);
 
     //! Returns the width of the box
-    real_t width() const;
+    float width() const;
     
     //! Returns the height of the box
-    real_t height() const;
+    float height() const;
     
     //! Returns the depth of the box
-    real_t depth() const;
+    float depth() const;
     
     //! Returns the volume of the box.
-    real_t volume() const;
+    float volume() const;
     
     //! Returns the half-extents of the box
     Vector half_extents() const;
@@ -59,12 +59,12 @@ public:
     //! Adds a point to the box, expanding it if necessary.
     void point(const Vector& point);
 
-    real_t min_x;
-    real_t max_x;
-    real_t min_y;
-    real_t max_y;
-    real_t min_z;
-    real_t max_z;
+    float min_x;
+    float max_x;
+    float min_y;
+    float max_y;
+    float min_z;
+    float max_z;
 };
 
 }

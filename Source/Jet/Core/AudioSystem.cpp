@@ -42,16 +42,12 @@ Core::AudioSystem::AudioSystem(Engine* engine) :
     
     FMOD_SPEAKERMODE mode;
     FMOD_CAPS caps;
-    FMOD_VECTOR pos = { 0.0f, 0.0f, 0.0f };
-	FMOD_VECTOR vel = { 0.0f, 0.0f, 0.0f };
-	FMOD_VECTOR forward = { 0.0f, 0.0f, 1.0f };
-	FMOD_VECTOR up = { 0.0f, 1.0f, 0.0f };
     
+    // Check device capabilities
     fmod_check(FMOD_System_Create(&system_));
     fmod_check(FMOD_System_GetDriverCaps(system_, 0, &caps, 0, 0, &mode));
     fmod_check(FMOD_System_SetSpeakerMode(system_, mode));
     fmod_check(FMOD_System_Init(system_, 32, FMOD_INIT_NORMAL, 0));
-    fmod_check(FMOD_System_Set3DListenerAttributes(system_, 0, &pos, &vel, &forward, &up));
     fmod_check(FMOD_System_Set3DSettings(system_, 1.0f, 1.0f, 0.05f));
 }
 
@@ -69,13 +65,17 @@ void Core::AudioSystem::on_init() {
 void Core::AudioSystem::on_update() {
     if (engine_->camera()) {
         Node* node = static_cast<Node*>(engine_->camera()->parent());
-        
+                
+        // Get the forward, up, velocity and origin vectors for the
+        // listener.  The listener is assumed to be located at the same
+        // coordinates as the current camera.
         Matrix matrix = node->matrix();
         Vector up = matrix.up();
         Vector forward = matrix.forward();
         Vector origin = matrix.origin();
         Vector velocity = node->linear_velocity();
         
+
         FMOD_VECTOR* u = (FMOD_VECTOR*)&up;
         FMOD_VECTOR* f = (FMOD_VECTOR*)&forward;
         FMOD_VECTOR* v = (FMOD_VECTOR*)&velocity;

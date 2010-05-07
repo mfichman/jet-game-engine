@@ -39,12 +39,12 @@ public:
     //! @param x x component
     //! @param y y component
     //! @param z z component
-    Quaternion(real_t w, real_t x, real_t y, real_t z);
+    Quaternion(float w, float x, float y, float z);
 
     //! Creates a new quaternion from an angle and axis.
     //! @param axis the quaternion axis
     //! @param angle the rotation angle about the axis
-    Quaternion(const Vector& axis, real_t angle);
+    Quaternion(const Vector& axis, float angle);
 
     //! Creates a new quaternion from an orthonormal basis.
     //! @param x the x axis
@@ -59,18 +59,18 @@ public:
     Quaternion();
 
     //! Returns the length of the quaternion.
-    real_t length() const;
+    float length() const;
 
     //! Returns the squared length of the quaternion.
-    real_t length2() const;
+    float length2() const;
 
     //! Dot product.
     //! @param other another quaternion
-    real_t dot(const Quaternion& other) const;
+    float dot(const Quaternion& other) const;
 
     //! Scalar multiplication.
     //! @param s the scalar
-    Quaternion operator*(real_t s) const;
+    Quaternion operator*(float s) const;
 
     //! Adds the other vector; returns a new quaternion.
     //! @param other another quaternion
@@ -89,7 +89,7 @@ public:
 
     //! Interpolates between this quaternion and another.
     //! @param other another quaternion
-    Quaternion slerp(const Quaternion& other, real_t alpha) const;
+    Quaternion slerp(const Quaternion& other, float alpha) const;
 
     //! Returns the inverse of this quaternion
     Quaternion inverse() const;
@@ -111,10 +111,10 @@ public:
 
     static Quaternion IDENTITY;
 
-    real_t w;
-    real_t x;
-    real_t y;
-    real_t z;
+    float w;
+    float x;
+    float y;
+    float z;
 };
 
 }

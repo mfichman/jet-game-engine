@@ -30,7 +30,8 @@
 #include <Jet/Color.hpp>
 #include <Jet/Plane.hpp>
 #include <Jet/Node.hpp>
-#include <Jet/BoundingBox.hpp>
+#include <Jet/Box.hpp>
+#include <Jet/Point.hpp>
 #include <Jet/MeshObject.hpp>
 #include <Jet/FractureObject.hpp>
 #include <Jet/ParticleSystem.hpp>
@@ -65,7 +66,7 @@ namespace luabind {
             switch (lua_type(env, index)) {
                 case LUA_TNIL: return boost::any();
                 case LUA_TSTRING: return boost::any(string(lua_tostring(env, index)));
-                case LUA_TNUMBER: return boost::any((real_t)lua_tonumber(env, index));
+                case LUA_TNUMBER: return boost::any((float)lua_tonumber(env, index));
 #ifdef WINDOWS
 #pragma warning(disable:4800)
 #endif
@@ -78,8 +79,8 @@ namespace luabind {
         }
         
         void to(lua_State* env, boost::any const& any) {
-            if (typeid(real_t) == any.type()) {
-                lua_pushnumber(env, boost::any_cast<real_t>(any));
+            if (typeid(float) == any.type()) {
+                lua_pushnumber(env, boost::any_cast<float>(any));
             } else if (typeid(string) == any.type()) {
                 lua_pushstring(env, boost::any_cast<string>(any).c_str());
             } else if (typeid(bool) == any.type()) {
@@ -214,7 +215,7 @@ void Core::ScriptSystem::init_value_type_bindings() {
         
         luabind::class_<Vector>("Vector")
             .def(luabind::constructor<>())
-            .def(luabind::constructor<real_t, real_t, real_t>())
+            .def(luabind::constructor<float, float, float>())
             .property("length", &Vector::length)
             .property("length2", &Vector::length2)
             .def_readwrite("x", &Vector::x)
@@ -239,7 +240,7 @@ void Core::ScriptSystem::init_value_type_bindings() {
             .def_readwrite("tangent", &Vertex::tangent),
             
         luabind::class_<Texcoord>("Texcoord")
-            .def(luabind::constructor<real_t, real_t>())
+            .def(luabind::constructor<float, float>())
             .def(luabind::constructor<>())
             .def_readwrite("u", &Texcoord::u)
             .def_readwrite("v", &Texcoord::v)
@@ -247,8 +248,8 @@ void Core::ScriptSystem::init_value_type_bindings() {
             
         luabind::class_<Quaternion>("Quaternion")
             .def(luabind::constructor<>())
-            .def(luabind::constructor<real_t, real_t, real_t, real_t>())
-            .def(luabind::constructor<const Vector&, real_t>())
+            .def(luabind::constructor<float, float, float, float>())
+            .def(luabind::constructor<const Vector&, float>())
             .def(luabind::constructor<const Vector&, const Vector&, const Vector&>())
             .property("length", &Quaternion::length)
             .property("length2", &Quaternion::length2)
@@ -261,7 +262,7 @@ void Core::ScriptSystem::init_value_type_bindings() {
             
         luabind::class_<Color>("Color")
             .def(luabind::constructor<>())
-            .def(luabind::constructor<real_t, real_t, real_t, real_t>())
+            .def(luabind::constructor<float, float, float, float>())
             .def_readwrite("red", &Color::red)
             .def_readwrite("green", &Color::green)
             .def_readwrite("blue", &Color::blue)
@@ -270,7 +271,7 @@ void Core::ScriptSystem::init_value_type_bindings() {
             
         luabind::class_<Range>("Range")
             .def(luabind::constructor<>())
-            .def(luabind::constructor<real_t, real_t>())
+            .def(luabind::constructor<float, float>())
             .def_readwrite("begin", &Range::begin)
             .def_readwrite("end", &Range::end)
             .def(luabind::tostring(luabind::const_self)),
@@ -279,27 +280,33 @@ void Core::ScriptSystem::init_value_type_bindings() {
             .def(luabind::constructor<>())
             .def(luabind::constructor<const Vector&, const Vector&>())
             .def(luabind::constructor<const Vector&, const Vector&, const Vector&>())
-            .def(luabind::constructor<real_t, real_t, real_t, real_t>())
+            .def(luabind::constructor<float, float, float, float>())
             .def_readwrite("a", &Plane::a)
             .def_readwrite("b", &Plane::b)
             .def_readwrite("c", &Plane::c)
             .def_readwrite("d", &Plane::d),
+            
+        luabind::class_<Point>("Point")
+            .def(luabind::constructor<>())
+            .def(luabind::constructor<float, float>())
+            .def_readwrite("x", &Point::x)
+            .def_readwrite("y", &Point::y),
 
-		luabind::class_<BoundingBox>("BoundingBox")
+		luabind::class_<Box>("Box")
 			.def(luabind::constructor<>())
-			.property("width", &BoundingBox::width)
-			.property("height", &BoundingBox::height)
-			.property("depth", &BoundingBox::depth)
-			.property("volume", &BoundingBox::volume)
-			.property("half_extents", &BoundingBox::half_extents)
-			.property("origin", &BoundingBox::origin)
-			.def("point", &BoundingBox::point)
-			.def_readwrite("min_x", &BoundingBox::min_x)
-			.def_readwrite("min_y", &BoundingBox::min_y)
-			.def_readwrite("min_z", &BoundingBox::min_x)
-			.def_readwrite("max_x", &BoundingBox::max_x)
-			.def_readwrite("max_y", &BoundingBox::max_y)
-			.def_readwrite("max_z", &BoundingBox::max_z)
+			.property("width", &Box::width)
+			.property("height", &Box::height)
+			.property("depth", &Box::depth)
+			.property("volume", &Box::volume)
+			.property("half_extents", &Box::half_extents)
+			.property("origin", &Box::origin)
+			.def("point", &Box::point)
+			.def_readwrite("min_x", &Box::min_x)
+			.def_readwrite("min_y", &Box::min_y)
+			.def_readwrite("min_z", &Box::min_x)
+			.def_readwrite("max_x", &Box::max_x)
+			.def_readwrite("max_y", &Box::max_y)
+			.def_readwrite("max_z", &Box::max_z)
     ];
 }
     
@@ -307,7 +314,7 @@ void Core::ScriptSystem::init_value_type_bindings() {
 void Core::ScriptSystem::init_entity_type_bindings() {
     using namespace luabind;
 
-    // Load value for entity types used by the engine
+    // Load script bindings for entity types used by the engine
     luabind::module(env_) [     
         luabind::class_<Jet::Light, Jet::LightPtr>("Light")
             .property("ambient_color", (const Color& (Jet::Light::*)() const)&Jet::Light::ambient_color, (void (Jet::Light::*)(const Color&))&Jet::Light::ambient_color)
@@ -323,32 +330,31 @@ void Core::ScriptSystem::init_entity_type_bindings() {
             .property("specular_map", (Jet::Texture* (Jet::Material::*)() const)&Jet::Material::specular_map, (void (Jet::Material::*)(const std::string&))&Jet::Material::specular_map)
             .property("normal_map", (Jet::Texture* (Jet::Material::*)() const)&Jet::Material::normal_map, (void (Jet::Material::*)(const std::string&))&Jet::Material::normal_map)
             .property("shader", (Jet::Shader* (Jet::Material::*)() const)&Jet::Material::shader, (void (Jet::Material::*)(const std::string&))&Jet::Material::shader)
-            .property("shininess", (real_t (Jet::Material::*)() const)&Jet::Material::shininess, (void (Jet::Material::*)(real_t))&Jet::Material::shininess)
+            .property("shininess", (float (Jet::Material::*)() const)&Jet::Material::shininess, (void (Jet::Material::*)(float))&Jet::Material::shininess)
             .property("receive_shadows", (bool (Jet::Material::*)() const)&Jet::Material::receive_shadows, (void (Jet::Material::*)(bool))&Jet::Material::receive_shadows)
             .property("name", (const std::string& (Jet::Material::*)() const)&Jet::Material::name),
         
         luabind::class_<Jet::Camera, Jet::CameraPtr>("Camera")
             .property("parent", &Jet::Camera::parent)
             .property("active", (bool (Jet::Camera::*)() const)&Jet::Camera::active, (void (Jet::Camera::*)(bool))&Jet::Camera::active)
-            .property("field_of_view", (real_t (Jet::Camera::*)() const)&Jet::Camera::field_of_view, (void (Jet::Camera::*)(real_t))&Jet::Camera::field_of_view)
-            .property("far_clipping_distance", (real_t (Jet::Camera::*)() const)&Jet::Camera::far_clipping_distance, (void (Jet::Camera::*)(real_t))&Jet::Camera::far_clipping_distance)
-            .property("near_clipping_distance", (real_t (Jet::Camera::*)() const)&Jet::Camera::near_clipping_distance, (void (Jet::Camera::*)(real_t))&Jet::Camera::near_clipping_distance),
+            .property("field_of_view", (float (Jet::Camera::*)() const)&Jet::Camera::field_of_view, (void (Jet::Camera::*)(float))&Jet::Camera::field_of_view)
+            .property("far_clipping_distance", (float (Jet::Camera::*)() const)&Jet::Camera::far_clipping_distance, (void (Jet::Camera::*)(float))&Jet::Camera::far_clipping_distance)
+            .property("near_clipping_distance", (float (Jet::Camera::*)() const)&Jet::Camera::near_clipping_distance, (void (Jet::Camera::*)(float))&Jet::Camera::near_clipping_distance),
             
         luabind::class_<Jet::Node, Jet::NodePtr>("Node")
             .property("parent", &Jet::Node::parent)
             .property("position", (const Vector& (Jet::Node::*)() const)&Jet::Node::position, (void (Jet::Node::*)(const Vector&))&Jet::Node::position)
             .property("rotation", (const Quaternion& (Jet::Node::*)() const)&Jet::Node::rotation, (void (Jet::Node::*)(const Quaternion&))&Jet::Node::rotation)
             .def("node", &Jet::Node::node)
-            .def("mesh_object", &Jet::Node::mesh_object)
-            .def("particle_system", &Jet::Node::particle_system)
-            .def("quad_set", &Jet::Node::quad_set)
-            .def("quad_chain", &Jet::Node::quad_chain)
-            .def("light", &Jet::Node::light)
+            .def("mesh_object", &Jet::Node::object<Jet::MeshObject>)
+            .def("particle_system", &Jet::Node::object<Jet::ParticleSystem>)
+            .def("quad_set", &Jet::Node::object<Jet::QuadSet>)
+            .def("quad_chain", &Jet::Node::object<Jet::QuadChain>)
+            .def("light", &Jet::Node::object<Jet::Light>)
             .def("rigid_body", &Jet::Node::rigid_body)
             .def("audio_source", &Jet::Node::audio_source)
-            .def("camera", &Jet::Node::camera)
-            .def("fracture_object", &Jet::Node::fracture_object)
-            .def("object", &Jet::Node::object)
+            .def("camera", &Jet::Node::object<Jet::Camera>)
+            .def("fracture_object", &Jet::Node::object<Jet::FractureObject>)
             .def("look", &Jet::Node::look)
 			.def("destroy", &Jet::Node::destroy),
             
@@ -371,7 +377,7 @@ void Core::ScriptSystem::init_entity_type_bindings() {
             
         luabind::class_<Jet::ParticleSystem, Jet::ParticleSystemPtr>("ParticleSystem")
             .property("parent", &Jet::ParticleSystem::parent)
-            .property("life", (real_t (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::life, (void (Jet::ParticleSystem::*)(real_t))&Jet::ParticleSystem::life)
+            .property("life", (float (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::life, (void (Jet::ParticleSystem::*)(float))&Jet::ParticleSystem::life)
             .property("quota", (size_t (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::quota, (void (Jet::ParticleSystem::*)(size_t))&Jet::ParticleSystem::quota)
 			.property("width", (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::width, (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::width)
             .property("height", (const Range& (Jet::ParticleSystem::*)() const)&Jet::ParticleSystem::height, (void (Jet::ParticleSystem::*)(const Range&))&Jet::ParticleSystem::height)
@@ -395,7 +401,7 @@ void Core::ScriptSystem::init_entity_type_bindings() {
             .def("apply_torque", &Jet::RigidBody::apply_torque)
             .def("apply_local_force", &Jet::RigidBody::apply_local_force)
             .def("apply_local_torque", &Jet::RigidBody::apply_local_torque)
-            .property("mass", (real_t (Jet::RigidBody::*)() const)&Jet::RigidBody::mass, (void (Jet::RigidBody::*)(real_t))&Jet::RigidBody::mass),
+            .property("mass", (float (Jet::RigidBody::*)() const)&Jet::RigidBody::mass, (void (Jet::RigidBody::*)(float))&Jet::RigidBody::mass),
             
         luabind::class_<Jet::Engine, Jet::EnginePtr>("Engine")
             .property("root", &Jet::Engine::root)
@@ -413,10 +419,10 @@ void Core::ScriptSystem::init_entity_type_bindings() {
             
         luabind::class_<Jet::Overlay, Jet::OverlayPtr>("Overlay")
             .def("overlay", &Jet::Overlay::overlay)
-            .property("x", (real_t (Jet::Overlay::*)() const)&Jet::Overlay::x, (void (Jet::Overlay::*)(real_t))&Jet::Overlay::x)
-            .property("y", (real_t (Jet::Overlay::*)() const)&Jet::Overlay::y, (void (Jet::Overlay::*)(real_t))&Jet::Overlay::y)
-            .property("width", (real_t (Jet::Overlay::*)() const)&Jet::Overlay::width, (void (Jet::Overlay::*)(real_t))&Jet::Overlay::width)
-            .property("height", (real_t (Jet::Overlay::*)() const)&Jet::Overlay::height, (void (Jet::Overlay::*)(real_t))&Jet::Overlay::height)
+            .property("x", (float (Jet::Overlay::*)() const)&Jet::Overlay::x, (void (Jet::Overlay::*)(float))&Jet::Overlay::x)
+            .property("y", (float (Jet::Overlay::*)() const)&Jet::Overlay::y, (void (Jet::Overlay::*)(float))&Jet::Overlay::y)
+            .property("width", (float (Jet::Overlay::*)() const)&Jet::Overlay::width, (void (Jet::Overlay::*)(float))&Jet::Overlay::width)
+            .property("height", (float (Jet::Overlay::*)() const)&Jet::Overlay::height, (void (Jet::Overlay::*)(float))&Jet::Overlay::height)
             .property("layout_mode", (LayoutMode (Jet::Overlay::*)() const)&Jet::Overlay::layout_mode, (void (Jet::Overlay::*)(LayoutMode))&Jet::Overlay::layout_mode)
             .property("vertical_alignment", (Alignment (Jet::Overlay::*)() const)&Jet::Overlay::vertical_alignment, (void (Jet::Overlay::*)(Alignment))&Jet::Overlay::vertical_alignment)
             .property("horizontal_alignment", (Alignment (Jet::Overlay::*)() const)&Jet::Overlay::horizontal_alignment, (void (Jet::Overlay::*)(Alignment))&Jet::Overlay::horizontal_alignment)

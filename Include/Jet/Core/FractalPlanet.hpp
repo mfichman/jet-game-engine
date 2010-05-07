@@ -59,7 +59,7 @@ public:
     
     //! Returns the roughness of the planet.  0 is the smoothest, and 1 is the
     //! roughest.
-    inline real_t roughness() const {
+    inline float roughness() const {
         return roughness_;
     }
     
@@ -98,7 +98,7 @@ public:
     //! Sets the roughness of the planet.  0 is the smoothest, and 1 is the
     //! roughest.
     //! @param roughness the roughness parameter
-    inline void roughness(real_t roughness) {
+    inline void roughness(float roughness) {
         roughness_ = roughness;
     }
     
@@ -141,7 +141,7 @@ private:
     Engine* engine_;
     Node* parent_;
     size_t seed_;
-    real_t roughness_;
+    float roughness_;
     MaterialPtr orbit_material_;
     MaterialPtr ground_material_;
     size_t ring_count_;

@@ -25,7 +25,7 @@
 using namespace Jet;
 using namespace std;
 
-Texcoord::Texcoord(real_t u, real_t v) : 
+Texcoord::Texcoord(float u, float v) : 
     u(u),
     v(v) {
 }

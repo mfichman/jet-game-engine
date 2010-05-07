@@ -48,7 +48,7 @@ Plane::Plane(const Vector& p1, const Vector& p2, const Vector& p3) {
     d = -normal.dot(p1);
 }
 
-Plane::Plane(real_t a, real_t b, real_t c, real_t d) :
+Plane::Plane(float a, float b, float c, float d) :
     a(a),
     b(b),
     c(c),
@@ -56,6 +56,6 @@ Plane::Plane(real_t a, real_t b, real_t c, real_t d) :
     
 }
 
-real_t Plane::distance(const Vector& vector) const {
+float Plane::distance(const Vector& vector) const {
     return (a*vector.x + b*vector.y + c*vector.z + d)/sqrtf(a*a + b*b + c*c);
 }

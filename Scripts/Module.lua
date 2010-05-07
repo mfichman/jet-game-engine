@@ -24,12 +24,12 @@ function Module:__init()
     __adopt_module(self)
 end
 
-function Module:on_key_pressed(key, x, y) end
-function Module:on_key_released(key, x, y) end
-function Module:on_button_pressed(button, x, y) end
-function Module:on_button_released(button, x, y) end
-function Module:on_mouse_motion(x, y) end
-function Module:on_joystick(button, x, y, z) end
+function Module:on_key_pressed(key, point) end
+function Module:on_key_released(key, point) end
+function Module:on_button_pressed(button, point) end
+function Module:on_button_released(button, point) end
+function Module:on_mouse_motion(point) end
+function Module:on_joystick(button, axes) end
 function Module:on_init() end
 function Module:on_update() end
 function Module:on_render() end

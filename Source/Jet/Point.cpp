@@ -20,29 +20,25 @@
  * IN THE SOFTWARE.
  */  
 
-#include <Jet/Color.hpp>
+#include <Jet/Point.hpp>
 
 using namespace Jet;
 using namespace std;
 
-Color::Color() :
-    red(0.0f),
-    blue(0.0f),
-    green(0.0f),
-    alpha(1.0f) {
+Point::Point(float x, float y) : 
+    x(x),
+    y(y) {
 }
 
-Color::Color(float red, float blue, float green, float alpha) :
-    red(red),
-    blue(blue),
-    green(green),
-    alpha(alpha) {
+Point::Point() :
+    x(0.0f),
+    y(0.0f) {
+    }
+
+ostream& operator<<(ostream& out, const Point& vector) {
+    return out << vector.x << " " << vector.y;
 }
 
-ostream& operator<<(ostream& out, const Color& color) {
-    return out << color.red << " " << color.blue << " " << color.green << " " << color.alpha;
-}
-
-istream& operator>>(istream& in, Color& color) {
-    return in >> color.red >> color.blue >> color.green >> color.alpha;
+istream& operator>>(istream& in, Point& vector) {
+    return in >> vector.x >> vector.y;
 }

@@ -28,14 +28,14 @@
 
 using namespace Jet;
 
-Matrix::Matrix(const real_t data[16]) {
+Matrix::Matrix(const float data[16]) {
     std::copy(data, data+16, this->data);
 }
 
-Matrix::Matrix(real_t m00, real_t m01, real_t m02, real_t m03,
-    real_t m10, real_t m11, real_t m12, real_t m13,
-    real_t m20, real_t m21, real_t m22, real_t m23,
-    real_t m30, real_t m31, real_t m32, real_t m33) {
+Matrix::Matrix(float m00, float m01, float m02, float m03,
+    float m10, float m11, float m12, float m13,
+    float m20, float m21, float m22, float m23,
+    float m30, float m31, float m32, float m33) {
     
     data[0] = m00; data[4] = m01; data[8] = m02; data[12] = m03;
     data[1] = m10; data[5] = m11; data[9] = m12; data[13] = m13;
@@ -72,18 +72,18 @@ Matrix::Matrix(const Vector& x, const Vector& y, const Vector& z) {
 
 Matrix::Matrix(const Quaternion& rotation, const Vector& trans) {
     // This routine is borrowed from Ogre 3D
-    real_t fTx  = 2.0f*rotation.x;
-    real_t fTy  = 2.0f*rotation.y;
-    real_t fTz  = 2.0f*rotation.z;
-    real_t fTwx = fTx*rotation.w;
-    real_t fTwy = fTy*rotation.w;
-    real_t fTwz = fTz*rotation.w;
-    real_t fTxx = fTx*rotation.x;
-    real_t fTxy = fTy*rotation.x;
-    real_t fTxz = fTz*rotation.x;
-    real_t fTyy = fTy*rotation.y;
-    real_t fTyz = fTz*rotation.y;
-    real_t fTzz = fTz*rotation.z;
+    float fTx  = 2.0f*rotation.x;
+    float fTy  = 2.0f*rotation.y;
+    float fTz  = 2.0f*rotation.z;
+    float fTwx = fTx*rotation.w;
+    float fTwy = fTy*rotation.w;
+    float fTwz = fTz*rotation.w;
+    float fTxx = fTx*rotation.x;
+    float fTxy = fTy*rotation.x;
+    float fTxz = fTz*rotation.x;
+    float fTyy = fTy*rotation.y;
+    float fTyz = fTz*rotation.y;
+    float fTzz = fTz*rotation.z;
 
     data[0] = 1.0f-(fTyy+fTzz);
     data[4] = fTxy-fTwz;
@@ -108,18 +108,18 @@ Matrix::Matrix(const Quaternion& rotation, const Vector& trans) {
 
 Matrix::Matrix(const Quaternion& rotation) {
     // This routine is borrowed from Ogre 3D
-    real_t fTx  = 2.0f*rotation.x;
-    real_t fTy  = 2.0f*rotation.y;
-    real_t fTz  = 2.0f*rotation.z;
-    real_t fTwx = fTx*rotation.w;
-    real_t fTwy = fTy*rotation.w;
-    real_t fTwz = fTz*rotation.w;
-    real_t fTxx = fTx*rotation.x;
-    real_t fTxy = fTy*rotation.x;
-    real_t fTxz = fTz*rotation.x;
-    real_t fTyy = fTy*rotation.y;
-    real_t fTyz = fTz*rotation.y;
-    real_t fTzz = fTz*rotation.z;
+    float fTx  = 2.0f*rotation.x;
+    float fTy  = 2.0f*rotation.y;
+    float fTz  = 2.0f*rotation.z;
+    float fTwx = fTx*rotation.w;
+    float fTwy = fTy*rotation.w;
+    float fTwz = fTz*rotation.w;
+    float fTxx = fTx*rotation.x;
+    float fTxy = fTy*rotation.x;
+    float fTxz = fTz*rotation.x;
+    float fTyy = fTy*rotation.y;
+    float fTyz = fTz*rotation.y;
+    float fTzz = fTz*rotation.z;
 
     data[0] = 1.0f-(fTyy+fTzz);
     data[4] = fTxy-fTwz;
@@ -198,7 +198,7 @@ Matrix Matrix::operator*(const Matrix& other) const {
 Vector Matrix::operator*(const Vector& v) const {
     Vector out;
     
-    real_t invw = 1.0f / (data[3]*v.x + data[7]*v.y + data[11]*v.z + data[15]);
+    float invw = 1.0f / (data[3]*v.x + data[7]*v.y + data[11]*v.z + data[15]);
     
     out.x = (data[0]*v.x + data[4]*v.y + data[8]*v.z + data[12])*invw;
     out.y = (data[1]*v.x + data[5]*v.y + data[9]*v.z + data[13])*invw;
@@ -210,7 +210,7 @@ Vector Matrix::operator*(const Vector& v) const {
 Vector Matrix::rotate(const Vector& v) const {
     Vector out;
     
-    //real_t invw = 1.0f / (data[3]*v.x + data[7]*v.y + data[11]*v.z + data[15]);
+    //float invw = 1.0f / (data[3]*v.x + data[7]*v.y + data[11]*v.z + data[15]);
     
     out.x = (data[0]*v.x + data[4]*v.y + data[8]*v.z);// + data[12])*invw;
     out.y = (data[1]*v.x + data[5]*v.y + data[9]*v.z);// + data[13])*invw;
@@ -239,34 +239,34 @@ Matrix Matrix::inverse() const {
     // This inversion routine is taken from Ogre3D, version 1.7.
     Matrix out;
     
-    real_t m00 = data[0], m01 = data[1], m02 = data[2], m03 = data[3];
-    real_t m10 = data[4], m11 = data[5], m12 = data[6], m13 = data[7];
-    real_t m20 = data[8], m21 = data[9], m22 = data[10], m23 = data[11];
-    real_t m30 = data[12], m31 = data[13], m32 = data[14], m33 = data[15];
+    float m00 = data[0], m01 = data[1], m02 = data[2], m03 = data[3];
+    float m10 = data[4], m11 = data[5], m12 = data[6], m13 = data[7];
+    float m20 = data[8], m21 = data[9], m22 = data[10], m23 = data[11];
+    float m30 = data[12], m31 = data[13], m32 = data[14], m33 = data[15];
     
-    real_t v0 = m20 * m31 - m21 * m30;
-    real_t v1 = m20 * m32 - m22 * m30;
-    real_t v2 = m20 * m33 - m23 * m30;
-    real_t v3 = m21 * m32 - m22 * m31;
-    real_t v4 = m21 * m33 - m23 * m31;
-    real_t v5 = m22 * m33 - m23 * m32;
+    float v0 = m20 * m31 - m21 * m30;
+    float v1 = m20 * m32 - m22 * m30;
+    float v2 = m20 * m33 - m23 * m30;
+    float v3 = m21 * m32 - m22 * m31;
+    float v4 = m21 * m33 - m23 * m31;
+    float v5 = m22 * m33 - m23 * m32;
            
-    real_t t00 = + (v5 * m11 - v4 * m12 + v3 * m13);
-    real_t t10 = - (v5 * m10 - v2 * m12 + v1 * m13);
-    real_t t20 = + (v4 * m10 - v2 * m11 + v0 * m13);
-    real_t t30 = - (v3 * m10 - v1 * m11 + v0 * m12);
+    float t00 = + (v5 * m11 - v4 * m12 + v3 * m13);
+    float t10 = - (v5 * m10 - v2 * m12 + v1 * m13);
+    float t20 = + (v4 * m10 - v2 * m11 + v0 * m13);
+    float t30 = - (v3 * m10 - v1 * m11 + v0 * m12);
     
-    real_t invDet = 1 / (t00 * m00 + t10 * m01 + t20 * m02 + t30 * m03);
+    float invDet = 1 / (t00 * m00 + t10 * m01 + t20 * m02 + t30 * m03);
 
-    real_t d00 = t00 * invDet;
-    real_t d10 = t10 * invDet;
-    real_t d20 = t20 * invDet;
-    real_t d30 = t30 * invDet;
+    float d00 = t00 * invDet;
+    float d10 = t10 * invDet;
+    float d20 = t20 * invDet;
+    float d30 = t30 * invDet;
 
-    real_t d01 = - (v5 * m01 - v4 * m02 + v3 * m03) * invDet;
-    real_t d11 = + (v5 * m00 - v2 * m02 + v1 * m03) * invDet;
-    real_t d21 = - (v4 * m00 - v2 * m01 + v0 * m03) * invDet;
-    real_t d31 = + (v3 * m00 - v1 * m01 + v0 * m02) * invDet;
+    float d01 = - (v5 * m01 - v4 * m02 + v3 * m03) * invDet;
+    float d11 = + (v5 * m00 - v2 * m02 + v1 * m03) * invDet;
+    float d21 = - (v4 * m00 - v2 * m01 + v0 * m03) * invDet;
+    float d31 = + (v3 * m00 - v1 * m01 + v0 * m02) * invDet;
 
     v0 = m10 * m31 - m11 * m30;
     v1 = m10 * m32 - m12 * m30;
@@ -275,10 +275,10 @@ Matrix Matrix::inverse() const {
     v4 = m11 * m33 - m13 * m31;
     v5 = m12 * m33 - m13 * m32;
 
-    real_t d02 = + (v5 * m01 - v4 * m02 + v3 * m03) * invDet;
-    real_t d12 = - (v5 * m00 - v2 * m02 + v1 * m03) * invDet;
-    real_t d22 = + (v4 * m00 - v2 * m01 + v0 * m03) * invDet;
-    real_t d32 = - (v3 * m00 - v1 * m01 + v0 * m02) * invDet;
+    float d02 = + (v5 * m01 - v4 * m02 + v3 * m03) * invDet;
+    float d12 = - (v5 * m00 - v2 * m02 + v1 * m03) * invDet;
+    float d22 = + (v4 * m00 - v2 * m01 + v0 * m03) * invDet;
+    float d32 = - (v3 * m00 - v1 * m01 + v0 * m02) * invDet;
 
     v0 = m21 * m10 - m20 * m11;
     v1 = m22 * m10 - m20 * m12;
@@ -287,10 +287,10 @@ Matrix Matrix::inverse() const {
     v4 = m23 * m11 - m21 * m13;
     v5 = m23 * m12 - m22 * m13;
 
-    real_t d03 = - (v5 * m01 - v4 * m02 + v3 * m03) * invDet;
-    real_t d13 = + (v5 * m00 - v2 * m02 + v1 * m03) * invDet;
-    real_t d23 = - (v4 * m00 - v2 * m01 + v0 * m03) * invDet;
-    real_t d33 = + (v3 * m00 - v1 * m01 + v0 * m02) * invDet;
+    float d03 = - (v5 * m01 - v4 * m02 + v3 * m03) * invDet;
+    float d13 = + (v5 * m00 - v2 * m02 + v1 * m03) * invDet;
+    float d23 = - (v4 * m00 - v2 * m01 + v0 * m03) * invDet;
+    float d33 = + (v3 * m00 - v1 * m01 + v0 * m02) * invDet;
     
     out.data[0] = d00;
     out.data[4] = d01;

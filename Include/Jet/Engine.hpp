@@ -78,10 +78,6 @@ public:
     //! load the underlying resource if load is set to true.
     //! @param name the name of the texture
     virtual Shader* shader(const std::string& name)=0;
-	
-	//! Returns the constructor function for the given type.
-	//! @param type the type
-	virtual constructor_t constructor(const std::string& type)=0;
     
     //! Returns the full path to the file using the given resource name.
     //! @param name the name of the resource
@@ -111,11 +107,6 @@ public:
     //! @param name the name of the option
     //! @param value the value of the option
     virtual void option(const std::string& name, const boost::any& value)=0;
-	
-	//! Sets a new object creator function
-	//! @param type the name of the object type.
-	//! @param funct a pointer to the constructor function
-	virtual void constructor(const std::string& type, constructor_t funct)=0;
     
     //! Runs the engine through one complete loop.  Note that the engine may
     //! or may not actually do anything on a given loop, depending on the

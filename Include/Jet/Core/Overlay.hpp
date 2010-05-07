@@ -81,22 +81,22 @@ public:
     Overlay* overlay(const std::string& name);
     
     //! Returns the x-coordinate of the top-left corner of the overlay.
-    inline real_t x() const {
+    inline float x() const {
         return x_;
     }
     
     //! Returns the y-coordinate of the top-left corner of the overlay.
-    inline real_t y() const {
+    inline float y() const {
         return y_;
     }
     
     //! Returns the width of the overlay.
-    inline real_t width() const {
+    inline float width() const {
         return width_;
     }
     
     //! Returns the height of the overlay.
-    inline real_t height() const {
+    inline float height() const {
         return height_;
     }
     
@@ -134,22 +134,22 @@ public:
     }
     
     //! Sets the x-coordinate of the top-left corner of the overlay.
-    inline void x(real_t x) {
+    inline void x(float x) {
         x_ = x;
     }
     
     //! Sets the y-coordinate of the top-left corner of the overlay.
-    inline void y(real_t y) {
+    inline void y(float y) {
         y_ = y;
     }
     
     //! Sets the width of the overlay.
-    inline void width(real_t width) {
+    inline void width(float width) {
         width_ = width;
     }
     
     //! Sets the height of the overlay.
-    inline void height(real_t height) {
+    inline void height(float height) {
         height_ = height;
     }
     
@@ -222,10 +222,10 @@ private:
     Overlay* parent_;
     bool destroyed_;
     std::tr1::unordered_map<std::string, OverlayPtr> overlay_;
-    real_t x_;
-    real_t y_;
-    real_t width_;
-    real_t height_;
+    float x_;
+    float y_;
+    float width_;
+    float height_;
     LayoutMode layout_mode_;
     Alignment vertical_alignment_;
     Alignment horizontal_alignment_;

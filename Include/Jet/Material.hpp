@@ -57,7 +57,7 @@ public:
     virtual Shader* shader() const=0;
 	
 	//! REturns the specular shininess
-	virtual real_t shininess() const=0;
+	virtual float shininess() const=0;
 	
 	//! True if the material receives shadows.
 	virtual bool receive_shadows() const=0;
@@ -102,7 +102,7 @@ public:
     virtual void shader(Shader* shader)=0;
 	
 	//! Sets the specular shininess.
-	virtual void shininess(real_t shininess)=0;
+	virtual void shininess(float shininess)=0;
 	
 	//! True if the material receives shadows.
 	virtual void receive_shadows(bool receive)=0;

@@ -39,28 +39,28 @@ public:
     //! @param x x component
     //! @param y y component
     //! @param z z component
-    Vector(real_t x, real_t y, real_t z);
+    Vector(float x, float y, float z);
 
     //! Creates a new vector.
     Vector();
 
     //! Returns the length of the vector.
-    real_t length() const;
+    float length() const;
 
     //! Returns the squared length of the vector.
-    real_t length2() const;
+    float length2() const;
 
     //! Distance; distance to another vector
     //! @param other another vector
-    real_t distance(const Vector& other) const;
+    float distance(const Vector& other) const;
 
     //! Distance squared; distance to another vector
     //! @param other another vector
-    real_t distance2(const Vector& other) const;
+    float distance2(const Vector& other) const;
 
     //! Dot product; returns a new vector.
     //! @param other another vector
-    real_t dot(const Vector& other) const;
+    float dot(const Vector& other) const;
 
     //! Cross product; returns a new vector.
     //! @param other another vector
@@ -87,7 +87,7 @@ public:
 
     //! Scales the vector.
     //! @param s the scaling factor
-    Vector operator*(real_t s) const;
+    Vector operator*(float s) const;
     
     //! Adds to this vector.
     Vector& operator+=(const Vector& other);
@@ -105,12 +105,12 @@ public:
     Vector orthogonal() const;
     
     //! Returns a pointer to the vector data.
-    operator const real_t*() const {
+    operator const float*() const {
         return &x;
     }
     
     //! Returns a pointer to the vector data.
-    operator real_t*() {
+    operator float*() {
         return &x;
     }
 
@@ -122,7 +122,7 @@ public:
 
     //! Comparison operator.
     bool operator<(const Vector& other) const {
-        static real_t epsilon = 0.0000001f;
+        static float epsilon = 0.0000001f;
         if (abs(x - other.x) > epsilon) return x < other.x;
         if (abs(y - other.y) > epsilon) return y < other.y;
         if (abs(z - other.z) > epsilon) return z < other.z;
@@ -130,7 +130,7 @@ public:
     }
     
     bool operator==(const Vector& other) const {
-        static real_t epsilon = 0.0000001f;
+        static float epsilon = 0.0000001f;
         if (abs(x - other.x) > epsilon) return false;
         if (abs(y - other.y) > epsilon) return false;
         if (abs(z - other.z) > epsilon) return false;
@@ -146,9 +146,9 @@ public:
     static Vector UNIT_Y;
     static Vector UNIT_Z;
 
-    real_t x;
-    real_t y;
-    real_t z;
+    float x;
+    float y;
+    float z;
 };
 
 }

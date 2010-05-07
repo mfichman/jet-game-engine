@@ -34,18 +34,18 @@ public:
     Rectangle();
     
     //! Creates a rectangle from a position and a width
-    Rectangle(real_t x, real_t y, real_t width, real_t height);
+    Rectangle(float x, float y, float width, float height);
 
     //! Returns the width of the box
-    real_t width() const;
+    float width() const;
     
     //! Returns the height of the box
-    real_t height() const;
+    float height() const;
 
-    real_t min_x;
-    real_t max_x;
-    real_t min_y;
-    real_t max_y;
+    float min_x;
+    float max_x;
+    float min_y;
+    float max_y;
 };
 
 }

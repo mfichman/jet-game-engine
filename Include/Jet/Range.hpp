@@ -41,7 +41,7 @@ public:
     //! Creates a new range from the given components.
     //! @param begin the start of the range
     //! @param end the end of the range
-    Range(real_t begin, real_t end);
+    Range(float begin, float end);
 
     //! Stream operator.
     friend std::ostream& ::operator<<(std::ostream& out, const Range& range);
@@ -49,8 +49,8 @@ public:
     //! Stream operator.
     friend std::istream& ::operator>>(std::istream& in, Range& range);
     
-    real_t begin;
-    real_t end;
+    float begin;
+    float end;
 };
 
 }

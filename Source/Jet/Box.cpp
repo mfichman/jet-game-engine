@@ -20,13 +20,13 @@
  * IN THE SOFTWARE.
  */  
     
-#include <Jet/BoundingBox.hpp>
+#include <Jet/Box.hpp>
 #include <Jet/Frustum.hpp>
 #include <cfloat>
     
 using namespace Jet;
     
-BoundingBox::BoundingBox() :
+Box::Box() :
     min_x(FLT_MAX),
     max_x(-FLT_MAX),
     min_y(FLT_MAX),
@@ -36,7 +36,7 @@ BoundingBox::BoundingBox() :
         
 }
 
-BoundingBox::BoundingBox(const Frustum& frustum) :
+Box::Box(const Frustum& frustum) :
     min_x(FLT_MAX),
     max_x(-FLT_MAX),
     min_y(FLT_MAX),
@@ -56,31 +56,31 @@ BoundingBox::BoundingBox(const Frustum& frustum) :
     
 }
 
-real_t BoundingBox::volume() const {
+float Box::volume() const {
     return width() * height() * depth();
 }
 
-real_t BoundingBox::width() const {
+float Box::width() const {
     return max_x - min_x;
 }
 
-real_t BoundingBox::height() const {
+float Box::height() const {
     return max_y - min_y;
 }
 
-real_t BoundingBox::depth() const {
+float Box::depth() const {
     return max_z - min_z;
 }
 
-Vector BoundingBox::half_extents() const {
+Vector Box::half_extents() const {
     return Vector(width()/2.0f, height()/2.0f, depth()/2.0f);
 }
 
-Vector BoundingBox::origin() const {
+Vector Box::origin() const {
     return Vector((max_x + min_x)/2.0f, (max_y + min_y)/2.0f, (max_z + min_z)/2.0f);
 }
 
-void BoundingBox::point(const Vector& point) {
+void Box::point(const Vector& point) {
     // Check to see if the added point expands the bounding box.
     if (point.x < min_x) {
         min_x = point.x;

@@ -28,13 +28,13 @@ using namespace Jet;
 
 #define PI 3.14159f
 
-static inline real_t rand_range(const Range& range) {
-    real_t r = (float)rand()/(float)RAND_MAX;
+static inline float rand_range(const Range& range) {
+    float r = (float)rand()/(float)RAND_MAX;
     return (range.end - range.begin) * r + range.begin;
 }
 
-static inline real_t rand_range2(const Range& range) {
-    real_t r = (float)rand()/(float)RAND_MAX;
+static inline float rand_range2(const Range& range) {
+    float r = (float)rand()/(float)RAND_MAX;
     if (r < 0.5) {
         return rand_range(Range(range.begin, range.end));
     } else {
@@ -100,28 +100,28 @@ void Core::ParticleSystem::render(Core::ParticleBuffer* buffer) {
 }
     
 void Core::ParticleSystem::init_particle_box(Particle& p) {
-    real_t w = rand_range2(Range(0, 1));
-    real_t h = rand_range2(Range(0, 1));
-    real_t d = rand_range2(Range(0, 1));
+    float w = rand_range2(Range(0, 1));
+    float h = rand_range2(Range(0, 1));
+    float d = rand_range2(Range(0, 1));
     p.init_position.x = w * (width_.end - width_.begin);
     p.init_position.y = h * (height_.end - height_.begin);
     p.init_position.z = d * (depth_.end - depth_.begin);
     
-    real_t speed = rand_range(emission_speed_);
+    float speed = rand_range(emission_speed_);
     p.init_velocity = Vector(w, h, d).unit() * speed;
 }
 
 void Core::ParticleSystem::init_particle_ellipsoid(Particle& p) {
-    real_t phi = rand_range(Range(0.0f, PI));
-    real_t theta = rand_range(Range(0.0f, 2.0f*PI));
-    real_t a = rand_range(width_);
-    real_t b = rand_range(height_);
-    real_t c = rand_range(depth_);
+    float phi = rand_range(Range(0.0f, PI));
+    float theta = rand_range(Range(0.0f, 2.0f*PI));
+    float a = rand_range(width_);
+    float b = rand_range(height_);
+    float c = rand_range(depth_);
     p.init_position.x = a * sinf(phi) * cosf(theta);
     p.init_position.y = b * sinf(phi) * sinf(theta);
     p.init_position.z = c * cosf(phi);
     
-    real_t speed = rand_range(emission_speed_);
+    float speed = rand_range(emission_speed_);
     p.init_velocity.x = speed * sinf(phi) * cosf(theta);
     p.init_velocity.y = speed * sinf(phi) * sinf(theta);
     p.init_velocity.z = speed * cosf(phi);
@@ -134,9 +134,9 @@ void Core::ParticleSystem::init_particle_point(Particle& p) {
     Vector up = forward.orthogonal();
     Vector right = forward.cross(up);
     
-    real_t speed = rand_range(emission_speed_);
-    real_t beta = PI / 180 * rand_range(emission_angle_);
-    real_t theta = PI / 180 * rand_range(emission_angle_);
+    float speed = rand_range(emission_speed_);
+    float beta = PI / 180 * rand_range(emission_angle_);
+    float theta = PI / 180 * rand_range(emission_angle_);
     Vector side = up * sinf(theta) + right * sinf(beta);
     Vector direction = side * cosf(theta) + forward;
     p.init_velocity = direction.unit() * speed;

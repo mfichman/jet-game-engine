@@ -92,22 +92,18 @@ public:
     //! Creates a light.
 	//! @param name the name of the new object
     virtual Light* light(const std::string& name="")=0;
+	
+	//! Returns the camera attached to this node.
+	virtual Camera* camera(const std::string& name="")=0;
     
     //! Returns the rigid body attached to this node.
     virtual RigidBody* rigid_body()=0;
     
     //! Returns the audio source attached to this node.
     virtual AudioSource* audio_source()=0;
-	
-	//! Returns the camera attached to this node.
-	virtual Camera* camera()=0;
-	
-	//! Creates and returns an extension object, if it doesn't already exist.
-	//! @param name the name of the extension object
-	//! @param type the type of the object
-	virtual Object* extension(const std::string& type, const std::string& name="")=0;
-    
-    //! Returns a component that is attached to this node.
+
+    //! Returns a component that is attached to this node.  If the object
+	//! does not exist, this function returns null.
     //! @param name the name of the component
     virtual Object* object(const std::string& name)=0;
 
@@ -132,6 +128,11 @@ public:
 	//! graph immediately, but won't be garbage collected until all references
 	//! to the node are destroyed.
 	virtual void destroy()=0;
+	
+	//! Returns the object with the given name.  If the typeid does not match,
+	//! the method throws an exception.  If the object does not exist, the
+	//! object will be created using the given typeid.
+	virtual Object* object(const std::type_info& type, const std::string& name)=0;
 };
 
 

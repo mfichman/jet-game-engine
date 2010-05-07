@@ -37,7 +37,7 @@ public:
     virtual Node* parent() const=0;
     
     //! Returns the life of this particle system.
-    virtual real_t life() const=0;
+    virtual float life() const=0;
     
     //! Returns the width this particle system.  This describes the range of
     //! x-values that particles will be created at.
@@ -88,7 +88,7 @@ public:
     
     //! Sets the life of this particle system.
     //! @param life the min and max life of the particle system.
-    virtual void life(real_t life)=0;
+    virtual void life(float life)=0;
     
     //! Sets the range of x-values that particles will be created at.
     //! @param width the range of x-values
