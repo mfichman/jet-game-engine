@@ -25,26 +25,78 @@
 using namespace Jet;
 using namespace std;
 
+#define PI 3.14159f
+
 
 void Core::FractalPlanet::generate_mesh() {
     mesh_->vertex_count(0);
+	mesh_->index_count(0);
     mesh_->state(LOADED);
     
+    float radius = 10.0f;
+    float dphi = PI/ring_count_;
+    float dtheta = 2.0f*PI/division_count_;
+    
+    for (float phi = 0.0f; phi < PI; phi += dphi) {
+        for (float theta = 0.0f; theta < 2*PI; theta += dtheta) {
+            Vertex quad[4];
+            Vector p0, p1, p2, p3;
+            p0.x = radius * sinf(phi) * cosf(theta);
+            p0.y = radius * sinf(phi) * sinf(theta);
+            p0.z = radius * cosf(phi);
+            
+            p1.x = radius * sinf(phi + dphi) * cosf(theta);
+            p1.y = radius * sinf(phi + dphi) * sinf(theta);
+            p1.z = radius * cosf(phi + dphi);
+            
+            p2.x = radius * sinf(phi + dphi) * cosf(theta + dtheta);
+            p2.y = radius * sinf(phi + dphi) * sinf(theta + dtheta);
+            p2.z = radius * cosf(phi + dphi);
+            
+            p3.x = radius * sinf(phi) * cosf(theta + dtheta);
+            p3.y = radius * sinf(phi) * sinf(theta + dtheta);
+            p3.z = radius * cosf(phi);
+            
+
+	/*for (float x = 1.0f; x < 5.0f; x++) {
+		for (float y = 1.0f; y < 5.0f; y++) {
+			Vector p0(x, y, 0);
+			Vector p1(x+1, y, 0);
+			Vector p2(x+1, y+1, 0);
+			Vector p3(x, y+1, 0);
+			Vertex quad[4];*/
+
+            quad[0].position = p0;
+            quad[1].position = p1;
+            quad[2].position = p2;
+            quad[3].position = p3;
+            quad[0].texcoord = Texcoord(0.0f, 4.0f);
+            quad[1].texcoord = Texcoord(4.0f, 4.0f);
+            quad[2].texcoord = Texcoord(4.0f, 0.0f);
+            quad[3].texcoord = Texcoord(0.0f, 0.0f);
+            quad[0].normal = p0.unit();
+            quad[1].normal = p1.unit();
+            quad[2].normal = p2.unit();
+            quad[3].normal = p3.unit();
+            generate_quad(quad, 0);
+        }
+    }
+    
+    /*    float phi = rand_range(Range(0.0f, PI));
+    float theta = rand_range(Range(0.0f, 2.0f*PI));
+    float a = rand_range(width_);
+    float b = rand_range(height_);
+    float c = rand_range(depth_);
+    p.init_position.x = a * sinf(phi) * cosf(theta);
+    p.init_position.y = b * sinf(phi) * sinf(theta);
+    p.init_position.z = c * cosf(phi);
+    
+    float speed = rand_range(emission_speed_);
+    p.init_velocity.x = speed * sinf(phi) * cosf(theta);
+    p.init_velocity.y = speed * sinf(phi) * sinf(theta);
+    p.init_velocity.z = speed * cosf(phi);*/
+    
     // TODO: Generate quads dynamically in a mesh shape
-    Vertex quad[4];
-    quad[0].position = Vector(-200.0f, 200.0f, -3.0f);
-    quad[1].position = Vector(200.0f, 200.0f, -3.0f);
-    quad[2].position = Vector(200.0f, -200.0f, -3.0f);
-    quad[3].position = Vector(-200.0f, -200.0f, -3.0f);
-	quad[0].texcoord = Texcoord(0.0f, 10.0f);
-	quad[1].texcoord = Texcoord(10.0f, 10.0f);
-	quad[2].texcoord = Texcoord(10.0f, 0.0f);
-	quad[3].texcoord = Texcoord(0.0f, 0.0f);
-	quad[0].normal = Vector(0.0f, 0.0f, 1.0f);
-	quad[1].normal = Vector(0.0f, 0.0f, 1.0f);
-	quad[2].normal = Vector(0.0f, 0.0f, 1.0f);
-	quad[3].normal = Vector(0.0f, 0.0f, 1.0f);
-    generate_quad(quad, 5);
 	recalculate_normals();
 
     mesh_->state(SYNCED);
@@ -73,7 +125,7 @@ void Core::FractalPlanet::generate_quad(Vertex quad[4], size_t level) {
             // Vertical interpolation (line 2).  TODO: Normals (autogen?)
             Vertex v = vh1*(1.0f-fv) + vh2*fv;
 
-            mesh_->vertex(row*size + col, v);
+            mesh_->vertex(vertex_offset + row*size + col, v);
         }
     }
 
@@ -85,13 +137,13 @@ void Core::FractalPlanet::generate_quad(Vertex quad[4], size_t level) {
     // Iterate through the grid to build the index array.
     for (size_t row = 0; row < (size-1); row++) {
         for (size_t col = 0; col < (size-1); col++) {
-            mesh_->index(mesh_->index_count(), row*size + col);
-			mesh_->index(mesh_->index_count(), row*size + (col+1));
-			mesh_->index(mesh_->index_count(), (row+1)*size + (col+1));
+            mesh_->index(mesh_->index_count(), vertex_offset + row*size + col);
+			mesh_->index(mesh_->index_count(), vertex_offset + row*size + (col+1));
+			mesh_->index(mesh_->index_count(), vertex_offset + (row+1)*size + (col+1));
 
-			mesh_->index(mesh_->index_count(), row*size + col);
-			mesh_->index(mesh_->index_count(), (row+1)*size + (col+1));
-			mesh_->index(mesh_->index_count(), (row+1)*size + col);
+			mesh_->index(mesh_->index_count(), vertex_offset + row*size + col);
+			mesh_->index(mesh_->index_count(), vertex_offset + (row+1)*size + (col+1));
+			mesh_->index(mesh_->index_count(), vertex_offset + (row+1)*size + col);
 		}
     }
 
@@ -101,7 +153,7 @@ void Core::FractalPlanet::generate_fractal(size_t vertex_offset, size_t level) {
 	const int size = (1 << level)+1; // # vertices along one edge of quad
 	const int vertex_count = (size)*(size);  // (2^level + 1)^2
 	int stride = (1 << (level-1));
-	float range = 100.0f;
+	float range = 1.0f;
 
 	vector<float> noise(vertex_count);
 
@@ -129,7 +181,7 @@ void Core::FractalPlanet::generate_fractal(size_t vertex_offset, size_t level) {
 				value += range * ((float)rand()/(float)RAND_MAX*2.0f - 1.0f); 
 				
 				// Now distort the vertex
-				Vertex& vertex = mesh_->vertex(row*size + col);
+				Vertex& vertex = mesh_->vertex(vertex_offset + row*size + col);
 				vertex.position += vertex.normal * value;
 			}
 		}
@@ -174,7 +226,7 @@ void Core::FractalPlanet::generate_fractal(size_t vertex_offset, size_t level) {
 				value += range * ((float)rand()/(float)RAND_MAX*2.0f - 1.0f); 
 
 				// Now distort the vertex
-				Vertex& vertex = mesh_->vertex(row*size + col);
+				Vertex& vertex = mesh_->vertex(vertex_offset + row*size + col);
 				vertex.position += vertex.normal * value;
 			}
 		}
@@ -204,6 +256,6 @@ void Core::FractalPlanet::recalculate_normals() {
 	}
 
 	for (size_t i = 0; i < mesh_->vertex_count(); i++) {
-		//mesh_->vertex(i).normal = mesh_->vertex(i).normal.unit();
+		mesh_->vertex(i).normal = mesh_->vertex(i).normal.unit();
 	}
 }

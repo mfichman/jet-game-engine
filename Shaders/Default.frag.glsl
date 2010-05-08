@@ -101,4 +101,5 @@ void main() {
 #endif
     
     gl_FragColor = vec4(ambient + diffuse + specular);
+    //gl_FragColor = gl_FrontMaterial.diffuse;
 }

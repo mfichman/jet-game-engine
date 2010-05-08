@@ -40,13 +40,13 @@ function Test:__init()
         ambient_color = Color(.3, .3, .3, 1),
         diffuse_color = Color(1, 1, 1, 1),
         specular_color = Color(1, 1, 1, 1),
-        direction = Vector(-1, 0, -1)
+        direction = Vector(0, 0, -1)
     }
     
     -- Set up the camera
     print("Creating camera")
     self.camera_node = engine.root:node("camera")
-    self.camera_node.position = Vector(20, 0, 20)
+    self.camera_node.position = Vector(0, 0, 50)
     self.camera_node:look(Vector(0, 0, 0), Vector(0, 1, 0))
     self.camera = self.camera_node:camera("camera") {
         active = true,
@@ -57,18 +57,18 @@ function Test:__init()
     
     
     -- Set up the plane
-    print("Creating plane")
+    --[[print("Creating plane")
     self.plane_node = engine.root:node("plane")
     self.plane = self.plane_node:mesh_object("plane") {
         mesh = "Plane.obj",
         material = "Metal.mtl"
     }
-    self.plane_node:rigid_body()
-    --[[
+    self.plane_node:rigid_body()]]
+    
     self.planet_node = engine.root:node("planet")
     self.planet = self.planet_node:fractal_planet("planet")
-    self.planet_node:rigid_body()]]
-    
+    --self.planet_node:rigid_body()
+    --[[
     -- Set up scene objects and apply some forces
     print("Creating objects")
     --self.s0 = Shark(engine.root, "s0")
@@ -83,7 +83,7 @@ function Test:__init()
     self.s1.node.position = Vector(0, 0, 0)
     --self.s0.node.position = Vector(0, -10, 0)
     --self.s0.body:apply_force(Vector(-15000, 30000, 0))
-    math.randomseed(os.time())
+    math.randomseed(os.time())]]
     
     self.camera_velocity = Vector()
 end
