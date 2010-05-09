@@ -20,6 +20,8 @@
  * IN THE SOFTWARE.
  */
 
+#include <Jet/Types.hpp>
+#include <Jet/Core/Types.hpp>
 #include <Jet/Core/ScriptSystem.hpp>
 #include <Jet/Core/ScriptController.hpp>
 #include <Jet/Core/ScriptModule.hpp>
@@ -434,7 +436,7 @@ void Core::ScriptSystem::init_entity_type_bindings() {
             //.property("font", (Jet::Font* (Jet::Overlay::*)() const)&Jet::Overlay::font, (void (Jet::Overlay::*)(const std::string&))&Jet::Overlay::font)
             .property("background", (Jet::Texture* (Jet::Overlay::*)() const)&Jet::Overlay::background, (void (Jet::Overlay::*)(const std::string&))&Jet::Overlay::background)
             .enum_("Alignment") [ value("LEFT", LEFT), value("RIGHT", RIGHT), value("CENTER", CENTER), value("TOP", TOP), value("BOTTOM", BOTTOM) ]
-            .enum_("LayoutMode") [ value("RELATIVE", RELATIVE), value("ABSOLUTE", ABSOLUTE) ]
+            .enum_("LayoutMode") [ value("RELATIVE_LAYOUT", RELATIVE_LAYOUT), value("ABSOLUTE_LAYOUT", ABSOLUTE_LAYOUT) ]
             
     ];
 }

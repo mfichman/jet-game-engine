@@ -109,7 +109,6 @@ void Core::FractalPlanet::generate_quad(Vertex quad[4], size_t level) {
     const size_t size = (1 << level)+1; // # # vertices along one edge of quad
     const size_t vertex_offset = mesh_->vertex_count();
     const size_t vertex_count = (size)*(size);  // (2^level + 1)^2
-    const size_t triangle_count = 2*(size-1)*(size-1);
     mesh_->vertex_count(mesh_->vertex_count() + vertex_count);
     
     // Generate the grid by interpolating between the corners of the quad.

@@ -26,8 +26,8 @@ using namespace Jet;
 
 Rectangle::Rectangle() :
     min_x(0.0f),
-    min_y(0.0f),
     max_x(0.0f),
+    min_y(0.0f),
     max_y(0.0f) {
     
 }
@@ -35,8 +35,8 @@ Rectangle::Rectangle() :
 //! Creates a rectangle from a position and a width
 Rectangle::Rectangle(float x, float y, float width, float height) :
     min_x(x),
-    min_y(y),
     max_x(x + width),
+    min_y(y),
     max_y(y + height) {
     
 }

@@ -69,10 +69,10 @@ Engine* Engine::create() {
 Core::Engine::Engine() :
     running_(true),
 	initialized_(false),
-	fps_frame_count_(0),
-	fps_elapsed_time_(0.0f),
 	frame_delta_(0.0f),
 	frame_time_(0.0f),
+	fps_frame_count_(0),
+	fps_elapsed_time_(0.0f),
 	auto_name_counter_(0) {
 		
 	cout << "Starting kernel..." << endl;

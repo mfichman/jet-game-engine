@@ -128,6 +128,7 @@ void Core::RenderSystem::init_extensions() {
 			glGenBuffers = glGenBuffersARB;
 			glBindBuffer = glBindBufferARB;
 			glBufferData = glBufferDataARB;
+			glBufferSubData = glBufferSubDataARB;
 			glDeleteBuffers = glDeleteBuffersARB;
 		}
 
@@ -175,6 +176,7 @@ void Core::RenderSystem::init_extensions() {
 			glDeleteShader = glDeleteObjectARB;
 			glUseProgram = glUseProgramObjectARB;
 			glUniform1i = glUniform1iARB;
+			glUniform1f = glUniform1fARB;
 			glGetUniformLocation = glGetUniformLocationARB;
 		}
     }	

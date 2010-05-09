@@ -40,10 +40,10 @@ public:
         engine_(engine),
         parent_(parent),
 		life_(0.0f),
-        accumulator_(0.0f),
 		type_(POINT_EMITTER),
+        accumulator_(0.0f), 
 		next_emission_(0.0f) {
-            
+
         shader("Particle");
         particle_.resize(0);
     }

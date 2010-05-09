@@ -20,7 +20,6 @@
  * IN THE SOFTWARE.
  */  
 
-#include <crtdbg.h>
 #include <Jet/Core/Mesh.hpp>
 #include <Jet/Core/Engine.hpp>
 #include <Jet/Core/Shader.hpp>
