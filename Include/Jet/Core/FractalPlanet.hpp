@@ -39,14 +39,14 @@ public:
         parent_(parent),
         seed_(0),
         roughness_(1.0f),
-        ring_count_(32),
-        division_count_(32),
+        ring_count_(12),
+        division_count_(12),
         detail_level_count_(5) {
             
         mesh_object_ = static_cast<MeshObject*>(parent_->mesh_object());
         mesh_ = static_cast<Mesh*>(engine_->mesh());
         mesh_object_->mesh(mesh_.get());
-        mesh_object_->material("Rock.mtl");
+        mesh_object_->material("Terrain.mtl");
         
         generate_mesh();
     }

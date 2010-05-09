@@ -77,7 +77,7 @@ function Test:__init()
     
     self.s1.node.position = Vector(0, 0, 0)
     math.randomseed(os.time())
-    
+
     self.camera_velocity = Vector()
 end
 
