@@ -42,20 +42,20 @@ void Core::FractalPlanet::generate_mesh() {
             Vertex quad[4];
             Vector p0, p1, p2, p3;
             p0.x = radius * sinf(phi) * cosf(theta);
-            p0.y = radius * sinf(phi) * sinf(theta);
-            p0.z = radius * cosf(phi);
+            p0.z = radius * sinf(phi) * sinf(theta);
+            p0.y = radius * cosf(phi);
             
             p1.x = radius * sinf(phi + dphi) * cosf(theta);
-            p1.y = radius * sinf(phi + dphi) * sinf(theta);
-            p1.z = radius * cosf(phi + dphi);
+            p1.z = radius * sinf(phi + dphi) * sinf(theta);
+            p1.y = radius * cosf(phi + dphi);
             
             p2.x = radius * sinf(phi + dphi) * cosf(theta + dtheta);
-            p2.y = radius * sinf(phi + dphi) * sinf(theta + dtheta);
-            p2.z = radius * cosf(phi + dphi);
+            p2.z = radius * sinf(phi + dphi) * sinf(theta + dtheta);
+            p2.y = radius * cosf(phi + dphi);
             
             p3.x = radius * sinf(phi) * cosf(theta + dtheta);
-            p3.y = radius * sinf(phi) * sinf(theta + dtheta);
-            p3.z = radius * cosf(phi);
+            p3.z = radius * sinf(phi) * sinf(theta + dtheta);
+            p3.y = radius * cosf(phi);
             
 
 	/*for (float x = 1.0f; x < 5.0f; x++) {
@@ -70,15 +70,15 @@ void Core::FractalPlanet::generate_mesh() {
             quad[1].position = p1;
             quad[2].position = p2;
             quad[3].position = p3;
-            quad[0].texcoord = Texcoord(0.0f, 4.0f);
-            quad[1].texcoord = Texcoord(4.0f, 4.0f);
-            quad[2].texcoord = Texcoord(4.0f, 0.0f);
-            quad[3].texcoord = Texcoord(0.0f, 0.0f);
+            quad[0].texcoord = Texcoord(theta/(2*PI), phi/PI);
+            quad[1].texcoord = Texcoord(theta/(2*PI), (phi+dphi)/PI);
+            quad[2].texcoord = Texcoord((theta+dtheta)/(2*PI), (phi+dphi)/PI);
+            quad[3].texcoord = Texcoord((theta+dtheta)/(2*PI), phi/PI);
             quad[0].normal = p0.unit();
             quad[1].normal = p1.unit();
             quad[2].normal = p2.unit();
             quad[3].normal = p3.unit();
-            generate_quad(quad, 0);
+            generate_quad(quad, 3);
         }
     }
     
@@ -153,7 +153,7 @@ void Core::FractalPlanet::generate_fractal(size_t vertex_offset, size_t level) {
 	const int size = (1 << level)+1; // # vertices along one edge of quad
 	const int vertex_count = (size)*(size);  // (2^level + 1)^2
 	int stride = (1 << (level-1));
-	float range = 1.0f;
+	float range = 0.1f;
 
 	vector<float> noise(vertex_count);
 
@@ -168,6 +168,10 @@ void Core::FractalPlanet::generate_fractal(size_t vertex_offset, size_t level) {
 		// in the center.
 		for (int row = stride; row < size-1; row += stride*2) {
 			for (int col = stride; col < size-1; col += stride*2) {
+                if (col <= 0 || col >= size-2 || row <= 0 || row >= size-2) {
+                    continue;
+                }
+                
 				// Average the four corners surrounding the current diamond corner.
 				float& value = noise[row*size + col];
 				assert(value == 0.0f);
@@ -192,6 +196,10 @@ void Core::FractalPlanet::generate_fractal(size_t vertex_offset, size_t level) {
 			// traversal at the stride.  Otherwise, start at 0
 			size_t offset = (row % (stride*2)) ? 0 : stride;
 			for	(int col = offset; col < size; col += stride*2) {
+                if (col <= 0 || col >= size-2 || row <= 0 || row >= size-2) {
+                    continue;
+                }
+                
 				int bottom = row+stride;
 				int top = row-stride;
 

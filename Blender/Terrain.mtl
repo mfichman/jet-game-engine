@@ -3,11 +3,10 @@
 newmtl Material_RockDiffuse.png
 Ns 3.078431
 Ka 0.000000 0.000000 0.000000
-Kd 1.000000 0.700000 0.500000
-Ks 0.200000 0.200000 0.200000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 2
-#map_Kd Rock2Diffuse.png
-map_bump TerrainNormal.png
-map_Ks Rock2Specular.png
+map_Kd MarsDiffuse.png
+map_bump MarsNormal.png

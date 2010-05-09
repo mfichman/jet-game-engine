@@ -39,8 +39,8 @@ public:
         parent_(parent),
         seed_(0),
         roughness_(1.0f),
-        ring_count_(8),
-        division_count_(8),
+        ring_count_(12),
+        division_count_(12),
         detail_level_count_(5) {
             
         mesh_object_ = static_cast<MeshObject*>(parent_->mesh_object());
