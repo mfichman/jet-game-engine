@@ -183,5 +183,4 @@ function Test:on_key_released(key, x, y)
         self.camera_velocity = self.camera_velocity + Vector(0, 0, -1)
     end
     
-    print(key)
 end
