@@ -80,7 +80,7 @@ void Core::FractureObject::fracture_indices(const Plane& plane) {
             b1.point(v0);
             b1.point(v1);
             b1.point(v2);
-        } else  {//if (d0 >= 0 && d1 >= 0 && d2 >= 0) {
+        } else {
             // If all the vertices are on the upper half-space created by the
             // plane, then push the indices to the second buffer
             mesh2->index(mesh2->index_count(), i0);

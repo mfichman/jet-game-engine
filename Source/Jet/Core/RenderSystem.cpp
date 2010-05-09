@@ -286,7 +286,7 @@ void Core::RenderSystem::on_render() {
     }
 
 	// Render overlays on top of the screen (may need to clear z-buffer...)
-	render_overlays();
+	//render_overlays();
 	
 	// Swap back buffer to front
 	SDL_GL_SwapBuffers();
@@ -301,10 +301,14 @@ void Core::RenderSystem::generate_shadow_map(Light* light) {
 	Vector up = forward.orthogonal();
 	Vector right = forward.cross(up);
 	Matrix matrix(right, -up, forward);
-	
+
 	// Transform the view frustum into light space and calculate
 	// the bounding box 
 	Box bounds(matrix * camera->shadow_frustum());
+
+	// We need to add a bias to the max z value.  This prevents artifacts
+	// that can occur when the camera is very close to a flat surface.
+	bounds.max_z += 3.0f;
 	
 	// Set up the projection matrix for the directional light
 	glMatrixMode(GL_PROJECTION);
@@ -314,7 +318,13 @@ void Core::RenderSystem::generate_shadow_map(Light* light) {
 	// Set up the view matrix for the directional light
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	glLoadMatrixf(matrix);
+	glLoadMatrixf(matrix);	
+	
+	// Material 
+	glMaterialfv(GL_FRONT, GL_AMBIENT, Color(1.0f, 1.0f, 1.0f, 1.0f));
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, Color(1.0f, 1.0f, 1.0f, 1.0f));
+	glMaterialfv(GL_FRONT, GL_SPECULAR, Color(0.0f, 0.0f, 0.0f, 0.0f));
+	glMaterialf(GL_FRONT, GL_SHININESS, 0.0f);
     
     // Render to the front buffer
     shadow_target_->enabled(true);

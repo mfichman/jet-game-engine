@@ -33,6 +33,7 @@ Core::MaterialLoader::MaterialLoader(Material* material, const std::string& file
     
     while (in.good()) {
         in >> command;
+        cout << command << endl;
 
 		if (!in.good()) break;
         
@@ -68,6 +69,8 @@ Core::MaterialLoader::MaterialLoader(Material* material, const std::string& file
 			float value;
 			in >> value;
 			material->shininess(value);
-		}
+		} else if (command == "double_sided") {
+            material->double_sided(true);
+        }
     }
 }

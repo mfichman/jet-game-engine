@@ -41,7 +41,7 @@ public:
 		shininess_(40.0f),
 		enabled_(false),
 		receive_shadows_(true),
-		double_sided_(true),
+		double_sided_(false),
 		diffuse_map_loc_(-1),
 		specular_map_loc_(-1),
 		normal_map_loc_(-1),
