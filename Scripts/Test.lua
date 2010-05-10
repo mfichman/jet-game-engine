@@ -40,7 +40,7 @@ function Test:__init()
         ambient_color = Color(.3, .3, .3, 1),
         diffuse_color = Color(1, 1, 1, 1),
         specular_color = Color(1, 1, 1, 1),
-        direction = Vector(0, 0, -1)
+        direction = Vector(0, 0, 1)
     }
     
     -- Set up the camera
@@ -85,8 +85,8 @@ function Test:on_destroy()
     print("Goodbye")
 end
 
-function Test:on_update()
-    self.camera_node.position = self.camera_velocity + self.camera_node.position
+function Test:on_tick(delta)
+    self.camera_node.position = self.camera_velocity*60*delta + self.camera_node.position
     self.camera_node:look(Vector(0, 0, 0), Vector(0, 1, 0))
 end
 
@@ -183,5 +183,4 @@ function Test:on_key_released(key, x, y)
         self.camera_velocity = self.camera_velocity + Vector(0, 0, -1)
     end
     
-    print(key)
 end

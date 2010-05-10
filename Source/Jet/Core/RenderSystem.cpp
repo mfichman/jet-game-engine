@@ -299,7 +299,7 @@ void Core::RenderSystem::generate_shadow_map(Light* light) {
 	
 	// Generate an orthogonal basis (rotation matrix) for the
 	// directional light
-	Vector forward = -light->direction().unit();
+	Vector forward = light->direction().unit();
 	Vector up = forward.orthogonal();
 	Vector right = forward.cross(up);
 	Matrix matrix(right, -up, forward);

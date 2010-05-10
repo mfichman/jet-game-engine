@@ -58,7 +58,6 @@ void Core::ParticleSystem::render(Core::ParticleBuffer* buffer) {
         if ((engine_->frame_time() - p.init_time) > p.life || p.life <= 0.0f) {
             dead_particle_.push_back(&p);
         } else {
-			cout << (engine_->frame_time() - p.init_time)/p.life << endl;
             buffer->particle(p);
         }
     }

@@ -61,8 +61,8 @@ void main() {
         vec3 r = reflect(v, n);
     
         // Calculate diffuse and specular coefficients
-        float kd = max(0.0, dot(-l, n));
-        float ks = pow(max(0.0, dot(-l, r)), gl_FrontMaterial.shininess);
+        float kd = max(0.0, dot(l, n));
+        float ks = pow(max(0.0, dot(l, r)), gl_FrontMaterial.shininess);
             
         // Calculate ambient, diffuse, and specular light
         diffuse += kd * gl_LightSource[i].diffuse;
