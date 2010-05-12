@@ -452,6 +452,7 @@ void Core::RenderSystem::render_shadow_casters() {
 
 void Core::RenderSystem::render_visible_mesh_objects() {
 	Core::Material* material = 0;
+	size_t cascades = (size_t)engine_->option<float>("shadow_cascades");
 	
 	// Render all MeshObjects
 	for (vector<Core::MeshObjectPtr>::iterator i = mesh_objects_.begin(); i != mesh_objects_.end(); i++) {
@@ -473,21 +474,24 @@ void Core::RenderSystem::render_visible_mesh_objects() {
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
 		glMultMatrixf(matrix);
-		glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_SAMPLER);
-		glMatrixMode(GL_TEXTURE);
-		glPushMatrix();
-		glMultMatrixf(matrix);
+		for (size_t i = 0; i < cascades; i++) {
+			glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_SAMPLER + i);
+			glMatrixMode(GL_TEXTURE);
+			glPushMatrix();
+			glMultMatrixf(matrix);
+		}
 		
 		// Enable the material and render the mesh
 		mesh->render(material->shader());
-		
 		    
 		// Pop the modelview and texture matrices off the stack
 		glMatrixMode(GL_MODELVIEW);
 		glPopMatrix();
-		glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_SAMPLER);
-		glMatrixMode(GL_TEXTURE);
-		glPopMatrix();
+		for (size_t i = 0; i < cascades; i++) {
+			glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_SAMPLER + i);
+			glMatrixMode(GL_TEXTURE);
+			glPopMatrix();
+		}
 	}
 	
 	// Disable the last material
