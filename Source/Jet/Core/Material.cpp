@@ -159,8 +159,8 @@ void Core::Material::begin_shader() {
 	if (engine_->option<bool>("shadows_enabled")) {
 		// Enable the shadow map sampler only if this object should receive
 		// shadows
-		glUniform1i(shadow_map_loc_, SHADOW_MAP_SAMPLER);
-		glUniform1i(shadow_map_enabled_, (bool)receive_shadows_);
+		glUniform1i(shadow_map_enabled_, (bool)receive_shadows_);		
+		glUniform1i(shadow_map_loc_, SHADOW_MAP_SAMPLER+0);//, SHADOW_MAP_SAMPLER+1, SHADOW_MAP_SAMPLER+2, SHADOW_MAP_SAMPLER+3);
 		glUniform1f(shadow_distance_loc_, engine_->option<float>("shadow_distance"));
 	} else {
 		glUniform1i(shadow_map_enabled_, false);

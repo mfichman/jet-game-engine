@@ -20,12 +20,6 @@
  * IN THE SOFTWARE.
  */
 
-//varying vec3 normal;
-//varying vec3 tangent;
-//varying vec3 view;
-
-uniform bool shadow_map_enabled;
-
 varying vec3 eye_dir;
 varying vec3 light_dir;
 
@@ -55,8 +49,6 @@ void main() {
     eye_dir = v;
     
 #ifdef SHADOW_MAP
-    if (shadow_map_enabled) {
-        gl_TexCoord[1] = gl_TextureMatrix[3] * gl_Vertex;
-    }
+    gl_TexCoord[1] = gl_TextureMatrix[3] * gl_Vertex;
 #endif
 }

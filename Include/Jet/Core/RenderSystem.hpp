@@ -71,7 +71,7 @@ private:
     Engine* engine_;
     
     // Shadow-mapping variables
-    RenderTargetPtr shadow_target_;
+    std::vector<RenderTargetPtr> shadow_target_;
     RenderTargetPtr color_target_;
     RenderTargetPtr highpass_target_;
     RenderTargetPtr bloom_target1_;

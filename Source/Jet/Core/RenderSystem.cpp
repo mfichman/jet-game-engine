@@ -232,30 +232,32 @@ void Core::RenderSystem::check_video_mode() {
 		for (Iterator<pair<const string, Jet::ShaderPtr> > i = engine_->shaders(); i; i++) {
 			i->second->state(LOADED);
 		}
-		shadow_target_.reset();
+		shadow_target_.clear();
 		particle_buffer_.reset();
 		on_init();
 	}
 	
 	// If shadows are enabled, make sure a render target is ready for
 	// receiving them.  Otherwise, clear the render target.
-	bool shaders_enabled = engine_->option<bool>("shaders_enabled");
-	bool shadows_enabled = engine_->option<bool>("shadows_enabled");
-	if (shaders_enabled && shadows_enabled) {
-		if (!shadow_target_) {
+	if (engine_->option<bool>("shaders_enabled") && engine_->option<bool>("shadows_enabled")) {
+		if (shadow_target_.empty()) {
+			size_t cascades = (size_t)engine_->option<float>("shadow_cascades");
 			GLuint size = (GLuint)engine_->option<float>("shadow_texture_size");
-			shadow_target_.reset(new RenderTarget(size, size, true, 1));
 
-			// These states are used to enable percentage closer filtering for the 
-			// shadow map sampler
-			glBindTexture(GL_TEXTURE_2D, shadow_target_->texture(0));
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-			glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
-			glBindTexture(GL_TEXTURE_2D, 0);
+			for (size_t i = 0; i < cascades; i++) {
+				shadow_target_.push_back(new RenderTarget(size, size, true, 1));
+
+				// These states are used to enable percentage closer filtering for the 
+				// shadow map sampler
+				glBindTexture(GL_TEXTURE_2D, shadow_target_.back()->texture(0));
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+				glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
+				glBindTexture(GL_TEXTURE_2D, 0);
+			}
 		}
 	} else {
-		shadow_target_.reset();
+		shadow_target_.clear();
 	}
 }
 
@@ -309,56 +311,68 @@ void Core::RenderSystem::generate_shadow_map(Light* light) {
 	Vector right = forward.cross(up);
 	Matrix matrix(right, -up, forward);
 
-	// Transform the view frustum into light space and calculate
-	// the bounding box 
-	Box bounds(matrix * camera->shadow_frustum());
+	size_t cascades = (size_t)engine_->option<float>("shadow_cascades");
+	float alpha = engine_->option<float>("shadow_correction"); 
+	float n = camera->near_clipping_distance();
+	float f = min(camera->far_clipping_distance(), engine_->option<float>("shadow_distance"));
+	for (size_t i = 0; i < cascades; i++) {
+		// Get the near and far clipping planes
+		float r0 = (float)i/(float)cascades;
+		float r1 = (float)(i+1)/(float)cascades;
+		float near_dist = alpha*n*pow(f/n, r0) + (1-alpha)*(n+r0*(f-n));
+		float far_dist = alpha*n*pow(f/n, r1) + (1-alpha)*(n+r1*(f-n));
 
-	// We need to add a bias to the max z value.  This prevents artifacts
-	// that can occur when the camera is very close to a flat surface.
-	bounds.max_z += 3.0f;
-	
-	// Set up the projection matrix for the directional light
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(bounds.min_x, bounds.max_x, bounds.min_y, bounds.max_y, bounds.min_z, bounds.max_z);
-    
-	// Set up the view matrix for the directional light
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glLoadMatrixf(matrix);	
-	
-	// Material 
-	glMaterialfv(GL_FRONT, GL_AMBIENT, Color(1.0f, 1.0f, 1.0f, 1.0f));
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, Color(1.0f, 1.0f, 1.0f, 1.0f));
-	glMaterialfv(GL_FRONT, GL_SPECULAR, Color(0.0f, 0.0f, 0.0f, 0.0f));
-	glMaterialf(GL_FRONT, GL_SHININESS, 0.0f);
-    
-    // Render to the front buffer
-    shadow_target_->enabled(true);
-    glDisable(GL_LIGHTING);
-	glCullFace(GL_FRONT);
-    render_shadow_casters();
-    shadow_target_->enabled(false);
-    glEnable(GL_LIGHTING);
-    glCullFace(GL_BACK);
+		// Transform the view frustum into light space and calculate
+		// the bounding box 
+		Box bounds(matrix * camera->frustum(near_dist, far_dist));
+
+		// We need to add a bias to the max z value.  This prevents artifacts
+		// that can occur when the camera is very close to a flat surface.
+		bounds.max_z += 3.0f;
 		
-    // Initialize the texture matrix for transforming the shadow map
-    // coordinates
-    Matrix light_bias(
-        0.5f, 0.0f, 0.0f, 0.5f,
-        0.0f, 0.5f, 0.0f, 0.5f,
-        0.0f, 0.0f, 0.5f, 0.5f,
-        0.0f, 0.0f, 0.0f, 1.0f
-    );
-    Matrix light_projection;
-    Matrix light_modelview;
-    glGetFloatv(GL_PROJECTION_MATRIX, light_projection);
-    glGetFloatv(GL_MODELVIEW_MATRIX, light_modelview);
-    glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_SAMPLER);
-    glMatrixMode(GL_TEXTURE);
-    glLoadMatrixf(light_bias);
-    glMultMatrixf(light_projection);
-    glMultMatrixf(light_modelview);
+		// Set up the projection matrix for the directional light
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glOrtho(bounds.min_x, bounds.max_x, bounds.min_y, bounds.max_y, bounds.min_z, bounds.max_z);
+	    
+		// Set up the view matrix for the directional light
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		glLoadMatrixf(matrix);	
+		
+		// Material 
+		glMaterialfv(GL_FRONT, GL_AMBIENT, Color(1.0f, 1.0f, 1.0f, 1.0f));
+		glMaterialfv(GL_FRONT, GL_DIFFUSE, Color(1.0f, 1.0f, 1.0f, 1.0f));
+		glMaterialfv(GL_FRONT, GL_SPECULAR, Color(0.0f, 0.0f, 0.0f, 0.0f));
+		glMaterialf(GL_FRONT, GL_SHININESS, 0.0f);
+	    
+		// Render to the front buffer
+		shadow_target_[i]->enabled(true);
+		glDisable(GL_LIGHTING);
+		glCullFace(GL_FRONT);
+		render_shadow_casters();
+		shadow_target_[i]->enabled(false);
+		glEnable(GL_LIGHTING);
+		glCullFace(GL_BACK);
+			
+		// Initialize the texture matrix for transforming the shadow map
+		// coordinates
+		Matrix light_bias(
+			0.5f, 0.0f, 0.0f, 0.5f,
+			0.0f, 0.5f, 0.0f, 0.5f,
+			0.0f, 0.0f, 0.5f, 0.5f,
+			0.0f, 0.0f, 0.0f, 1.0f
+		);
+		Matrix light_projection;
+		Matrix light_modelview;
+		glGetFloatv(GL_PROJECTION_MATRIX, light_projection);
+		glGetFloatv(GL_MODELVIEW_MATRIX, light_modelview);
+		glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_SAMPLER + i);
+		glMatrixMode(GL_TEXTURE);
+		glLoadMatrixf(light_bias);
+		glMultMatrixf(light_projection);
+		glMultMatrixf(light_modelview);
+	}
 	
 	
 }
@@ -402,8 +416,8 @@ void Core::RenderSystem::render_final(Light* light) {
 	glEnable(GL_LIGHT0);
 		
 	// Bind the shadow sampler to the shadow texture
-	if (shadow_target_) {
-		shadow_target_->sampler(SHADOW_MAP_SAMPLER);
+	for (size_t i = 0; i < shadow_target_.size(); i++) {
+		shadow_target_[i]->sampler(SHADOW_MAP_SAMPLER + i);
 	}
     
     // Render to the back buffer.

@@ -70,19 +70,11 @@ public:
     
     //! Returns the viewing frustum
     inline Frustum view_frustum() const {
-        return compute_frustum(far_clipping_distance());
+        return frustum(near_clipping_distance(), far_clipping_distance());
     }
     
     //! Returns the shadow frustum
-    inline Frustum shadow_frustum() const {
-        float shadow_distance = engine_->option<float>("shadow_distance");
-#ifdef WINDOWS
-        float far_distance = min(shadow_distance, far_clipping_distance());
-#else
-        float far_distance = std::min(shadow_distance, far_clipping_distance());
-#endif
-        return compute_frustum(far_distance);
-    }
+    Frustum frustum(float near, float far) const;
     
     //! Sets the field of view
     inline void field_of_view(float fov) {
@@ -105,7 +97,6 @@ public:
     }
 
 private:    
-    Frustum compute_frustum(float far_distance) const;
     
     Engine* engine_;
     Node* parent_;

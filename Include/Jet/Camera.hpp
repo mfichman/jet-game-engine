@@ -55,7 +55,7 @@ public:
     //! Returns the shadow frustum for this camera.  This is the same as
     //! the view frustum except for the far clipping plane, which is set to
     //! the minimum of the shadow distance and the far clipping distance.
-    virtual Frustum shadow_frustum() const=0;
+    virtual Frustum frustum(float near, float far) const=0;
     
     //! Sets the field of view
     virtual void field_of_view(float fov)=0;
