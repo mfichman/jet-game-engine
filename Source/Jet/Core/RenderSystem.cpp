@@ -187,7 +187,7 @@ void Core::RenderSystem::init_extensions() {
 
 void Core::RenderSystem::init_default_states() {
     // Initialize some common s
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClearColor(0.15f, 0.15f, 0.15f, 0.0f);
     glClearDepth(1.0f);
     
     glEnable(GL_LIGHTING);
@@ -325,10 +325,9 @@ void Core::RenderSystem::generate_shadow_map(Light* light) {
 		// Transform the view frustum into light space and calculate
 		// the bounding box 
 		Box bounds(matrix * camera->frustum(near_dist, far_dist));
-
-		// We need to add a bias to the max z value.  This prevents artifacts
-		// that can occur when the camera is very close to a flat surface.
-		bounds.max_z += 3.0f;
+		
+		// Causes the shadow map cascades to overlap
+		bounds.max_z += 0.8f;
 		
 		// Set up the projection matrix for the directional light
 		glMatrixMode(GL_PROJECTION);
@@ -453,6 +452,7 @@ void Core::RenderSystem::render_shadow_casters() {
 void Core::RenderSystem::render_visible_mesh_objects() {
 	Core::Material* material = 0;
 	size_t cascades = (size_t)engine_->option<float>("shadow_cascades");
+	bool shaders_enabled = engine_->option<bool>("shaders_enabled");
 	
 	// Render all MeshObjects
 	for (vector<Core::MeshObjectPtr>::iterator i = mesh_objects_.begin(); i != mesh_objects_.end(); i++) {
@@ -474,11 +474,11 @@ void Core::RenderSystem::render_visible_mesh_objects() {
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
 		glMultMatrixf(matrix);
-		for (size_t i = 0; i < cascades; i++) {
-			glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_SAMPLER + i);
+
+		if (shaders_enabled) {
+			glActiveTexture(GL_TEXTURE0);
 			glMatrixMode(GL_TEXTURE);
-			glPushMatrix();
-			glMultMatrixf(matrix);
+			glLoadMatrixf(matrix);
 		}
 		
 		// Enable the material and render the mesh
@@ -487,17 +487,16 @@ void Core::RenderSystem::render_visible_mesh_objects() {
 		// Pop the modelview and texture matrices off the stack
 		glMatrixMode(GL_MODELVIEW);
 		glPopMatrix();
-		for (size_t i = 0; i < cascades; i++) {
-			glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_SAMPLER + i);
-			glMatrixMode(GL_TEXTURE);
-			glPopMatrix();
-		}
 	}
 	
 	// Disable the last material
 	if (material) {
 		material->enabled(false);
 	}
+
+	glActiveTexture(GL_TEXTURE0);
+	glMatrixMode(GL_TEXTURE);
+	glLoadIdentity();
 }
 
 void Core::RenderSystem::render_visible_particle_systems() {

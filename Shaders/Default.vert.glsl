@@ -20,12 +20,17 @@
  * IN THE SOFTWARE.
  */
 
+#define SHADOW_MAP
+
 varying vec3 eye_dir;
 varying vec3 light_dir;
 
-attribute vec3 tangent;
+varying vec4 shadow_coord0;
+varying vec4 shadow_coord1;
+varying vec4 shadow_coord2;
+varying vec4 shadow_coord3;
 
-#define SHADOW_MAP
+attribute vec3 tangent;
 
 void main() {
     
@@ -49,6 +54,9 @@ void main() {
     eye_dir = v;
     
 #ifdef SHADOW_MAP
-    gl_TexCoord[1] = gl_TextureMatrix[3] * gl_Vertex;
+    shadow_coord0 = gl_TextureMatrix[3] * gl_TextureMatrix[0] * gl_Vertex;
+    shadow_coord1 = gl_TextureMatrix[4] * gl_TextureMatrix[0] * gl_Vertex;
+    shadow_coord2 = gl_TextureMatrix[5] * gl_TextureMatrix[0] * gl_Vertex;
+    shadow_coord3 = gl_TextureMatrix[6] * gl_TextureMatrix[0] * gl_Vertex;
 #endif
 }

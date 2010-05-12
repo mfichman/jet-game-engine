@@ -40,13 +40,13 @@ function Test:__init()
         ambient_color = Color(.3, .3, .3, 1),
         diffuse_color = Color(1, 1, 1, 1),
         specular_color = Color(1, 1, 1, 1),
-        direction = Vector(0, 0, 1)
+        direction = Vector(-0.1, 0, 1)
     }
     
     -- Set up the camera
     print("Creating camera")
     self.camera_node = engine.root:node("camera")
-    self.camera_node.position = Vector(20, 0, 20)
+    self.camera_node.position = Vector(35, 0, 35)
     self.camera_node:look(Vector(0, 0, 0), Vector(0, 1, 0))
     self.camera = self.camera_node:camera("camera") {
         active = true,
@@ -60,20 +60,28 @@ function Test:__init()
     print("Creating plane")
     self.plane_node = engine.root:node("plane")
     self.plane = self.plane_node:mesh_object("plane") {
-        mesh = "Plane.obj",
+        mesh = "Box.obj",
         material = "Metal.mtl"
     }
     self.plane_node:rigid_body()
+    self.plane_node.rotation = Quaternion(Vector(0, 1, 0), -2) * Quaternion(Vector(1, 0, 0), -0.5)
+    self.plane_node.position = Vector(0, 0, -14)
     
     -- Set up scene objects and apply some forces
     print("Creating objects")
     self.s1 = Dagger()
     self.s1.node.position = Vector(-5, -5, 5)
-    self.s2 = Rock()
-    self.s2.node.position = Vector(5, 5, 5)
-    self.s3 = Rock()
-    self.s3.node.position = Vector(-10, 0, 5)
     
+    self.rocks = {}
+    for i=1,20 do
+        self.rocks[i] = Dagger()
+        local x = math.random(-50, 50)
+        local y = math.random(-50, 50)
+        local z = math.random(-50, 50)
+        local pos = Vector(x, y, z)
+        self.rocks[i].node.position = pos;
+        self.rocks[i].body.linear_velocity = -pos.unit * 7;
+    end
     
     self.s1.node.position = Vector(0, 0, 0)
     math.randomseed(os.time())
@@ -86,6 +94,7 @@ function Test:on_destroy()
 end
 
 function Test:on_tick(delta)
+    delta = delta / engine:option("simulation_speed");
     self.camera_node.position = self.camera_velocity*60*delta + self.camera_node.position
     self.camera_node:look(Vector(0, 0, 0), Vector(0, 1, 0))
 end
@@ -103,19 +112,20 @@ function Test:on_key_pressed(key, x, y)
         end
     elseif (key == 't') then
         self.s2.body:apply_torque(Vector(2000, 0, 0))
-    elseif (key == 'r') then        
-        self.s1.node.position = Vector(5, 0, 0)
-        self.s1.body.linear_velocity = Vector(0, 0, 0)
-        self.s2.node.position = Vector(5, 0, 0)
-        self.s2.body.linear_velocity = Vector(0, 0, 0)
-        self.s3.node.position = Vector(5, 0, 0)
-        self.s3.body.linear_velocity = Vector(0, 0, 0)
     elseif (key == 'n') then
         engine:option("normal_mapping_enabled", not engine:option("normal_mapping_enabled"))
     elseif (key == 'p') then
         engine:option("specular_mapping_enabled", not engine:option("specular_mapping_enabled"))
     elseif (key == 'h') then
         engine:option("shadows_enabled", not engine:option("shadows_enabled"))
+    elseif (key == 'x') then
+        print("hello")
+        for i=1,20 do
+            local x = math.random(-1.5, 1.5)
+            local y = math.random(-1.5, 1.5)
+            local z = math.random(-1.5, 1.5)
+            self.rocks[i].body.angular_velocity = Vector(x, y, z)
+        end
     elseif (key == 'm') then
     
         if (engine:option("fullscreen_enabled")) then

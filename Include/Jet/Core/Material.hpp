@@ -49,6 +49,7 @@ public:
 		shadow_map1_loc_(-1),
 		shadow_map2_loc_(-1),
 		shadow_map3_loc_(-1),
+		shadow_z_loc_(-1),
 		shadow_distance_loc_(-1),
 		diffuse_map_enabled_(-1),
 		specular_map_enabled_(-1),
@@ -241,6 +242,7 @@ private:
 	int32_t shadow_map1_loc_;
 	int32_t shadow_map2_loc_;
 	int32_t shadow_map3_loc_;
+	int32_t shadow_z_loc_;
 	int32_t shadow_distance_loc_;
 	
 	int32_t diffuse_map_enabled_;

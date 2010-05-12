@@ -42,7 +42,7 @@ Core::RigidBody::RigidBody(Engine* engine, Node* parent) :
     
     body_.reset(new btRigidBody(mass_, this, shape_.get()));
     body_->setUserPointer(this);
-    body_->setSleepingThresholds(0.3f, 0.1f);
+    body_->setSleepingThresholds(0.03f, 0.01f);
     engine_->physics_system()->world()->addRigidBody(body_.get());
     
     update_collision_shapes();
@@ -127,6 +127,7 @@ void Core::RigidBody::apply_force(const Vector& v) {
 }
 
 void Core::RigidBody::apply_torque(const Vector& v) {
+	body_->activate(true);
     body_->applyTorque(btVector3(v.x, v.y, v.z));
 }
 

@@ -21,6 +21,7 @@
  */  
 
 #include <Jet/Core/Material.hpp>
+#include <Jet/Core/Camera.hpp>
 #include <Jet/Core/MaterialLoader.hpp>
 #ifdef WINDOWS
 #define WIN32_LEAN_AND_MEAN
@@ -70,6 +71,7 @@ void Core::Material::shader(Jet::Shader* shader) {
 		shadow_map1_loc_ = shader_->uniform_location("shadow_map1");
 		shadow_map2_loc_ = shader_->uniform_location("shadow_map2");
 		shadow_map3_loc_ = shader_->uniform_location("shadow_map3");
+		shadow_z_loc_ = shader_->uniform_location("shadow_z");
 		diffuse_map_enabled_ = shader_->uniform_location("diffuse_map_enabled");
 		specular_map_enabled_ = shader_->uniform_location("specular_map_enabled");
 		normal_map_enabled_ = shader_->uniform_location("normal_map_enabled");
@@ -160,6 +162,18 @@ void Core::Material::begin_shader() {
 	}
 	
 	if (engine_->option<bool>("shadows_enabled")) {
+		// Calculate the shadow far z distances for CSM
+		Core::CameraPtr camera = static_cast<Core::Camera*>(engine_->camera());
+		size_t cascades = (size_t)engine_->option<float>("shadow_cascades");
+		float alpha = engine_->option<float>("shadow_correction"); 
+		float n = camera->near_clipping_distance();
+		float f = min(camera->far_clipping_distance(), engine_->option<float>("shadow_distance"));
+		float shadow_z[4];
+		for (size_t i = 0; i < cascades; i++) {
+			float r = (float)(i+1)/(float)cascades;
+			shadow_z[i] = alpha*n*pow(f/n, r) + (1-alpha)*(n+r*(f-n));
+		}
+		
 		// Enable the shadow map sampler only if this object should receive
 		// shadows
 		glUniform1i(shadow_map_enabled_, (bool)receive_shadows_);		
@@ -167,6 +181,7 @@ void Core::Material::begin_shader() {
 		glUniform1i(shadow_map1_loc_, SHADOW_MAP_SAMPLER+1);
 		glUniform1i(shadow_map2_loc_, SHADOW_MAP_SAMPLER+2);
 		glUniform1i(shadow_map3_loc_, SHADOW_MAP_SAMPLER+3);
+		glUniform1fv(shadow_z_loc_,  4, shadow_z);
 		glUniform1f(shadow_distance_loc_, engine_->option<float>("shadow_distance"));
 	} else {
 		glUniform1i(shadow_map_enabled_, false);

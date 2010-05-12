@@ -46,17 +46,34 @@ uniform bool shadow_map_enabled;
 
 varying vec3 eye_dir;
 varying vec3 light_dir;
+varying vec4 shadow_coord0;
+varying vec4 shadow_coord1;
+varying vec4 shadow_coord2;
+varying vec4 shadow_coord3;
 
+float shadow_lookup(sampler2DShadow shadow_sampler, vec4 shadow_coord) {  
+    return shadow2DProj(shadow_sampler, shadow_coord).w;
+}
 
-float shadow_lookup(sampler2DShadow shadow_sampler, vec2 offset) {  
-    
-    //float x_offset = 1.0/2048.0;
-    //float y_offset = 1.0/2048.0;
-    vec4 shadow_coord = gl_TexCoord[1];
-    //shadow_coord.x += offset.x * x_offset * gl_TexCoord[1].w;
-    //shadow_coord.y += offset.y * y_offset * gl_TexCoord[1].w;
+float shadow_pcf_lookup(sampler2DShadow shadow_sampler, vec4 shadow_coord, vec2 offset) {
+    float x_offset = 1.0/2048.0;
+    float y_offset = 1.0/2048.0;
+    shadow_coord.x += offset.x * x_offset * shadow_coord.w;
+    shadow_coord.y += offset.y * y_offset * shadow_coord.w;
     shadow_coord.z -= 0.0005;
     return shadow2DProj(shadow_sampler, shadow_coord).w;
+}
+
+float shadow_pcf(sampler2DShadow shadow_sampler, vec4 shadow_coord) {
+    vec2 o = mod(floor(vec2(gl_FragCoord.xy)), 2.0);
+    float shadow = 0.0;
+    shadow += shadow_pcf_lookup(shadow_sampler, shadow_coord, vec2(-1.5, 1.5) + o);
+    shadow += shadow_pcf_lookup(shadow_sampler, shadow_coord, vec2(0.5, 1.5) + o);
+    shadow += shadow_pcf_lookup(shadow_sampler, shadow_coord, vec2(-1.5, -0.5) + o);
+    shadow += shadow_pcf_lookup(shadow_sampler, shadow_coord, vec2(0.5, -0.5) + o);                                
+    shadow /= 4.0;
+    
+    return shadow;
 }
 
 
@@ -95,19 +112,20 @@ void shadow_color(inout vec4 diffuse, inout vec4 specular, inout vec4 ambient) {
 #ifdef SHADOW_MAP
     float z = gl_FragCoord.z/gl_FragCoord.w;
     if (shadow_map_enabled && z < shadow_distance) {
-        float ratio = pow(clamp(z/shadow_distance, 0.0, 1.0), 2.0);
         float shadow = 0.0;
-        shadow = shadow_lookup(shadow_map1, vec2(0, 0));
-        /*vec2 o = mod(floor(gl_FragCoord.xy), 2.0);
-        shadow += shadow_lookup(vec2(-1.5, 1.5) + o);
-        shadow += shadow_lookup(vec2( 0.5, 1.5) + o);
-        shadow += shadow_lookup(vec2(-1.5, -0.5) + o);
-        shadow += shadow_lookup(vec2( 0.5, -0.5) + o);                                
-        shadow /= 4.0;*/
+        if (z < shadow_z[0]) {
+            shadow += shadow_lookup(shadow_map0, shadow_coord0);
+        } else if (z < shadow_z[1]) {
+            shadow += shadow_lookup(shadow_map1, shadow_coord1);
+        } else if (z < shadow_z[2]) {
+            shadow += shadow_lookup(shadow_map2, shadow_coord2);
+        } else {
+            float ratio = pow(clamp((z-shadow_z[2])/(shadow_z[3] - shadow_z[2]), 0.0, 1.0), 2.0);
+            shadow += shadow_lookup(shadow_map3, shadow_coord3);
+            shadow = (1.0 - ratio) * shadow + ratio;
+        }    
         
-        shadow = (1.0 - ratio) * shadow + ratio;        
-        
-        diffuse *= 0.4 + 0.6 * shadow;
+        diffuse *= 0.5 + 0.5 * shadow;
         specular *= 0.1 + 0.9 * shadow;
     }
 #endif
