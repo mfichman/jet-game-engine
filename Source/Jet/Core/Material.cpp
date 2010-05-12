@@ -66,7 +66,10 @@ void Core::Material::shader(Jet::Shader* shader) {
 		diffuse_map_loc_ = shader_->uniform_location("diffuse_map");
 		specular_map_loc_ = shader_->uniform_location("specular_map");
 		normal_map_loc_ = shader_->uniform_location("normal_map");
-		shadow_map_loc_ = shader_->uniform_location("shadow_map");
+		shadow_map0_loc_ = shader_->uniform_location("shadow_map0");
+		shadow_map1_loc_ = shader_->uniform_location("shadow_map1");
+		shadow_map2_loc_ = shader_->uniform_location("shadow_map2");
+		shadow_map3_loc_ = shader_->uniform_location("shadow_map3");
 		diffuse_map_enabled_ = shader_->uniform_location("diffuse_map_enabled");
 		specular_map_enabled_ = shader_->uniform_location("specular_map_enabled");
 		normal_map_enabled_ = shader_->uniform_location("normal_map_enabled");
@@ -160,7 +163,10 @@ void Core::Material::begin_shader() {
 		// Enable the shadow map sampler only if this object should receive
 		// shadows
 		glUniform1i(shadow_map_enabled_, (bool)receive_shadows_);		
-		glUniform1i(shadow_map_loc_, SHADOW_MAP_SAMPLER+0);//, SHADOW_MAP_SAMPLER+1, SHADOW_MAP_SAMPLER+2, SHADOW_MAP_SAMPLER+3);
+		glUniform1i(shadow_map0_loc_, SHADOW_MAP_SAMPLER+0);
+		glUniform1i(shadow_map1_loc_, SHADOW_MAP_SAMPLER+1);
+		glUniform1i(shadow_map2_loc_, SHADOW_MAP_SAMPLER+2);
+		glUniform1i(shadow_map3_loc_, SHADOW_MAP_SAMPLER+3);
 		glUniform1f(shadow_distance_loc_, engine_->option<float>("shadow_distance"));
 	} else {
 		glUniform1i(shadow_map_enabled_, false);

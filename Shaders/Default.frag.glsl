@@ -23,7 +23,10 @@
 uniform sampler2D diffuse_map;
 uniform sampler2D specular_map;
 uniform sampler2D normal_map;
-uniform sampler2DShadow shadow_map;
+uniform sampler2DShadow shadow_map0;
+uniform sampler2DShadow shadow_map1;
+uniform sampler2DShadow shadow_map2;
+uniform sampler2DShadow shadow_map3;
 uniform samplerCube environment_map;
 uniform int light_count;
 uniform int cascade_count;
@@ -45,15 +48,15 @@ varying vec3 eye_dir;
 varying vec3 light_dir;
 
 
-float shadow_lookup(vec2 offset) {  
+float shadow_lookup(sampler2DShadow shadow_sampler, vec2 offset) {  
     
-    float x_offset = 1.0/2048.0;
-    float y_offset = 1.0/2048.0;
+    //float x_offset = 1.0/2048.0;
+    //float y_offset = 1.0/2048.0;
     vec4 shadow_coord = gl_TexCoord[1];
-    shadow_coord.x += offset.x * x_offset * gl_TexCoord[1].w;
-    shadow_coord.y += offset.y * y_offset * gl_TexCoord[1].w;
+    //shadow_coord.x += offset.x * x_offset * gl_TexCoord[1].w;
+    //shadow_coord.y += offset.y * y_offset * gl_TexCoord[1].w;
     shadow_coord.z -= 0.0005;
-    return shadow2DProj(shadow_map, shadow_coord).w;
+    return shadow2DProj(shadow_sampler, shadow_coord).w;
 }
 
 
@@ -93,13 +96,14 @@ void shadow_color(inout vec4 diffuse, inout vec4 specular, inout vec4 ambient) {
     float z = gl_FragCoord.z/gl_FragCoord.w;
     if (shadow_map_enabled && z < shadow_distance) {
         
-        float shadow = 0.0;             
-        vec2 o = mod(floor(gl_FragCoord.xy), 2.0);
+        float shadow = 0.0;
+        shadow = shadow_lookup(shadow_map0, vec2(0, 0));
+        /*vec2 o = mod(floor(gl_FragCoord.xy), 2.0);
         shadow += shadow_lookup(vec2(-1.5, 1.5) + o);
         shadow += shadow_lookup(vec2( 0.5, 1.5) + o);
         shadow += shadow_lookup(vec2(-1.5, -0.5) + o);
         shadow += shadow_lookup(vec2( 0.5, -0.5) + o);                                
-        shadow /= 4.0;
+        shadow /= 4.0;*/
         
         float ratio = pow(clamp(z/shadow_distance, 0.0, 1.0), 2.0);
         shadow = (1.0 - ratio) * shadow + ratio;        
