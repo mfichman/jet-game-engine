@@ -25,7 +25,7 @@ class 'Monkey' (Actor)
 function Monkey:__init(node, name)
     Actor.__init(self, node, name)
 
-    self.mesh = self.node:mesh_object("mesh") {
+    self.mesh = self.node:mesh_object() {
         mesh = "Monkey.obj",
         material = "Metal.mtl"
     }

@@ -25,7 +25,7 @@ class 'Box' (Actor)
 function Box:__init(node, name)
     Actor.__init(self, node, name)
 
-    self.mesh = self.node:mesh_object("mesh") {
+    self.mesh = self.node:mesh_object() {
         mesh = "Box.obj",
         material = "Dagger.mtl"
     }

@@ -41,7 +41,7 @@ void main() {
     float distance = length(view_position.xyz);
     
     float x = elapsed_time/life;
-    float f = (-exp((x+0.03)/1.5)-exp(-80.0*(x+0.03)/1.5)+0.2*exp(2.2*(x+0.03)/1.5)+1.08)*4.5;
+    float f = (-exp((x+0.03)/1.5)-exp(-65.0*(x+0.03)/1.5)+0.2*exp(2.2*(x+0.03)/1.5)+1.08)*4.5;
     //float f = 18.0 * sin(x) * exp(-6.0*x);
     
     gl_Position = gl_ProjectionMatrix * view_position;

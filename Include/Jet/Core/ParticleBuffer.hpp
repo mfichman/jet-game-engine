@@ -79,6 +79,7 @@ private:
 	int32_t init_rotation_attrib_;
 	int32_t life_attrib_;
 	int32_t growth_rate_attrib_;
+    int32_t drag_coefficient_attrib_;
 };
 
 }}

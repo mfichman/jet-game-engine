@@ -25,7 +25,7 @@ class 'Dagger' (Actor)
 function Dagger:__init(node, name)
     Actor.__init(self, node, name)
 
-    self.mesh = self.node:fracture_object("mesh") {
+    self.mesh = self.node:fracture_object() {
         mesh = "Dagger.obj",
         material = "Dagger.mtl",
         fracture_count = 2
@@ -52,11 +52,11 @@ function Dagger:__init(node, name)
 end
 
 function Dagger:on_fracture(node)
-    self.node:particle_system("sparks")(self.spark_template)
-    self.node:particle_system("sparks").life = math.random() * 3 + 2
+    self.sparks = self.sparks or self.node:particle_system()(self.spark_template)
+    self.sparks.life = math.random() * 3 + 2
     
-    node:particle_system("sparks")(self.spark_template)
-    node:particle_system("sparks").life = math.random() * 3 + 2
+    node.sparks = node:particle_system()(self.spark_template)
+    node.sparks.life = math.random() * 3 + 2
 end
 
 function Dagger:on_collision(node)

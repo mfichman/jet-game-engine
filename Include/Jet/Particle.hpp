@@ -46,6 +46,7 @@ public:
 	float init_rotation;
     float life;
 	float growth_rate;
+    float drag_coefficient;
 };
 
 }

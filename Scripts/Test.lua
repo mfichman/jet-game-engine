@@ -67,11 +67,11 @@ function Test:__init()
     
     -- Set up scene objects and apply some forces
     print("Creating objects")
-    self.s1 = Dagger(engine.root, "s1")
+    self.s1 = Dagger()
     self.s1.node.position = Vector(-5, -5, 5)
-    self.s2 = Rock(engine.root, "s2")
+    self.s2 = Rock()
     self.s2.node.position = Vector(5, 5, 5)
-    self.s3 = Rock(engine.root, "s3")
+    self.s3 = Rock()
     self.s3.node.position = Vector(-10, 0, 5)
     
     
@@ -129,10 +129,6 @@ function Test:on_key_pressed(key, x, y)
         end
         
         engine:option("video_mode_synced", false)
-    elseif (key == 'x') then
-        self.plane.material.shader = "Default"
-    elseif (key == 'y') then
-        self.plane.material.shader = "Default2"
     elseif (key == 'a') then
         engine:option("fsaa_enabled", not engine:option("fsaa_enabled"));
         engine:option("video_mode_synced", false)

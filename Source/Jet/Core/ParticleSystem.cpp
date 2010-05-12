@@ -51,6 +51,7 @@ void Core::ParticleSystem::render(Core::ParticleBuffer* buffer) {
 	buffer->shader(shader_.get());
     buffer->texture(texture_.get());
     
+    
     // Add particles that are alive to the particle buffer, and
     // add dead particles to the free list
     for (size_t i = 0; i < particle_.size(); i++) {
@@ -61,15 +62,17 @@ void Core::ParticleSystem::render(Core::ParticleBuffer* buffer) {
             buffer->particle(p);
         }
     }
-
+    
 	if (life_ <= 0.0f && life_ > -1.0f) {
 		return;
 	}
-
-	accumulator_ += engine_->frame_delta();
+    
+        
     if (life_ > -1.0f) {
 		life_ = max(0.0f, life_ - engine_->frame_delta());
 	}
+
+	accumulator_ += engine_->frame_delta();
  
     // Spawn additional particles
     while (accumulator_ > next_emission_ && !dead_particle_.empty()) {

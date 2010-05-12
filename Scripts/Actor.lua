@@ -21,6 +21,8 @@
 class 'Actor'
 
 function Actor:__init(node, name)
+    node = node or engine.root
+    name = name or ""
     __adopt_actor(self, node, name)
 end
 

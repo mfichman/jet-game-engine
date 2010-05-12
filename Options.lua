@@ -3,11 +3,12 @@
 
 
 engine:option("vsync_enabled", false)
-engine:option("shadow_texture_size", 1024)
+engine:option("shadow_texture_size", 2048)
+engine:option("shadow_distance1", 30)
 engine:option("shadow_distance", 50)
 engine:option("shadows_enabled", true)
-engine:option("display_width",800)
-engine:option("display_height", 600)
+engine:option("display_width", 1600)
+engine:option("display_height", 900)
 engine:option("fullscreen_enabled", false)
 engine:option("shaders_enabled", true)
 engine:option("normal_mapping_enabled", true)

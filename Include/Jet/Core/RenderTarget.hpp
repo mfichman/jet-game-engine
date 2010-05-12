@@ -50,6 +50,11 @@ public:
     
     //! Enables or disables the render target.
     void enabled(bool enabled);
+
+	//! Returns a texture
+	int32_t texture(size_t index) const {
+		return texture_[index];
+	}
     
     //! Sets the sampler the texture is bound to.
 	//! @param the sampler to bind the texture to

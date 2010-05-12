@@ -44,31 +44,43 @@ end
 
 local engine_material = engine.material;
 function engine:material(name)
+    name = name or ""
     return table_syntax(engine_material(self, name))
+end
+
+local node_node = engine.root.node;
+function Node:node(name)
+    name = name or ""
+    return table_syntax(node_node(self, name))
 end
 
 local node_mesh_object = engine.root.mesh_object;
 function Node:mesh_object(name)
+    name = name or ""
     return table_syntax(node_mesh_object(self, name))
 end
 
 local node_fracture_object = engine.root.fracture_object;
 function Node:fracture_object(name)
+    name = name or ""
     return table_syntax(node_fracture_object(self, name))
 end
 
 local node_particle_system = engine.root.particle_system;
 function Node:particle_system(name)
+    name = name or ""
     return table_syntax(node_particle_system(self, name))
 end
 
 local node_light = engine.root.light;
 function Node:light(name)
+    name = name or ""
     return table_syntax(node_light(self, name))
 end
 
 local node_camera = engine.root.camera;
 function Node:camera(name)
+    name = name or ""
     return table_syntax(node_camera(self, name))
 end
 

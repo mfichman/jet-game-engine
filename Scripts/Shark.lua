@@ -25,7 +25,7 @@ class 'Shark' (Actor)
 function Shark:__init(node, name)
     Actor.__init(self, node, name)
 
-    self.mesh = self.node:mesh_object("mesh") {
+    self.mesh = self.node:mesh_object() {
         mesh = "Shark.obj",
         material = "Shark.mtl"
     }

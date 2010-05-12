@@ -33,6 +33,7 @@
 #ifdef WINDOWS
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#define putenv _putenv
 #endif
 #define FREEGLUT_LIB_PRAGMAS 0
 #include <GL/glew.h>
@@ -91,12 +92,14 @@ void Core::RenderSystem::init_window() {
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, vsync_enabled);
+	putenv("SDL_VIDEO_WINDOW_POS=center");
 	
 	uint32_t flags = SDL_OPENGL;
 	if (fullscreen_enabled) {
 		flags |= SDL_FULLSCREEN;
 	}
 	SDL_WM_SetCaption(title.c_str(), NULL);
+	
 	
 	if (!SDL_SetVideoMode(width, height, 0, flags)) {
 		throw runtime_error(string("SDL initialization failed: ") + SDL_GetError());
@@ -200,12 +203,6 @@ void Core::RenderSystem::on_init() {
 	init_window();
 	init_extensions();
     init_default_states();
-		
-	// Initialize shadow target
-	if (engine_->option<bool>("shadows_enabled")) {
-		GLuint size = (GLuint)engine_->option<float>("shadow_texture_size");
-    	shadow_target_.reset(new RenderTarget(size, size, true, 1));
-	}
 	
 	// Initialize particle buffer
 	particle_buffer_.reset(new ParticleBuffer(engine_));
@@ -248,6 +245,14 @@ void Core::RenderSystem::check_video_mode() {
 		if (!shadow_target_) {
 			GLuint size = (GLuint)engine_->option<float>("shadow_texture_size");
 			shadow_target_.reset(new RenderTarget(size, size, true, 1));
+
+			// These states are used to enable percentage closer filtering for the 
+			// shadow map sampler
+			glBindTexture(GL_TEXTURE_2D, shadow_target_->texture(0));
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+			glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
+			glBindTexture(GL_TEXTURE_2D, 0);
 		}
 	} else {
 		shadow_target_.reset();
@@ -288,7 +293,7 @@ void Core::RenderSystem::on_render() {
     }
 
 	// Render overlays on top of the screen (may need to clear z-buffer...)
-	//render_overlays();
+	render_overlays();
 	
 	// Swap back buffer to front
 	SDL_GL_SwapBuffers();

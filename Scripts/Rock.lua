@@ -25,7 +25,7 @@ class 'Rock' (Actor)
 function Rock:__init(node, name)
     Actor.__init(self, node, name)
 
-    self.mesh = self.node:mesh_object("mesh") {
+    self.mesh = self.node:mesh_object() {
         mesh = "Rock.obj",
         material = "Rock.mtl"
     }
