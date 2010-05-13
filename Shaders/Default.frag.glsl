@@ -106,7 +106,7 @@ void shadow_color(inout vec4 diffuse, inout vec4 specular, inout vec4 ambient) {
 #ifdef SHADOW_MAP
     float z = gl_FragCoord.z/gl_FragCoord.w;
     if (shadow_map_enabled && z < shadow_distance) {
-        float shadow = 1.0;
+        float shadow = 0.0;
         if (z < shadow_z[0]) {
             shadow += shadow_lookup(shadow_map[0], shadow_coord[0]);
         } else if (z < shadow_z[1]) {
