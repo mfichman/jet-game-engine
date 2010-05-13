@@ -67,10 +67,7 @@ void Core::Material::shader(Jet::Shader* shader) {
 		diffuse_map_loc_ = shader_->uniform_location("diffuse_map");
 		specular_map_loc_ = shader_->uniform_location("specular_map");
 		normal_map_loc_ = shader_->uniform_location("normal_map");
-		shadow_map0_loc_ = shader_->uniform_location("shadow_map0");
-		shadow_map1_loc_ = shader_->uniform_location("shadow_map1");
-		shadow_map2_loc_ = shader_->uniform_location("shadow_map2");
-		shadow_map3_loc_ = shader_->uniform_location("shadow_map3");
+		shadow_map_loc_ = shader_->uniform_location("shadow_map");
 		shadow_z_loc_ = shader_->uniform_location("shadow_z");
 		diffuse_map_enabled_ = shader_->uniform_location("diffuse_map_enabled");
 		specular_map_enabled_ = shader_->uniform_location("specular_map_enabled");
@@ -169,18 +166,19 @@ void Core::Material::begin_shader() {
 		float n = camera->near_clipping_distance();
 		float f = min(camera->far_clipping_distance(), engine_->option<float>("shadow_distance"));
 		float shadow_z[4];
-		for (size_t i = 0; i < cascades; i++) {
+		GLint shadow_sampler[4];
+
+		// Set up the shader sampler numbers and shadow z vector
+		for (size_t i = 0; i < min(cascades, 4); i++) {
 			float r = (float)(i+1)/(float)cascades;
 			shadow_z[i] = alpha*n*pow(f/n, r) + (1-alpha)*(n+r*(f-n));
+			shadow_sampler[i] = SHADOW_MAP_SAMPLER+i;
 		}
 		
 		// Enable the shadow map sampler only if this object should receive
 		// shadows
 		glUniform1i(shadow_map_enabled_, (bool)receive_shadows_);		
-		glUniform1i(shadow_map0_loc_, SHADOW_MAP_SAMPLER+0);
-		glUniform1i(shadow_map1_loc_, SHADOW_MAP_SAMPLER+1);
-		glUniform1i(shadow_map2_loc_, SHADOW_MAP_SAMPLER+2);
-		glUniform1i(shadow_map3_loc_, SHADOW_MAP_SAMPLER+3);
+		glUniform1iv(shadow_map_loc_, 4, shadow_sampler);
 		glUniform1fv(shadow_z_loc_,  4, shadow_z);
 		glUniform1f(shadow_distance_loc_, engine_->option<float>("shadow_distance"));
 	} else {
