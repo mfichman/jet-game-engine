@@ -42,6 +42,7 @@ public:
 		enabled_(false),
 		receive_shadows_(true),
 		double_sided_(false),
+		cascade_count_loc_(-1),
 		diffuse_map_loc_(-1),
 		specular_map_loc_(-1),
 		normal_map_loc_(-1),
@@ -232,6 +233,7 @@ private:
 	
 	
 	// Shader uniform variable handles
+	int32_t cascade_count_loc_;
 	int32_t diffuse_map_loc_;
 	int32_t specular_map_loc_;
 	int32_t normal_map_loc_;

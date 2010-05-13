@@ -20,15 +20,15 @@
  * IN THE SOFTWARE.
  */
 
+#define MAX_CASCADES 4
 #define SHADOW_MAP
+
+uniform int cascade_count;
 
 varying vec3 eye_dir;
 varying vec3 light_dir;
 
-varying vec4 shadow_coord0;
-varying vec4 shadow_coord1;
-varying vec4 shadow_coord2;
-varying vec4 shadow_coord3;
+varying vec4 shadow_coord[MAX_CASCADES];
 
 attribute vec3 tangent;
 
@@ -54,9 +54,8 @@ void main() {
     eye_dir = v;
     
 #ifdef SHADOW_MAP
-    shadow_coord0 = gl_TextureMatrix[3] * gl_TextureMatrix[0] * gl_Vertex;
-    shadow_coord1 = gl_TextureMatrix[4] * gl_TextureMatrix[0] * gl_Vertex;
-    shadow_coord2 = gl_TextureMatrix[5] * gl_TextureMatrix[0] * gl_Vertex;
-    shadow_coord3 = gl_TextureMatrix[6] * gl_TextureMatrix[0] * gl_Vertex;
+    for (int i = 0; i < cascade_count; i++) {
+        shadow_coord[i] = gl_TextureMatrix[3+i] * gl_TextureMatrix[0] * gl_Vertex;
+    }
 #endif
 }

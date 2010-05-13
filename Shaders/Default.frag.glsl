@@ -20,14 +20,20 @@
  * IN THE SOFTWARE.
  */
 
+#define MAX_CASCADES 4
+#define NORMAL_MAP
+#define SHADOW_MAP
+#define SPECULAR_MAP
+#define DIFFUSE_MAP
+
 uniform sampler2D diffuse_map;
 uniform sampler2D specular_map;
 uniform sampler2D normal_map;
-uniform sampler2DShadow shadow_map[4];
+uniform sampler2DShadow shadow_map[MAX_CASCADES];
 uniform samplerCube environment_map;
 uniform int light_count;
 uniform int cascade_count;
-uniform float shadow_z[4];
+uniform float shadow_z[MAX_CASCADES];
 uniform float shadow_distance;
 
 uniform bool diffuse_map_enabled;
@@ -35,18 +41,9 @@ uniform bool specular_map_enabled;
 uniform bool normal_map_enabled;
 uniform bool shadow_map_enabled;
 
-
-#define NORMAL_MAP
-#define SHADOW_MAP
-#define SPECULAR_MAP
-#define DIFFUSE_MAP
-
 varying vec3 eye_dir;
 varying vec3 light_dir;
-varying vec4 shadow_coord0;
-varying vec4 shadow_coord1;
-varying vec4 shadow_coord2;
-varying vec4 shadow_coord3;
+varying vec4 shadow_coord[MAX_CASCADES];
 
 float shadow_lookup(sampler2DShadow shadow_sampler, vec4 shadow_coord) {  
     return shadow2DProj(shadow_sampler, shadow_coord).w;
@@ -109,18 +106,16 @@ void shadow_color(inout vec4 diffuse, inout vec4 specular, inout vec4 ambient) {
 #ifdef SHADOW_MAP
     float z = gl_FragCoord.z/gl_FragCoord.w;
     if (shadow_map_enabled && z < shadow_distance) {
-        float shadow = 0.0;
+        float shadow = 1.0;
         if (z < shadow_z[0]) {
-            shadow += shadow_lookup(shadow_map[0], shadow_coord0);
+            shadow += shadow_lookup(shadow_map[0], shadow_coord[0]);
         } else if (z < shadow_z[1]) {
-            shadow += shadow_lookup(shadow_map[1], shadow_coord1);
+            shadow += shadow_lookup(shadow_map[1], shadow_coord[1]);
         } else if (z < shadow_z[2]) {
-            shadow += shadow_lookup(shadow_map[2], shadow_coord2);
+            shadow += shadow_lookup(shadow_map[2], shadow_coord[2]);
         } else {
-            float ratio = pow(clamp((z-shadow_z[2])/(shadow_z[3] - shadow_z[2]), 0.0, 1.0), 2.0);
-            shadow += shadow_lookup(shadow_map[3], shadow_coord3);
-            shadow = (1.0 - ratio) * shadow + ratio;
-        }    
+            shadow += shadow_lookup(shadow_map[3], shadow_coord[3]);
+        }
         
         diffuse *= 0.5 + 0.5 * shadow;
         specular *= 0.1 + 0.9 * shadow;
