@@ -23,12 +23,6 @@
 uniform sampler2D diffuse_map;
 uniform sampler2D specular_map;
 uniform sampler2D normal_map;
-/*
-uniform sampler2DShadow shadow_map0;
-uniform sampler2DShadow shadow_map1;
-uniform sampler2DShadow shadow_map2;
-uniform sampler2DShadow shadow_map3;
-*/
 uniform sampler2DShadow shadow_map[4];
 uniform samplerCube environment_map;
 uniform int light_count;
