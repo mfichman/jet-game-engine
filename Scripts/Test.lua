@@ -40,7 +40,7 @@ function Test:__init()
         ambient_color = Color(.3, .3, .3, 1),
         diffuse_color = Color(1, 1, 1, 1),
         specular_color = Color(1, 1, 1, 1),
-        direction = Vector(-0.1, 0, 1)
+        direction = Vector(1, 0, 1)
     }
     
     -- Set up the camera
@@ -71,21 +71,18 @@ function Test:__init()
     print("Creating objects")
     self.s1 = Dagger()
     self.s1.node.position = Vector(-5, -5, 5)
-    
+   
     self.rocks = {}
-    for i=1,20 do
-        self.rocks[i] = Dagger()
+    for i=1,15 do
+        self.rocks[i] = Rock()
         local x = math.random(-50, 50)
         local y = math.random(-50, 50)
         local z = math.random(-50, 50)
         local pos = Vector(x, y, z)
-        self.rocks[i].node.position = pos;
-        self.rocks[i].body.linear_velocity = -pos.unit * 7;
+        self.rocks[i].node.position = pos
+        self.rocks[i].body.angular_velocity = pos.unit * 0.2
+        --self.rocks[i].body.linear_velocity = -pos.unit * 9;
     end
-    
-    self.s1.node.position = Vector(0, 0, 0)
-    math.randomseed(os.time())
-
     self.camera_velocity = Vector()
 end
 
@@ -99,7 +96,6 @@ function Test:on_tick(delta)
     self.camera_node:look(Vector(0, 0, 0), Vector(0, 1, 0))
 end
 
-
 function Test:on_key_pressed(key, x, y)
 
     if (key == 'q') then
@@ -110,24 +106,11 @@ function Test:on_key_pressed(key, x, y)
         else
             engine:option("simulation_speed", 1/30)
         end
-    elseif (key == 't') then
-        self.s2.body:apply_torque(Vector(2000, 0, 0))
     elseif (key == 'n') then
         engine:option("normal_mapping_enabled", not engine:option("normal_mapping_enabled"))
-    elseif (key == 'p') then
-        engine:option("specular_mapping_enabled", not engine:option("specular_mapping_enabled"))
     elseif (key == 'h') then
         engine:option("shadows_enabled", not engine:option("shadows_enabled"))
-    elseif (key == 'x') then
-        print("hello")
-        for i=1,20 do
-            local x = math.random(-1.5, 1.5)
-            local y = math.random(-1.5, 1.5)
-            local z = math.random(-1.5, 1.5)
-            self.rocks[i].body.angular_velocity = Vector(x, y, z)
-        end
-    elseif (key == 'm') then
-    
+    elseif (key == 'f') then
         if (engine:option("fullscreen_enabled")) then
             engine:option("display_width", 1024)
             engine:option("display_height", 768)
@@ -139,26 +122,18 @@ function Test:on_key_pressed(key, x, y)
         end
         
         engine:option("video_mode_synced", false)
-    elseif (key == 'a') then
-        engine:option("fsaa_enabled", not engine:option("fsaa_enabled"));
-        engine:option("video_mode_synced", false)
-    elseif (key == 'f') then
-   
-        if (not self.e) then
-            self.e = Explosion(engine.root, "e")
+    elseif (key == 'e') then
+        if (not self.explosion) then
+            self.explosion = Explosion()
         else
-            self.e:reset()
+            self.explosion:reset()
         end
-   
+        self.explosion.node.position = self.s1.node.position;
         local n = Vector(math.random()*2-1, math.random()*2-1, math.random()*2-1)
         self.s1.mesh:fracture(Plane(n.unit, Vector(0, 0, 0)))
         local n = Vector(math.random()*2-1, math.random()*2-1, math.random()*2-1)
         self.s1.mesh:fracture(Plane(n.unit, Vector(0, 0, 0)))
         
-    elseif (key == 'e') then
-        print(type(self.s3))
-        self.s3.node:destroy()
-        self.s3 = nil
     elseif (key == 'j') then
         self.camera_velocity = self.camera_velocity + Vector(-1, 0, 0)
     elseif (key == 'l') then

@@ -31,6 +31,45 @@ function Dagger:__init(node, name)
         fracture_count = 2
     }
     
+    self.engine_node = self.node:node() {
+        position = Vector(0, -1.7, 0)
+    }
+    
+    --[[self.exhaust = self.engine_node:particle_system() {
+        type = ParticleSystem.POINT_EMITTER,
+        quota = 30,
+        texture = "FireBlue.png",
+        particle_life = Range(.40, .40),
+        particle_size = Range(1.5, 1.5),
+        life = -1,
+        width = Range(0, .2),
+        height = Range(0, 0),
+        depth = Range(0, .2),
+        emission_speed = Range(-3, -3),
+        emission_angle = Range(0, 0),
+        emission_direction = Vector(0, 1, 0),
+        emission_rate = Range(14, 14)
+        
+    }]]
+    
+    self.flame = self.engine_node:particle_system() {
+        type = ParticleSystem.POINT_EMITTER,
+        quota = 30,
+        texture = "IncandescentBlue.png",
+        particle_life = Range(.35, .35),
+        particle_size = Range(2.2, 2.2),
+        particle_growth_rate = Range(-10, -10),
+        life = -1,
+        width = Range(0, .2),
+        height = Range(0, 0),
+        depth = Range(0, .2),
+        emission_speed = Range(-3.5, -4),
+        emission_angle = Range(0, 0),
+        emission_direction = Vector(0, 1, 0),
+        emission_rate = Range(25, 25),
+        
+    }
+    
     self.spark_template = {
         type = ParticleSystem.BOX_EMITTER,
         quota = 100,
@@ -42,8 +81,6 @@ function Dagger:__init(node, name)
         height = Range(0, .7),
         depth = Range(0, .2),
         emission_speed = Range(0, 0),
-        emission_direction = Vector(0, 1, 0),
-        emission_angle = Range(0, 0),
         emission_rate = Range(1, 90)
     }
 
@@ -52,6 +89,7 @@ function Dagger:__init(node, name)
 end
 
 function Dagger:on_fracture(node)
+    self.flame.life = 0
     self.sparks = self.sparks or self.node:particle_system()(self.spark_template)
     self.sparks.life = math.random() * 3 + 2
     

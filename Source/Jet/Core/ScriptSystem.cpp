@@ -48,6 +48,7 @@
 #include <Jet/Texture.hpp>
 #include <Jet/FractalPlanet.hpp>
 #include <Jet/Shader.hpp>
+#include <Jet/ActionQueue.hpp>
 #include <luabind/luabind.hpp>
 #include <luabind/adopt_policy.hpp>
 #include <luabind/operator.hpp>
@@ -348,6 +349,7 @@ void Core::ScriptSystem::init_entity_type_bindings() {
             .property("parent", &Jet::Node::parent)
             .property("position", (const Vector& (Jet::Node::*)() const)&Jet::Node::position, (void (Jet::Node::*)(const Vector&))&Jet::Node::position)
             .property("rotation", (const Quaternion& (Jet::Node::*)() const)&Jet::Node::rotation, (void (Jet::Node::*)(const Quaternion&))&Jet::Node::rotation)
+            .property("visible", (bool (Jet::Node::*)() const)&Jet::Node::visible, (void (Jet::Node::*)(bool))&Jet::Node::visible)
             .def("node", &Jet::Node::node)
             .def("mesh_object", &Jet::Node::mesh_object)
             .def("particle_system", &Jet::Node::particle_system)
@@ -415,7 +417,12 @@ void Core::ScriptSystem::init_entity_type_bindings() {
             .def("search_folder", &Jet::Engine::search_folder)
 			.def("mesh", (Jet::Mesh* (Jet::Engine::*)(const std::string&))&Jet::Engine::mesh)
             .def("material", &Jet::Engine::material)
+            .def("action_queue", &Jet::Engine::action_queue)
             .property("running", (bool (Jet::Engine::*)() const)&Jet::Engine::running, (void (Jet::Engine::*)(bool))&Jet::Engine::running),
+            
+        luabind::class_<Jet::ActionQueue, Jet::ActionQueuePtr>("ActionQueue")
+            .property("action", (std::string (Jet::ActionQueue::*)())&Jet::ActionQueue::action, (void (Jet::ActionQueue::*)(const std::string&))&Jet::ActionQueue::action)
+            .property("action_count", &Jet::ActionQueue::action_count),
             
         luabind::class_<Jet::Mesh, Jet::MeshPtr>("Mesh")
             .def("vertex", (void (Jet::Mesh::*)(size_t, const Vertex&))&Jet::Mesh::vertex)

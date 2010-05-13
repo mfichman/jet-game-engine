@@ -134,7 +134,9 @@ void shadow_color(inout vec4 diffuse, inout vec4 specular, inout vec4 ambient) {
 void diffuse_color(inout vec4 diffuse, inout vec4 specular, inout vec4 ambient) {
 #ifdef DIFFUSE_MAP
     if (diffuse_map_enabled) {
-        diffuse *= texture2D(diffuse_map, gl_TexCoord[0].st);
+        vec4 color = texture2D(diffuse_map, gl_TexCoord[0].st);
+        diffuse *= color;
+        ambient *= color;
     }
 #endif
 }

@@ -48,6 +48,7 @@
 #endif
 
 namespace Jet {
+    class ActionQueue;
     class AudioSource;
     class Box;
     class Camera;
@@ -86,6 +87,7 @@ namespace Jet {
     class Vector;
     class Vertex;
 
+    typedef boost::intrusive_ptr<ActionQueue> ActionQueuePtr;
     typedef boost::intrusive_ptr<AudioSource> AudioSourcePtr;
     typedef boost::intrusive_ptr<Camera> CameraPtr;
     typedef boost::intrusive_ptr<Engine> EnginePtr;

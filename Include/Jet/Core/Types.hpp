@@ -25,6 +25,7 @@
 
 
 namespace Jet { namespace Core {
+    class ActionQueue;
     class AudioSource;
     class AudioSystem;
     class Camera;
@@ -53,6 +54,7 @@ namespace Jet { namespace Core {
     class Texture;
     
 
+    typedef boost::intrusive_ptr<ActionQueue> ActionQueuePtr;
     typedef boost::intrusive_ptr<AudioSource> AudioSourcePtr;
     typedef boost::intrusive_ptr<AudioSystem> AudioSystemPtr;
     typedef boost::intrusive_ptr<Camera> CameraPtr;

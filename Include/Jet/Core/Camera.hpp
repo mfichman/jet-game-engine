@@ -39,7 +39,7 @@ public:
         parent_(parent),
         field_of_view_(45.0f),
         near_clipping_distance_(0.1f),
-        far_clipping_distance_(1000.0f) {
+        far_clipping_distance_(1000.0f){
             
     }
     

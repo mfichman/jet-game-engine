@@ -49,6 +49,11 @@ public:
         return parent_;
     }
 
+	//! Sets whether or not the rigid body is active
+	inline bool active() const {
+		return active_;
+	}
+
     //! Returns the linear velocity of the object.
     inline Vector linear_velocity() const {
 		const btVector3& v = body_->getLinearVelocity();
@@ -103,6 +108,9 @@ public:
     
     //! Sets the mass of the rigid body.
     void mass(float mass);
+
+	//! Sets whether or not the rigid body is active.
+	void active(bool active);
     
     //! Updates the collision shapes attached to this rigid body
     void update_collision_shapes();
@@ -117,6 +125,7 @@ private:
     Engine* engine_;
     Node* parent_;
     float mass_;
+	bool active_;
 
     std::auto_ptr<btRigidBody> body_;
     std::auto_ptr<btCompoundShape> shape_;

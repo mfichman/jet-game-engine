@@ -40,6 +40,9 @@ class Node : public Object {
 public:        
     //! Returns the parent scene node
     virtual Node* parent() const=0;
+	
+	//! Returns true if the node is visible.
+	virtual bool visible() const=0;
     
     //! Returns the node's current rotation.
     virtual const Quaternion& rotation() const=0;
@@ -110,6 +113,9 @@ public:
 	//! does not exist, this function returns null.
     //! @param name the name of the component
     virtual Object* object(const std::string& name)=0;
+	
+	//! Sets whether or not the node is visible.
+	virtual void visible(bool visible)=0;
 
 	//! Sets the position of the node.
     //! @param position the position of the node

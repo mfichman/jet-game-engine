@@ -51,6 +51,7 @@
 #include <Jet/Core/RigidBody.hpp>
 #include <Jet/Core/Shader.hpp>
 #include <Jet/Core/Overlay.hpp>
+#include <Jet/Core/ActionQueue.hpp>
 
 #include <Jet/Iterator.hpp>
 #include <fstream>
@@ -207,6 +208,17 @@ Jet::Shader* Core::Engine::shader(const std::string& name) {
         Core::ShaderPtr shader(new Core::Shader(this, name));
         shader_.insert(make_pair(name, shader));
         return shader.get();
+	} else {
+		return i->second.get();
+	}
+}
+
+Jet::ActionQueue* Core::Engine::action_queue(const std::string& name) {
+    map<string, Jet::ActionQueuePtr>::iterator i = action_queue_.find(name);
+    if (i == action_queue_.end()) {
+        Core::ActionQueuePtr action_queue(new Core::ActionQueue);
+        action_queue_.insert(make_pair(name, action_queue));
+        return action_queue.get();
 	} else {
 		return i->second.get();
 	}

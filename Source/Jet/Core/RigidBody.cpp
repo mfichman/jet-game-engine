@@ -33,7 +33,8 @@ using namespace std;
 Core::RigidBody::RigidBody(Engine* engine, Node* parent) :
     engine_(engine),
     parent_(parent),
-    mass_(0.0f) {
+    mass_(0.0f),
+	active_(false) {
         
     shape_.reset(new btCompoundShape);
     
@@ -43,14 +44,13 @@ Core::RigidBody::RigidBody(Engine* engine, Node* parent) :
     body_.reset(new btRigidBody(mass_, this, shape_.get()));
     body_->setUserPointer(this);
     body_->setSleepingThresholds(0.03f, 0.01f);
-    engine_->physics_system()->world()->addRigidBody(body_.get());
-    
+	
+	active(parent_->visible());    
     update_collision_shapes();
-    
 }
 
 Core::RigidBody::~RigidBody() {
-    engine_->physics_system()->world()->removeCollisionObject(body_.get());
+	active(false);
 }
 
 void Core::RigidBody::getWorldTransform(btTransform& transform) const {
@@ -152,7 +152,25 @@ void Core::RigidBody::mass(float mass) {
     body_->setMassProps(mass, inertia);
     body_->updateInertiaTensor();
     body_->activate(true);
-    engine_->physics_system()->world()->removeCollisionObject(body_.get());
-    engine_->physics_system()->world()->addRigidBody(body_.get());
+
+	// If the body is active, remove and re-add it back into the world.
+	// Otherwise, Bullet won't update the object's mass from zero to 
+	// a non-zero mass (this will cause the object to be static even
+	// though it has a positive mass).
+	if (active_) {
+		engine_->physics_system()->world()->removeCollisionObject(body_.get());
+		engine_->physics_system()->world()->addRigidBody(body_.get());
+	}
 }
 
+
+void Core::RigidBody::active(bool active) {
+	if (active_ != active) {
+		active_ = active;
+		if (active_) {
+			engine_->physics_system()->world()->addRigidBody(body_.get());
+		} else {
+			engine_->physics_system()->world()->removeCollisionObject(body_.get());
+		}
+	}
+}

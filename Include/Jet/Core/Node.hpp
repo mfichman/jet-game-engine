@@ -67,10 +67,11 @@ public:
 	inline Node(Engine* engine) :
 		engine_(engine),
 		parent_(0),
-		shape_transform_(btTransform::getIdentity()),
+		visible_(true),
 		destroyed_(false),
 		transform_modified_count_(1),
-		transform_update_count_(0) {
+		transform_update_count_(0),
+		auto_name_counter_(0) {
 	}
     
     //! Creates a new node with a parent.
@@ -79,8 +80,8 @@ public:
 	inline Node(Engine* engine, Node* parent) :
 		engine_(engine),
 		parent_(parent),
+		visible_(true),
 		rigid_body_(parent->rigid_body_),
-		shape_transform_(parent->shape_transform_),
 		destroyed_(false),
 		transform_modified_count_(1),
 		transform_update_count_(0),
@@ -159,6 +160,11 @@ public:
         return parent_;
     }
     
+	//! Returns the visibility of this node.
+	inline bool visible() const {
+		return visible_;
+	}
+	
     //! Returns the node's current rotation.
     inline const Quaternion& rotation() const {
         return rotation_;
@@ -192,6 +198,9 @@ public:
 	
 	//! Returns the linear velocity.
 	Vector linear_velocity() const;
+	
+	//! Sets the visibility of this node.
+	void visible(bool visible);
 
 	//! Sets the position of the node.
     //! @param position the position of the node
@@ -257,6 +266,7 @@ private:
   
 	Engine* engine_;
     Node* parent_;
+	bool visible_;
     Vector position_;
     Quaternion rotation_;
 	Vector world_position_;
@@ -267,7 +277,6 @@ private:
     Jet::AudioSourcePtr audio_source_;
     std::tr1::unordered_map<std::string, ObjectPtr> object_;
     std::vector<NodeListenerPtr> listener_;
-	btTransform shape_transform_;
     bool destroyed_;
 	size_t transform_modified_count_;
 	size_t transform_update_count_;

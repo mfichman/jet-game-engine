@@ -327,7 +327,7 @@ void Core::RenderSystem::generate_shadow_map(Light* light) {
 		Box bounds(matrix * camera->frustum(near_dist, far_dist));
 		
 		// Causes the shadow map cascades to overlap
-		bounds.max_z += 0.8f;
+		//bounds.max_z += 5.0f;
 		
 		// Set up the projection matrix for the directional light
 		glMatrixMode(GL_PROJECTION);
@@ -475,6 +475,9 @@ void Core::RenderSystem::render_visible_mesh_objects() {
 		glPushMatrix();
 		glMultMatrixf(matrix);
 
+		// This is a hack to pass the model matrix to the shader.  Really,
+		// a uniform variable should be used, but it's a pain to set the
+		// uniform variable for the shader currently.
 		if (shaders_enabled) {
 			glActiveTexture(GL_TEXTURE0);
 			glMatrixMode(GL_TEXTURE);
@@ -494,6 +497,7 @@ void Core::RenderSystem::render_visible_mesh_objects() {
 		material->enabled(false);
 	}
 
+	// Reset the 0 texture matrix to identity
 	glActiveTexture(GL_TEXTURE0);
 	glMatrixMode(GL_TEXTURE);
 	glLoadIdentity();
@@ -578,13 +582,18 @@ void Core::RenderSystem::render_fullscreen_quad() {
 
 
 void Core::RenderSystem::generate_render_list(Core::Node* node) {
+	
+	// Do not render invisible nodes or their children
+	if (!node->visible()) {
+		return;
+	}
 
 	// Iterate through all sub objects and add them to the appropriate
 	// render list as necessary
     for (Iterator<ObjectPtr> i = node->objects(); i; i++) {
         const type_info& type = typeid(**i);
         if (typeid(Core::Node) == type) {
-			// Recursively add nodes
+			// Recursively add nodes			
             generate_render_list(static_cast<Core::Node*>(i->get()));
 			
         } else if (typeid(Core::MeshObject) == type) {

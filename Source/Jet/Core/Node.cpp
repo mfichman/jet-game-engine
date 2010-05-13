@@ -225,6 +225,19 @@ void Core::Node::rotation(const Quaternion& rotation) {
 	}
 }
 
+void Core::Node::visible(bool visible) {
+	if (visible_ != visible) {
+		visible_ = visible;
+
+		// If the node is the parent of the rigid body, and the rigid body
+		// exists, then making an object invisible should also disable
+		// physics calculations on the rigid body.
+		if (rigid_body_ && rigid_body_->parent() == this) {
+			static_cast<RigidBody*>(rigid_body_.get())->active(visible_);
+		}
+	}
+}
+
 void Core::Node::look(const Vector& target, const Vector& up) {
     Vector zaxis = (target - position_).unit();
     Vector xaxis = (up.cross(zaxis)).unit();
