@@ -45,7 +45,7 @@ void Core::InputSystem::on_init() {
     SDL_EnableUNICODE(true);
 }
 
-void Core::InputSystem::on_tick() {
+void Core::InputSystem::on_update() {
     // Poll for events, and then notify the current game module if a key
     // is pressed or a mouse butt is clicked.
     SDL_Event evt;

@@ -163,9 +163,6 @@ public:
     //! load the underlying resource if load is set to true.
     //! @param name the name of the texture
     Jet::Shader* shader(const std::string& name="");
-	
-	//! Returns the action queue with the given name.
-	Jet::ActionQueue* action_queue(const std::string& name);
 
     //! Adds a listener, which listens for engine events.
     //! @param listener the engine listener.
@@ -242,7 +239,7 @@ public:
     //! Runs the engine through one complete loop.  Note that the engine may
     //! or may not actually do anything on a given loop, depending on the
     //! elapsed time.
-    void tick();	
+    void update();	
 	
 	template <typename T>
 	inline T option(const std::string& name) const {
@@ -287,7 +284,6 @@ private:
     std::map<std::string, Jet::MeshPtr> mesh_;
     std::map<std::string, Jet::TexturePtr> texture_;
 	std::map<std::string, Jet::ShaderPtr> shader_;
-	std::map<std::string, Jet::ActionQueuePtr> action_queue_;
     std::set<std::string> search_folder_;
     
 	// Listeners

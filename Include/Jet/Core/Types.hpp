@@ -23,6 +23,7 @@
 
 #include <boost/intrusive_ptr.hpp>
 
+#define MAX_SHADOW_CASCADES 4
 
 namespace Jet { namespace Core {
     class ActionQueue;
@@ -81,8 +82,7 @@ namespace Jet { namespace Core {
     typedef boost::intrusive_ptr<Sound> SoundPtr;
     typedef boost::intrusive_ptr<Texture> TexturePtr;
     typedef boost::intrusive_ptr<QuadSet> QuadSetPtr;
-    
-    
+
     enum TextureSampler {
         DIFFUSE_MAP_SAMPLER = 0,
         SPECULAR_MAP_SAMPLER = 1,

@@ -241,7 +241,7 @@ void Core::RenderSystem::check_video_mode() {
 	// receiving them.  Otherwise, clear the render target.
 	if (engine_->option<bool>("shaders_enabled") && engine_->option<bool>("shadows_enabled")) {
 		if (shadow_target_.empty()) {
-			size_t cascades = (size_t)engine_->option<float>("shadow_cascades");
+			size_t cascades = min(MAX_SHADOW_CASCADES, (size_t)engine_->option<float>("shadow_cascades"));
 			GLuint size = (GLuint)engine_->option<float>("shadow_texture_size");
 
 			for (size_t i = 0; i < cascades; i++) {
@@ -259,9 +259,6 @@ void Core::RenderSystem::check_video_mode() {
 	} else {
 		shadow_target_.clear();
 	}
-}
-
-void Core::RenderSystem::on_update() {
 }
 
 void Core::RenderSystem::on_render() {	
@@ -311,7 +308,7 @@ void Core::RenderSystem::generate_shadow_map(Light* light) {
 	Vector right = forward.cross(up);
 	Matrix matrix(right, -up, forward);
 
-	size_t cascades = (size_t)engine_->option<float>("shadow_cascades");
+	size_t cascades = min(MAX_SHADOW_CASCADES, (size_t)engine_->option<float>("shadow_cascades"));
 	float alpha = engine_->option<float>("shadow_correction"); 
 	float n = camera->near_clipping_distance();
 	float f = min(camera->far_clipping_distance(), engine_->option<float>("shadow_distance"));
@@ -451,7 +448,7 @@ void Core::RenderSystem::render_shadow_casters() {
 
 void Core::RenderSystem::render_visible_mesh_objects() {
 	Core::Material* material = 0;
-	size_t cascades = (size_t)engine_->option<float>("shadow_cascades");
+	size_t cascades = min(MAX_SHADOW_CASCADES, (size_t)engine_->option<float>("shadow_cascades"));
 	bool shaders_enabled = engine_->option<bool>("shaders_enabled");
 	
 	// Render all MeshObjects

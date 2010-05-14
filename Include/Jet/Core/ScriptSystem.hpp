@@ -60,6 +60,7 @@ private:
     
     static int adopt_actor(lua_State* env);
     static int adopt_module(lua_State* env);
+    static int on_error(lua_State* env);
     
     Engine* engine_;
     lua_State* env_;

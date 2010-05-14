@@ -63,6 +63,10 @@ void Core::AudioSystem::on_init() {
 }
 
 void Core::AudioSystem::on_update() {
+    fmod_check(FMOD_System_Update(system_));
+}
+
+void Core::AudioSystem::on_tick() {
     if (engine_->camera()) {
         Node* node = static_cast<Node*>(engine_->camera()->parent());
                 
@@ -81,6 +85,5 @@ void Core::AudioSystem::on_update() {
         FMOD_VECTOR* o = (FMOD_VECTOR*)&origin;
         
         fmod_check(FMOD_System_Set3DListenerAttributes(system_, 0, o, v, f, u));
-        fmod_check(FMOD_System_Update(system_));
     }
 }

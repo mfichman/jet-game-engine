@@ -51,8 +51,8 @@ public:
     }
 
 private:
-    inline void on_update() {
-		self_["on_update"](self_);
+    inline void on_update(float delta) {
+		self_["on_update"](self_, delta);
 	}
 
     inline void on_render() {
@@ -72,8 +72,12 @@ private:
 		self_["on_fracture"](self_, node);
 	}
     
-    inline void on_tick(float delta) {
-        self_["on_tick"](self_, delta);
+    inline void on_tick() {
+        self_["on_tick"](self_);
+    }
+    
+    inline void on_signal(const Signal& signal) {
+        self_["on_" + signal.name](self_, signal.first, signal.second);
     }
     
     Node* node_;

@@ -35,7 +35,8 @@ class ScriptModule : public Module {
 public:
   
     //! Creates a new script module
-    inline ScriptModule(const luabind::object& self) :
+    inline ScriptModule(lua_State* env, const luabind::object& self) :
+        env_(env),
         self_(self) {
             
     }
@@ -95,8 +96,8 @@ private:
     }
     
     //! Called when the ScriptModule is updated (during the physics update)
-    inline void on_update() {
-        self_["on_update"](self_);
+    inline void on_update(float delta) {
+        self_["on_update"](self_, delta);
     }
     
     //! Called when the ScriptModule is rendered.
@@ -110,10 +111,11 @@ private:
     }
     
     //! Called once per frame.
-    inline void on_tick(float delta) {
-        self_["on_tick"](self_, delta);
+    inline void on_tick() {
+        self_["on_tick"](self_);
     }
     
+    lua_State* env_;
     luabind::object self_;
 };
 

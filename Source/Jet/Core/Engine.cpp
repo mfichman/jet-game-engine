@@ -51,7 +51,6 @@
 #include <Jet/Core/RigidBody.hpp>
 #include <Jet/Core/Shader.hpp>
 #include <Jet/Core/Overlay.hpp>
-#include <Jet/Core/ActionQueue.hpp>
 
 #include <Jet/Iterator.hpp>
 #include <fstream>
@@ -213,16 +212,6 @@ Jet::Shader* Core::Engine::shader(const std::string& name) {
 	}
 }
 
-Jet::ActionQueue* Core::Engine::action_queue(const std::string& name) {
-    map<string, Jet::ActionQueuePtr>::iterator i = action_queue_.find(name);
-    if (i == action_queue_.end()) {
-        Core::ActionQueuePtr action_queue(new Core::ActionQueue);
-        action_queue_.insert(make_pair(name, action_queue));
-        return action_queue.get();
-	} else {
-		return i->second.get();
-	}
-}
 
 std::string Core::Engine::resource_path(const std::string& name) const {
     for (set<string>::const_iterator i = search_folder_.begin(); i != search_folder_.end(); i++) {
@@ -256,7 +245,7 @@ std::string Core::Engine::resolve_path(const std::string& name) {
     return result.string();
 }
 
-void Core::Engine::tick() {
+void Core::Engine::update() {
 	// Initialize the engine systems if this is the first tick
 	if (!initialized_) {
 		init_systems();
@@ -268,12 +257,12 @@ void Core::Engine::tick() {
     
 	// Run the tick callback
 	for (list<EngineListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
-		(*i)->on_tick();
+		(*i)->on_update();
 	}
 	if (module_) {
-		module_->on_tick(frame_delta());
+		module_->on_update(frame_delta());
 	}
-	static_cast<Core::Node*>(root())->tick();
+	static_cast<Core::Node*>(root())->update();
     
     // Fire render event
     for (list<EngineListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {

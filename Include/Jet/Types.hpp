@@ -65,6 +65,7 @@ namespace Jet {
     class Mesh;
     class MeshObject;
     class Module;
+    class NetworkMonitor;
     class Node;
     class NodeListener;
     class Object;
@@ -80,6 +81,7 @@ namespace Jet {
     class Quaternion;
     class Range;
     class RigidBody;
+    class Signal;
     class Shader;
     class Sound;
     class Texcoord;
@@ -100,6 +102,7 @@ namespace Jet {
     typedef boost::intrusive_ptr<Mesh> MeshPtr;
     typedef boost::intrusive_ptr<MeshObject> MeshObjectPtr;
     typedef boost::intrusive_ptr<Module> ModulePtr;
+    typedef boost::intrusive_ptr<NetworkMonitor> NetworkMonitorPtr;
     typedef boost::intrusive_ptr<Node> NodePtr;
     typedef boost::intrusive_ptr<NodeListener> NodeListenerPtr;
     typedef boost::intrusive_ptr<Object> ObjectPtr;

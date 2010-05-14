@@ -31,7 +31,7 @@ function Module:on_button_released(button, point) end
 function Module:on_mouse_motion(point) end
 function Module:on_joystick(button, axes) end
 function Module:on_init() end
-function Module:on_update() end
+function Module:on_update(delta) end
 function Module:on_render() end
 function Module:on_destroy() end
-function Module:on_tick(delta) end
+function Module:on_tick() end

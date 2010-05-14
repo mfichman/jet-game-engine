@@ -90,7 +90,7 @@ function Test:on_destroy()
     print("Goodbye")
 end
 
-function Test:on_tick(delta)
+function Test:on_update(delta)
     delta = delta / engine:option("simulation_speed");
     self.camera_node.position = self.camera_velocity*60*delta + self.camera_node.position
     self.camera_node:look(Vector(0, 0, 0), Vector(0, 1, 0))
@@ -129,10 +129,8 @@ function Test:on_key_pressed(key, x, y)
             self.explosion:reset()
         end
         self.explosion.node.position = self.s1.node.position;
-        local n = Vector(math.random()*2-1, math.random()*2-1, math.random()*2-1)
-        self.s1.mesh:fracture(Plane(n.unit, Vector(0, 0, 0)))
-        local n = Vector(math.random()*2-1, math.random()*2-1, math.random()*2-1)
-        self.s1.mesh:fracture(Plane(n.unit, Vector(0, 0, 0)))
+        self.s1.node:signal(Signal("explode", Vector(0, 0, 9), "hello"))
+        --print(self.s1.node.signal)
         
     elseif (key == 'j') then
         self.camera_velocity = self.camera_velocity + Vector(-1, 0, 0)

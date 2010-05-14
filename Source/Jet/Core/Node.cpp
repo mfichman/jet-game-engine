@@ -97,6 +97,10 @@ AudioSource* Core::Node::audio_source() {
     return audio_source_.get();
 }
 
+NetworkMonitor* Core::Node::network_monitor() {
+	return 0;
+}
+
 void Core::Node::add_object(const std::string& name, Object* object) {
 	// Add the given object to the node.  If the name is the empty string,
 	// then auto-generate a name using the automatic name counter.
@@ -246,6 +250,15 @@ void Core::Node::look(const Vector& target, const Vector& up) {
     rotation_ = Quaternion(xaxis, yaxis, zaxis);   
 }
 
+void Core::Node::signal(const Signal& signal) {
+	if (true /*!network_monitor*/) {
+		// Send signal immediately to the object.
+		for (vector<NodeListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
+			(*i)->on_signal(signal);
+		}
+	}
+}
+
 void Core::Node::destroy() {
     if (!destroyed_) {
 		destroyed_ = true;
@@ -295,8 +308,7 @@ void Core::Node::fracture(Jet::Node* node) {
 	}
 }
 
-void Core::Node::update() {
-	
+void Core::Node::update() {	
 	// Calculate the transform for this node if the transform is dirty.
 	update_transform();
 	
@@ -309,14 +321,13 @@ void Core::Node::update() {
 		}
 	}
 	
-	// Notify listeners that an update is happening
+	// Notify all listeners that a tick is happening
 	for (vector<NodeListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
-		(*i)->on_update();
+		(*i)->on_update(engine_->frame_delta());
 	}
 }
 
 void Core::Node::tick() {
-		
 	// Calculate the transform for this node if the transform is dirty.
 	update_transform();
 	
@@ -329,9 +340,9 @@ void Core::Node::tick() {
 		}
 	}
 	
-	// Notify all listeners that a tick is happening
+	// Notify listeners that an update is happening
 	for (vector<NodeListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
-		(*i)->on_tick(engine_->frame_delta());
+		(*i)->on_tick();
 	}
 }
 

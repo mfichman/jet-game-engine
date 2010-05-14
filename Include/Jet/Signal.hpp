@@ -1,4 +1,6 @@
 /*
+ * Copyright (c) 2010 Matt Fichman
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a 
  * copy of this software and associated documentation files (the "Software"),
  * to deal in the Software without restriction, including without limitation 
@@ -20,25 +22,38 @@
 #pragma once
 
 #include <Jet/Types.hpp>
-#include <Jet/Object.hpp>
+#include <boost/any.hpp>
 
 namespace Jet {
 
-//! Manages semantic input signals for the game.
-//! @class ActionQueue
-//! @brief Manages semantic input signals for the game.
-class ActionQueue : public Object {
+//! Represents a signal, which is basically a very primitive RPC with two
+//! arguments (which is plenty for most purposes)
+//! @class Signal
+//! @brief a signal
+class Signal {
 public:
+    //! Creates a new signal with the given name and parameters.
+    Signal(const std::string& name, const boost::any& a, const boost::any& b) :
+        name(name),
+        first(a),
+        second(b) {
+    }
 
-    //! Returns action currently at the top of the queue.
-    virtual std::string action()=0;
+    //! Creates a new signal with the given name and parameters.
+    Signal(const std::string& name, const boost::any& a) :
+        name(name),
+        first(a) {
+    }
     
-    //! Returns number of actions in the queue
-    virtual size_t action_count() const=0;
+    //! Creates a new signal with the given name and parameters.
+    Signal(const std::string& name) :
+        name(name) {
+            
+    }
     
-    //! Offers an action for the next input tick.  This is usually a few
-    //! ticks ahead of the current game tick.
-    //! @param action the action to record for this tick
-    virtual void action(const std::string& action)=0;
+    const std::string name;
+    const boost::any first;
+    const boost::any second;
 };
+
 }

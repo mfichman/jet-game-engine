@@ -97,5 +97,13 @@ function Dagger:on_fracture(node)
     node.sparks.life = math.random() * 3 + 2
 end
 
+function Dagger:on_explode(first, second)
+print(first, second)
+    local n = Vector(math.random()*2-1, math.random()*2-1, math.random()*2-1)
+    self.mesh:fracture(Plane(n.unit, Vector(0, 0, 0)))
+    local n = Vector(math.random()*2-1, math.random()*2-1, math.random()*2-1)
+    self.mesh:fracture(Plane(n.unit, Vector(0, 0, 0)))
+end
+
 function Dagger:on_collision(node)
 end

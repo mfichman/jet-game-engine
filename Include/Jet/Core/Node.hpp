@@ -35,10 +35,12 @@
 #include <Jet/Quaternion.hpp>
 #include <Jet/Vector.hpp>
 #include <Jet/Matrix.hpp>
+#include <Jet/Signal.hpp>
 #include <Jet/Iterator.hpp>
 
 #include <string>
 #include <stdexcept>
+#include <queue>
 #include <vector>
 #ifdef WINDOWS
 #include <unordered_map>
@@ -142,6 +144,9 @@ public:
     
     //! Returns the audio source attached to this node.
     Jet::AudioSource* audio_source();
+	
+	//! Returns the network monitor attached to this node.
+	Jet::NetworkMonitor* network_monitor();
     
 	//! Creates and returns an extension object, if it doesn't already exist.
 	//! @param name the name of the extension object
@@ -219,6 +224,10 @@ public:
     //! @param up the up vector
     void look(const Vector& target, const Vector& up=Vector(0.0f, 1.0f, 0.0f));
 
+	//! Sends a signal to this node.  Note that if the node is owned by
+	//! a remote machine, then the signal will be sent by RPC.
+	void signal(const Signal& signal);
+
 	//! Marks this node for destruction.  The node is removed from the scene 
 	//! graph immediately, but won't be garbage collected until all references
 	//! to the node are destroyed.
@@ -277,6 +286,7 @@ private:
     Jet::AudioSourcePtr audio_source_;
     std::tr1::unordered_map<std::string, ObjectPtr> object_;
     std::vector<NodeListenerPtr> listener_;
+	std::queue<std::vector<Signal>> signal_;
     bool destroyed_;
 	size_t transform_modified_count_;
 	size_t transform_update_count_;

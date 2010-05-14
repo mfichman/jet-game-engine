@@ -70,7 +70,7 @@ public:
     virtual void on_init()=0;
     
     //! Called when the module is updated (during the physics update)
-    virtual void on_update()=0;
+    virtual void on_update(float delta)=0;
     
     //! Called when the module is rendered.
     virtual void on_render()=0;
@@ -79,7 +79,7 @@ public:
     virtual void on_destroy()=0;
     
     //! Called once per frame.
-    virtual void on_tick(float delta)=0;
+    virtual void on_tick()=0;
 };
 
 }

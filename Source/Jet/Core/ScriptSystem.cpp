@@ -48,7 +48,7 @@
 #include <Jet/Texture.hpp>
 #include <Jet/FractalPlanet.hpp>
 #include <Jet/Shader.hpp>
-#include <Jet/ActionQueue.hpp>
+#include <Jet/Signal.hpp>
 #include <luabind/luabind.hpp>
 #include <luabind/adopt_policy.hpp>
 #include <luabind/operator.hpp>
@@ -67,6 +67,8 @@ namespace luabind {
         }
         
         boost::any from(lua_State* env, int index) {
+            boost::optional<Vector> o1;
+            boost::optional<Quaternion> o2;
             switch (lua_type(env, index)) {
                 case LUA_TNIL: return boost::any();
                 case LUA_TSTRING: return boost::any(string(lua_tostring(env, index)));
@@ -78,6 +80,16 @@ namespace luabind {
 #ifdef WINDOWS
 #pragma warning(default:4800)
 #endif
+                case LUA_TUSERDATA:
+                    o1 = object_cast_nothrow<Vector>(object(from_stack(env, index)));
+                    if (o1) {
+                        return o1.get();
+                    }
+                    o2 = object_cast_nothrow<Quaternion>(object(from_stack(env, index)));
+                    if (o2) {
+                        return o2.get();
+                    }
+
                 default: return boost::any();
             }          
         }
@@ -89,6 +101,12 @@ namespace luabind {
                 lua_pushstring(env, boost::any_cast<string>(any).c_str());
             } else if (typeid(bool) == any.type()) {
                 lua_pushboolean(env, boost::any_cast<bool>(any));
+            } else if (typeid(Vector) == any.type()) {
+                object o(env, boost::any_cast<Vector>(any));
+                o.push(env);
+            } else if (typeid(Quaternion) == any.type()) {
+                object o(env, boost::any_cast<Quaternion>(any));
+                o.push(env);
             } else {
                 lua_pushnil(env);
             }
@@ -136,6 +154,9 @@ Core::ScriptSystem::ScriptSystem(Engine* engine) :
     init_value_type_bindings();
     init_entity_type_bindings();
     
+    // Called when an error occurs
+    luabind::set_pcall_callback(&ScriptSystem::on_error);
+    
     // Add __adopt_actor function
     lua_pushlightuserdata(env_, this);
     lua_pushcclosure(env_, &ScriptSystem::adopt_actor, 1);
@@ -169,7 +190,6 @@ Core::ScriptSystem::~ScriptSystem() {
     lua_close(env_);
     
 }
-
 void Core::ScriptSystem::on_init() {
     std::cout << "Initializing script system" << std::endl;
 
@@ -205,10 +225,18 @@ int Core::ScriptSystem::adopt_module(lua_State* env) {
     
     ScriptSystem* self = static_cast<ScriptSystem*>(lua_touserdata(env, lua_upvalueindex(1)));
     luabind::object ref = object(from_stack(env, -1));
-    self->engine_->module(new ScriptModule(ref));
+    self->engine_->module(new ScriptModule(env, ref));
     
     return 0;
 }
+
+int Core::ScriptSystem::on_error(lua_State* env) {
+    cout << lua_tostring(env, -1) << endl;
+    luabind::object object = luabind::globals(env)["debug"]["traceback"]();
+    cout << object << endl;
+    return 0;
+}
+
 
 void Core::ScriptSystem::init_value_type_bindings() {
     // Load Lua bindings for basic value types exported by the engine.
@@ -295,6 +323,14 @@ void Core::ScriptSystem::init_value_type_bindings() {
             .def(luabind::constructor<float, float>())
             .def_readwrite("x", &Point::x)
             .def_readwrite("y", &Point::y),
+            
+        luabind::class_<Signal>("Signal")
+            .def(luabind::constructor<const std::string&>())
+            .def(luabind::constructor<const std::string&, const boost::any&, const boost::any&>())
+            .def(luabind::constructor<const std::string&, const boost::any&>())
+            .def_readonly("name", &Signal::name)
+            .def_readonly("first", &Signal::first)
+            .def_readonly("second", &Signal::second),
 
 		luabind::class_<Box>("Box")
 			.def(luabind::constructor<>())
@@ -362,6 +398,7 @@ void Core::ScriptSystem::init_entity_type_bindings() {
             .def("fracture_object", &Jet::Node::fracture_object)
             .def("fractal_planet", &Jet::Node::fractal_planet)
             .def("look", &Jet::Node::look)
+            .def("signal", &Jet::Node::signal)
 			.def("destroy", &Jet::Node::destroy),
             
         luabind::class_<Jet::MeshObject, Jet::MeshObjectPtr>("MeshObject")
@@ -417,12 +454,7 @@ void Core::ScriptSystem::init_entity_type_bindings() {
             .def("search_folder", &Jet::Engine::search_folder)
 			.def("mesh", (Jet::Mesh* (Jet::Engine::*)(const std::string&))&Jet::Engine::mesh)
             .def("material", &Jet::Engine::material)
-            .def("action_queue", &Jet::Engine::action_queue)
             .property("running", (bool (Jet::Engine::*)() const)&Jet::Engine::running, (void (Jet::Engine::*)(bool))&Jet::Engine::running),
-            
-        luabind::class_<Jet::ActionQueue, Jet::ActionQueuePtr>("ActionQueue")
-            .property("action", (std::string (Jet::ActionQueue::*)())&Jet::ActionQueue::action, (void (Jet::ActionQueue::*)(const std::string&))&Jet::ActionQueue::action)
-            .property("action_count", &Jet::ActionQueue::action_count),
             
         luabind::class_<Jet::Mesh, Jet::MeshPtr>("Mesh")
             .def("vertex", (void (Jet::Mesh::*)(size_t, const Vertex&))&Jet::Mesh::vertex)

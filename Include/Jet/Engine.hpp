@@ -82,9 +82,6 @@ public:
     //! load the underlying resource if load is set to true.
     //! @param name the name of the texture
     virtual Shader* shader(const std::string& name="")=0;
-	
-	//! Returns the action queue with the given name.
-	virtual ActionQueue* action_queue(const std::string& name="")=0;
     
     //! Returns the full path to the file using the given resource name.
     //! @param name the name of the resource
@@ -118,7 +115,7 @@ public:
     //! Runs the engine through one complete loop.  Note that the engine may
     //! or may not actually do anything on a given loop, depending on the
     //! elapsed time.
-    virtual void tick()=0;
+    virtual void update()=0;
 	
 	//! Creates a new engine.
 	static Engine* create();

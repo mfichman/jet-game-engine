@@ -162,12 +162,12 @@ void Core::Material::begin_shader() {
 	if (engine_->option<bool>("shadows_enabled")) {
 		// Calculate the shadow far z distances for CSM
 		Core::CameraPtr camera = static_cast<Core::Camera*>(engine_->camera());
-		size_t cascades = min(4, (size_t)engine_->option<float>("shadow_cascades"));
+		size_t cascades = min(MAX_SHADOW_CASCADES, (size_t)engine_->option<float>("shadow_cascades"));
 		float alpha = engine_->option<float>("shadow_correction"); 
 		float n = camera->near_clipping_distance();
 		float f = min(camera->far_clipping_distance(), engine_->option<float>("shadow_distance"));
-		float shadow_z[4];
-		GLint shadow_sampler[4];
+		float shadow_z[MAX_SHADOW_CASCADES];
+		GLint shadow_sampler[MAX_SHADOW_CASCADES];
 
 		// Set up the shader sampler numbers and shadow z vector
 		for (size_t i = 0; i < cascades; i++) {
@@ -180,8 +180,8 @@ void Core::Material::begin_shader() {
 		// shadows
 		glUniform1i(cascade_count_loc_, cascades);
 		glUniform1i(shadow_map_enabled_, (bool)receive_shadows_);		
-		glUniform1iv(shadow_map_loc_, 4, shadow_sampler);
-		glUniform1fv(shadow_z_loc_,  4, shadow_z);
+		glUniform1iv(shadow_map_loc_, MAX_SHADOW_CASCADES, shadow_sampler);
+		glUniform1fv(shadow_z_loc_, MAX_SHADOW_CASCADES, shadow_z);
 		glUniform1f(shadow_distance_loc_, engine_->option<float>("shadow_distance"));
 	} else {
 		glUniform1i(shadow_map_enabled_, false);

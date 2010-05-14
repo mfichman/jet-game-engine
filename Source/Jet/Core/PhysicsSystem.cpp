@@ -50,7 +50,7 @@ Core::PhysicsSystem::~PhysicsSystem() {
     
 }
 
-void Core::PhysicsSystem::on_tick() {
+void Core::PhysicsSystem::on_update() {
     float gravity = engine_->option<float>("gravity");
     world_->setGravity(btVector3(0.0f, -gravity, 0.0f));
     
@@ -79,16 +79,16 @@ void Core::PhysicsSystem::on_tick(btDynamicsWorld* world, btScalar step) {
     
     // Update all engine listeners
     for (Iterator<EngineListenerPtr> i = system->engine_->listeners(); i; i++) {
-        (*i)->on_update();
+        (*i)->on_tick();
     }
 	
     // Update the active module
     if (system->engine_->module()) {
-        system->engine_->module()->on_update();
+        system->engine_->module()->on_tick();
     }
     
     // Update the nodes
-    static_cast<Node*>(system->engine_->root())->update();
+    static_cast<Node*>(system->engine_->root())->tick();
     
     // Check for collisions
     int nmanifolds = world->getDispatcher()->getNumManifolds();

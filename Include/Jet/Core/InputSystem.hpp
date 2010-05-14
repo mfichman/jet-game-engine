@@ -39,9 +39,9 @@ public:
     ~InputSystem();
 
 private:
-    void on_tick();
+    void on_tick() {}
     void on_init();
-    void on_update() {}
+    void on_update();
     void on_render() {}
     
 	void on_keyboard(const std::string& key);

@@ -18,7 +18,7 @@ int main(int argc, char** argv) {
         Jet::EnginePtr engine(Jet::Engine::create()); 
         
         while (engine->running()) {
-			engine->tick();
+			engine->update();
 		}
        	return 0; 
     } catch (std::exception& ex) {
