@@ -154,7 +154,7 @@ public:
 //! engine.
 //! @class NodeListener
 //! @brief Interface for handling node events.
-class NodeListener : public Object {
+class NodeListener : public virtual Object {
 public: 
     //! Called once per frame.  The value passed in is the game
 	//! time elapsed since the last frame.  Note that this will

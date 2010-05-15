@@ -45,7 +45,7 @@ Core::Mesh::~Mesh() {
 }
 
 void Core::Mesh::state(ResourceState state) {
-	if (state == state_) {
+	if (state == state_ || destroyed_) {
 		return; // No change
 	}
 	
@@ -71,6 +71,10 @@ void Core::Mesh::state(ResourceState state) {
 	if (UNLOADED == state) {
 		vertex_.clear();
 		index_.clear();
+		if (parent_) {
+			engine_->delete_mesh(name_);
+			destroyed_ = true;
+		}
 	}
 	
 	state_ = state;
@@ -206,6 +210,10 @@ void Core::Mesh::read_mesh_data() {
 }
 
 void Core::Mesh::render(Core::Shader* shader) {
+	// If the mesh has been destroyed (that is, unliked from the engine)
+	// then the vertex buffers are released, so don't render.
+	assert(!destroyed_);
+	
 	// Make sure that all vertex data is synchronized
 	state(SYNCED);
 	if (parent_) {
@@ -246,7 +254,7 @@ void Core::Mesh::render(Core::Shader* shader) {
 	}
 }
 
- void Core::Mesh::vertex(size_t i, const Vertex& vertex) {
+void Core::Mesh::vertex(size_t i, const Vertex& vertex) {
 	if (parent_) {
 		throw std::runtime_error("Vertex data is read-only");
 	} else {

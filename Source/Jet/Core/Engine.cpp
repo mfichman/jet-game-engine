@@ -35,9 +35,10 @@
 #include <Jet/Core/ScriptSystem.hpp>
 #include <Jet/Core/PhysicsSystem.hpp>
 #include <Jet/Core/InputSystem.hpp>
+#include <Jet/Core/AudioSystem.hpp>
+#include <Jet/Core/NetworkSystem.hpp>
 
 #include <Jet/Core/AudioSource.hpp>
-#include <Jet/Core/AudioSystem.hpp>
 #include <Jet/Core/Camera.hpp>
 #include <Jet/Core/Sound.hpp>
 #include <Jet/Core/Light.hpp>
@@ -94,6 +95,7 @@ Core::Engine::Engine() :
 	physics_system_ = new PhysicsSystem(this);
 	audio_system_ = new AudioSystem(this);
 	script_system_ = new ScriptSystem(this);
+	network_system_ = new NetworkSystem(this);
 	
 	// Platform-dependent timer code
 #ifdef WINDOWS
@@ -212,6 +214,9 @@ Jet::Shader* Core::Engine::shader(const std::string& name) {
 	}
 }
 
+Jet::Network* Core::Engine::network() const {
+	return network_system_.get();
+}
 
 std::string Core::Engine::resource_path(const std::string& name) const {
     for (set<string>::const_iterator i = search_folder_.begin(); i != search_folder_.end(); i++) {
@@ -314,4 +319,8 @@ void Core::Engine::update_frame_delta() {
 	prev_time_ = current_time;
 
 #endif
+}
+
+void Core::Engine::delete_mesh(const std::string& name) {
+	mesh_.erase(name);	
 }

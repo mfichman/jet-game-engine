@@ -42,6 +42,7 @@ class Mesh : public Jet::Mesh {
 public:
 	inline Mesh(Engine* engine, const std::string& name) :
 		engine_(engine),
+		destroyed_(false),
 		name_(name),
 		state_(UNLOADED),
 		vbuffer_(0),
@@ -53,6 +54,7 @@ public:
 	inline Mesh(Engine* engine, const std::string& name, Mesh* parent) :
 		engine_(engine),
 		parent_(parent),
+		destroyed_(false),
 		name_(name),
 		state_(UNLOADED),
 		vbuffer_(0),
@@ -151,6 +153,7 @@ private:
     
     Engine* engine_;
 	MeshPtr parent_;
+	bool destroyed_;
 	std::string name_;
 	ResourceState state_;
     std::vector<Vertex> vertex_;

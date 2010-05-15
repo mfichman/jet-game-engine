@@ -124,7 +124,7 @@ public:
 //! This class is used to register for events regarding an overlay.
 //! @class OverlayListener
 //! @brief Listens for overlay events.
-class OverlayListener : public Object {
+class OverlayListener : public virtual Object {
 public:
     //! Called when the mouse is pressed while over the overlay.
     virtual void on_mouse_pressed()=0;

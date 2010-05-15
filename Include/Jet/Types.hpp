@@ -65,6 +65,7 @@ namespace Jet {
     class Mesh;
     class MeshObject;
     class Module;
+    class Network;
     class NetworkMonitor;
     class Node;
     class NodeListener;
@@ -102,6 +103,7 @@ namespace Jet {
     typedef boost::intrusive_ptr<Mesh> MeshPtr;
     typedef boost::intrusive_ptr<MeshObject> MeshObjectPtr;
     typedef boost::intrusive_ptr<Module> ModulePtr;
+    typedef boost::intrusive_ptr<Network> NetworkPtr;
     typedef boost::intrusive_ptr<NetworkMonitor> NetworkMonitorPtr;
     typedef boost::intrusive_ptr<Node> NodePtr;
     typedef boost::intrusive_ptr<NodeListener> NodeListenerPtr;
@@ -123,4 +125,5 @@ namespace Jet {
     enum SyncMode { STATIC_SYNC, DYNAMIC_SYNC };
     enum LayoutMode { RELATIVE_LAYOUT, ABSOLUTE_LAYOUT };
     enum Alignment { TOP, CENTER, BOTTOM, LEFT, RIGHT };
+    enum NetworkState { DISCOVER, HOST, RUNNING, DISABLED };
 }

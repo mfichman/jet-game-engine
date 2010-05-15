@@ -103,7 +103,7 @@ void Core::FractureObject::fracture_indices(const Plane& plane) {
     float m1 = v1 * mass / (v1 + v2);
     float m2 = v2 * mass / (v1 + v2);
     
-    // Swap the mesh halves if v1 is smaller than v2 (index1 should always
+    // Swap the mesh halves if v1 is smaller than v2 (mesh1 should always
     // have the largest mesh)
     if (v1 < v2) {
         swap(b1, b2);

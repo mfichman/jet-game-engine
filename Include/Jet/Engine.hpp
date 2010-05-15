@@ -44,6 +44,9 @@ public:
 	
 	//! Returns the current module.
 	virtual Module* module() const=0;
+	
+	//! Returns the network interface.
+	virtual Network* network() const=0;
         
     //! Returns true if the engine is running
     virtual bool running() const=0;
@@ -68,10 +71,6 @@ public:
     //! Returns the mesh with the given name.
     //! @param name the name of the mesh.
     virtual Mesh* mesh(const std::string& name="")=0;
-	
-	//! Creates a new mesh using the given mesh's vertex data.
-	//! Index data is not copied, and the mesh will be anonymous
-	virtual Mesh* mesh(Mesh* mesh)=0;
 
     //! Returns the given texture descriptor.  This function will attempt to
     //! load the underlying resource if load is set to true.
@@ -127,7 +126,7 @@ public:
 //! engine.
 //! @class EngineListener
 //! @brief Interface for handling engine events.
-class EngineListener : public Object {
+class EngineListener : public virtual Object {
 public:
 	//! Called when the engine is initialized
 	virtual void on_init()=0;

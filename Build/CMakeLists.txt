@@ -93,6 +93,10 @@ set(LIBRARIES ${LIBRARIES} ${BOOST_FILESYSTEM})
 set(LIBRARIES ${LIBRARIES} ${COCOA})
 endif()
 
+if(WIN32)
+find_library(WINSOCK NAMES ws2_32 PATHS ${LIB_DIRS})
+set(LIBRARIES ${LIBRARIES} ${WINSOCK})
+endif()
 
 target_link_libraries(Jet ${LIBRARIES})
 target_link_libraries(Test Jet)

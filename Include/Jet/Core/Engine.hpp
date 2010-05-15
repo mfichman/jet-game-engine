@@ -86,6 +86,11 @@ public:
 		return audio_system_.get();
 	}
 	
+	//! Returns the network system.
+	inline NetworkSystem* network_system() const {
+		return network_system_.get();
+	}
+	
 	//! Returns the current module.
 	inline Module* module() const {
 		return module_.get();
@@ -150,8 +155,9 @@ public:
     //! @param name the name of the mesh.
     Jet::Mesh* mesh(const std::string& name="");
 	
-	//! Returns the mesh with the given name.
-    //! @param name the name of the mesh.
+	//! Returns a mesh that is a copy of the given mesh.  The new mesh will
+	//! share a read-only reference to the old mesh's vertex buffer, but will
+	//! have its own index buffer.
     Jet::Mesh* mesh(Jet::Mesh* mesh);
 
     //! Returns the given texture descriptor.  This function will attempt to
@@ -163,6 +169,9 @@ public:
     //! load the underlying resource if load is set to true.
     //! @param name the name of the texture
     Jet::Shader* shader(const std::string& name="");
+		
+	//! Returns the network interface.
+	Jet::Network* network() const;
 
     //! Adds a listener, which listens for engine events.
     //! @param listener the engine listener.
@@ -257,19 +266,31 @@ public:
 	}
 
 private:
-	
     std::string resolve_path(const std::string& path);
     void update_frame_delta();
 	void update_fps();
 	void init_systems();
-
+	void delete_mesh(const std::string& name);
+	
 	// Map containing engine options
 	std::map<std::string, boost::any> option_;
+    std::set<std::string> search_folder_;
+
+
+	// Resource descriptors
+	std::map<std::string, Jet::SoundPtr> sound_;
+    std::map<std::string, Jet::MaterialPtr> material_;
+    std::map<std::string, Jet::MeshPtr> mesh_;
+    std::map<std::string, Jet::TexturePtr> texture_;
+	std::map<std::string, Jet::ShaderPtr> shader_;
 
     Jet::NodePtr root_;
 	Jet::OverlayPtr overlay_;
 	Jet::CameraPtr camera_;
 	Jet::ModulePtr module_;
+		
+	// Listeners
+    std::list<EngineListenerPtr> listener_;
 	
 	// Engine sub-systems
 	PhysicsSystemPtr physics_system_;
@@ -277,18 +298,8 @@ private:
 	ScriptSystemPtr script_system_;
 	InputSystemPtr input_system_;
 	AudioSystemPtr audio_system_;
-    
-	// Resource descriptors
-	std::map<std::string, Jet::SoundPtr> sound_;
-    std::map<std::string, Jet::MaterialPtr> material_;
-    std::map<std::string, Jet::MeshPtr> mesh_;
-    std::map<std::string, Jet::TexturePtr> texture_;
-	std::map<std::string, Jet::ShaderPtr> shader_;
-    std::set<std::string> search_folder_;
-    
-	// Listeners
-    std::list<EngineListenerPtr> listener_;
-    
+	NetworkSystemPtr network_system_;
+
     // Record-keeping values for timing statistics
     bool running_;
 	bool initialized_;
@@ -296,7 +307,7 @@ private:
 	float frame_time_;
 	unsigned fps_frame_count_;
 	float fps_elapsed_time_;
-	size_t auto_name_counter_;;
+	size_t auto_name_counter_;
 	
 #ifdef WINDOWS
     float secs_per_count_;
@@ -304,6 +315,8 @@ private:
 #else
 	timeval prev_time_;
 #endif
+
+	friend class Mesh;
     
 };
 

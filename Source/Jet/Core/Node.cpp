@@ -252,7 +252,7 @@ void Core::Node::look(const Vector& target, const Vector& up) {
 
 void Core::Node::signal(const Signal& signal) {
 	if (true /*!network_monitor*/) {
-		// Send signal immediately to the object.
+		// Send signal immediately to the object, or else delay the object.
 		for (vector<NodeListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
 			(*i)->on_signal(signal);
 		}
@@ -352,7 +352,7 @@ void Core::Node::update_transform() {
 	if (parent_ && parent_->transform_update_count_ != transform_modified_count_) {
 		// If the parent transform has been recalculated more times than
 		// the node's data hs been modified, then we know that our
-		// transform is ut of date.  Therefore, we set the transform counts
+		// transform is out of date.  Therefore, we set the transform counts
 		// equal to the parent node count and recalculate our
 		transform_update_count_ = parent_->transform_update_count_;
 		transform_modified_count_ = parent_->transform_modified_count_;
