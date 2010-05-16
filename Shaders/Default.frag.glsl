@@ -45,7 +45,8 @@ varying vec3 eye_dir;
 varying vec3 light_dir;
 varying vec4 shadow_coord[MAX_CASCADES];
 
-float shadow_lookup(sampler2DShadow shadow_sampler, vec4 shadow_coord) {  
+float shadow_lookup(sampler2DShadow shadow_sampler, vec4 shadow_coord) {
+    shadow_coord.z -= 0.0005;
     return shadow2DProj(shadow_sampler, shadow_coord).w;
 }
 

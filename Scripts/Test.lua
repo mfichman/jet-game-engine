@@ -40,7 +40,7 @@ function Test:__init()
         ambient_color = Color(.3, .3, .3, 1),
         diffuse_color = Color(1, 1, 1, 1),
         specular_color = Color(1, 1, 1, 1),
-        direction = Vector(1, 0, 1)
+        direction = Vector(1, 0, -1)
     }
     
     -- Set up the camera
