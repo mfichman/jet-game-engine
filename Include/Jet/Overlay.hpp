@@ -67,6 +67,9 @@ public:
     //! Returns the text that will be displayed by this overlay.
     virtual const std::string& text() const=0;
     
+    //! Returns the text color
+    virtual const Color& text_color() const=0;
+    
     //! Returns the text font.
     virtual Font* font() const=0;
     
@@ -99,6 +102,9 @@ public:
     
     //! Sets the text attached to this overlay.
     virtual void text(const std::string& text)=0;
+    
+    //! Sets the text color
+    virtual void text_color(const Color& color)=0;
     
     //! Sets the text font.
     virtual void font(Font* font)=0;

@@ -118,8 +118,12 @@ void Core::Overlay::render_background() {
 }
 
 void Core::Overlay::render_text() {
-    if (!text_.empty() && font_) {  
+    if (!text_.empty() && font_) {
+        glColor4fv(text_color_);
+        glPushMatrix();
+        glTranslatef(0, (float)font_->height(), 0);
         font_->render(text_);
+        glPopMatrix();
     }
 }
 

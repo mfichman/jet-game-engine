@@ -53,7 +53,8 @@ public:
         height_(0.0f),
         layout_mode_(RELATIVE_LAYOUT),
         vertical_alignment_(TOP),
-        horizontal_alignment_(LEFT) {
+        horizontal_alignment_(LEFT),
+        text_color_(1.0f, 1.0f, 1.0f, 1.0f) {
         
     }
     
@@ -68,7 +69,8 @@ public:
         height_(0.0f),
         layout_mode_(RELATIVE_LAYOUT),
         vertical_alignment_(TOP),
-        horizontal_alignment_(LEFT) {
+        horizontal_alignment_(LEFT),
+        text_color_(1.0f, 1.0f, 1.0f, 1.0f) {
             
     }
     
@@ -124,6 +126,11 @@ public:
         return text_;
     }
     
+    //! Returns the text color
+    inline const Color& text_color() const {
+        return text_color_;
+    }
+    
     //! Returns the text font.
     inline Font* font() const {
         throw std::runtime_error("Not implemented");
@@ -175,6 +182,11 @@ public:
     //! Sets the text attached to this overlay.
     inline void text(const std::string& text) {
         text_ = text;
+    }
+    
+    //! Sets the text color
+    inline void text_color(const Color& color) {
+        text_color_ = color;
     }
     
     //! Sets the text font.
@@ -231,6 +243,7 @@ private:
     Alignment vertical_alignment_;
     Alignment horizontal_alignment_;
     std::string text_;
+    Color text_color_;
     TexturePtr background_;
     FontPtr font_;
     std::vector<OverlayListenerPtr> listener_;

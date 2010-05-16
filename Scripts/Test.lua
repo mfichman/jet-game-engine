@@ -35,14 +35,15 @@ function Test:__init()
     
     -- Create overlay
     print("Creating overlay")
-    self.overlay = engine.overlay:overlay("overlay") {
-        background = "Electricity.png",
-        font = "Neuropol.ttf#32",
-        text = "Hello, world!",
-        x = 0,
+    self.overlay = engine.overlay:overlay("tl") {
+        font = "Neuropol.ttf#14",
+        text = "Jet Game Engine build 2.0.1",
+        text_color = Color(1, 1, 1, 0.8),
+        vertical_alignment = Overlay.TOP,
+        x = 2,
         y = 0,
         width = 200,
-        height = 200
+        height = 18
     }
     
     -- Set up lights

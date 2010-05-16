@@ -86,6 +86,7 @@ function Dagger:__init(node, name)
 
     self.body = self.node:rigid_body()
     self.body.mass = 10.0
+    self.body.linear_velocity = Vector(0, 1, 0)
 end
 
 function Dagger:on_fracture(node)

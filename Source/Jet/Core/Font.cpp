@@ -163,10 +163,8 @@ void Core::Font::create_bitmap(FT_Face face, unsigned char ch) {
     glPushMatrix();
     
     // Adjust for left spacing and descent of the glyph.
-
     glTranslatef((float)bitmap_glyph->left, 0, 0);
-    glTranslatef(0, (float)(bitmap_glyph->top-bitmap.rows), 0);
-//        glScalef(0, -1, 0);
+    glTranslatef(0, (float)(bitmap.rows-bitmap_glyph->top), 0);
     
     // Compensate for blank space surrounding the character.
     float x = (float)bitmap.width / (float)width;
@@ -198,8 +196,6 @@ void Core::Font::render(const std::string& text) {
     // Render all the lists necessary at once using the string
     // directly (very efficient!!)
     glPushMatrix();
-
-	glTranslatef(0, 50, 0);
     glCallLists(text.length(), GL_UNSIGNED_BYTE, text.c_str());
     glPopMatrix();
     

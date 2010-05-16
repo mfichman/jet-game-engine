@@ -116,6 +116,8 @@ void shadow_color(inout vec4 diffuse, inout vec4 specular, inout vec4 ambient) {
             shadow += shadow_lookup(shadow_map[2], shadow_coord[2]);
         } else {
             shadow += shadow_lookup(shadow_map[3], shadow_coord[3]);
+            float fade = (shadow_z[3] - z)/(shadow_z[3] - shadow_z[2]);
+            shadow = mix(1.0, shadow, sqrt(fade));
         }
         
         diffuse *= 0.5 + 0.5 * shadow;
