@@ -30,6 +30,7 @@
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <fstream>
+#include <cmath>
 
 using namespace Jet;
 using namespace std;
@@ -162,7 +163,7 @@ void Core::Material::begin_shader() {
 	if (engine_->option<bool>("shadows_enabled")) {
 		// Calculate the shadow far z distances for CSM
 		Core::CameraPtr camera = static_cast<Core::Camera*>(engine_->camera());
-		size_t cascades = min(MAX_SHADOW_CASCADES, (size_t)engine_->option<float>("shadow_cascades"));
+		size_t cascades = min((size_t)MAX_SHADOW_CASCADES, (size_t)engine_->option<float>("shadow_cascades"));
 		float alpha = engine_->option<float>("shadow_correction"); 
 		float n = camera->near_clipping_distance();
 		float f = min(camera->far_clipping_distance(), engine_->option<float>("shadow_distance"));

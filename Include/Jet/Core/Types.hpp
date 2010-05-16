@@ -23,7 +23,7 @@
 
 #include <boost/intrusive_ptr.hpp>
 
-#define MAX_SHADOW_CASCADES 4
+#define MAX_SHADOW_CASCADES 4U
 
 namespace Jet { namespace Core {
     class ActionQueue;
