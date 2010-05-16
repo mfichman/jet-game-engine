@@ -18,7 +18,7 @@ int main(int argc, char** argv) {
 #endif
 	cout << UINT_MAX << endl;
 
-    try {        
+    try {
         Jet::EnginePtr engine(Jet::Engine::create()); 
         
         while (engine->running()) {

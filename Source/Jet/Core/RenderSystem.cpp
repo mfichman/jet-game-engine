@@ -63,10 +63,11 @@ Core::RenderSystem::RenderSystem(Engine* engine) :
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		throw runtime_error(string("SDL initialization failed: ") + SDL_GetError());
 	}
+	putenv("SDL_VIDEO_WINDOW_POS=center");
 }
 	
 Core::RenderSystem::~RenderSystem() {
-	//SDL_Quit();
+	SDL_Quit();
 }
 
 void Core::RenderSystem::init_window() {
@@ -84,7 +85,6 @@ void Core::RenderSystem::init_window() {
 		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, fsaa_samples);
 		glEnable(GL_MULTISAMPLE);
 	}
-	
 	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
@@ -92,7 +92,6 @@ void Core::RenderSystem::init_window() {
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, vsync_enabled);
-	putenv("SDL_VIDEO_WINDOW_POS=center");
 	
 	uint32_t flags = SDL_OPENGL;
 	if (fullscreen_enabled) {
@@ -224,7 +223,8 @@ void Core::RenderSystem::check_video_mode() {
 		SDL_GL_SwapBuffers();
 		
 		// Demote all resources to the LOADED state, because the OpenGL context
-		// is about to be destroyed
+		// is about to be destroyed.  They will return to the SYNCED state
+		// when needed
 		for (Iterator<pair<const string, Jet::MeshPtr> > i = engine_->meshes(); i; i++) {
 			i->second->state(LOADED);
 		}
@@ -232,6 +232,9 @@ void Core::RenderSystem::check_video_mode() {
 			i->second->state(LOADED);
 		}
 		for (Iterator<pair<const string, Jet::ShaderPtr> > i = engine_->shaders(); i; i++) {
+			i->second->state(LOADED);
+		}
+		for (Iterator<pair<const string, Jet::FontPtr> > i = engine_->fonts(); i; i++) {
 			i->second->state(LOADED);
 		}
 		shadow_target_.clear();
@@ -531,6 +534,8 @@ void Core::RenderSystem::render_overlays() {
 	glDisable(GL_LIGHTING);
 	glDisable(GL_CULL_FACE);
 	glEnable(GL_BLEND);
+	glEnable(GL_TEXTURE_2D);
+	glActiveTexture(GL_TEXTURE0);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	
 	static_cast<Core::Overlay*>(engine_->overlay())->render();
@@ -544,6 +549,7 @@ void Core::RenderSystem::render_overlays() {
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_CULL_FACE);
+	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_BLEND);
 	
 }

@@ -1,7 +1,8 @@
 -- This file declares engine options.  Only two functions should be called from
--- this file: 
+-- this file:
 
-if (system == "advanced") then
+
+if (true) then
 engine:option("shadow_texture_size", 2048)
 engine:option("display_width", 1440)
 engine:option("display_height", 900)

@@ -76,7 +76,7 @@ Core::Engine::Engine() :
 	fps_elapsed_time_(0.0f),
 	auto_name_counter_(0) {
 		
-	cout << "Starting kernel..." << endl;
+	cout << "Starting kernel" << endl;
 		
 	// Add some default search folders
 	search_folder(".");
@@ -140,7 +140,14 @@ void Core::Engine::init_systems() {
 }
 
 Jet::Font* Core::Engine::font(const std::string& name) {
-	throw runtime_error("Not implemented");
+	map<string, Jet::FontPtr>::iterator i = font_.find(name);
+    if (i == font_.end()) {
+        Core::FontPtr font(new Core::Font(this, name));
+        font_.insert(make_pair(name, font));
+        return font.get();
+	} else {
+		return i->second.get();
+	}
 }
 
 Jet::Sound* Core::Engine::sound(const std::string& name) {

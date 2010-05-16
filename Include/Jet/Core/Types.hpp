@@ -31,6 +31,7 @@ namespace Jet { namespace Core {
     class AudioSystem;
     class Camera;
     class Engine;
+    class Font;
     class FractureObject;
     class FractalPlanet;
     class InputSystem;
@@ -64,6 +65,7 @@ namespace Jet { namespace Core {
     typedef boost::intrusive_ptr<AudioSystem> AudioSystemPtr;
     typedef boost::intrusive_ptr<Camera> CameraPtr;
     typedef boost::intrusive_ptr<Engine> EnginePtr;
+    typedef boost::intrusive_ptr<Font> FontPtr;
     typedef boost::intrusive_ptr<FractureObject> FractureObjectPtr;
     typedef boost::intrusive_ptr<FractalPlanet> FractalPlanetPtr;
     typedef boost::intrusive_ptr<InputSystem> InputSystemPtr;

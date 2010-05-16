@@ -93,14 +93,8 @@ function Test:on_destroy()
 end
 
 function Test:on_update(delta)
-	local step = self.camera_velocity*(60*delta)
-	local posi = self.camera_node.position
-	local pos2 = step + posi
-	print("STEP: ", step)
-	print("POSI: ", posi)
-	print("POS2: ", pos2)
     delta = delta / engine:option("simulation_speed");
-    self.camera_node.position = step + self.camera_node.position
+    self.camera_node.position = self.camera_velocity*(60*delta) + self.camera_node.position
     self.camera_node:look(Vector(0, 0, 0), Vector(0, 1, 0))
 end
 

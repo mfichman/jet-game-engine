@@ -21,7 +21,7 @@
  */
 
 #define MAX_CASCADES 4
-//#define SHADOW_MAP
+#define SHADOW_MAP
 
 uniform int cascade_count;
 

@@ -239,6 +239,11 @@ public:
 	inline Iterator<std::pair<const std::string, Jet::ShaderPtr> > shaders() {
 		return Iterator<std::pair<const std::string, Jet::ShaderPtr> >(shader_.begin(), shader_.end());
 	}
+		
+	//! Returns an iterator to the meshes
+	inline Iterator<std::pair<const std::string, Jet::FontPtr> > fonts() {
+		return Iterator<std::pair<const std::string, Jet::FontPtr> >(font_.begin(), font_.end());
+	}
 	
 	//! Returns an iterator to all listeners
 	inline Iterator<Jet::EngineListenerPtr> listeners() {
@@ -283,6 +288,7 @@ private:
     std::map<std::string, Jet::MeshPtr> mesh_;
     std::map<std::string, Jet::TexturePtr> texture_;
 	std::map<std::string, Jet::ShaderPtr> shader_;
+	std::map<std::string, Jet::FontPtr> font_;
 
     Jet::NodePtr root_;
 	Jet::OverlayPtr overlay_;

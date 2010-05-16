@@ -25,6 +25,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
+#include <GL/glew.h>
 #include <GL/gl.h>
 
 using namespace Jet;
@@ -102,9 +103,7 @@ void Core::Overlay::render() {
 
 void Core::Overlay::render_background() {
     if (background_) {
-        background_->sampler(0);
-        glEnable(GL_TEXTURE_2D);
-        
+        background_->sampler(0);        
         glBegin(GL_QUADS);
         glTexCoord2f(0.0f, 0.0f);
         glVertex2f(0.0f, 0.0f);
@@ -115,13 +114,13 @@ void Core::Overlay::render_background() {
         glTexCoord2f(0.0f, 1.0f);
         glVertex2f(0.0f, height_);    
         glEnd();
-
-        glDisable(GL_TEXTURE_2D);
     }
 }
 
 void Core::Overlay::render_text() {
-    
+    if (!text_.empty() && font_) {  
+        font_->render(text_);
+    }
 }
 
 void Core::Overlay::delete_overlay(Overlay* overlay) {

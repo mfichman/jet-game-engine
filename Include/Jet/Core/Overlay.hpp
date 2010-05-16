@@ -24,6 +24,7 @@
 #include <Jet/Core/Types.hpp>
 #include <Jet/Core/Texture.hpp>
 #include <Jet/Core/Engine.hpp>
+#include <Jet/Core/Font.hpp>
 #include <Jet/Overlay.hpp>
 
 #ifdef WINDOWS
@@ -177,14 +178,14 @@ public:
     }
     
     //! Sets the text font.
-    inline void font(Font* font) {
-        throw std::runtime_error("Not implemented");
+    inline void font(Jet::Font* font) {
+        font_ = static_cast<Font*>(font);
     }
     
     //! Sets the text font by name.
     //! @param name the name of the font to use
     inline void font(const std::string& name) {
-        throw std::runtime_error("Not implemented");
+        font(engine_->font(name));
     }
     
     //! Sets the background texture.
@@ -230,8 +231,8 @@ private:
     Alignment vertical_alignment_;
     Alignment horizontal_alignment_;
     std::string text_;
-    //Font
     TexturePtr background_;
+    FontPtr font_;
     std::vector<OverlayListenerPtr> listener_;
 };
 

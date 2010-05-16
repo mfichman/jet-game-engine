@@ -32,20 +32,20 @@ using namespace std;
 
 #ifdef WINDOWS
 #define EWOULDBLOCK WSAEWOULDBLOCK
-typedef socklen_t int
-const char* errmsg() {
+typedef int socklen_t;
+const char* socket_errmsg() {
     static char buffer[512];
     FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, WSAGetLastError(), NULL, buffer, 512, NULL);
     return buffer;
 }    
-int errcode() {
+int socket_errcode() {
     return WSAGetLastError();
 }
 #else
 #define SD_BOTH SHUT_RDWR
 #define INVALID_SOCKET -1
-#define errmsg() strerror(errno)
-#define errcode() errno
+#define socket_errmsg() strerror(errno)
+#define socket_errcode() errno
 #define closesocket close
 #include <unistd.h>
 #include <fcntl.h>
@@ -128,7 +128,7 @@ Core::Socket::Socket(const sockaddr_in& local, const sockaddr_in& remote, Socket
     // Use non-blocking sockets
     u_long yes = 1;
     if (ioctlsocket(socket_, FIONBIO, &yes) < 0) {
-        throw runtime_error(errmsg());
+        throw runtime_error(socket_errmsg());
     }
 #else
 	int flags = fcntl(socket_, F_GETFL, 0);
@@ -151,18 +151,18 @@ void Core::Socket::init_server() {
     // Create a new TCP socket.  If the attempt fails, throw an exception.
     socket_ = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (INVALID_SOCKET == socket_) {
-        throw runtime_error(errmsg());
+        throw runtime_error(socket_errmsg());
     }
     
     // Attempt to bind the socket to any port.  If the attempt fails,
     // clean close the socket and throw an exception.
     if(bind(socket_, (sockaddr*)&local_, sizeof(local_)) < 0) {
-        throw runtime_error(errmsg());
+        throw runtime_error(socket_errmsg());
     }
 
 	// Listen for connections
 	if (listen(socket_, 1) < 0) {
-		throw runtime_error(errmsg());
+		throw runtime_error(socket_errmsg());
 	}
 }
 
@@ -170,13 +170,13 @@ void Core::Socket::init_client() {
     // Create a new TCP socket.  If the attempt fails, throw an exception.
     socket_ = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (INVALID_SOCKET == socket_) {
-        throw runtime_error(errmsg());
+        throw runtime_error(socket_errmsg());
     }
     
     // Attempt to bind the socket to any port.  If the attempt fails,
     // clean close the socket and throw an exception.
     if(bind(socket_, (sockaddr*)&local_, sizeof(local_)) < 0) {
-        throw runtime_error(errmsg());
+        throw runtime_error(socket_errmsg());
     }
 
 	// Attempt to bind the socket to the given port.  This is non-blocking,
@@ -184,8 +184,8 @@ void Core::Socket::init_client() {
     // for a blocking connect, then we will catch that error on the first read
     // or write.
     if (::connect(socket_, (sockaddr*)&remote_, sizeof(remote_)) < 0) {
-        if (EWOULDBLOCK != errcode()) {
-            throw runtime_error(errmsg());
+        if (EWOULDBLOCK != socket_errcode()) {
+            throw runtime_error(socket_errmsg());
         }
     }
 }
@@ -198,26 +198,26 @@ void Core::Socket::init_multicast() {
     // Create a new UDP socket.  If the attempt fails, throw an exception.
     socket_ = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (INVALID_SOCKET == socket_) {
-        throw runtime_error(errmsg());
+        throw runtime_error(socket_errmsg());
     }
     
     // Set the port to be reusable.  If the attempt fails, close the socket
     // and throw an exception.
     int yes = 1;
     if (setsockopt(socket_, SOL_SOCKET, SO_REUSEADDR, (char*)&yes, sizeof(yes)) < 0) {
-        throw runtime_error(errmsg());
+        throw runtime_error(socket_errmsg());
     }
     
     // Join the multicast group.  If the attempt fails, close the socket and
     // throw and exception.
     if (setsockopt(socket_, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&mreq, sizeof(ip_mreq)) < 0) {
-        throw runtime_error(errmsg());
+        throw runtime_error(socket_errmsg());
     }
     
     // Attempt to bind the socket to the given port.  If the attempt fails,
     // clean close the socket and throw an exception.
     if(bind(socket_, (sockaddr*)&local_, sizeof(local_)) < 0) {
-        throw runtime_error(errmsg());
+        throw runtime_error(socket_errmsg());
     }
 }
 
@@ -226,20 +226,20 @@ void Core::Socket::init_datagram() {
     // Create a new UP socket.  If the attempt fails, throw an exception.
     socket_ = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (INVALID_SOCKET == socket_) {
-        throw runtime_error(errmsg());
+        throw runtime_error(socket_errmsg());
     }
     
     // Set the port to be reusable.  If the attempt fails, close the socket
     // and throw an exception.
     int yes = 1;
     if (setsockopt(socket_, SOL_SOCKET, SO_REUSEADDR, (char*)&yes, sizeof(yes)) < 0) {
-        throw runtime_error(errmsg());
+        throw runtime_error(socket_errmsg());
     }
     
     // Attempt to bind the socket to the given port.  If the attempt fails,
     // clean close the socket and throw an exception.
     if(bind(socket_, (sockaddr*)&local_, sizeof(local_)) < 0) {
-        throw runtime_error(errmsg());
+        throw runtime_error(socket_errmsg());
     }
 }
 
@@ -288,10 +288,10 @@ void Core::Socket::accept() {
     socklen_t socklen = sizeof(remote_);
 	int sd = ::accept(socket_, (sockaddr*)&remote_, &socklen);
 	if (INVALID_SOCKET == sd) {
-		if (EWOULDBLOCK == errcode()) {
+		if (EWOULDBLOCK == socket_errcode()) {
 			return;
 		} else {
-			throw runtime_error(errmsg());
+			throw runtime_error(socket_errmsg());
 		}
     }
     
@@ -335,10 +335,10 @@ void Core::Socket::write_datagram() {
     // If an error occurred, or the socket is already closed, then throw
     // an exception
 	if (rt < 0) {
-		if (EWOULDBLOCK == errcode()) {
+		if (EWOULDBLOCK == socket_errcode()) {
 			return;
 		} else {
-			throw runtime_error(errmsg());
+			throw runtime_error(socket_errmsg());
 		}
     } else if (rt != (int)len) {
         throw runtime_error("Failed to send datagram");
@@ -366,10 +366,10 @@ void Core::Socket::read_datagram() {
     // If an error occurred, or the socket is already closed, then throw an
     // exception.
 	if (rt < 0) {
-		if (EWOULDBLOCK == errcode()) {
+		if (EWOULDBLOCK == socket_errcode()) {
 			return;
 		} else {
-			throw runtime_error(errmsg());
+			throw runtime_error(socket_errmsg());
 		}
     } else if (rt < (int)sizeof(size_t)) {
         throw runtime_error("Invalid packet");
@@ -399,10 +399,10 @@ void Core::Socket::write_stream() {
     // If an error occurred, or the socket is already closed, then throw
     // an exception
 	if (rt < 0) {
-		if (EWOULDBLOCK == errcode()) {
+		if (EWOULDBLOCK == socket_errcode()) {
 			return;
 		} else {
-			throw runtime_error(errmsg());
+			throw runtime_error(socket_errmsg());
 		}
     } else {
         write_bytes_ += rt;
@@ -433,10 +433,10 @@ void Core::Socket::read_stream() {
     // If an error occurred, or the socket is already closed, then throw an
     // exception.
 	if (rt < 0) {
-		if (EWOULDBLOCK == errcode()) {
+		if (EWOULDBLOCK == socket_errcode()) {
 			return;
 		} else {
-			throw runtime_error(errmsg());
+			throw runtime_error(socket_errmsg());
 		}
     } else if (rt == 0) {
         throw runtime_error("Socket is closed");
