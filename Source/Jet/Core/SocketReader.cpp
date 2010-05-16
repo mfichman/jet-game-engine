@@ -27,17 +27,13 @@ using namespace std;
 
 Core::SocketReader::SocketReader(Socket* socket) :
     socket_(socket),
-    lock_(socket->in_mutex_),
     bytes_read_(sizeof(size_t)) {
-        
-    if (!socket_->in_packet_) {
-        throw std::runtime_error("No packet available");
-    }
 }
 
 Core::SocketReader::~SocketReader() {
-    socket_->in_packet_ = false;
-    socket_->in_condition_.notify_all();
+    // Clear the buffer so that the next packet can be read.
+    socket_->in_.clear();
+	socket_->read_bytes_ = 0;
 }
 
 float Core::SocketReader::real() {

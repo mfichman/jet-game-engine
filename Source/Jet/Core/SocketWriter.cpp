@@ -27,23 +27,14 @@ using namespace std;
 
 Core::SocketWriter::SocketWriter(Socket* socket) :
     socket_(socket),
-    lock_(socket->out_mutex_),
     bytes_written_(sizeof(size_t)) {
-        
-    // Wait for the previous packet to be sent before sending this
-    // one.  This prevents the packet from being overwritten, but
-    // can add extra delay in some cases.
-    while (socket_->out_packet_) {
-        socket_->out_condition_.wait(lock_);
-    }
 
     socket_->out_.resize(sizeof(size_t));
 }
 
 Core::SocketWriter::~SocketWriter() {
-    // Signal to the socket that a packet is ready to be sent
-    socket_->out_packet_ = true;
-    socket_->out_condition_.notify_all();
+    // Send right away if possible.
+    socket_->poll_write();
 }
 
 void Core::SocketWriter::real(float real) {

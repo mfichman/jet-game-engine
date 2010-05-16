@@ -21,6 +21,8 @@
  */
 
 #include <Jet/Core/Socket.hpp>
+#include <Jet/Core/SocketWriter.hpp>
+#include <Jet/core/SocketReader.hpp>
 #include <stdexcept>
 #include <cstring>
 #include <iostream>
@@ -29,6 +31,7 @@ using namespace Jet;
 using namespace std;
 
 #ifdef WINDOWS
+#define EWOULDBLOCK WSAEWOULDBLOCK
 const char* errmsg() {
     static char buffer[512];
     FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, WSAGetLastError(), NULL, buffer, 512, NULL);
@@ -105,63 +108,30 @@ Core::Socket::Socket(const sockaddr_in& local, const sockaddr_in& remote, Socket
     socket_(INVALID_SOCKET),
     local_(local),
     remote_(remote),
-    in_(4096),
-    out_(4096),
-    out_packet_(false),
-    in_packet_(false),
-    quit_(false),
-    connected_(false),
-	type_(type) {
+	type_(type),
+    read_bytes_(0),
+    write_bytes_(0) {
         
-    init_thread_ = boost::thread(boost::bind(boost::mem_fn(&Socket::init), this));
-}
-
-Core::Socket::~Socket() {
-    quit_ = true;
+    switch (type_) {
+        case DATAGRAM: init_datagram(); break;
+        case MULTICAST: init_multicast(); break;
+        case SERVER: init_server(); break;
+        case CLIENT: init_client(); break;
+        default: return;
+    }
     
-	out_mutex_.lock();
-	out_packet_ = true;
-	out_condition_.notify_all();
-	out_mutex_.unlock();
-        
-    timeval tv;
-    tv.tv_sec = 0;
-    tv.tv_usec = 0;
-
-	if (socket_ != INVALID_SOCKET) {
-		shutdown(socket_, SD_BOTH);
-	    
-		//! Set socket option for receive timeouts
-		if (setsockopt(socket_, SOL_SOCKET, SO_RCVTIMEO, (char*)&tv, sizeof(tv))) {
-			throw runtime_error(errmsg());
-		}
-	    
-		//! Set socket option for receive timeouts
-		if (setsockopt(socket_, SOL_SOCKET, SO_SNDTIMEO, (char*)&tv, sizeof(tv))) {
-			throw runtime_error(errmsg());
-		}
-	}
-    
-    in_thread_.join();
-    out_thread_.join();
-	
-    if (socket_ != INVALID_SOCKET) {
-        closesocket(socket_);
+    // Use non-blocking sockets
+    u_long yes = 1;
+    if (ioctlsocket(socket_, FIONBIO, &yes) < 0) {
+        throw runtime_error(errmsg());
     }
 }
 
-void Core::Socket::init() {
-	try {
-		switch (type_) {
-			case DATAGRAM: init_datagram(); break;
-			case MULTICAST: init_multicast(); break;
-			case SERVER: init_server(); break;
-			case CLIENT: init_client(); break;
-			default: return;
-		}
-	} catch (std::runtime_error& ex) {
-		cout << ex.what() << endl;
-	}
+Core::Socket::~Socket() {	
+    if (socket_ != INVALID_SOCKET) {
+		shutdown(socket_, SD_BOTH);
+        closesocket(socket_);
+    }
 }
 
 void Core::Socket::init_server() {
@@ -181,25 +151,6 @@ void Core::Socket::init_server() {
 	if (listen(socket_, 1) < 0) {
 		throw runtime_error(errmsg());
 	}
-    
-    // Attempt to accept a socket
-    int socklen = sizeof(remote_);
-    int sd = accept(socket_, (sockaddr*)&remote_, &socklen);
-    if (quit_) {
-        return;
-    } else if (INVALID_SOCKET == sd) {
-        throw runtime_error(errmsg());
-    }
-    
-    // Shut down the server socket, and start using the connection socket.
-    shutdown(socket_, SD_BOTH);
-    closesocket(socket_);
-    socket_ = sd;
-    
-    in_thread_ = boost::thread(boost::bind(boost::mem_fn(&Socket::run_in_thread), this));
-    out_thread_ = boost::thread(boost::bind(boost::mem_fn(&Socket::run_out_thread), this));
-    boost::mutex::scoped_lock lock(connected_mutex_);
-    connected_ = true;
 }
 
 void Core::Socket::init_client() {    
@@ -214,20 +165,16 @@ void Core::Socket::init_client() {
     if(bind(socket_, (sockaddr*)&local_, sizeof(local_)) < 0) {
         throw runtime_error(errmsg());
     }
-    
-    // Attempt to bind the socket to the given port.  If the attempt fails,
-    // clean close the socket and throw an exception.
-    int rt = connect(socket_, (sockaddr*)&remote_, sizeof(remote_));
-    if (quit_) {
-        return;
-    } else if (rt < 0) {
-        throw runtime_error(errmsg());
+
+	// Attempt to bind the socket to the given port.  This is non-blocking,
+    // so the socket will return EWOULDBLOCK.  If an error would have happened
+    // for a blocking connect, then we will catch that error on the first read
+    // or write.
+    if (::connect(socket_, (sockaddr*)&remote_, sizeof(remote_)) < 0) {
+        if (EWOULDBLOCK != err()) {
+            throw runtime_error(errmsg());
+        }
     }
-    
-    in_thread_ = boost::thread(boost::bind(boost::mem_fn(&Socket::run_in_thread), this));
-    out_thread_ = boost::thread(boost::bind(boost::mem_fn(&Socket::run_out_thread), this));
-    boost::mutex::scoped_lock lock(connected_mutex_);
-    connected_ = true;
 }
 
 void Core::Socket::init_multicast() {    
@@ -259,11 +206,6 @@ void Core::Socket::init_multicast() {
     if(bind(socket_, (sockaddr*)&local_, sizeof(local_)) < 0) {
         throw runtime_error(errmsg());
     }
-
-    in_thread_ = boost::thread(boost::bind(boost::mem_fn(&Socket::run_in_thread), this));
-    out_thread_ = boost::thread(boost::bind(boost::mem_fn(&Socket::run_out_thread), this));
-    boost::mutex::scoped_lock lock(connected_mutex_);
-    connected_ = true;
 }
 
 void Core::Socket::init_datagram() {
@@ -286,24 +228,83 @@ void Core::Socket::init_datagram() {
     if(bind(socket_, (sockaddr*)&local_, sizeof(local_)) < 0) {
         throw runtime_error(errmsg());
     }
-    
-    in_thread_ = boost::thread(boost::bind(boost::mem_fn(&Socket::run_in_thread), this));
-    out_thread_ = boost::thread(boost::bind(boost::mem_fn(&Socket::run_out_thread), this));
-    boost::mutex::scoped_lock lock(connected_mutex_);
-    connected_ = true;
 }
 
-void Core::Socket::do_packet_send() {
-    // Wait until a packet has been queued to be sent using this socket.
-    boost::mutex::scoped_lock lock(out_mutex_);
-    while (!out_packet_) {
-        out_condition_.wait(lock);
+void Core::Socket::poll_read() {
+    
+    // Attempt to accept the incoming connection
+    if (SERVER == type_) {
+        accept();
+    } else if (CLIENT == type_) {
+        connect();
     }
-	if (out_.empty()) {
-		out_packet_ = false;
-		out_condition_.notify_all();
-		return;
+    
+    // If the input buffer is empty or a read is in progress, then continue
+    // reading the packet if data is available.
+    if (in_.empty() || in_.size() != read_bytes_) {
+        if (MULTICAST == type_ || DATAGRAM == type_) {
+            read_datagram();
+        } else if (STREAM == type_) {
+            read_stream();
+        }
+    }
+}
+
+void Core::Socket::poll_write() {
+    // Attempt to accept the incoming connection
+    if (SERVER == type_) {
+        accept();
+    } else if (CLIENT == type_) {
+        connect();
+    }
+    
+    // If the output buffer is not empty, then continue writing the packet
+    // if writing is permissible.
+    if (!out_.empty()) {
+        if (MULTICAST == type_ || DATAGRAM == type_) {
+            write_datagram();
+        } else if (STREAM == type_) {
+            write_stream();
+        }
+    } 
+}
+
+void Core::Socket::accept() {
+    // Attempt to accept a socket
+    int socklen = sizeof(remote_);
+	int sd = ::accept(socket_, (sockaddr*)&remote_, &socklen);
+	if (INVALID_SOCKET == sd) {
+		if (EWOULDBLOCK == err()) {
+			return;
+		} else {
+			throw runtime_error(errmsg());
+		}
+    }
+    
+    // Shut down the server socket, and start using the connection socket.
+    shutdown(socket_, SD_BOTH);
+    closesocket(socket_);
+    socket_ = sd;
+    type_ = STREAM;
+}
+
+void Core::Socket::connect() {
+
+	fd_set write;
+	FD_ZERO(&write);
+	FD_SET(socket_, &write);
+	timeval tv;
+	tv.tv_sec = 0;
+	tv.tv_usec = 0;
+	
+	if (select(socket_ + 1, &write, 0, 0, &tv)) {
+		if (FD_ISSET(socket_, &write)) {
+			type_ = STREAM;
+		}
 	}
+}
+
+void Core::Socket::write_datagram() {
     int socklen = sizeof(remote_);
     
     // Write the length of the packet into the header.  This includes the
@@ -319,26 +320,22 @@ void Core::Socket::do_packet_send() {
         
     // If an error occurred, or the socket is already closed, then throw
     // an exception
-	if (quit_) {
-		return;
-	} else if (rt < 0) {
-        throw runtime_error(errmsg());
+	if (rt < 0) {
+		if (EWOULDBLOCK == err()) {
+			return;
+		} else {
+			throw runtime_error(errmsg());
+		}
     } else if (rt != len) {
         throw runtime_error("Failed to send datagram");
-    }
+	} else {
+		write_bytes_ += rt;
+	}
 
-	out_packet_ = false;
-    out_condition_.notify_all();
+	out_.clear();
 }
 
-void Core::Socket::do_packet_receive() {
-    // Wait until the current packet has been read by a reader before reading
-    // the next packet.
-    boost::mutex::scoped_lock lock(in_mutex_);
-    while (in_packet_) {
-        in_condition_.wait(lock);
-    }
-    lock.unlock();
+void Core::Socket::read_datagram() {
     sockaddr_in source;
     int socklen = sizeof(source);
 
@@ -352,152 +349,113 @@ void Core::Socket::do_packet_receive() {
     // Read from the socket, and capture the source addres.
     int rt = recvfrom(socket_, pkt, len, 0, (sockaddr*)&source, &socklen);
 
-        
     // If an error occurred, or the socket is already closed, then throw an
     // exception.
-	if (quit_) {
-		return;
-	} else if (rt < 0) {
-        throw runtime_error(errmsg());
+	if (rt < 0) {
+		if (EWOULDBLOCK == err()) {
+			return;
+		} else {
+			throw runtime_error(errmsg());
+		}
     } else if (rt < sizeof(size_t)) {
         throw runtime_error("Invalid packet");
-    }
+	} else {
+		read_bytes_ += rt;
+	}
     
     // Read the length of the packet from the beginning of the packet, as
     // long as there are at least 4 bytes in the packet (size of an int).
     in_.resize(ntohl(*(size_t*)&in_[0]));
-
-	in_packet_ = true;
-    in_condition_.notify_all();
 }
 
-void Core::Socket::do_stream_send() {
-    // Wait until a packet has been queued to be sent using this socket.
-    boost::mutex::scoped_lock lock(out_mutex_);
-    while (!out_packet_) {
-        out_condition_.wait(lock);
-    }
-	if (out_.empty()) {
-		out_packet_ = false;
-		out_condition_.notify_all();
-		return;
-	}
-    
-    // This is the number of bytes that have been sent from the socket
-    size_t sent_bytes = 0;
-    
+void Core::Socket::write_stream() {        
     // Write the length of the packet into the header.  This includes the
     // length of the header itself.
-    *(size_t*)&out_[0] = htonl(out_.size());
+    if (!write_bytes_) {
+        *(size_t*)&out_[0] = htonl(out_.size());
+    }
     
-    // If the number of sent bytes is greater than or equal to the number of
-    // bytes in the output buffer, then we have reached the end of the buffer
-    // and the whole packet has been sent.
-    while (sent_bytes < out_.size()) {
-        char* pkt = &out_[sent_bytes];
-        size_t len = out_.size() - sent_bytes;
-        
-        // Write to the socket
-        int rt = send(socket_, pkt, len, 0);
-        
-        // If an error occurred, or the socket is already closed, then throw
-        // an exception
-		if (quit_) {
+    // Attempt to send any bytes remaining in the buffer.
+    char* pkt = &out_[write_bytes_];
+    size_t len = out_.size() - write_bytes_;
+    
+    // Write to the socket
+    int rt = send(socket_, pkt, len, 0);
+    
+    // If an error occurred, or the socket is already closed, then throw
+    // an exception
+	if (rt < 0) {
+		if (EWOULDBLOCK == err()) {
 			return;
-		} else if (rt < 0) {
-            throw runtime_error(errmsg());
-        } else {
-            sent_bytes += rt;
-        }        
+		} else {
+			throw runtime_error(errmsg());
+		}
+    } else {
+        write_bytes_ += rt;
     }
     
-    out_packet_ = false;
-    out_condition_.notify_all();
+    //!If the number of sent bytes equals the buffer size, then the packet
+    // is done sending.  Thus, we can reset the buffer.
+    if (write_bytes_ == out_.size()) {
+        out_.clear();
+        write_bytes_ = 0;
+    }
 }
 
-void Core::Socket::do_stream_receive() {
-    // Wait until the current packet has been read by a reader before reading
-    // the next packet.
-    boost::mutex::scoped_lock lock(in_mutex_);
-    while (in_packet_) {
-        in_condition_.wait(lock);
+void Core::Socket::read_stream() {
+    // If the number of bytes received is zero, then resize buffer
+    // to hold 4096 bytes
+    if (!read_bytes_) {
+        in_.resize(sizeof(size_t));
     }
-    lock.unlock();
-
-    // Number of bytes read, used to track progress in receiving the packet
-    size_t read_bytes = 0;
     
-    // Assume the packet will be 4 bytes.  This is the size of a minimum
-    // packet, which ontains only the length header.  This value will be
-    // adjusted once the actual length of the packet is read from the header.
-    in_.resize(sizeof(size_t));
+    // Attempt to read the rest of the packet
+    char* pkt = &in_[read_bytes_];
+    size_t len = in_.size() - read_bytes_;   
     
-    // If the length of the buffer is greater than the header says, then
-    // we have reached the end of the current packet. 
-    while (read_bytes < in_.size()) {
-        char* pkt = &in_[read_bytes];
-        size_t len = in_.size() - read_bytes;   
-        
-        // Read from the socket, and capture the source addres.
-        int rt = recv(socket_, pkt, len, 0);
-        
-        // If an error occurred, or the socket is already closed, then throw an
-        // exception.
-		if (quit_) {
+    // Read from the socket, and capture the source addres.
+    int rt = recv(socket_, pkt, len, 0);
+    
+    // If an error occurred, or the socket is already closed, then throw an
+    // exception.
+	if (rt < 0) {
+		if (EWOULDBLOCK == err()) {
 			return;
-		} else if (rt < 0) {
-            throw runtime_error(errmsg());
-        } else if (rt == 0) {
-            throw runtime_error("Socket is closed");
-        } else {
-            read_bytes += rt;
-        }
-        
-        // Read the length of the packet from the beginning of the packet, as
-        // long as there are at least 4 bytes in the packet (size of an int).
-        if (read_bytes >= sizeof(size_t)) {
-            in_.resize(ntohl(*(size_t*)&in_[0]));
-        }
+		} else {
+			throw runtime_error(errmsg());
+		}
+    } else if (rt == 0) {
+        throw runtime_error("Socket is closed");
+    } else {
+        read_bytes_ += rt;
     }
     
-    in_packet_ = true;
-    in_condition_.notify_all();
+    //! Check if all the bytes from the packet have been read.
+    if (read_bytes_ >= sizeof(size_t)) {
+        in_.resize(ntohl(*(size_t*)&in_[0]));
+	}
 }
 
-void Core::Socket::run_in_thread() {
-    try {
-		if (DATAGRAM == type_ || MULTICAST == type_) {
-			while (!quit_) {
-				do_packet_receive();
-			}
-		} else if (CLIENT == type_ || SERVER == type_) {
-			while (!quit_) {
-				do_stream_receive();
-			}
-		}
-    } catch(std::exception& ex) {
-        std::cout << ex.what() << std::endl;
+Core::SocketWriter* Core::Socket::writer() {
+    // Return a socket writer if the buffer is empty.
+	poll_write();
+
+    if (out_.empty()) {
+        return new Core::SocketWriter(this);
+    } else {
+        return 0;
     }
-    
-    boost::mutex::scoped_lock lock(connected_mutex_);
-    connected_ = false;
 }
 
-void Core::Socket::run_out_thread() {
-    try {
-		if (DATAGRAM == type_ || MULTICAST == type_) {
-			while (!quit_) {
-				do_packet_send();
-			}
-		} else if (CLIENT == type_ || SERVER == type_) {
-			while (!quit_) {
-				do_stream_send();
-			}
-		}
-    } catch(std::exception& ex) {
-        std::cout << ex.what() << std::endl;
+Core::SocketReader* Core::Socket::reader() {
+    // Poll for more data from the socket.
+    poll_read();
+
+    // Return a socket reader if the buffer is not empty, and no packet read
+    // is currently in progress
+    if (!in_.empty() && in_.size() == read_bytes_) {
+        return new Core::SocketReader(this);
+    } else {
+        return 0;
     }
-    
-    boost::mutex::scoped_lock lock(connected_mutex_);
-    connected_ = false;
 }

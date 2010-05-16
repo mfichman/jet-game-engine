@@ -53,7 +53,6 @@ public:
     
 private:
     SocketPtr socket_;
-    boost::mutex::scoped_lock lock_;
     size_t bytes_read_;
 };
 

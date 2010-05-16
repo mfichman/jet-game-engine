@@ -75,53 +75,39 @@ public:
     //! @param port the group port
     static Socket* datagram(const std::string& ip, uint16_t port);
         
-    //! Returns true if data is available for reading.
-    bool incoming_packet() {
-        boost::mutex::scoped_lock lock(in_mutex_);
-        return in_packet_;
-    }
+    //! Returns a packet writer for this socket, or null if no data is
+    //! available.
+    SocketWriter* writer();
     
-    //! Returns true if the socket is connected.
-    bool connected() {
-        boost::mutex::scoped_lock lock(connected_mutex_);
-        return connected_;
-    }
+    //! Returns a socket reader for this socket, or null if no data is
+    //! available.
+    SocketReader* reader();
    
 private:
     Socket(const sockaddr_in& local, const sockaddr_in& remote, SocketType type);
     
-    void init();
     void init_multicast();
     void init_client();
     void init_server();
     void init_datagram();
     
-    void run_in_thread();
-    void run_out_thread();
-    void do_stream_receive();
-    void do_stream_send();
-    void do_packet_receive();
-    void do_packet_send();
+    void accept();
+    void connect();
+    void poll_read();
+    void poll_write();
+    void read_stream();
+    void read_datagram();
+    void write_stream();
+    void write_datagram();
     
     int socket_;
     sockaddr_in local_;
     sockaddr_in remote_;
     std::vector<char> in_;
     std::vector<char> out_;
-    boost::thread init_thread_;
-    boost::thread in_thread_;
-    boost::thread out_thread_;
-    boost::mutex in_mutex_;
-    boost::mutex out_mutex_;
-    boost::mutex connected_mutex_;
-    boost::condition_variable in_condition_;
-    boost::condition_variable out_condition_;
-    boost::condition_variable ready_condition_;
-    bool out_packet_;
-    bool in_packet_;
-    bool quit_;
-    bool connected_;
     SocketType type_;
+    size_t write_bytes_;
+    size_t read_bytes_;
     
     friend class SocketReader;
     friend class SocketWriter;

@@ -53,6 +53,8 @@ namespace Jet { namespace Core {
     class ScriptSystem;
     class Shader;
     class Socket;
+    class SocketWriter;
+    class SocketReader;
     class Sound;
     class Texture;
     
@@ -83,6 +85,8 @@ namespace Jet { namespace Core {
     typedef boost::intrusive_ptr<ScriptController> ScriptControllerPtr;
     typedef boost::intrusive_ptr<Shader> ShaderPtr;
     typedef boost::intrusive_ptr<Socket> SocketPtr;
+    typedef boost::intrusive_ptr<SocketReader> SocketReaderPtr;
+    typedef boost::intrusive_ptr<SocketWriter> SocketWriterPtr;
     typedef boost::intrusive_ptr<Sound> SoundPtr;
     typedef boost::intrusive_ptr<Texture> TexturePtr;
     typedef boost::intrusive_ptr<QuadSet> QuadSetPtr;
@@ -93,5 +97,5 @@ namespace Jet { namespace Core {
         NORMAL_MAP_SAMPLER = 2,
         SHADOW_MAP_SAMPLER = 3
     };
-    enum SocketType { SERVER, CLIENT, MULTICAST, DATAGRAM };
+    enum SocketType { SERVER, CLIENT, MULTICAST, DATAGRAM, STREAM };
 }}
