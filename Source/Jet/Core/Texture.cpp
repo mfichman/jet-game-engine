@@ -48,13 +48,13 @@ void Core::Texture::state(ResourceState state) {
 		read_texture_data();
 	}
 	
-	// Entering the SYNCED state
-	if (SYNCED == state) {
+	// Entering the LOADED state
+	if (LOADED == state) {
 		init_texture();
 	}
 	
-	// Leaving the SYNCED state
-	if (SYNCED == state_) {
+	// Leaving the LOADED state
+	if (LOADED == state_) {
 		glDeleteTextures(1, &texture_);
 		texture_ = 0;
 	}
@@ -123,7 +123,7 @@ void Core::Texture::init_texture() {
 }
 
 void Core::Texture::sampler(uint32_t sampler) {
-	state(SYNCED);
+	state(LOADED);
 	glActiveTexture(GL_TEXTURE0 + sampler);
 	glBindTexture(GL_TEXTURE_2D, texture_);
 }

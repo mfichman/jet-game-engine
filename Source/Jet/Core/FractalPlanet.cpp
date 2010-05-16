@@ -31,7 +31,7 @@ using namespace std;
 void Core::FractalPlanet::generate_mesh() {
     mesh_->vertex_count(0);
 	mesh_->index_count(0);
-    mesh_->state(LOADED);
+    mesh_->state(CACHED);
     
     float radius = 10.0f;
     float dphi = PI/ring_count_;
@@ -99,7 +99,7 @@ void Core::FractalPlanet::generate_mesh() {
     // TODO: Generate quads dynamically in a mesh shape
 	recalculate_normals();
 
-    mesh_->state(SYNCED);
+    mesh_->state(LOADED);
 }
 
 void Core::FractalPlanet::generate_quad(Vertex quad[4], size_t level) {

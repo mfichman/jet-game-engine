@@ -54,13 +54,13 @@ void Core::Shader::state(ResourceState state) {
 		read_source(vert_path, vsource_);
 	}
 	
-	// Entering the SYNCED state
-	if (SYNCED == state) {
+	// Entering the LOADED state
+	if (LOADED == state) {
 		init_program();
 	}
 	
-	// Leaving the SYNCED state
-	if (SYNCED == state_) {
+	// Leaving the LOADED state
+	if (LOADED == state_) {
 		assert(program_ && vshader_ && fshader_);
 		glUseProgram(0);
 		glDeleteShader(vshader_);
@@ -147,7 +147,7 @@ void Core::Shader::enabled(bool enabled) {
 	}
 	
 	if (enabled) {
-		state(SYNCED);
+		state(LOADED);
 		glUseProgram(program_);
 	} else {
 		glUseProgram(0);

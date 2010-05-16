@@ -114,7 +114,7 @@ void Core::RigidBody::attach_mesh_object(const btTransform& transform, MeshObjec
     Mesh* mesh = mesh_object->mesh();
     if (mesh) {
         if (UNLOADED == mesh->state()) {
-            mesh->state(SYNCED);
+            mesh->state(LOADED);
         }
         // This is for triangle mesh shapes
         shape_->addChildShape(transform, mesh->shape());

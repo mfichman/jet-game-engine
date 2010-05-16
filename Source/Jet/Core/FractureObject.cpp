@@ -38,7 +38,7 @@ void Core::FractureObject::fracture(const Plane& plane) {
     Mesh* mesh = mesh_object_->mesh();
     
     if (mesh && fracture_count_ > 0 && parent_->visible()) {
-        mesh->state(SYNCED);
+        mesh->state(LOADED);
         
         // Here, we will begin the fracture.  The object must have a mesh
         // attached, or else we won't be able to split the object.

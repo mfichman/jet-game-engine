@@ -79,7 +79,7 @@ void Core::AudioSource::state(size_t chan, PlaybackState state) {
     if (PLAY == state && sound_[chan] && !channel_[chan]) {
         // Make sure the sound is loaded, and that the channel is not in use.
         // Then play the sound and register callbacks
-        sound_[chan]->state(SYNCED);
+        sound_[chan]->state(LOADED);
         FMOD_SYSTEM* system = engine_->audio_system()->system();
         FMOD_SOUND* sound = sound_[chan]->sound();
         fmod_check(FMOD_System_PlaySound(system, FMOD_CHANNEL_FREE, sound, true, &channel_[chan]));

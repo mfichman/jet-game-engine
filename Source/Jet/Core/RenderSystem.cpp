@@ -222,20 +222,20 @@ void Core::RenderSystem::check_video_mode() {
 		glClear(GL_COLOR_BUFFER_BIT);
 		SDL_GL_SwapBuffers();
 		
-		// Demote all resources to the LOADED state, because the OpenGL context
-		// is about to be destroyed.  They will return to the SYNCED state
+		// Demote all resources to the CACHED state, because the OpenGL context
+		// is about to be destroyed.  They will return to the LOADED state
 		// when needed
 		for (Iterator<pair<const string, Jet::MeshPtr> > i = engine_->meshes(); i; i++) {
-			i->second->state(LOADED);
+			i->second->state(CACHED);
 		}
 		for (Iterator<pair<const string, Jet::TexturePtr> > i = engine_->textures(); i; i++) {
-			i->second->state(LOADED);
+			i->second->state(CACHED);
 		}
 		for (Iterator<pair<const string, Jet::ShaderPtr> > i = engine_->shaders(); i; i++) {
-			i->second->state(LOADED);
+			i->second->state(CACHED);
 		}
 		for (Iterator<pair<const string, Jet::FontPtr> > i = engine_->fonts(); i; i++) {
-			i->second->state(LOADED);
+			i->second->state(CACHED);
 		}
 		shadow_target_.clear();
 		particle_buffer_.reset();

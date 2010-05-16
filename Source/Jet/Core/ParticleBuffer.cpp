@@ -94,7 +94,7 @@ void Core::ParticleBuffer::shader(Shader* shader) {
         // Enable the new shader, and read the new uniform locations for
         // the particle system attributes
         if (shader_) {
-			shader_->state(SYNCED);
+			shader_->state(LOADED);
             shader_->enabled(true);
 			
 			diffuse_map_loc_ = shader_->uniform_location("diffuse_map");

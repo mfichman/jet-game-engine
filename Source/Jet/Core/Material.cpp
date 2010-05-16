@@ -64,7 +64,7 @@ void Core::Material::shader(Jet::Shader* shader) {
 		// If the shader was set to null, turn on the default shader
 		Material::shader("Default");
 	} else if (engine_->option<bool>("shaders_enabled")) {
-		shader_->state(SYNCED);
+		shader_->state(LOADED);
 		cascade_count_loc_ = shader_->uniform_location("cascade_count");
 		diffuse_map_loc_ = shader_->uniform_location("diffuse_map");
 		specular_map_loc_ = shader_->uniform_location("specular_map");
@@ -86,7 +86,7 @@ void Core::Material::enabled(bool enabled) {
 	
 	if (enabled) {
 		// Make sure the material is properly loaded into memory
-		state(SYNCED);
+		state(LOADED);
 		
 		if (engine_->option<bool>("shaders_enabled")) {
 			// Enable the material using the shader.

@@ -121,7 +121,7 @@ namespace Jet {
     enum LightType { POINT_LIGHT, DIRECTIONAL_LIGHT };
     enum EmitterType { BOX_EMITTER, ELLIPSOID_EMITTER, POINT_EMITTER };
     enum PlaybackState { PLAY, STOP };
-    enum ResourceState { UNLOADED, LOADED, SYNCED };
+    enum ResourceState { UNLOADED, CACHED, LOADED };
     enum SyncMode { STATIC_SYNC, DYNAMIC_SYNC };
     enum LayoutMode { RELATIVE_LAYOUT, ABSOLUTE_LAYOUT };
     enum Alignment { TOP, CENTER, BOTTOM, LEFT, RIGHT };

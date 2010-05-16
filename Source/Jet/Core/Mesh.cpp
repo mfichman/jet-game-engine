@@ -55,15 +55,15 @@ void Core::Mesh::state(ResourceState state) {
 		read_mesh_data();
 	}
 	
-	// Entering the SYNCED state
-	if (SYNCED == state) {
+	// Entering the LOADED state
+	if (LOADED == state) {
 		update_tangents();
 		update_collision_shape();
 		init_hardware_buffers();
 	}
 
-	// Leaving the SYNCED state
-	if (SYNCED == state_) {
+	// Leaving the LOADED state
+	if (LOADED == state_) {
 		free_hardware_buffers();
 	}
 	
@@ -114,7 +114,7 @@ void Core::Mesh::init_hardware_buffers() {
 		glBufferData(GL_ARRAY_BUFFER, vertex_count()*sizeof(Vertex), vertex_data(), mode);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	} else {
-		parent_->state(SYNCED);
+		parent_->state(LOADED);
 		vbuffer_ = parent_->vbuffer_;
 	}
 
@@ -215,9 +215,9 @@ void Core::Mesh::render(Core::Shader* shader) {
 	assert(!destroyed_);
 	
 	// Make sure that all vertex data is synchronized
-	state(SYNCED);
+	state(LOADED);
 	if (parent_) {
-		parent_->state(SYNCED);
+		parent_->state(LOADED);
 	}
 	
 	// Bind and enable the vertex and index buffers
