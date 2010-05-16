@@ -196,36 +196,32 @@ Vector Core::Node::linear_velocity() const {
 }
 
 void Core::Node::position(const Vector& position) {
-	if (position_ != position) {
-		// Set the new position and mark the transform as dirty
-		position_ = position;
-		transform_modified_count_++;
+	// Set the new position and mark the transform as dirty
+	position_ = position;
+	transform_modified_count_++;
 		
-		// If the rigid body exists, and this node is the parent of the
-		// rigid body, then set the transform for the rigid body.
-		if (rigid_body_ && rigid_body_->parent() == this) {
-			RigidBody* rigid_body = static_cast<RigidBody*>(rigid_body_.get());
-			btTransform transform = rigid_body->body_->getCenterOfMassTransform();
-			transform.setOrigin(btVector3(position.x, position.y, position.z));
-			rigid_body->body_->setCenterOfMassTransform(transform);
-		}
+	// If the rigid body exists, and this node is the parent of the
+	// rigid body, then set the transform for the rigid body.
+	if (rigid_body_ && rigid_body_->parent() == this) {
+		RigidBody* rigid_body = static_cast<RigidBody*>(rigid_body_.get());
+		btTransform transform = rigid_body->body_->getCenterOfMassTransform();
+		transform.setOrigin(btVector3(position.x, position.y, position.z));
+		rigid_body->body_->setCenterOfMassTransform(transform);
 	}
 }
 
 void Core::Node::rotation(const Quaternion& rotation) {
-	if (rotation != rotation_) {
-		// Set the new rotation and mark the transform as dirty
-		rotation_ = rotation;
-		transform_modified_count_++;
+	// Set the new rotation and mark the transform as dirty
+	rotation_ = rotation;
+	transform_modified_count_++;
 		
 		// If the rigid body exists, and this node is the parent of the
 		// rigid body, then set the transform for the rigid body.
-		if (rigid_body_ && rigid_body_->parent() == this) {
-			RigidBody* rigid_body = static_cast<RigidBody*>(rigid_body_.get());
-			btTransform transform = rigid_body->body_->getCenterOfMassTransform();
-			transform.setRotation(btQuaternion(rotation.x, rotation.y, rotation.z, rotation.w));
-			rigid_body->body_->setCenterOfMassTransform(transform);
-		}
+	if (rigid_body_ && rigid_body_->parent() == this) {
+		RigidBody* rigid_body = static_cast<RigidBody*>(rigid_body_.get());
+		btTransform transform = rigid_body->body_->getCenterOfMassTransform();
+		transform.setRotation(btQuaternion(rotation.x, rotation.y, rotation.z, rotation.w));
+		rigid_body->body_->setCenterOfMassTransform(transform);
 	}
 }
 

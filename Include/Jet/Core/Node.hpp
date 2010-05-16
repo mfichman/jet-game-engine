@@ -286,7 +286,7 @@ private:
     Jet::AudioSourcePtr audio_source_;
     std::tr1::unordered_map<std::string, ObjectPtr> object_;
     std::vector<NodeListenerPtr> listener_;
-	std::queue<std::vector<Signal>> signal_;
+	std::queue<std::vector<Signal> > signal_;
     bool destroyed_;
 	size_t transform_modified_count_;
 	size_t transform_update_count_;

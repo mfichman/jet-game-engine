@@ -71,7 +71,8 @@ function Test:__init()
     print("Creating objects")
     self.s1 = Dagger()
     self.s1.node.position = Vector(-5, -5, 5)
-   
+
+ 
     self.rocks = {}
     for i=1,15 do
         self.rocks[i] = Rock()
@@ -83,6 +84,7 @@ function Test:__init()
         self.rocks[i].body.angular_velocity = pos.unit * 0.2
         --self.rocks[i].body.linear_velocity = -pos.unit * 9;
     end
+
     self.camera_velocity = Vector()
 end
 
@@ -91,8 +93,14 @@ function Test:on_destroy()
 end
 
 function Test:on_update(delta)
+	local step = self.camera_velocity*(60*delta)
+	local posi = self.camera_node.position
+	local pos2 = step + posi
+	print("STEP: ", step)
+	print("POSI: ", posi)
+	print("POS2: ", pos2)
     delta = delta / engine:option("simulation_speed");
-    self.camera_node.position = self.camera_velocity*60*delta + self.camera_node.position
+    self.camera_node.position = step + self.camera_node.position
     self.camera_node:look(Vector(0, 0, 0), Vector(0, 1, 0))
 end
 

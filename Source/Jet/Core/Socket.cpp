@@ -32,19 +32,23 @@ using namespace std;
 
 #ifdef WINDOWS
 #define EWOULDBLOCK WSAEWOULDBLOCK
+typedef socklen_t int
 const char* errmsg() {
     static char buffer[512];
     FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, WSAGetLastError(), NULL, buffer, 512, NULL);
     return buffer;
 }    
-int err() {
+int errcode() {
     return WSAGetLastError();
 }
 #else
+#define SD_BOTH SHUT_RDWR
 #define INVALID_SOCKET -1
 #define errmsg() strerror(errno)
-#define err errno
+#define errcode() errno
 #define closesocket close
+#include <unistd.h>
+#include <fcntl.h>
 #endif
 
 Core::Socket* Core::Socket::server(uint16_t port) {
@@ -109,8 +113,8 @@ Core::Socket::Socket(const sockaddr_in& local, const sockaddr_in& remote, Socket
     local_(local),
     remote_(remote),
 	type_(type),
-    read_bytes_(0),
-    write_bytes_(0) {
+    write_bytes_(0),
+    read_bytes_(0) {
         
     switch (type_) {
         case DATAGRAM: init_datagram(); break;
@@ -120,16 +124,25 @@ Core::Socket::Socket(const sockaddr_in& local, const sockaddr_in& remote, Socket
         default: return;
     }
     
+#ifdef WINDOWS
     // Use non-blocking sockets
     u_long yes = 1;
     if (ioctlsocket(socket_, FIONBIO, &yes) < 0) {
         throw runtime_error(errmsg());
     }
+#else
+	int flags = fcntl(socket_, F_GETFL, 0);
+	flags |= O_NONBLOCK;
+	fcntl(socket_, F_SETFL, flags);
+#endif
+
 }
 
 Core::Socket::~Socket() {	
     if (socket_ != INVALID_SOCKET) {
+#ifdef WINDOWS
 		shutdown(socket_, SD_BOTH);
+#endif
         closesocket(socket_);
     }
 }
@@ -171,7 +184,7 @@ void Core::Socket::init_client() {
     // for a blocking connect, then we will catch that error on the first read
     // or write.
     if (::connect(socket_, (sockaddr*)&remote_, sizeof(remote_)) < 0) {
-        if (EWOULDBLOCK != err()) {
+        if (EWOULDBLOCK != errcode()) {
             throw runtime_error(errmsg());
         }
     }
@@ -271,10 +284,11 @@ void Core::Socket::poll_write() {
 
 void Core::Socket::accept() {
     // Attempt to accept a socket
-    int socklen = sizeof(remote_);
+
+    socklen_t socklen = sizeof(remote_);
 	int sd = ::accept(socket_, (sockaddr*)&remote_, &socklen);
 	if (INVALID_SOCKET == sd) {
-		if (EWOULDBLOCK == err()) {
+		if (EWOULDBLOCK == errcode()) {
 			return;
 		} else {
 			throw runtime_error(errmsg());
@@ -321,12 +335,12 @@ void Core::Socket::write_datagram() {
     // If an error occurred, or the socket is already closed, then throw
     // an exception
 	if (rt < 0) {
-		if (EWOULDBLOCK == err()) {
+		if (EWOULDBLOCK == errcode()) {
 			return;
 		} else {
 			throw runtime_error(errmsg());
 		}
-    } else if (rt != len) {
+    } else if (rt != (int)len) {
         throw runtime_error("Failed to send datagram");
 	} else {
 		write_bytes_ += rt;
@@ -337,7 +351,7 @@ void Core::Socket::write_datagram() {
 
 void Core::Socket::read_datagram() {
     sockaddr_in source;
-    int socklen = sizeof(source);
+    socklen_t socklen = sizeof(source);
 
     // Assume the packet will be 4096 bytes, max.
     in_.resize(4096);
@@ -352,12 +366,12 @@ void Core::Socket::read_datagram() {
     // If an error occurred, or the socket is already closed, then throw an
     // exception.
 	if (rt < 0) {
-		if (EWOULDBLOCK == err()) {
+		if (EWOULDBLOCK == errcode()) {
 			return;
 		} else {
 			throw runtime_error(errmsg());
 		}
-    } else if (rt < sizeof(size_t)) {
+    } else if (rt < (int)sizeof(size_t)) {
         throw runtime_error("Invalid packet");
 	} else {
 		read_bytes_ += rt;
@@ -385,7 +399,7 @@ void Core::Socket::write_stream() {
     // If an error occurred, or the socket is already closed, then throw
     // an exception
 	if (rt < 0) {
-		if (EWOULDBLOCK == err()) {
+		if (EWOULDBLOCK == errcode()) {
 			return;
 		} else {
 			throw runtime_error(errmsg());
@@ -419,7 +433,7 @@ void Core::Socket::read_stream() {
     // If an error occurred, or the socket is already closed, then throw an
     // exception.
 	if (rt < 0) {
-		if (EWOULDBLOCK == err()) {
+		if (EWOULDBLOCK == errcode()) {
 			return;
 		} else {
 			throw runtime_error(errmsg());

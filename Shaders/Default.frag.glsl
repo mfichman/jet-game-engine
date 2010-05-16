@@ -22,7 +22,7 @@
 
 #define MAX_CASCADES 4
 #define NORMAL_MAP
-#define SHADOW_MAP
+//#define SHADOW_MAP
 #define SPECULAR_MAP
 #define DIFFUSE_MAP
 
