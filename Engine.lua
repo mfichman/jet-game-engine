@@ -48,6 +48,12 @@ function engine:material(name)
     return table_syntax(engine_material(self, name))
 end
 
+local overlay_overlay = engine.overlay.overlay;
+function Overlay:overlay(name)
+    name = name or ""
+    return table_syntax(overlay_overlay(self, name))
+end
+
 local node_node = engine.root.node;
 function Node:node(name)
     name = name or ""

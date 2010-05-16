@@ -49,6 +49,7 @@
 #include <Jet/FractalPlanet.hpp>
 #include <Jet/Shader.hpp>
 #include <Jet/Signal.hpp>
+#include <Jet/Font.hpp>
 #include <luabind/luabind.hpp>
 #include <luabind/adopt_policy.hpp>
 #include <luabind/operator.hpp>
@@ -472,7 +473,7 @@ void Core::ScriptSystem::init_entity_type_bindings() {
             .property("vertical_alignment", (Alignment (Jet::Overlay::*)() const)&Jet::Overlay::vertical_alignment, (void (Jet::Overlay::*)(Alignment))&Jet::Overlay::vertical_alignment)
             .property("horizontal_alignment", (Alignment (Jet::Overlay::*)() const)&Jet::Overlay::horizontal_alignment, (void (Jet::Overlay::*)(Alignment))&Jet::Overlay::horizontal_alignment)
             .property("text", (const std::string& (Jet::Overlay::*)() const)&Jet::Overlay::text, (void (Jet::Overlay::*)(const std::string&))&Jet::Overlay::text)
-            //.property("font", (Jet::Font* (Jet::Overlay::*)() const)&Jet::Overlay::font, (void (Jet::Overlay::*)(const std::string&))&Jet::Overlay::font)
+            .property("font", (Jet::Font* (Jet::Overlay::*)() const)&Jet::Overlay::font, (void (Jet::Overlay::*)(const std::string&))&Jet::Overlay::font)
             .property("background", (Jet::Texture* (Jet::Overlay::*)() const)&Jet::Overlay::background, (void (Jet::Overlay::*)(const std::string&))&Jet::Overlay::background)
             .enum_("Alignment") [ value("LEFT", LEFT), value("RIGHT", RIGHT), value("CENTER", CENTER), value("TOP", TOP), value("BOTTOM", BOTTOM) ]
             .enum_("LayoutMode") [ value("RELATIVE_LAYOUT", RELATIVE_LAYOUT), value("ABSOLUTE_LAYOUT", ABSOLUTE_LAYOUT) ]

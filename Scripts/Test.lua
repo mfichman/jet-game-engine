@@ -33,6 +33,18 @@ function Test:__init()
     
     print("Hello")
     
+    -- Create overlay
+    print("Creating overlay")
+    self.overlay = engine.overlay:overlay("overlay") {
+        background = "Electricity.png",
+        font = "Neuropol.ttf#32",
+        text = "Hello, world!",
+        x = 0,
+        y = 0,
+        width = 200,
+        height = 200
+    }
+    
     -- Set up lights
     print("Creating lights")
     self.light_node = engine.root:node("light")
