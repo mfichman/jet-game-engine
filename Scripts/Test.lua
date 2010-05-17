@@ -25,49 +25,19 @@ require 'Monkey'
 require 'Rock'
 require 'Box'
 require 'Explosion'
+require 'Build'
 
 class 'Test' (Module)
 
 function Test:__init()
     Module.__init(self)
+    math.randomseed(os.time())
     
     print("Hello")
     
     -- Create overlay
     print("Creating overlay")
-    self.overlay = engine.overlay:overlay("tl") {
-        font = "Neuropol.ttf#14",
-        text = "Jet Game Engine build 2.0.1",
-        text_color = Color(1, 1, 1, 0.8),
-        vertical_alignment = Overlay.TOP,
-        x = 2,
-        y = 0,
-        width = 200,
-        height = 18
-    }
-    
-    -- Set up lights
-    print("Creating lights")
-    self.light_node = engine.root:node("light")
-    self.light = self.light_node:light("light") {
-        ambient_color = Color(.3, .3, .3, 1),
-        diffuse_color = Color(1, 1, 1, 1),
-        specular_color = Color(1, 1, 1, 1),
-        direction = Vector(1, 0, 1)
-    }
-    
-    -- Set up the camera
-    print("Creating camera")
-    self.camera_node = engine.root:node("camera")
-    self.camera_node.position = Vector(35, 0, 35)
-    self.camera_node:look(Vector(0, 0, 0), Vector(0, 1, 0))
-    self.camera = self.camera_node:camera("camera") {
-        active = true,
-        field_of_view = 45,
-        far_clipping_distance = 1000,
-        near_clipping_distance = 0.1
-    }
-    
+    self.overlay = Build(nil, "build")
     
     -- Set up the plane
     print("Creating plane")
@@ -95,7 +65,7 @@ function Test:__init()
         local pos = Vector(x, y, z)
         self.rocks[i].node.position = pos
         self.rocks[i].body.angular_velocity = pos.unit * 0.2
-        --self.rocks[i].body.linear_velocity = -pos.unit * 9;
+        --self.rocks[i].body.linear_velocity = -pos.unit * 5;
     end
 
     self.camera_velocity = Vector()
@@ -107,8 +77,8 @@ end
 
 function Test:on_update(delta)
     delta = delta / engine:option("simulation_speed");
-    self.camera_node.position = self.camera_velocity*(60*delta) + self.camera_node.position
-    self.camera_node:look(Vector(0, 0, 0), Vector(0, 1, 0))
+    camera_node.position = self.camera_velocity*(60*delta) + camera_node.position
+    camera_node:look(Vector(0, 0, 0), Vector(0, 1, 0))
 end
 
 function Test:on_key_pressed(key, x, y)

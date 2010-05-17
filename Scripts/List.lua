@@ -18,20 +18,39 @@
 -- FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 -- IN THE SOFTWARE.
 
-class 'Module'
+require 'Widget'
+require 'Button'
+require 'Engine'
 
-function Module:__init()
-    __adopt_module(self)
+class 'List' (Widget)
+
+function List:__init(node, name)
+    Widget.__init(self, node, name)
+
+    -- Default options
+    self.name = name
+    self.font_size = 54
+    self.font_face = "Russel.ttf"
+    self.button_spacing = 10
+    self.buttons = {}
+    self.overlay.height = 0
 end
 
-function Module:on_key_pressed(key, point) end
-function Module:on_key_released(key, point) end
-function Module:on_mouse_pressed(button, point) end
-function Module:on_mouse_released(button, point) end
-function Module:on_mouse_motion(point) end
-function Module:on_joystick(button, axes) end
-function Module:on_init() end
-function Module:on_update(delta) end
-function Module:on_render() end
-function Module:on_destroy() end
-function Module:on_tick() end
+
+function List:button(text, callback)
+    -- Creates a new button
+    local n = table.getn(self.buttons)+1
+    local b = Button(self.overlay, self.name..n)
+    b.overlay {
+        font = self.font_face.."#"..self.font_size,
+        height = self.font_size,
+        text = text,
+        y = self.overlay.height
+    }
+    b.on_click = callback
+    
+    -- Increase the height of the list to accomodate the button
+    self.overlay.height = self.overlay.height + self.button_spacing + self.font_size
+    
+    self.buttons[n] = b
+end

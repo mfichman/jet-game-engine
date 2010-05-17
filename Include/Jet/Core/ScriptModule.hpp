@@ -62,16 +62,16 @@ private:
     //! @param button the button
     //! @param x the x value of the mouse position in the range (-1.0, 1.0)
     //! @param y the y value of the mouse position in the range (-1.0, 1.0)
-    inline void on_button_pressed(uint32_t button, const Point& point) {
-        self_["on_button_pressed"](self_, button, point);
+    inline void on_mouse_pressed(uint32_t button, const Point& point) {
+        self_["on_mouse_pressed"](self_, button, point);
     }
     
     //! Called when the button is released.
     //! @param button the button
     //! @param x the x value of the mouse position in the range (-1.0, 1.0)
     //! @param y the y value of the mouse position in the range (-1.0, 1.0)
-    inline void on_button_released(uint32_t button, const Point& point) {
-        self_["on_button_released"](self_, button, point);
+    inline void on_mouse_released(uint32_t button, const Point& point) {
+        self_["on_mouse_released"](self_, button, point);
     }
     
     //! Called when the mouse movies.

@@ -50,7 +50,7 @@ namespace Jet { namespace Core {
     class RenderSystem;
     class RenderTarget;
     class RigidBody;
-    class ScriptController;
+    class ScriptActor;
     class ScriptSystem;
     class Shader;
     class Socket;
@@ -84,7 +84,7 @@ namespace Jet { namespace Core {
     typedef boost::intrusive_ptr<RenderTarget> RenderTargetPtr;
     typedef boost::intrusive_ptr<RigidBody> RigidBodyPtr;
     typedef boost::intrusive_ptr<ScriptSystem> ScriptSystemPtr;
-    typedef boost::intrusive_ptr<ScriptController> ScriptControllerPtr;
+    typedef boost::intrusive_ptr<ScriptActor> ScriptControllerPtr;
     typedef boost::intrusive_ptr<Shader> ShaderPtr;
     typedef boost::intrusive_ptr<Socket> SocketPtr;
     typedef boost::intrusive_ptr<SocketReader> SocketReaderPtr;

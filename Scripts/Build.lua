@@ -18,20 +18,47 @@
 -- FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 -- IN THE SOFTWARE.
 
-class 'Module'
+require 'Widget'
 
-function Module:__init()
-    __adopt_module(self)
+class 'Build' (Widget)
+
+function Build:__init(node, name)
+    Widget.__init(self, node, name)
+
+    self.overlay.font = "Russel.ttf#14"
+    self.overlay.text = engine:option("engine_build")
+    self.overlay.text_color = Color(1, 1, 1, 0.7)
+    self.overlay.vertical_alignment = Overlay.TOP
+    self.overlay.x = 4
+    self.overlay.y = 4
+    self.overlay.width = 800
+    self.overlay.height = 18
+    self.color_fade = -1;
 end
 
-function Module:on_key_pressed(key, point) end
-function Module:on_key_released(key, point) end
-function Module:on_mouse_pressed(button, point) end
-function Module:on_mouse_released(button, point) end
-function Module:on_mouse_motion(point) end
-function Module:on_joystick(button, axes) end
-function Module:on_init() end
-function Module:on_update(delta) end
-function Module:on_render() end
-function Module:on_destroy() end
-function Module:on_tick() end
+function Build:on_update(delta)
+    local color = self.overlay.text_color
+    local alpha = math.clamp(color.alpha + 2*self.color_fade*delta, .7, 1)
+    self.overlay.text_color = Color(1, 1, 1, alpha)
+end
+
+function Build:on_mouse_pressed(button)
+    print("Click")
+end
+
+function Build:on_mouse_released(button)
+    print("Release")
+end
+
+function Build:on_mouse_enter()
+    self.color_fade = 1;
+    print("Enter")
+end
+
+function Build:on_mouse_exit()
+    self.color_fade = -1;
+    print("Exit")
+end
+
+function Build:on_destroy()
+end

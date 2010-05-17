@@ -18,20 +18,48 @@
 -- FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 -- IN THE SOFTWARE.
 
-class 'Module'
+require 'Module'
+require 'List'
 
-function Module:__init()
-    __adopt_module(self)
+class 'Multiplayer' (Module)
+
+function Multiplayer:__init()
+    Module.__init(self)
+
+    -- Multiplayer overlay
+    self.screen = engine.screen:overlay("multiplayer_screen") {
+        visible = true,
+        x = 20
+    }
+    
+    -- Title for the MP screen
+    self.title = self.screen:overlay("mp_title") {
+        height = 0,
+        y = 120,
+        text_color = Color(1, .4, .1, 1.0),
+        font = "Russel.ttf#96",
+        text = "multiplayer."
+    }
+    
+    -- List for MP screen buttons
+    self.list = List(self.screen, "mp_list")
+    self.list:button("matt's game", callback(self, "b"))
+    self.list:button("bob's game", callback(self, "a"))
+    self.list:button("back", callback(self, "on_back_click"))
+    self.list.overlay.y = 250
+
 end
 
-function Module:on_key_pressed(key, point) end
-function Module:on_key_released(key, point) end
-function Module:on_mouse_pressed(button, point) end
-function Module:on_mouse_released(button, point) end
-function Module:on_mouse_motion(point) end
-function Module:on_joystick(button, axes) end
-function Module:on_init() end
-function Module:on_update(delta) end
-function Module:on_render() end
-function Module:on_destroy() end
-function Module:on_tick() end
+function Multiplayer:a()
+end
+
+function Multiplayer:b()
+end
+
+function Multiplayer:on_back_click(widget, button)
+    Start()
+end
+
+function Multiplayer:on_destroy()
+    self.screen.visible = false
+end

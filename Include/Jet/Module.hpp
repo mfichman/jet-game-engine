@@ -47,13 +47,13 @@ public:
     //! @param button the button
     //! @param point the x and y values of the mouse position in the normalized
     //! range (-1.0, 1.0)
-    virtual void on_button_pressed(uint32_t button, const Point& point)=0;
+    virtual void on_mouse_pressed(uint32_t button, const Point& point)=0;
     
     //! Called when the button is released.
     //! @param button the button
     //! @param point the x and y values of the mouse position in the normalized
     //! range (-1.0, 1.0)
-    virtual void on_button_released(uint32_t button, const Point& point)=0;
+    virtual void on_mouse_released(uint32_t button, const Point& point)=0;
     
     //! Called when the mouse movies.
     //! @param point the x and y values of the mouse position in the normalized

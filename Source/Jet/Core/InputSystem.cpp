@@ -22,6 +22,7 @@
 
 #include <Jet/Core/InputSystem.hpp>
 #include <Jet/Core/Engine.hpp>
+#include <Jet/Core/Overlay.hpp>
 #include <Jet/Point.hpp>
 #include <SDL/SDL.h>
 #include <cmath>
@@ -52,15 +53,16 @@ void Core::InputSystem::on_update() {
     while(SDL_PollEvent(&evt)) {
         switch (evt.type) {
             case SDL_QUIT: engine_->running(false); break;
-            case SDL_KEYDOWN: on_keyboard(SDL_GetKeyName(evt.key.keysym.sym)); break;
-            case SDL_KEYUP: on_keyboard_up(SDL_GetKeyName(evt.key.keysym.sym)); break;
-            case SDL_MOUSEBUTTONDOWN: on_mouse(evt.button.button, evt.button.x, evt.button.y); break;
-            case SDL_MOUSEBUTTONUP: on_mouse_up(evt.button.button, evt.button.x, evt.button.y); break;
+            case SDL_KEYDOWN: on_key_pressed(SDL_GetKeyName(evt.key.keysym.sym)); break;
+            case SDL_KEYUP: on_key_released(SDL_GetKeyName(evt.key.keysym.sym)); break;
+            case SDL_MOUSEBUTTONDOWN: on_mouse_pressed(evt.button.button, evt.button.x, evt.button.y); break;
+            case SDL_MOUSEBUTTONUP: on_mouse_released(evt.button.button, evt.button.x, evt.button.y); break;
+			case SDL_MOUSEMOTION: on_mouse_moved(evt.motion.x, evt.motion.y); break;
         }
     }
 }
 
-void Core::InputSystem::on_keyboard(const std::string& key) {
+void Core::InputSystem::on_key_pressed(const std::string& key) {
     Module* module = engine_->module();
     if (module) {
         int x, y;
@@ -69,7 +71,7 @@ void Core::InputSystem::on_keyboard(const std::string& key) {
     }
 }
 
-void Core::InputSystem::on_keyboard_up(const std::string& key) {
+void Core::InputSystem::on_key_released(const std::string& key) {
     Module* module = engine_->module();
     if (module) {
         int x, y;
@@ -78,26 +80,35 @@ void Core::InputSystem::on_keyboard_up(const std::string& key) {
     }
 }
 
-void Core::InputSystem::on_special(int key, int x, int y) {
+void Core::InputSystem::on_special_pressed(int key, int x, int y) {
     //Module* module = system_->engine_->module();
 }
 
-void Core::InputSystem::on_special_up(int key, int x, int y) {
+void Core::InputSystem::on_special_released(int key, int x, int y) {
     //Module* module = system_->engine_->module();
 }
 
-void Core::InputSystem::on_mouse(int button, int x, int y) {
+void Core::InputSystem::on_mouse_pressed(int button, int x, int y) {
     Module* module = engine_->module();
     if (module) {
-        module->on_button_pressed(button, normalized_mouse(x, y));
+        module->on_mouse_pressed(button, normalized_mouse(x, y));
     }
+	Overlay* overlay = static_cast<Overlay*>(engine_->screen());
+	overlay->mouse_pressed(button, (float)x, (float)y);
 }
 
-void Core::InputSystem::on_mouse_up(int button, int x, int y) {
+void Core::InputSystem::on_mouse_released(int button, int x, int y) {
     Module* module = engine_->module();
     if (module) {
-        module->on_button_released(button, normalized_mouse(x, y));
+        module->on_mouse_released(button, normalized_mouse(x, y));
     }
+	Overlay* overlay = static_cast<Overlay*>(engine_->screen());
+	overlay->mouse_released(button, (float)x, (float)y);
+}
+
+void Core::InputSystem::on_mouse_moved(int x, int y) {
+	Overlay* overlay = static_cast<Overlay*>(engine_->screen());
+	overlay->mouse_moved((float)x, (float)y);
 }
 
 void Core::InputSystem::on_joystick(int button, int x, int y, int z) {

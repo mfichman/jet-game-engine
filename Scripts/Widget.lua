@@ -18,20 +18,17 @@
 -- FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 -- IN THE SOFTWARE.
 
-class 'Module'
+class 'Widget'
 
-function Module:__init()
-    __adopt_module(self)
+function Widget:__init(overlay, name)
+    oveerlay = overlay or engine.screen
+    name = name or ""
+    __adopt_widget(self, oveerlay, name)
 end
 
-function Module:on_key_pressed(key, point) end
-function Module:on_key_released(key, point) end
-function Module:on_mouse_pressed(button, point) end
-function Module:on_mouse_released(button, point) end
-function Module:on_mouse_motion(point) end
-function Module:on_joystick(button, axes) end
-function Module:on_init() end
-function Module:on_update(delta) end
-function Module:on_render() end
-function Module:on_destroy() end
-function Module:on_tick() end
+function Widget:on_update(delta) end
+function Widget:on_mouse_pressed(button) end
+function Widget:on_mouse_released(button) end
+function Widget:on_mouse_enter() end
+function Widget:on_mouse_exit() end
+function Widget:on_destroy() end

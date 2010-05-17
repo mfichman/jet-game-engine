@@ -40,6 +40,9 @@ public:
     //! child overlay if it already exists.
     virtual Overlay* overlay(const std::string& name)=0;
     
+    //! Returns true if the overlay is visible
+    virtual bool visible() const=0;
+    
     //! Returns the x-coordinate of the top-left corner of the overlay.
     virtual float x() const=0;
     
@@ -75,6 +78,9 @@ public:
     
     //! Returns the background texture of this overlay.
     virtual Texture* background() const=0;
+    
+    //! Sets the visibility of the overlay.
+    virtual void visible(bool visible)=0;
     
     //! Sets the x-coordinate of the top-left corner of the overlay.
     virtual void x(float x)=0;
@@ -133,16 +139,19 @@ public:
 class OverlayListener : public virtual Object {
 public:
     //! Called when the mouse is pressed while over the overlay.
-    virtual void on_mouse_pressed()=0;
+    virtual void on_mouse_pressed(int button)=0;
     
     //! Called when the mouse is released over the overlay.
-    virtual void on_mouse_released()=0;
+    virtual void on_mouse_released(int button)=0;
     
     //! Called when the mouse enters the region of the overlay.
     virtual void on_mouse_enter()=0;
     
     //! Called when the mouse exits the region of the overlay.
     virtual void on_mouse_exit()=0;
+    
+    //! Called when the overlay is updated (once per frame)
+    virtual void on_update(float delta)=0;
     
     //! Called when the overlay is destroyed.
     virtual void on_destroy()=0;

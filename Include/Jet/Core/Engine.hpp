@@ -57,8 +57,8 @@ public:
     }
 	
 	//! Returns the root overlay.
-	inline Jet::Overlay* overlay() const {
-		return overlay_.get();
+	inline Jet::Overlay* screen() const {
+		return screen_.get();
         
 	}
 	//! Returns the active camera.
@@ -291,7 +291,7 @@ private:
 	std::map<std::string, Jet::FontPtr> font_;
 
     Jet::NodePtr root_;
-	Jet::OverlayPtr overlay_;
+	Jet::OverlayPtr screen_;
 	Jet::CameraPtr camera_;
 	Jet::ModulePtr module_;
 		

@@ -32,6 +32,18 @@ using namespace Jet;
 using namespace std;
 using namespace std::tr1;
 
+Core::Overlay::~Overlay() {
+	if (!destroyed_) {
+		// If the node hasn't been destroyed, then mark it as destroyed
+		// and notify all the listeners to the node.  This case can
+		// happen if the parent node is destroyed.
+		destroyed_ = true;
+		if (listener_) { 
+            listener_->on_destroy();
+        }
+	}
+}
+
 Core::Overlay* Core::Overlay::overlay(const string& name) {
     unordered_map<string, OverlayPtr>::const_iterator i = overlay_.find(name);
     if (i == overlay_.end()) {
@@ -43,45 +55,53 @@ Core::Overlay* Core::Overlay::overlay(const string& name) {
     }
 }
 
-void Core::Overlay::render() {
-    float x;
-    float y;
-    
+float Core::Overlay::corner_x() const {
     // Find the top-left corner of the overlay.  Depends on the horizontal
     // alignment of the overlay.
     if (LEFT == horizontal_alignment_) {
-        x = x_;
+        return x_;
     } else if (RIGHT == horizontal_alignment_) {
         if (parent_) {
-            x = parent_->width() - width_ + x_;
+            return parent_->width() - width_ + x_;
         } else {
-            x = engine_->option<float>("display_width") - width_ + x_;
+            return engine_->option<float>("display_width") - width_ + x_;
         }
     } else {
         if (parent_) {
-            x = (parent_->width() - width_) / 2.0f + x_;
+            return (parent_->width() - width_) / 2.0f + x_;
         } else {
-            x = (engine_->option<float>("display_width") - width_) / 2.0f + x_;
+            return (engine_->option<float>("display_width") - width_) / 2.0f + x_;
         }
     }
-    
+}
+
+float Core::Overlay::corner_y() const {
     // Find the top-right corner of the overlay.  Depends on the vertical
     // alignment of the overlay.
     if (TOP == vertical_alignment_) {
-        y = y_;
+        return y_;
     } else if (BOTTOM == vertical_alignment_) {
         if (parent_) {
-            y = parent_->height() - height_ + y_;
+            return parent_->height() - height_ + y_;
         } else {
-            y = engine_->option<float>("display_height") - height_ + y_;
+            return engine_->option<float>("display_height") - height_ + y_;
         }
     } else {
         if (parent_) {
-            y = (parent_->height() - height_) / 2.0f + y_;
+            return (parent_->height() - height_) / 2.0f + y_;
         } else {
-            y = (engine_->option<float>("display_height") - height_) / 2.0f + y_;
+            return (engine_->option<float>("display_height") - height_) / 2.0f + y_;
         }
     }
+}
+
+void Core::Overlay::render() {
+    if (!visible_) {
+        return;
+    }
+    
+    float x = corner_x();
+    float y = corner_y();
     
     // Now translate to the top-left corner of the overlay, and render
     // the text and background image
@@ -137,6 +157,92 @@ void Core::Overlay::delete_overlay(Overlay* overlay) {
     }
 }
 
+//! Adds a listener to the overlay.
+void Core::Overlay::listener(OverlayListener* listener) {
+    if (destroyed_) {
+		throw std::runtime_error("Attempted to add a listener to a node marked for deletion");
+	} else {
+		listener_ = listener;
+	}
+}
+
+void Core::Overlay::update() {
+    if (visible_) {
+        if (listener_) { 
+              listener_->on_update(engine_->frame_delta());
+        }
+        // Generate a mouse pressed event for children
+        for (unordered_map<string, OverlayPtr>::iterator i = overlay_.begin(); i != overlay_.end(); i++) {
+            i->second->update();
+        }
+    }
+}
+
+void Core::Overlay::mouse_pressed(int button, float x, float y) {
+    if (visible_) {
+        x -= corner_x();
+        y -= corner_y();
+        
+        // If the point is inside the overlay's bounding box, generate an event.
+        if (x >= 0 && y >= 0 && x <= width_ && y <= height_) {
+            if (listener_) {
+                listener_->on_mouse_pressed(button);
+            }
+        }
+        
+        // Generate a mouse pressed event for children
+        for (unordered_map<string, OverlayPtr>::iterator i = overlay_.begin(); i != overlay_.end(); i++) {
+            i->second->mouse_pressed(button, x, y);
+        }
+    }
+}
+
+void Core::Overlay::mouse_released(int button, float x, float y) {
+    if (visible_) {
+        x -= corner_x();
+        y -= corner_y();
+        
+        // If the point is inside the overlay's bounding box, generate an event.
+        if (x >= 0 && y >= 0 && x <= width_ && y <= height_) {
+           if (listener_) {
+				listener_->on_mouse_released(button);
+            }
+        }
+        
+        // Generate a mouse pressed event for children
+        for (unordered_map<string, OverlayPtr>::iterator i = overlay_.begin(); i != overlay_.end(); i++) {
+            i->second->mouse_released(button, x, y);
+        }
+    }
+}
+
+void Core::Overlay::mouse_moved(float x, float y) {
+    if (visible_) {
+        x -= corner_x();
+        y -= corner_y();
+        
+        // If the point is inside the overlay's bounding box, generate an event.
+        if (x >= 0 && y >= 0 && x <= width_ && y <= height_) {
+            if (!mouse_inside_) {
+                if (listener_) {
+                    listener_->on_mouse_enter();
+                }
+                mouse_inside_ = true;
+            }
+        } else if (mouse_inside_) {
+            if (listener_) {
+                 listener_->on_mouse_exit();
+            }
+            mouse_inside_ = false;
+        }
+        
+        // Generate a mouse pressed event for children
+        for (unordered_map<string, OverlayPtr>::iterator i = overlay_.begin(); i != overlay_.end(); i++) {
+            i->second->mouse_moved(x, y);
+        }
+    }
+}
+
 void Core::Overlay::destroy() {
     if (destroyed_) {
         return;
@@ -152,11 +258,11 @@ void Core::Overlay::destroy() {
         }
         
         // Motify listeners.
-        for (vector<OverlayListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
-            (*i)->on_destroy();
+        if (listener_) {
+            listener_->on_destroy();
         }
         
         // Break cycle with listeners.
-        listener_.clear();
+        listener_.reset();
     }
 }

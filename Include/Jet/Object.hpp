@@ -49,7 +49,7 @@ public:
     //! Decrements the reference count on this object.
     inline void refcount_dec() const { 
         refcount_--; 
-        if (refcount_ <= 0) {
+        if (refcount_ == 0) {
             delete this;
         } 
     }

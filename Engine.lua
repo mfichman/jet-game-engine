@@ -18,6 +18,12 @@
 -- FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 -- IN THE SOFTWARE.
 
+function math.clamp(val, min, max)
+    if (val < min) then return min end
+    if (val > max) then return max end
+    return val;
+end
+
 function option(key, value)
     engine:option(key, value)
 end
@@ -32,7 +38,7 @@ function copy(src, dest)
     end
 end
 
-local function table_syntax(o)
+function callable(o)
     local mt = getmetatable(o)
     mt.__call = function(o, table)
         copy(table, o)
@@ -41,52 +47,58 @@ local function table_syntax(o)
     return o
 end
 
+function callback(self, method)
+    return function(...)
+        self[method](self, ...)
+    end
+end
+
 
 local engine_material = engine.material;
 function engine:material(name)
     name = name or ""
-    return table_syntax(engine_material(self, name))
+    return callable(engine_material(self, name))
 end
 
-local overlay_overlay = engine.overlay.overlay;
+local overlay_overlay = engine.screen.overlay;
 function Overlay:overlay(name)
     name = name or ""
-    return table_syntax(overlay_overlay(self, name))
+    return callable(overlay_overlay(self, name))
 end
 
 local node_node = engine.root.node;
 function Node:node(name)
     name = name or ""
-    return table_syntax(node_node(self, name))
+    return callable(node_node(self, name))
 end
 
 local node_mesh_object = engine.root.mesh_object;
 function Node:mesh_object(name)
     name = name or ""
-    return table_syntax(node_mesh_object(self, name))
+    return callable(node_mesh_object(self, name))
 end
 
 local node_fracture_object = engine.root.fracture_object;
 function Node:fracture_object(name)
     name = name or ""
-    return table_syntax(node_fracture_object(self, name))
+    return callable(node_fracture_object(self, name))
 end
 
 local node_particle_system = engine.root.particle_system;
 function Node:particle_system(name)
     name = name or ""
-    return table_syntax(node_particle_system(self, name))
+    return callable(node_particle_system(self, name))
 end
 
 local node_light = engine.root.light;
 function Node:light(name)
     name = name or ""
-    return table_syntax(node_light(self, name))
+    return callable(node_light(self, name))
 end
 
 local node_camera = engine.root.camera;
 function Node:camera(name)
     name = name or ""
-    return table_syntax(node_camera(self, name))
+    return callable(node_camera(self, name))
 end
 

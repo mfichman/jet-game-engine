@@ -106,8 +106,8 @@ void Core::RenderSystem::init_window() {
     glViewport(0, 0, (uint32_t)width, (uint32_t)height);
 
 	
-	engine_->overlay()->width((float)width);
-	engine_->overlay()->height((float)height);
+	engine_->screen()->width((float)width);
+	engine_->screen()->height((float)height);
 }
 
 void Core::RenderSystem::init_extensions() {
@@ -538,7 +538,7 @@ void Core::RenderSystem::render_overlays() {
 	glActiveTexture(GL_TEXTURE0);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	
-	static_cast<Core::Overlay*>(engine_->overlay())->render();
+	static_cast<Core::Overlay*>(engine_->screen())->render();
 	
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();

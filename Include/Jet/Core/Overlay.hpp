@@ -54,7 +54,8 @@ public:
         layout_mode_(RELATIVE_LAYOUT),
         vertical_alignment_(TOP),
         horizontal_alignment_(LEFT),
-        text_color_(1.0f, 1.0f, 1.0f, 1.0f) {
+        text_color_(1.0f, 1.0f, 1.0f, 1.0f),
+        visible_(true) {
         
     }
     
@@ -65,14 +66,19 @@ public:
         destroyed_(false),
         x_(0.0f),
         y_(0.0f),
-        width_(0.0f),
-        height_(0.0f),
+        width_(parent->width_),
+        height_(parent->height_),
         layout_mode_(RELATIVE_LAYOUT),
         vertical_alignment_(TOP),
         horizontal_alignment_(LEFT),
-        text_color_(1.0f, 1.0f, 1.0f, 1.0f) {
+        text_color_(1.0f, 1.0f, 1.0f, 1.0f),
+        mouse_inside_(false),
+        visible_(true) {
             
     }
+
+	//! Destructor
+	virtual ~Overlay();
     
     //! Returns the parent overlay.
     inline Overlay* parent() const {
@@ -83,6 +89,11 @@ public:
     //! child overlay if it already exists.
     Overlay* overlay(const std::string& name);
     
+    //! Returns true if the overlay is visible.
+    inline bool visible() const {
+        return visible_;
+    }
+    
     //! Returns the x-coordinate of the top-left corner of the overlay.
     inline float x() const {
         return x_;
@@ -92,6 +103,12 @@ public:
     inline float y() const {
         return y_;
     }
+
+	//! Returns the screen x-coordinate
+	float corner_x() const;
+
+	//! Returns the screen y-coordinate
+	float corner_y() const;
     
     //! Returns the width of the overlay.
     inline float width() const {
@@ -139,6 +156,11 @@ public:
     //! Returns the background texture of this overlay.
     inline Texture* background() const {
         return background_.get();
+    }
+    
+    //! Makes this overlay visible/invisible.
+    inline void visible(bool visible) {
+        visible_ = visible;
     }
     
     //! Sets the x-coordinate of the top-left corner of the overlay.
@@ -212,19 +234,25 @@ public:
     }
     
     //! Adds a listener to the overlay.
-    inline void listener(OverlayListener* listener) {
-        if (destroyed_) {
-			throw std::runtime_error("Attempted to add a listener to a node marked for deletion");
-		} else {
-			listener_.push_back(listener);
-		}
-    }
+    void listener(OverlayListener* listener);
     
     //! Renders this overlay.
     void render();
     
     //! Destroys this overlay.
     void destroy();
+    
+    //! Updates this overlay.
+    void update();
+        
+    //! Mouse event.
+    void mouse_pressed(int button, float x, float y);
+    
+    //! Mouse event
+    void mouse_released(int button, float x, float y);
+    
+    //! Mouse event
+    void mouse_moved(float x, float y);
     
 private:    
     void render_background();
@@ -246,7 +274,9 @@ private:
     Color text_color_;
     TexturePtr background_;
     FontPtr font_;
-    std::vector<OverlayListenerPtr> listener_;
+    bool mouse_inside_;
+    bool visible_;
+    OverlayListenerPtr listener_;
 };
 
 }}

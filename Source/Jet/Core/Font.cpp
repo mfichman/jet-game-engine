@@ -146,7 +146,7 @@ void Core::Font::create_bitmap(FT_Face face, unsigned char ch) {
             } else {
                 value = bitmap.buffer[i + bitmap.width*j];
             }
-            bitmap_data[2*(i+j*width)] = value; // Luminosity
+            bitmap_data[2*(i+j*width)] = 255; // Luminosity
             bitmap_data[2*(i+j*width)+1] = value; // Alpha
         }
     }

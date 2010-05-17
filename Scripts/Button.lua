@@ -18,20 +18,44 @@
 -- FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 -- IN THE SOFTWARE.
 
-class 'Module'
+require 'Widget'
+require 'Engine'
 
-function Module:__init()
-    __adopt_module(self)
+class 'Button' (Widget)
+
+function Button:__init(node, name)
+    Widget.__init(self, node, name)
+
+    -- Default options
+    self.overlay.font = "Russel.ttf#14"
+    self.overlay.text_color = Color(1, 1, 1, 0.7)
+    self.overlay.vertical_alignment = Overlay.TOP
+    self.overlay.x = 4
+    self.overlay.y = 4
+    self.overlay.width = 800
+    self.overlay.height = 16
+    self.color_fade = -1;
 end
 
-function Module:on_key_pressed(key, point) end
-function Module:on_key_released(key, point) end
-function Module:on_mouse_pressed(button, point) end
-function Module:on_mouse_released(button, point) end
-function Module:on_mouse_motion(point) end
-function Module:on_joystick(button, axes) end
-function Module:on_init() end
-function Module:on_update(delta) end
-function Module:on_render() end
-function Module:on_destroy() end
-function Module:on_tick() end
+function Button:on_update(delta)
+    local alpha = self.overlay.text_color.alpha + 2*self.color_fade*delta
+    self.overlay.text_color = Color(1, 1, 1, math.clamp(alpha, .7, 1))
+end
+
+function Button:on_mouse_pressed(button)
+    self:on_click(button)
+end
+
+function Button:on_mouse_enter()
+    self.color_fade = 1;
+end
+
+function Button:on_mouse_exit()
+    self.color_fade = -1;
+end
+
+function Button:on_destroy()
+end
+
+function Button:on_click(button)
+end

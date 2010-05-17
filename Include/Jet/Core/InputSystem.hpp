@@ -44,12 +44,13 @@ private:
     void on_update();
     void on_render() {}
     
-	void on_keyboard(const std::string& key);
-    void on_keyboard_up(const std::string& key);
-    void on_special(int key, int x, int y);
-    void on_special_up(int key, int x, int y);
-    void on_mouse(int button, int x, int y);
-    void on_mouse_up(int button, int x, int y);
+	void on_key_pressed(const std::string& key);
+    void on_key_released(const std::string& key);
+    void on_special_pressed(int key, int x, int y);
+    void on_special_released(int key, int x, int y);
+    void on_mouse_pressed(int button, int x, int y);
+    void on_mouse_released(int button, int x, int y);
+	void on_mouse_moved(int x, int y);
     void on_joystick(int button, int x, int y, int z);
     
     Point normalized_mouse(int x, int y);

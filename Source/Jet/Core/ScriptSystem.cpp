@@ -23,8 +23,9 @@
 #include <Jet/Types.hpp>
 #include <Jet/Core/Types.hpp>
 #include <Jet/Core/ScriptSystem.hpp>
-#include <Jet/Core/ScriptController.hpp>
+#include <Jet/Core/ScriptActor.hpp>
 #include <Jet/Core/ScriptModule.hpp>
+#include <Jet/Core/ScriptWidget.hpp>
 #include <Jet/Overlay.hpp>
 #include <Jet/Vector.hpp>
 #include <Jet/Quaternion.hpp>
@@ -163,6 +164,11 @@ Core::ScriptSystem::ScriptSystem(Engine* engine) :
     lua_pushcclosure(env_, &ScriptSystem::adopt_actor, 1);
     lua_setglobal(env_, "__adopt_actor");
     
+    // Add __adopt_widget function
+    lua_pushlightuserdata(env_, this);
+    lua_pushcclosure(env_, &ScriptSystem::adopt_widget, 1);
+    lua_setglobal(env_, "__adopt_widget");
+    
     // Add __adopt_module function
     lua_pushlightuserdata(env_, this);
     lua_pushcclosure(env_, &ScriptSystem::adopt_module, 1);
@@ -216,7 +222,19 @@ int Core::ScriptSystem::adopt_actor(lua_State* env) {
     Jet::Node* node = object_cast<Jet::Node*>(object(from_stack(env, 2)));
     string name = lua_tostring(env, 3);
     
-    ObjectPtr obj = new ScriptController(ref, node, name);
+    ObjectPtr obj = new ScriptActor(ref, node, name);
+    
+    return 0;
+}
+
+int Core::ScriptSystem::adopt_widget(lua_State* env) {
+    using namespace luabind;
+    
+    luabind::object ref = object(from_stack(env, 1));
+    Jet::Overlay* overlay = object_cast<Jet::Overlay*>(object(from_stack(env, 2)));
+    string name = lua_tostring(env, 3);
+    
+    ObjectPtr obj = new ScriptWidget(ref, overlay, name);
     
     return 0;
 }
@@ -449,10 +467,12 @@ void Core::ScriptSystem::init_entity_type_bindings() {
             
         luabind::class_<Jet::Engine, Jet::EnginePtr>("Engine")
             .property("root", &Jet::Engine::root)
-            .property("overlay", &Jet::Engine::overlay)
+            .property("screen", &Jet::Engine::screen)
             .def("option", (void (Jet::Engine::*)(const std::string&, const boost::any&))&Jet::Engine::option)
             .def("option", (const boost::any& (Jet::Engine::*)(const std::string&) const)&Jet::Engine::option)
             .def("search_folder", &Jet::Engine::search_folder)
+            .property("frame_time", &Jet::Engine::frame_time)
+            .property("frame_delta", &Jet::Engine::frame_delta)
 			.def("mesh", (Jet::Mesh* (Jet::Engine::*)(const std::string&))&Jet::Engine::mesh)
             .def("material", &Jet::Engine::material)
             .property("running", (bool (Jet::Engine::*)() const)&Jet::Engine::running, (void (Jet::Engine::*)(bool))&Jet::Engine::running),
@@ -470,6 +490,7 @@ void Core::ScriptSystem::init_entity_type_bindings() {
             .property("width", (float (Jet::Overlay::*)() const)&Jet::Overlay::width, (void (Jet::Overlay::*)(float))&Jet::Overlay::width)
             .property("height", (float (Jet::Overlay::*)() const)&Jet::Overlay::height, (void (Jet::Overlay::*)(float))&Jet::Overlay::height)
             .property("layout_mode", (LayoutMode (Jet::Overlay::*)() const)&Jet::Overlay::layout_mode, (void (Jet::Overlay::*)(LayoutMode))&Jet::Overlay::layout_mode)
+            .property("visible", (bool (Jet::Overlay::*)() const)&Jet::Overlay::visible, (void (Jet::Overlay::*)(bool))&Jet::Overlay::visible)
             .property("vertical_alignment", (Alignment (Jet::Overlay::*)() const)&Jet::Overlay::vertical_alignment, (void (Jet::Overlay::*)(Alignment))&Jet::Overlay::vertical_alignment)
             .property("horizontal_alignment", (Alignment (Jet::Overlay::*)() const)&Jet::Overlay::horizontal_alignment, (void (Jet::Overlay::*)(Alignment))&Jet::Overlay::horizontal_alignment)
             .property("text", (const std::string& (Jet::Overlay::*)() const)&Jet::Overlay::text, (void (Jet::Overlay::*)(const std::string&))&Jet::Overlay::text)

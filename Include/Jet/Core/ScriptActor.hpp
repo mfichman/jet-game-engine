@@ -30,12 +30,12 @@ namespace Jet { namespace Core {
 
 //! Base class for objects that are connected to a scene node, and control it.
 //! This class is used to attach logic to a node.
-//! @class ScriptController
+//! @class ScriptActor
 //! @brief Attaches script logic to a node
-class ScriptController : public Jet::NodeListener {
+class ScriptActor : public Jet::NodeListener {
 public:
     //! Creates a new script controller with a new node.
-	inline ScriptController(const luabind::object& self, Jet::Node* node, const std::string& name) :
+	inline ScriptActor(const luabind::object& self, Jet::Node* node, const std::string& name) :
 		node_(static_cast<Node*>(node->node(name))),
 		self_(self) {
             
@@ -43,10 +43,8 @@ public:
         self_["node"] = static_cast<Jet::Node*>(node_);
     }
     
-    inline virtual ~ScriptController() {
-		if (node_) {
-			node_->destroy();
-		}
+    //! Destructor
+    inline virtual ~ScriptActor() {
         self_["node"] = luabind::nil;
     }
 

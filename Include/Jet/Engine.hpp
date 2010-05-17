@@ -40,7 +40,7 @@ public:
 	
 	//! Returns the root overlay.  This overlay can be used to add other
 	//! overlays to the screen.
-	virtual Overlay* overlay() const=0;
+	virtual Overlay* screen() const=0;
 	
 	//! Returns the current module.
 	virtual Module* module() const=0;
@@ -50,6 +50,12 @@ public:
         
     //! Returns true if the engine is running
     virtual bool running() const=0;
+	
+	//! Returns the frame time
+	virtual float frame_time() const=0;
+	
+	//! Returns the frame delta
+	virtual float frame_delta() const=0;
     
     //! Returns an engine option.  This method will throw an exception if
     //! the option could not be found.

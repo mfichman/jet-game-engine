@@ -56,9 +56,9 @@ Core::Node::~Node() {
 		// and notify all the listeners to the node.  This case can
 		// happen if the parent node is destroyed.
 		destroyed_ = true;
-		for (vector<NodeListenerPtr>::iterator i = listener_.begin(); i < listener_.end(); i++) {
-            (*i)->on_destroy();
-        }
+		if (listener_) {
+			listener_->on_destroy();
+		}
 	}
 }
 
@@ -181,7 +181,7 @@ void Core::Node::listener(NodeListener* listener) {
 	if (destroyed_) {
 		throw std::runtime_error("Attempted to add a listener to a node marked for deletion");
 	} else {
-		listener_.push_back(listener);
+		listener_ = listener;
 	}
 }
 
@@ -249,8 +249,8 @@ void Core::Node::look(const Vector& target, const Vector& up) {
 void Core::Node::signal(const Signal& signal) {
 	if (true /*!network_monitor*/) {
 		// Send signal immediately to the object, or else delay the object.
-		for (vector<NodeListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
-			(*i)->on_signal(signal);
+		if (listener_) {
+			listener_->on_signal(signal);
 		}
 	}
 }
@@ -271,36 +271,36 @@ void Core::Node::destroy() {
         }
 		
 		// Notify all listeners that this node will be deleted.
-        for (vector<NodeListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
-            (*i)->on_destroy();
+        if (listener_) {
+            listener_->on_destroy();
         }
 		
 		// Break cycle between listeners and the node.  If the listeners have
 		// a strong reference to this node, they will still be reclaimed
 		// properly.
-        listener_.clear(); 
+        listener_.reset(); 
     }
 }
 
 void Core::Node::render() {
 	// Handle a render event by notifying all listeners
-    for (vector<NodeListenerPtr>::iterator i = listener_.begin(); i < listener_.end(); i++) {
-		(*i)->on_render();
+    if (listener_) {
+		listener_->on_render();
 	}
 }
 
 void Core::Node::collision(Jet::Node* node) {
 	// Handle a collision event by notifying all listeners
-    for (vector<NodeListenerPtr>::iterator i = listener_.begin(); i < listener_.end(); i++) {
-		(*i)->on_collision(node);
+    if (listener_) {
+		listener_->on_collision(node);
 	}
 }
 
 void Core::Node::fracture(Jet::Node* node) {
 	// Handle a fracture event (i.e., a new node is created using this
 	// node as a template of some kind)
-    for (vector<NodeListenerPtr>::iterator i = listener_.begin(); i < listener_.end(); i++) {
-		(*i)->on_fracture(node);
+    if (listener_) {
+		listener_->on_fracture(node);
 	}
 }
 
@@ -318,8 +318,8 @@ void Core::Node::update() {
 	}
 	
 	// Notify all listeners that a tick is happening
-	for (vector<NodeListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
-		(*i)->on_update(engine_->frame_delta());
+    if (listener_) {
+		listener_->on_update(engine_->frame_delta());
 	}
 }
 
@@ -337,8 +337,8 @@ void Core::Node::tick() {
 	}
 	
 	// Notify listeners that an update is happening
-	for (vector<NodeListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
-		(*i)->on_tick();
+    if (listener_) {
+		listener_->on_tick();
 	}
 }
 

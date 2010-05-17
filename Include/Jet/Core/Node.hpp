@@ -285,7 +285,7 @@ private:
     Jet::RigidBodyPtr rigid_body_;
     Jet::AudioSourcePtr audio_source_;
     std::tr1::unordered_map<std::string, ObjectPtr> object_;
-    std::vector<NodeListenerPtr> listener_;
+    NodeListenerPtr listener_;
 	std::queue<std::vector<Signal> > signal_;
     bool destroyed_;
 	size_t transform_modified_count_;

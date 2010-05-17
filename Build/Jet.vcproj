@@ -177,7 +177,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Source\Jet\Core\ScriptController.cpp"
+				RelativePath="..\Source\Jet\Core\ScriptActor.cpp"
 				>
 			</File>
 			<File
@@ -231,11 +231,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\AudioSource.hpp"
+				RelativePath="..\Include\Jet\Core\AudioSource.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Core\AudioSource.hpp"
+				RelativePath="..\Include\Jet\AudioSource.hpp"
 				>
 			</File>
 			<File
@@ -259,19 +259,23 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Core\Engine.hpp"
-				>
-			</File>
-			<File
 				RelativePath="..\Include\Jet\Engine.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\FractalPlanet.hpp"
+				RelativePath="..\Include\Jet\Core\Engine.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Include\Jet\Core\Font.hpp"
 				>
 			</File>
 			<File
 				RelativePath="..\Include\Jet\Core\FractalPlanet.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Include\Jet\FractalPlanet.hpp"
 				>
 			</File>
 			<File
@@ -295,11 +299,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Core\Light.hpp"
+				RelativePath="..\Include\Jet\Light.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Light.hpp"
+				RelativePath="..\Include\Jet\Core\Light.hpp"
 				>
 			</File>
 			<File
@@ -319,11 +323,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Mesh.hpp"
+				RelativePath="..\Include\Jet\Core\Mesh.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Core\Mesh.hpp"
+				RelativePath="..\Include\Jet\Mesh.hpp"
 				>
 			</File>
 			<File
@@ -331,11 +335,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\MeshObject.hpp"
+				RelativePath="..\Include\Jet\Core\MeshObject.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Core\MeshObject.hpp"
+				RelativePath="..\Include\Jet\MeshObject.hpp"
 				>
 			</File>
 			<File
@@ -344,6 +348,10 @@
 			</File>
 			<File
 				RelativePath="..\Include\Jet\Module.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Include\Jet\Core\NetworkSystem.hpp"
 				>
 			</File>
 			<File
@@ -375,11 +383,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\ParticleSystem.hpp"
+				RelativePath="..\Include\Jet\Core\ParticleSystem.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Core\ParticleSystem.hpp"
+				RelativePath="..\Include\Jet\ParticleSystem.hpp"
 				>
 			</File>
 			<File
@@ -407,11 +415,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Core\QuadSet.hpp"
+				RelativePath="..\Include\Jet\QuadSet.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\QuadSet.hpp"
+				RelativePath="..\Include\Jet\Core\QuadSet.hpp"
 				>
 			</File>
 			<File
@@ -435,15 +443,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\RigidBody.hpp"
-				>
-			</File>
-			<File
 				RelativePath="..\Include\Jet\Core\RigidBody.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Core\ScriptController.hpp"
+				RelativePath="..\Include\Jet\RigidBody.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Include\Jet\Core\ScriptActor.hpp"
 				>
 			</File>
 			<File
@@ -455,7 +463,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Core\Shader.hpp"
+				RelativePath="..\Include\Jet\Core\ScriptWidget.hpp"
 				>
 			</File>
 			<File
@@ -463,11 +471,23 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Include\Jet\Core\Shader.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\Include\Jet\Signal.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Core\Sound.hpp"
+				RelativePath="..\Include\Jet\Core\Socket.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Include\Jet\Core\SocketReader.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Include\Jet\Core\SocketWriter.hpp"
 				>
 			</File>
 			<File
@@ -475,15 +495,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Include\Jet\Core\Sound.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\Include\Jet\Texcoord.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Texture.hpp"
+				RelativePath="..\Include\Jet\Core\Texture.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Core\Texture.hpp"
+				RelativePath="..\Include\Jet\Texture.hpp"
 				>
 			</File>
 			<File

@@ -77,6 +77,8 @@ Core::Engine::Engine() :
 	auto_name_counter_(0) {
 		
 	cout << "Starting kernel" << endl;
+	
+	option("engine_build", string("Jet Game Engine 2.0.1 "__DATE__" "__TIME__));
 		
 	// Add some default search folders
 	search_folder(".");
@@ -87,7 +89,7 @@ Core::Engine::Engine() :
         
 	// Create the root node of the scene graph
     root_ = new Core::Node(this);
-	overlay_ = new Core::Overlay(this);
+	screen_ = new Core::Overlay(this);
 	
 	// Create subsystems and register them
 	render_system_ = new RenderSystem(this);
@@ -119,6 +121,7 @@ Core::Engine::~Engine() {
 
 	// Free the scene graph, the free all resources
 	root_.reset();
+	screen_.reset();
 	module_.reset();
 	mesh_.clear();
 	texture_.clear();
@@ -275,6 +278,7 @@ void Core::Engine::update() {
 		module_->on_update(frame_delta());
 	}
 	static_cast<Core::Node*>(root())->update();
+	static_cast<Core::Overlay*>(screen())->update();
     
     // Fire render event
     for (list<EngineListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
