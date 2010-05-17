@@ -29,8 +29,9 @@ function List:__init(node, name)
 
     -- Default options
     self.name = name
-    self.font_size = 54
+    self.font_size = 48
     self.font_face = "Russel.ttf"
+    self.button_width = 380
     self.button_spacing = 10
     self.buttons = {}
     self.overlay.height = 0
@@ -44,6 +45,7 @@ function List:button(text, callback)
     b.overlay {
         font = self.font_face.."#"..self.font_size,
         height = self.font_size,
+        width = self.button_width,
         text = text,
         y = self.overlay.height
     }

@@ -37,16 +37,27 @@ function Multiplayer:__init()
         height = 0,
         y = 120,
         text_color = Color(1, .4, .1, 1.0),
-        font = "Russel.ttf#96",
+        font = "Russel.ttf#90",
         text = "multiplayer."
     }
     
     -- List for MP screen buttons
     self.list = List(self.screen, "mp_list")
+    self.list.button_width = 320
+    self.list:button("host game", callback(self, "on_host_click"))
+    self.list:button("back", callback(self, "on_back_click"))
+    self.list.overlay.y = 230
+    
+    self.list = List(self.screen, "games_list")
+    self.list.overlay.y = 235
+    self.list.overlay.x = 360
+    self.list.font_size = 24
     self.list:button("matt's game", callback(self, "b"))
     self.list:button("bob's game", callback(self, "a"))
-    self.list:button("back", callback(self, "on_back_click"))
-    self.list.overlay.y = 250
+    self.list:button("mikes's game", callback(self, "b"))
+    self.list:button("jim's game", callback(self, "a"))
+    self.list:button("jon's game", callback(self, "b"))
+    self.list:button("bill's game", callback(self, "a"))
 
 end
 
@@ -54,6 +65,13 @@ function Multiplayer:a()
 end
 
 function Multiplayer:b()
+end
+
+function Multiplayer:on_host_click(widget, button)
+    print("host")
+end
+
+function Multiplayer:on_more_click(widget, button)
 end
 
 function Multiplayer:on_back_click(widget, button)

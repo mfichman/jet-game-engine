@@ -39,7 +39,7 @@ function Start:__init()
         height = 0,
         y = 120,
         text_color = Color(1, .4, .1, 1.0),
-        font = "Russel.ttf#96",
+        font = "Russel.ttf#90",
         text = "zero combat."
     }
     
@@ -48,7 +48,7 @@ function Start:__init()
     self.list:button("multiplayer", callback(self, "on_mp_click"))
     self.list:button("single player", callback(self, "on_sp_click"))
     self.list:button("quit", callback(self, "on_quit_click"))
-    self.list.overlay.y = 250
+    self.list.overlay.y = 230
     
     -- Set up the box
     self.box_node = engine.root:node("box")
