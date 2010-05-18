@@ -53,9 +53,3 @@ end
 function Button:on_mouse_exit()
     self.color_fade = -1;
 end
-
-function Button:on_destroy()
-end
-
-function Button:on_click(button)
-end

@@ -296,8 +296,8 @@ void Core::Engine::update_fps() {
     fps_elapsed_time_ += frame_delta_;
     fps_frame_count_++;
     if (fps_elapsed_time_ > 0.1f) {
-        cout << fps_frame_count_/fps_elapsed_time_ << "\t";
-		cout << script_system_->memory_usage() << "K" << endl;
+		option("stat_fps", fps_frame_count_/fps_elapsed_time_);
+		option("stat_memory", script_system_->memory_usage());
         fps_frame_count_ = 0;
         fps_elapsed_time_ = 0.0f;
     }

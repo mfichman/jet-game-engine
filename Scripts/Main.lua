@@ -1,5 +1,6 @@
 require 'Start'
 require 'Task'
+require 'Stats'
 
 -- Set up lights
 print("Creating lights")
@@ -22,6 +23,9 @@ camera = camera_node:camera("camera") {
     far_clipping_distance = 1000,
     near_clipping_distance = 0.1
 }
+
+-- Set up FPS counter
+Stats()
 
 
 Start()
