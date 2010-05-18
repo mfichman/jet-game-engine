@@ -532,6 +532,7 @@ void Core::ScriptSystem::init_entity_type_bindings() {
             .property("height", (float (Jet::Overlay::*)() const)&Jet::Overlay::height, (void (Jet::Overlay::*)(float))&Jet::Overlay::height)
             .property("layout_mode", (LayoutMode (Jet::Overlay::*)() const)&Jet::Overlay::layout_mode, (void (Jet::Overlay::*)(LayoutMode))&Jet::Overlay::layout_mode)
             .property("visible", (bool (Jet::Overlay::*)() const)&Jet::Overlay::visible, (void (Jet::Overlay::*)(bool))&Jet::Overlay::visible)
+            .property("focusable", (bool (Jet::Overlay::*)() const)&Jet::Overlay::focusable, (void (Jet::Overlay::*)(bool))&Jet::Overlay::focusable)
             .property("vertical_alignment", (Alignment (Jet::Overlay::*)() const)&Jet::Overlay::vertical_alignment, (void (Jet::Overlay::*)(Alignment))&Jet::Overlay::vertical_alignment)
             .property("horizontal_alignment", (Alignment (Jet::Overlay::*)() const)&Jet::Overlay::horizontal_alignment, (void (Jet::Overlay::*)(Alignment))&Jet::Overlay::horizontal_alignment)
             .property("text", (const std::string& (Jet::Overlay::*)() const)&Jet::Overlay::text, (void (Jet::Overlay::*)(const std::string&))&Jet::Overlay::text)

@@ -20,6 +20,7 @@
 
 require 'Widget'
 require 'List'
+require 'SlideAnimation'
 
 class 'Menu' (Widget)
 
@@ -42,12 +43,35 @@ function Menu:__init(options)
     self.list = List {
         parent = self.overlay,
         name = options.name.."_list",
-        y = 230,
+        y = 240,
         button_width = options.button_width
+    }
+    
+    -- Create a slide-in animation
+    SlideAnimation {
+        overlay = self.overlay,
+        start_position = "left",
+        end_position = 20,
+        on_complete = options.on_complete
     }
 end
 
 function Menu:button(...)
     self.list:button(...)
+end
+
+function Menu:text_field(...)
+    self.list:text_field(...)
+end
+
+function Menu:next(on_complete)
+    SlideAnimation {
+        overlay = self.overlay,
+        end_position = "right",
+        on_complete = function()
+            self.visible = false
+            on_complete()
+        end
+    }
 end
 

@@ -86,6 +86,8 @@ Core::Engine::Engine() :
 	
 	// Default options
 	option("simulation_speed", 1.0f);
+	option("stat_fps", 0.0f);
+	option("stat_memory", 0.0f);
         
 	// Create the root node of the scene graph
     root_ = new Core::Node(this);
@@ -122,6 +124,7 @@ Core::Engine::~Engine() {
 	// Free the scene graph, the free all resources
 	root_.reset();
 	screen_.reset();
+	focused_overlay_.reset();
 	module_.reset();
 	mesh_.clear();
 	texture_.clear();
@@ -297,7 +300,7 @@ void Core::Engine::update_fps() {
     fps_frame_count_++;
     if (fps_elapsed_time_ > 0.1f) {
 		option("stat_fps", fps_frame_count_/fps_elapsed_time_);
-		option("stat_memory", script_system_->memory_usage());
+		option("stat_memory", (float)script_system_->memory_usage());
         fps_frame_count_ = 0;
         fps_elapsed_time_ = 0.0f;
     }

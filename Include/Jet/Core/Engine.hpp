@@ -27,6 +27,7 @@
 #include <Jet/Engine.hpp>
 #include <Jet/Camera.hpp>
 #include <Jet/Module.hpp>
+#include <Jet/Overlay.hpp>
 #include <list>
 #include <map>
 #include <set>
@@ -61,6 +62,12 @@ public:
 		return screen_.get();
         
 	}
+	
+	//! Returns the focused overlay.
+	inline Jet::Overlay* focused_overlay() const {
+		return focused_overlay_.get();
+	}
+	
 	//! Returns the active camera.
 	inline Jet::Camera* camera() const {
 		return camera_.get();
@@ -205,6 +212,11 @@ public:
         running_ = running;
     }
 	
+	//! Sets the focused overlay.
+	inline void focused_overlay(Jet::Overlay* overlay) {
+		focused_overlay_ = overlay;
+	}
+	
 	//! Sets the active camera.
 	inline void camera(Jet::Camera* camera) {
 		camera_ = camera;
@@ -292,6 +304,7 @@ private:
 
     Jet::NodePtr root_;
 	Jet::OverlayPtr screen_;
+	Jet::OverlayPtr focused_overlay_;
 	Jet::CameraPtr camera_;
 	Jet::ModulePtr module_;
 		

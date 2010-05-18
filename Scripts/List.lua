@@ -20,6 +20,7 @@
 
 require 'Widget'
 require 'Button'
+require 'TextField'
 require 'Engine'
 
 class 'List' (Widget)
@@ -40,6 +41,25 @@ function List:__init(options)
     self.overlay.height = 0
 end
 
+
+function List:text_field(text, callback)
+    -- Creates a new button
+    local n = table.getn(self.buttons)+1
+    local t = TextField(self.overlay, self.name..n)
+    t.overlay {
+        font = self.font_face.."#"..self.font_size,
+        height = self.font_size,
+        width = self.button_width,
+        text = text,
+        y = self.overlay.height
+    }
+    t.on_enter = callback
+    
+    -- Increase the height of the list to accomodate the button
+    self.overlay.height = self.overlay.height + self.button_spacing + self.font_size
+    
+    self.buttons[n] = t
+end
 
 function List:button(text, callback)
     -- Creates a new button

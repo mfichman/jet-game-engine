@@ -54,6 +54,11 @@ function bind(method, self)
 end
 
 
+function math.round(num, idp)
+    local mult = 10^(idp or 0)
+    return math.floor(num * mult + 0.5) / mult
+end
+
 local engine_material = engine.material;
 function engine:material(name)
     name = name or ""

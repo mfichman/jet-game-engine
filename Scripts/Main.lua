@@ -1,4 +1,4 @@
-require 'Start'
+require 'StartScreen'
 require 'Task'
 require 'Stats'
 
@@ -25,7 +25,7 @@ camera = camera_node:camera("camera") {
 }
 
 -- Set up FPS counter
-Stats()
+Stats(engine.screen, "stats")
 
 
-Start()
+StartScreen()

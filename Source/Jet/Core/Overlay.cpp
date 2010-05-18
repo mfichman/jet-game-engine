@@ -185,6 +185,9 @@ void Core::Overlay::mouse_pressed(int button, float x, float y) {
         
         // If the point is inside the overlay's bounding box, generate an event.
         if (x >= 0 && y >= 0 && x <= width_ && y <= height_) {
+            if (focusable_ && !destroyed_) {
+                engine_->focused_overlay(this);
+            }
             if (listener_) {
                 listener_->on_mouse_pressed(button);
             }
@@ -243,6 +246,18 @@ void Core::Overlay::mouse_moved(float x, float y) {
     }
 }
 
+void Core::Overlay::key_pressed(const std::string& key) {
+    if (listener_ && visible_) {
+        listener_->on_key_pressed(key);
+    }
+}
+
+void Core::Overlay::key_released(const std::string& key) {
+    if (listener_ && visible_) {
+        listener_->on_key_released(key);
+    }
+}
+
 void Core::Overlay::destroy() {
     if (destroyed_) {
         return;
@@ -260,6 +275,11 @@ void Core::Overlay::destroy() {
         // Motify listeners.
         if (listener_) {
             listener_->on_destroy();
+        }
+        
+        // Remove focus
+        if (engine_->focused_overlay() == this) {
+            engine_->focused_overlay(0);
         }
         
         // Break cycle with listeners.

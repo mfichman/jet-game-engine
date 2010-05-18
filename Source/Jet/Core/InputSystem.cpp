@@ -26,6 +26,7 @@
 #include <Jet/Point.hpp>
 #include <SDL/SDL.h>
 #include <cmath>
+#include <cctype>
 
 using namespace Jet;
 using namespace std;
@@ -44,6 +45,7 @@ Core::InputSystem::~InputSystem() {
 void Core::InputSystem::on_init() {
     std::cout << "Initializing input system" << std::endl;
     SDL_EnableUNICODE(true);
+    //SDL_EnableKeyRepeat(200, 40);
 }
 
 void Core::InputSystem::on_update() {
@@ -69,6 +71,20 @@ void Core::InputSystem::on_key_pressed(const std::string& key) {
         SDL_GetMouseState(&x, &y);
         module->on_key_pressed(key, normalized_mouse(x, y));
     }
+
+
+    Overlay* overlay = static_cast<Overlay*>(engine_->focused_overlay());
+    if (overlay) {
+		if ((key.length() == 1) && (SDL_GetModState() & KMOD_LSHIFT || SDL_GetModState() & KMOD_RSHIFT)) {
+			//if (isalpha(key[0])) {
+				string upper(" ");
+				upper[0] = toupper(key[0]);
+				overlay->key_pressed(upper);
+			//}
+		} else {
+			overlay->key_pressed(key);
+		}
+    }
 }
 
 void Core::InputSystem::on_key_released(const std::string& key) {
@@ -78,14 +94,10 @@ void Core::InputSystem::on_key_released(const std::string& key) {
         SDL_GetMouseState(&x, &y);
         module->on_key_released(key, normalized_mouse(x, y));
     }
-}
-
-void Core::InputSystem::on_special_pressed(int key, int x, int y) {
-    //Module* module = system_->engine_->module();
-}
-
-void Core::InputSystem::on_special_released(int key, int x, int y) {
-    //Module* module = system_->engine_->module();
+    Overlay* overlay = static_cast<Overlay*>(engine_->focused_overlay());
+    if (overlay) {
+        overlay->key_released(key);
+    }
 }
 
 void Core::InputSystem::on_mouse_pressed(int button, int x, int y) {

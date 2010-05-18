@@ -55,7 +55,8 @@ public:
         vertical_alignment_(TOP),
         horizontal_alignment_(LEFT),
         text_color_(1.0f, 1.0f, 1.0f, 1.0f),
-        visible_(true) {
+        visible_(true),
+        focusable_(false) {
         
     }
     
@@ -73,7 +74,8 @@ public:
         horizontal_alignment_(LEFT),
         text_color_(1.0f, 1.0f, 1.0f, 1.0f),
         mouse_inside_(false),
-        visible_(true) {
+        visible_(true),
+        focusable_(false) {
             
     }
 
@@ -92,6 +94,11 @@ public:
     //! Returns true if the overlay is visible.
     inline bool visible() const {
         return visible_;
+    }
+    
+    //! Returns true if the overlay is focusable
+    inline bool focusable() const {
+        return focusable_;
     }
     
     //! Returns the x-coordinate of the top-left corner of the overlay.
@@ -161,6 +168,12 @@ public:
     //! Makes this overlay visible/invisible.
     inline void visible(bool visible) {
         visible_ = visible;
+    }
+    
+    //! Makes this overlay is focusable.
+    inline void focusable(bool focusable) {
+        focusable_ = focusable;
+		engine_->focused_overlay(this);
     }
     
     //! Sets the x-coordinate of the top-left corner of the overlay.
@@ -254,6 +267,12 @@ public:
     //! Mouse event
     void mouse_moved(float x, float y);
     
+    //! Key event
+    void key_pressed(const std::string& key);
+
+    //! Key event
+    void key_released(const std::string& key);
+    
 private:    
     void render_background();
     void render_text();
@@ -276,6 +295,7 @@ private:
     FontPtr font_;
     bool mouse_inside_;
     bool visible_;
+    bool focusable_;
     OverlayListenerPtr listener_;
 };
 

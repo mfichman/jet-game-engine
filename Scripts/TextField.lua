@@ -21,35 +21,44 @@
 require 'Widget'
 require 'Engine'
 
-class 'Button' (Widget)
+class 'TextField' (Widget)
 
-function Button:__init(overlay, name)
+function TextField:__init(overlay, name)
     Widget.__init(self, overlay, name)
 
     -- Default options
     self.overlay.font = "Russel.ttf#14"
-    self.overlay.text_color = Color(1, 1, 1, 0.7)
+    self.overlay.text_color = Color(1, 1, 1, 1)
     self.overlay.vertical_alignment = Overlay.TOP
     self.overlay.x = 4
     self.overlay.y = 4
     self.overlay.width = 800
     self.overlay.height = 16
+    self.overlay.focusable = true
     self.color_fade = -1;
+    self.blink_time = 0
+    self.buffer = ""
 end
 
-function Button:on_update(delta)
-    local alpha = self.overlay.text_color.alpha + 2*self.color_fade*delta
-    self.overlay.text_color = Color(1, 1, 1, math.clamp(alpha, .7, 1))
+function TextField:on_update(delta)
+    self.blink_time = self.blink_time + delta;
+    if (self.blink_time > 1) then
+        self.blink_time = self.blink_time - 1
+    end
+    
+    if (self.blink_time < 0.5) then
+        self.overlay.text = ">"..self.buffer.."_"
+    else
+        self.overlay.text = ">"..self.buffer..""
+    end
 end
 
-function Button:on_mouse_pressed(button)
-    self:on_click(button)
-end
-
-function Button:on_mouse_enter()
-    self.color_fade = 1;
-end
-
-function Button:on_mouse_exit()
-    self.color_fade = -1;
+function TextField:on_key_pressed(key)
+    if (key == "backspace") then
+        self.buffer = self.buffer:sub(1, -2)
+    elseif (key == "space") then
+        self.buffer = self.buffer.." "
+    elseif (key:len() == 1) then
+        self.buffer = self.buffer..key
+    end
 end

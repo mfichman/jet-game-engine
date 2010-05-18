@@ -18,19 +18,35 @@
 -- FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 -- IN THE SOFTWARE.
 
-class 'Widget'
+require 'Module'
+require 'Menu'
+require 'MPScreen'
 
-function Widget:__init(overlay, name)
-    oveerlay = overlay or engine.screen
-    name = name or ""
-    __adopt_widget(self, oveerlay, name)
+class 'MPLogin' (Module)
+
+function MPLogin:__init()
+    Module.__init(self)
+    
+    -- Overlay
+    self.menu = Menu {
+        name = "mplogin_menu",
+        title_text = "login.",
+        button_width = 230
+    }
+    self.menu:text_field("", bind("on_text_enter", self))
+    self.menu:button("ok", bind("on_ok_click", self))
+    self.menu:button("back", bind("on_back_click", self))
+    
 end
 
-function Widget:on_update(delta) end
-function Widget:on_key_pressed(button) end
-function Widget:on_key_released(button) end
-function Widget:on_mouse_pressed(button) end
-function Widget:on_mouse_released(button) end
-function Widget:on_mouse_enter() end
-function Widget:on_mouse_exit() end
-function Widget:on_destroy() end
+function MPLogin:on_text_enter(widget, button)
+
+end
+
+function MPLogin:on_ok_click(widget, button)
+    self.menu:next(MPScreen)
+end
+
+function MPLogin:on_back_click(widget, button)
+    self.menu:next(StartScreen)
+end

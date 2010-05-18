@@ -81,7 +81,7 @@ public:
             // that resumes immediately will yield to other threads
             // and wait until the next frame
             resume_time_ = (float)(engine_->frame_time() + lua_tonumber(thread_, -1));
-            resume_time_ += 0.000001f;
+            resume_time_ += 0.0001f;
         }
         lua_pop(thread_, lua_gettop(thread_));
     }

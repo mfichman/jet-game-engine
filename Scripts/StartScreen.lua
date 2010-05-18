@@ -21,18 +21,17 @@
 require 'Module'
 require 'List'
 require 'Menu'
-require 'Rock'
-require 'Multiplayer'
-require 'Single'
+require 'SPGame'
+require 'MPLogin'
 
-class 'Start' (Module)
+class 'StartScreen' (Module)
 
-function Start:__init()
+function StartScreen:__init()
     Module.__init(self)
     
     -- Create the menu
     self.menu = Menu {
-        name = "start_menu",
+        name = "startscreen_menu",
         title_text = "zero combat."
     }
     self.menu:button("multiplayer", bind("on_mp_click", self))
@@ -49,42 +48,22 @@ function Start:__init()
     self.box_body = self.box_node:rigid_body()
     self.box_body.mass = 1000.0
     self.box_body.angular_velocity = Vector(.05, .2, 0)
-    
-    -- Animation
-    SlideAnimation {
-        overlay = self.menu.overlay,
-        start_position = "left",
-        end_position = 20
-    }
 end
 
-
-function Start:on_key_pressed(key)
+function StartScreen:on_key_pressed(key)
     if (key == 'q') then
         engine.running = false
     end
 end
 
-function Start:on_mp_click(widget, buttton)
-    SlideAnimation {
-        overlay = self.menu.overlay,
-        end_position = "right",
-        on_complete = Multiplayer
-    }
+function StartScreen:on_mp_click(widget, buttton)
+    self.menu:next(MPLogin)
 end
 
-function Start:on_sp_click(widget, buttton)
-    SlideAnimation {
-        overlay = self.menu.overlay,
-        end_position = "right",
-        on_complete = Single
-    }
+function StartScreen:on_sp_click(widget, buttton)
+    self.menu:next(SPGame)
 end
 
-function Start:on_quit_click(widget, buttton)
+function StartScreen:on_quit_click(widget, buttton)
     engine.running = false
-end
-
-function Start:on_destroy()
-    --self.menu.overlay.visible = false
 end

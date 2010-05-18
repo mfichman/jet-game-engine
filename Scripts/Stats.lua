@@ -18,19 +18,29 @@
 -- FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 -- IN THE SOFTWARE.
 
-class 'Widget'
+require 'Widget'
+require 'Engine'
 
-function Widget:__init(overlay, name)
-    oveerlay = overlay or engine.screen
-    name = name or ""
-    __adopt_widget(self, oveerlay, name)
+class 'Stats' (Widget)
+
+function Stats:__init(overlay, name)
+    Widget.__init(self, overlay, name)
+
+    -- Default options
+    self.overlay.font = "Russel.ttf#14"
+    self.overlay.text_color = Color(1, 1, 1, 0.7)
+    self.overlay.vertical_alignment = Overlay.BOTTOM
+    self.overlay.x = 4
+    self.overlay.y = -4
+    self.overlay.width = 800
+    self.overlay.height = 16
+    self.color_fade = -1;
 end
 
-function Widget:on_update(delta) end
-function Widget:on_key_pressed(button) end
-function Widget:on_key_released(button) end
-function Widget:on_mouse_pressed(button) end
-function Widget:on_mouse_released(button) end
-function Widget:on_mouse_enter() end
-function Widget:on_mouse_exit() end
-function Widget:on_destroy() end
+function Stats:on_update(delta)
+    local stat_fps = math.round(engine:option("stat_fps"))
+    local stat_memory = engine:option("stat_memory")
+    
+    self.overlay.text = stat_fps.." FPS "..stat_memory.." KB"
+end
+

@@ -56,6 +56,16 @@ public:
     }
     
 private:
+    //! Called when a key is released
+    inline void on_key_pressed(const std::string& key) {
+        self_["on_key_pressed"](self_, key);
+    }
+    
+    //! Called when a key is released
+    inline void on_key_released(const std::string& key) {
+        self_["on_key_released"](self_, key);
+    }
+    
     //! Called when the mouse is pressed while over the overlay.
     inline void on_mouse_pressed(int button) {
         self_["on_mouse_pressed"](self_, button);

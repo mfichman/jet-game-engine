@@ -27,9 +27,9 @@ require 'Box'
 require 'Explosion'
 require 'Build'
 
-class 'Single' (Module)
+class 'SPGame' (Module)
 
-function Single:__init()
+function SPGame:__init()
     Module.__init(self)
     math.randomseed(os.time())
 
@@ -38,21 +38,12 @@ function Single:__init()
     -- Start overlay
     self.menu = Menu {
         name = "sp_menu",
-        title_text = "loading..."
-    }
-    
-    -- Animation
-    SlideAnimation {
-        overlay = self.menu.overlay,
-        start_position = "left",
-        end_position = 20,
-        on_complete = function()
-            self:on_load()
-        end
+        title_text = "loading...",
+        on_complete = function() self:on_load() end
     }
 end
 
-function Single:on_load()
+function SPGame:on_load()
     -- Create overlay
     print("Creating overlay")
     self.build = Build(nil, "build")
@@ -76,17 +67,16 @@ function Single:on_load()
         --self.rocks[i].body.linear_velocity = -pos.unit * 5;
     end
     
-    -- Animation   
     self.menu.overlay.visible = false
 end
 
-function Single:on_update(delta)    
+function SPGame:on_update(delta)    
     delta = delta / engine:option("simulation_speed");
     camera_node.position = self.camera_velocity*(60*delta) + camera_node.position
     camera_node:look(Vector(0, 0, 0), Vector(0, 1, 0))
 end
 
-function Single:on_key_pressed(key, x, y)
+function SPGame:on_key_pressed(key, x, y)
 
     if (key == 'q') then
         engine.running = false
@@ -136,7 +126,7 @@ function Single:on_key_pressed(key, x, y)
     end
 end
 
-function Single:on_key_released(key, x, y)
+function SPGame:on_key_released(key, x, y)
     if (key == 'j') then
         self.camera_velocity = self.camera_velocity + Vector(1, 0, 0)
     elseif (key == 'l') then

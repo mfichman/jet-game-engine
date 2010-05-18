@@ -19,17 +19,17 @@
 -- IN THE SOFTWARE.
 
 require 'Module'
+require 'Menu'
 require 'List'
-require 'SlideAnimation'
 
-class 'Multiplayer' (Module)
+class 'MPScreen' (Module)
 
-function Multiplayer:__init()
+function MPScreen:__init()
     Module.__init(self)
 
-    -- Multiplayer overlay
+    -- Screen overlay
     self.menu = Menu {
-        name = "mp_menu",
+        name = "mpscreen_menu",
         title_text = "multiplayer.",
         button_width = 230
     }
@@ -50,29 +50,15 @@ function Multiplayer:__init()
     self.list:button("jim's game", bind("on_null", self))
     self.list:button("jon's game", bind("on_null", self))
     self.list:button("bill's game", bind("on_null", self))
-    
-    -- Animation
-    SlideAnimation {
-        overlay = self.menu.overlay,
-        start_position = "left",
-        end_position = 20
-    }
 end
 
-function Multiplayer:on_null()
+function MPScreen:on_null()
 end
 
-function Multiplayer:on_host_click(widget, button)
+function MPScreen:on_host_click(widget, button)
+    --self.menu:next(MPLogin)
 end
 
-function Multiplayer:on_back_click(widget, button)
-    SlideAnimation {
-        overlay = self.menu.overlay,
-        end_position = "right",
-        on_complete = Start
-    }
-end
-
-function Multiplayer:on_destroy()
-    self.menu.overlay.visible = false
+function MPScreen:on_back_click(widget, button)
+    self.menu:next(MPLogin)
 end

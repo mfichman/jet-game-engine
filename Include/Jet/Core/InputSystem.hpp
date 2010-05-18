@@ -46,8 +46,6 @@ private:
     
 	void on_key_pressed(const std::string& key);
     void on_key_released(const std::string& key);
-    void on_special_pressed(int key, int x, int y);
-    void on_special_released(int key, int x, int y);
     void on_mouse_pressed(int button, int x, int y);
     void on_mouse_released(int button, int x, int y);
 	void on_mouse_moved(int x, int y);

@@ -2,10 +2,11 @@
 -- this file:
 
 
-if (true) then
+if (false) then
     engine:option("shadow_texture_size", 2048)
-    engine:option("display_width", 1440)
-    engine:option("display_height", 900)
+    engine:option("display_width", 1680)
+    engine:option("display_height", 1050)
+    engine:option("fullscreen_enabled", true)
     engine:option("fsaa_enabled", true)
     engine:option("fsaa_samples", 4)
     engine:option("shadows_enabled", true)
@@ -15,6 +16,7 @@ else
     engine:option("shadow_texture_size", 1024)
     engine:option("display_width", 800)
     engine:option("display_height", 600)
+    engine:option("fullscreen_enabled", false)
     engine:option("fsaa_enabled", false)
     engine:option("fsaa_samples", 0)
     engine:option("shadows_enabled", false)
@@ -26,9 +28,8 @@ engine:option("vsync_enabled", false)
 engine:option("shadow_distance", 400)
 engine:option("shadow_cascades", 4)
 engine:option("shadow_correction", 0.65)
-engine:option("fullscreen_enabled", false)
 engine:option("shaders_enabled", true)
-engine:option("window_title", "Extreme Asteroids")
+engine:option("window_title", "zero combat")
 engine:option("gravity", 0)
 
 --[[
