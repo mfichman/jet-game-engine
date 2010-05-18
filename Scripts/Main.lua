@@ -1,4 +1,5 @@
 require 'Start'
+require 'Task'
 
 -- Set up lights
 print("Creating lights")

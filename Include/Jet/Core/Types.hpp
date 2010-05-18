@@ -52,6 +52,7 @@ namespace Jet { namespace Core {
     class RigidBody;
     class ScriptActor;
     class ScriptSystem;
+    class ScriptTask;
     class Shader;
     class Socket;
     class SocketWriter;
@@ -85,6 +86,7 @@ namespace Jet { namespace Core {
     typedef boost::intrusive_ptr<RigidBody> RigidBodyPtr;
     typedef boost::intrusive_ptr<ScriptSystem> ScriptSystemPtr;
     typedef boost::intrusive_ptr<ScriptActor> ScriptControllerPtr;
+    typedef boost::intrusive_ptr<ScriptTask> ScriptTaskPtr;
     typedef boost::intrusive_ptr<Shader> ShaderPtr;
     typedef boost::intrusive_ptr<Socket> SocketPtr;
     typedef boost::intrusive_ptr<SocketReader> SocketReaderPtr;

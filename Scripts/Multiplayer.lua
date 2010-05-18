@@ -20,6 +20,7 @@
 
 require 'Module'
 require 'List'
+require 'SlideAnimation'
 
 class 'Multiplayer' (Module)
 
@@ -27,57 +28,51 @@ function Multiplayer:__init()
     Module.__init(self)
 
     -- Multiplayer overlay
-    self.screen = engine.screen:overlay("multiplayer_screen") {
-        visible = true,
-        x = 20
+    self.menu = Menu {
+        name = "mp_menu",
+        title_text = "multiplayer.",
+        button_width = 230
     }
+    self.menu:button("host game", bind("on_host_click", self))
+    self.menu:button("back", bind("on_back_click", self))
     
-    -- Title for the MP screen
-    self.title = self.screen:overlay("mp_title") {
-        height = 0,
-        y = 120,
-        text_color = Color(1, .4, .1, 1.0),
-        font = "Russel.ttf#90",
-        text = "multiplayer."
+    -- Games list
+    self.list = List {
+        parent = self.menu.overlay,
+        name = "games_list",
+        font_size = 24,
+        y = 280,
+        x = 380
     }
+    self.list:button("matt's game", bind("on_null", self))
+    self.list:button("bob's game", bind("on_null", self))
+    self.list:button("mikes's game", bind("on_null", self))
+    self.list:button("jim's game", bind("on_null", self))
+    self.list:button("jon's game", bind("on_null", self))
+    self.list:button("bill's game", bind("on_null", self))
     
-    -- List for MP screen buttons
-    self.list = List(self.screen, "mp_list")
-    self.list.button_width = 320
-    self.list:button("host game", callback(self, "on_host_click"))
-    self.list:button("back", callback(self, "on_back_click"))
-    self.list.overlay.y = 230
-    
-    self.list = List(self.screen, "games_list")
-    self.list.overlay.y = 235
-    self.list.overlay.x = 360
-    self.list.font_size = 24
-    self.list:button("matt's game", callback(self, "b"))
-    self.list:button("bob's game", callback(self, "a"))
-    self.list:button("mikes's game", callback(self, "b"))
-    self.list:button("jim's game", callback(self, "a"))
-    self.list:button("jon's game", callback(self, "b"))
-    self.list:button("bill's game", callback(self, "a"))
-
+    -- Animation
+    SlideAnimation {
+        overlay = self.menu.overlay,
+        start_position = "left",
+        end_position = 20
+    }
 end
 
-function Multiplayer:a()
-end
-
-function Multiplayer:b()
+function Multiplayer:on_null()
 end
 
 function Multiplayer:on_host_click(widget, button)
-    print("host")
-end
-
-function Multiplayer:on_more_click(widget, button)
 end
 
 function Multiplayer:on_back_click(widget, button)
-    Start()
+    SlideAnimation {
+        overlay = self.menu.overlay,
+        end_position = "right",
+        on_complete = Start
+    }
 end
 
 function Multiplayer:on_destroy()
-    self.screen.visible = false
+    self.menu.overlay.visible = false
 end

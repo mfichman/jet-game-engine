@@ -104,7 +104,7 @@ void Core::RenderSystem::init_window() {
 		throw runtime_error(string("SDL initialization failed: ") + SDL_GetError());
 	}
     glViewport(0, 0, (uint32_t)width, (uint32_t)height);
-
+	glClear(GL_COLOR_BUFFER_BIT);
 	
 	engine_->screen()->width((float)width);
 	engine_->screen()->height((float)height);

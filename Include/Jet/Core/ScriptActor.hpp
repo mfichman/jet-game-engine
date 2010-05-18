@@ -35,11 +35,16 @@ namespace Jet { namespace Core {
 class ScriptActor : public Jet::NodeListener {
 public:
     //! Creates a new script controller with a new node.
-	inline ScriptActor(const luabind::object& self, Jet::Node* node, const std::string& name) :
-		node_(static_cast<Node*>(node->node(name))),
-		self_(self) {
-            
+	inline ScriptActor(Engine* engine, int ref, Jet::Node* node, const std::string& name) :
+		engine_(engine),
+		node_(static_cast<Node*>(node->node(name))) {
+        
+		lua_State* env = engine_->script_system()->env();
+		lua_getref(env, ref);
+		lua_unref(env, ref);
+
 		node_->listener(this);
+		self_ = luabind::object(luabind::from_stack(env, -1));
         self_["node"] = static_cast<Jet::Node*>(node_);
     }
     
@@ -78,6 +83,7 @@ private:
         self_["on_" + signal.name](self_, signal.first, signal.second);
     }
     
+	Engine* engine_;
     Node* node_;
     luabind::object self_;
     

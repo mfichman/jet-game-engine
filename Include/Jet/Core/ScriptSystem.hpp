@@ -25,6 +25,8 @@
 #include <Jet/Core/Types.hpp>
 #include <lua/lua.hpp>
 #include <luabind/luabind.hpp>
+#include <queue>
+#include <vector>
 
 namespace Jet { namespace Core {
 
@@ -52,7 +54,7 @@ public:
 private:
     void on_tick() {}
     void on_init();
-    void on_update() {}
+    void on_update();
     void on_render() {}
     
     void init_value_type_bindings();
@@ -61,10 +63,18 @@ private:
     static int adopt_actor(lua_State* env);
     static int adopt_widget(lua_State* env);
     static int adopt_module(lua_State* env);
+    static int adopt_task(lua_State* env);
     static int on_error(lua_State* env);
     
+    class Compare {
+    public:
+        bool operator()(ScriptTaskPtr t0, ScriptTaskPtr t1);
+    };
+    
+    std::priority_queue<ScriptTaskPtr, std::vector<ScriptTaskPtr>, Compare> task_;
     Engine* engine_;
     lua_State* env_;
 };
+
 
 }}

@@ -47,7 +47,7 @@ function callable(o)
     return o
 end
 
-function callback(self, method)
+function bind(method, self)
     return function(...)
         self[method](self, ...)
     end

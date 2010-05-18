@@ -27,35 +27,43 @@ require 'Box'
 require 'Explosion'
 require 'Build'
 
-class 'Test' (Module)
+class 'Single' (Module)
 
-function Test:__init()
+function Single:__init()
     Module.__init(self)
     math.randomseed(os.time())
+
+    self.camera_velocity = Vector()
     
-    print("Hello")
+    -- Start overlay
+    self.menu = Menu {
+        name = "sp_menu",
+        title_text = "loading..."
+    }
     
+    -- Animation
+    SlideAnimation {
+        overlay = self.menu.overlay,
+        start_position = "left",
+        end_position = 20,
+        on_complete = function()
+            self:on_load()
+        end
+    }
+end
+
+function Single:on_load()
     -- Create overlay
     print("Creating overlay")
-    self.overlay = Build(nil, "build")
-    
-    -- Set up the plane
-    print("Creating plane")
-    self.plane_node = engine.root:node("plane")
-    self.plane = self.plane_node:mesh_object("plane") {
-        mesh = "Box.obj",
-        material = "Metal.mtl"
-    }
-    self.plane_node:rigid_body()
-    self.plane_node.rotation = Quaternion(Vector(0, 1, 0), -2) * Quaternion(Vector(1, 0, 0), -0.5)
-    self.plane_node.position = Vector(0, 0, -14)
+    self.build = Build(nil, "build")
     
     -- Set up scene objects and apply some forces
     print("Creating objects")
     self.s1 = Dagger()
     self.s1.node.position = Vector(-5, -5, 5)
 
- 
+    -- Create rocks
+    print("Creating rocks")
     self.rocks = {}
     for i=1,15 do
         self.rocks[i] = Rock()
@@ -67,21 +75,18 @@ function Test:__init()
         self.rocks[i].body.angular_velocity = pos.unit * 0.2
         --self.rocks[i].body.linear_velocity = -pos.unit * 5;
     end
-
-    self.camera_velocity = Vector()
+    
+    -- Animation   
+    self.menu.overlay.visible = false
 end
 
-function Test:on_destroy()
-    print("Goodbye")
-end
-
-function Test:on_update(delta)
+function Single:on_update(delta)    
     delta = delta / engine:option("simulation_speed");
     camera_node.position = self.camera_velocity*(60*delta) + camera_node.position
     camera_node:look(Vector(0, 0, 0), Vector(0, 1, 0))
 end
 
-function Test:on_key_pressed(key, x, y)
+function Single:on_key_pressed(key, x, y)
 
     if (key == 'q') then
         engine.running = false
@@ -115,7 +120,6 @@ function Test:on_key_pressed(key, x, y)
         end
         self.explosion.node.position = self.s1.node.position;
         self.s1.node:signal(Signal("explode", Vector(0, 0, 9), "hello"))
-        --print(self.s1.node.signal)
         
     elseif (key == 'j') then
         self.camera_velocity = self.camera_velocity + Vector(-1, 0, 0)
@@ -132,7 +136,7 @@ function Test:on_key_pressed(key, x, y)
     end
 end
 
-function Test:on_key_released(key, x, y)
+function Single:on_key_released(key, x, y)
     if (key == 'j') then
         self.camera_velocity = self.camera_velocity + Vector(1, 0, 0)
     elseif (key == 'l') then

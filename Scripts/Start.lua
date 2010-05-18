@@ -20,35 +20,24 @@
 
 require 'Module'
 require 'List'
+require 'Menu'
 require 'Rock'
 require 'Multiplayer'
+require 'Single'
 
 class 'Start' (Module)
 
 function Start:__init()
     Module.__init(self)
     
-    -- Start overlay
-    self.screen = engine.screen:overlay("start_screen") {
-        visible = true,
-        x = 20
+    -- Create the menu
+    self.menu = Menu {
+        name = "start_menu",
+        title_text = "zero combat."
     }
-    
-    -- Title for the main screen
-    self.title = self.screen:overlay("start_title") {
-        height = 0,
-        y = 120,
-        text_color = Color(1, .4, .1, 1.0),
-        font = "Russel.ttf#90",
-        text = "zero combat."
-    }
-    
-    -- List for start screen buttons
-    self.list = List(self.screen, "start_list")
-    self.list:button("multiplayer", callback(self, "on_mp_click"))
-    self.list:button("single player", callback(self, "on_sp_click"))
-    self.list:button("quit", callback(self, "on_quit_click"))
-    self.list.overlay.y = 230
+    self.menu:button("multiplayer", bind("on_mp_click", self))
+    self.menu:button("single player", bind("on_sp_click", self))
+    self.menu:button("quit", bind("on_quit_click", self))
     
     -- Set up the box
     self.box_node = engine.root:node("box")
@@ -60,7 +49,15 @@ function Start:__init()
     self.box_body = self.box_node:rigid_body()
     self.box_body.mass = 1000.0
     self.box_body.angular_velocity = Vector(.05, .2, 0)
+    
+    -- Animation
+    SlideAnimation {
+        overlay = self.menu.overlay,
+        start_position = "left",
+        end_position = 20
+    }
 end
+
 
 function Start:on_key_pressed(key)
     if (key == 'q') then
@@ -69,10 +66,19 @@ function Start:on_key_pressed(key)
 end
 
 function Start:on_mp_click(widget, buttton)
-    Multiplayer()
+    SlideAnimation {
+        overlay = self.menu.overlay,
+        end_position = "right",
+        on_complete = Multiplayer
+    }
 end
 
 function Start:on_sp_click(widget, buttton)
+    SlideAnimation {
+        overlay = self.menu.overlay,
+        end_position = "right",
+        on_complete = Single
+    }
 end
 
 function Start:on_quit_click(widget, buttton)
@@ -80,5 +86,5 @@ function Start:on_quit_click(widget, buttton)
 end
 
 function Start:on_destroy()
-    self.screen.visible = false
+    --self.menu.overlay.visible = false
 end

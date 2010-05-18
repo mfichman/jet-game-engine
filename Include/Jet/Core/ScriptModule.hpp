@@ -35,10 +35,14 @@ class ScriptModule : public Module {
 public:
   
     //! Creates a new script module
-    inline ScriptModule(lua_State* env, const luabind::object& self) :
-        env_(env),
-        self_(self) {
-            
+    inline ScriptModule(Engine* engine, int ref) :
+        engine_(engine) {
+           
+		lua_State* env = engine_->script_system()->env();
+		lua_getref(env, ref);
+		lua_unref(env, ref);
+
+		self_ = luabind::object(luabind::from_stack(env, -1));
     }
     
 private:
@@ -115,7 +119,7 @@ private:
         self_["on_tick"](self_);
     }
     
-    lua_State* env_;
+	Engine* engine_;
     luabind::object self_;
 };
 

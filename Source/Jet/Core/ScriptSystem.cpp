@@ -26,6 +26,7 @@
 #include <Jet/Core/ScriptActor.hpp>
 #include <Jet/Core/ScriptModule.hpp>
 #include <Jet/Core/ScriptWidget.hpp>
+#include <Jet/Core/ScriptTask.hpp>
 #include <Jet/Overlay.hpp>
 #include <Jet/Vector.hpp>
 #include <Jet/Quaternion.hpp>
@@ -174,6 +175,11 @@ Core::ScriptSystem::ScriptSystem(Engine* engine) :
     lua_pushcclosure(env_, &ScriptSystem::adopt_module, 1);
     lua_setglobal(env_, "__adopt_module");
     
+    // Add __adopt_task function
+    lua_pushlightuserdata(env_, this);
+    lua_pushcclosure(env_, &ScriptSystem::adopt_task, 1);
+    lua_setglobal(env_, "__adopt_task");
+    
     // Set a variable for the engine
     luabind::globals(env_)["engine"] = static_cast<Jet::Engine*>(engine_);
     
@@ -194,9 +200,13 @@ Core::ScriptSystem::ScriptSystem(Engine* engine) :
 
 //! Destructor
 Core::ScriptSystem::~ScriptSystem() {
+	while (!task_.empty()) {
+		task_.pop();
+	}
     lua_close(env_);
     
 }
+
 void Core::ScriptSystem::on_init() {
     std::cout << "Initializing script system" << std::endl;
 
@@ -215,14 +225,31 @@ void Core::ScriptSystem::on_init() {
     }
 }
 
+void Core::ScriptSystem::on_update() {
+    
+    // Execute tasks on top of the heap if the resume time for the task is
+    // less than or equal to the current frame time
+    float time = engine_->frame_time();
+    while (!task_.empty() && task_.top()->resume_time() <= time) {
+        ScriptTaskPtr task = task_.top();
+        task_.pop();
+        task->resume();
+        if (task->alive()) {
+            task_.push(task);
+        }
+    }
+}
+
 int Core::ScriptSystem::adopt_actor(lua_State* env) {
     using namespace luabind;
     
-    luabind::object ref = object(from_stack(env, 1));
+	ScriptSystem* self = static_cast<ScriptSystem*>(lua_touserdata(env, lua_upvalueindex(1)));
+	lua_pushvalue(env, 1);
+    int ref = lua_ref(env, LUA_REGISTRYINDEX);
     Jet::Node* node = object_cast<Jet::Node*>(object(from_stack(env, 2)));
     string name = lua_tostring(env, 3);
     
-    ObjectPtr obj = new ScriptActor(ref, node, name);
+    ObjectPtr obj = new ScriptActor(self->engine_, ref, node, name);
     
     return 0;
 }
@@ -230,11 +257,13 @@ int Core::ScriptSystem::adopt_actor(lua_State* env) {
 int Core::ScriptSystem::adopt_widget(lua_State* env) {
     using namespace luabind;
     
-    luabind::object ref = object(from_stack(env, 1));
+    ScriptSystem* self = static_cast<ScriptSystem*>(lua_touserdata(env, lua_upvalueindex(1)));
+	lua_pushvalue(env, 1);
+    int ref = lua_ref(env, LUA_REGISTRYINDEX);
     Jet::Overlay* overlay = object_cast<Jet::Overlay*>(object(from_stack(env, 2)));
     string name = lua_tostring(env, 3);
     
-    ObjectPtr obj = new ScriptWidget(ref, overlay, name);
+    ObjectPtr obj = new ScriptWidget(self->engine_, ref, overlay, name);
     
     return 0;
 }
@@ -243,11 +272,23 @@ int Core::ScriptSystem::adopt_module(lua_State* env) {
     using namespace luabind;
     
     ScriptSystem* self = static_cast<ScriptSystem*>(lua_touserdata(env, lua_upvalueindex(1)));
-    luabind::object ref = object(from_stack(env, -1));
-    self->engine_->module(new ScriptModule(env, ref));
+    int ref = lua_ref(env, LUA_REGISTRYINDEX);
+    self->engine_->module(new ScriptModule(self->engine_, ref));
     
     return 0;
 }
+
+int Core::ScriptSystem::adopt_task(lua_State* env) {
+    using namespace luabind;
+    
+    ScriptSystem* self = static_cast<ScriptSystem*>(lua_touserdata(env, lua_upvalueindex(1)));
+    int ref = lua_ref(env, LUA_REGISTRYINDEX);
+    self->task_.push(new ScriptTask(self->engine_, ref));
+    // Push task on heap
+    
+    return 0;
+}
+
 
 int Core::ScriptSystem::on_error(lua_State* env) {
     cout << lua_tostring(env, -1) << endl;
@@ -501,4 +542,8 @@ void Core::ScriptSystem::init_entity_type_bindings() {
             .enum_("LayoutMode") [ value("RELATIVE_LAYOUT", RELATIVE_LAYOUT), value("ABSOLUTE_LAYOUT", ABSOLUTE_LAYOUT) ]
             
     ];
+}
+
+bool Core::ScriptSystem::Compare::operator()(ScriptTaskPtr t0, ScriptTaskPtr t1) {
+    return t0->resume_time() > t1->resume_time();
 }

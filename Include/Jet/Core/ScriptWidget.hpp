@@ -37,11 +37,16 @@ public:
     //! @param self the lua object
     //! @param node the parent overlay for this widget
     //! @param name the name of the widget overlay
-    inline ScriptWidget(const luabind::object& self, Jet::Overlay* overlay, const std::string& name) :
-        overlay_(static_cast<Overlay*>(overlay->overlay(name))),
-        self_(self) {
+    inline ScriptWidget(Engine* engine, int ref, Jet::Overlay* overlay, const std::string& name) :
+        engine_(engine),
+		overlay_(static_cast<Overlay*>(overlay->overlay(name))) {
             
+		lua_State* env = engine_->script_system()->env();
+		lua_getref(env, ref);
+		lua_unref(env, ref);
+
         overlay_->listener(this);
+		self_ = luabind::object(luabind::from_stack(env, -1));
         self_["overlay"] = static_cast<Jet::Overlay*>(overlay_);
     }
     
@@ -82,6 +87,7 @@ private:
         overlay_ = 0;
     }
     
+	Engine* engine_;
     Overlay* overlay_;
     luabind::object self_;
 };
