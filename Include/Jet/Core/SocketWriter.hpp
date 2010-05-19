@@ -22,21 +22,35 @@
 #pragma once
 
 #include <Jet/Core/Types.hpp>
-#include <Jet/Core/Material.hpp>
+#include <Jet/Core/Socket.hpp>
+#include <Jet/Object.hpp>
+#include <boost/thread.hpp>
 
 namespace Jet { namespace Core {
 
-//! Loads a material from a MTL file.
-//! @class MaterialLoader
-//! @brief Loads a material from a MTL file
-class MaterialLoader : public Jet::Object {
+//! Writes data to a socket synchronously.
+//! @class SocketWriter
+//! @brief Writes data to a socket synchronously.
+class SocketWriter : public Object {
 public:
+    //! Creates a new socket writer, and locks the socket's buffer.
+    SocketWriter(Socket* socket);
     
-    //! Creates a new material loader that will load values in to the given
-    //! material.
-    //! @param material the material to load
-    //! @param path the path to the material file
-    MaterialLoader(Material* material, const std::string& path);
+    //! Destructor
+    ~SocketWriter();
+    
+    //! Writes a floating-point number to the socket.  Does not block.
+    void real(float real);
+    
+    //! Writes an integer number to the socket.
+    void integer(int integer);
+    
+    //! Writes a string to the socket
+    void string(const std::string& string);
+    
+private:
+    SocketPtr socket_;
+    size_t bytes_written_;
 };
 
 }}

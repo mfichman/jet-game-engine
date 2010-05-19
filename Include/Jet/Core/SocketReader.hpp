@@ -22,21 +22,38 @@
 #pragma once
 
 #include <Jet/Core/Types.hpp>
-#include <Jet/Core/Material.hpp>
+#include <Jet/Core/Socket.hpp>
+#include <Jet/Object.hpp>
+#include <boost/thread.hpp>
 
 namespace Jet { namespace Core {
 
-//! Loads a material from a MTL file.
-//! @class MaterialLoader
-//! @brief Loads a material from a MTL file
-class MaterialLoader : public Jet::Object {
+//! Reads data from a socket synchronously.
+//! @class SocketReader
+//! @brief Reads data from a socket synchronously.
+class SocketReader : public Object {
 public:
+    //! Creates a new socket reader and locks the buffer for reading.
+    SocketReader(Socket* socket);
     
-    //! Creates a new material loader that will load values in to the given
-    //! material.
-    //! @param material the material to load
-    //! @param path the path to the material file
-    MaterialLoader(Material* material, const std::string& path);
+    //! Destructor
+    ~SocketReader();
+
+    //! Reads floating-point data from the socket.  Throws an exception if data
+    //! is not available.  Does not block.
+    float real();
+    
+    //! Reads integer data from the socket.  Throws an exception if data is not
+    //! available.  Does not block.
+    int integer();
+    
+    //! Reads a string from the socket.  Throws an exception if data is not
+    //! available.  Does not block.
+    std::string string();
+    
+private:
+    SocketPtr socket_;
+    size_t bytes_read_;
 };
 
 }}

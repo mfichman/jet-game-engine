@@ -18,25 +18,43 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- */  
-#pragma once
+ */
 
-#include <Jet/Core/Types.hpp>
-#include <Jet/Core/Material.hpp>
+#include <Jet/Core/SocketWriter.hpp>
 
-namespace Jet { namespace Core {
+using namespace Jet;
+using namespace std;
 
-//! Loads a material from a MTL file.
-//! @class MaterialLoader
-//! @brief Loads a material from a MTL file
-class MaterialLoader : public Jet::Object {
-public:
+Core::SocketWriter::SocketWriter(Socket* socket) :
+    socket_(socket),
+    bytes_written_(sizeof(size_t)) {
+
+    socket_->out_.resize(sizeof(size_t));
+}
+
+Core::SocketWriter::~SocketWriter() {
+    // Send right away if possible.
+    socket_->poll_write();
+}
+
+void Core::SocketWriter::real(float real) {
+    socket_->out_.resize(socket_->out_.size() + sizeof(real));
     
-    //! Creates a new material loader that will load values in to the given
-    //! material.
-    //! @param material the material to load
-    //! @param path the path to the material file
-    MaterialLoader(Material* material, const std::string& path);
-};
+    *(float*)&socket_->out_[bytes_written_] = real;
+    bytes_written_ += sizeof(real);
+}
 
-}}
+void Core::SocketWriter::integer(int integer) {
+    socket_->out_.resize(socket_->out_.size() + sizeof(integer));
+    
+    *(int*)&socket_->out_[bytes_written_] = htonl(integer);
+    bytes_written_ += sizeof(integer);
+}
+
+void Core::SocketWriter::string(const std::string& string) {
+    size_t length = string.length() + 1;
+    socket_->out_.resize(socket_->out_.size() + length);
+    
+    memcpy(&socket_->out_[bytes_written_], string.c_str(), length);
+    bytes_written_ += length;
+}

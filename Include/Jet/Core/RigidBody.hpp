@@ -21,13 +21,14 @@
  */  
 #pragma once
 
-#include <Jet/Types.hpp>
-#include <Jet/Object.hpp>
-#include <Jet/Vector.hpp>
-#include <Jet/Quaternion.hpp>
-#include <string>
+#include <Jet/Core/Types.hpp>
+#include <Jet/Core/Node.hpp>
+#include <Jet/Core/PhysicsSystem.hpp>
+#include <Jet/RigidBody.hpp>
+#include <Bullet/btBulletDynamicsCommon.h>
+#include <Bullet/btBulletCollisionCommon.h>
 
-namespace Jet {
+namespace Jet { namespace Core {
 
 //! Physical simulation.  This class is used for simple rigid body dynamics.
 //! Access to the underlying physics engine, if needed, can be obtained by
@@ -35,49 +36,101 @@ namespace Jet {
 //! are using.
 //! @class RigidBody
 //! @brief Physical simulation with collisions.
-class RigidBody : public Object {
+class RigidBody : public Jet::RigidBody, public btMotionState {
 public:
+    //! Creates a new rigid body with the given parent node.
+    RigidBody(Engine* engine, Node* parent);
+    
+    //! Destructor
+    virtual ~RigidBody();
+    
     //! Returns the parent node.
-    virtual Node* parent() const=0;
+    inline Node* parent() const {
+        return parent_;
+    }
+
+	//! Sets whether or not the rigid body is active
+	inline bool active() const {
+		return active_;
+	}
 
     //! Returns the linear velocity of the object.
-    virtual Vector linear_velocity() const=0;
+    inline Vector linear_velocity() const {
+		const btVector3& v = body_->getLinearVelocity();
+        return Vector(v.x(), v.y(), v.z());
+    }
 
     //! Returns the angular velocity of the object.
-    virtual Vector angular_velocity() const=0;
+    inline Vector angular_velocity() const {
+        const btVector3& v = body_->getAngularVelocity();
+		return Vector(v.x(), v.y(), v.z());
+    }
     
-    //! Returns the mass fo the object
-    virtual float mass() const=0;
+    //! Returns the mass
+    inline float mass() const {
+        return mass_;
+    }
+
+    //! Returns the rigid body shape.
+    inline btCollisionShape* shape() const {
+        return shape_.get();
+    }
 
     //! Sets the linear velocity of the object.
     //! @param v the new linear velocity
-    virtual void linear_velocity(const Vector& v)=0;
-
+    inline void linear_velocity(const Vector& v) {
+        body_->setLinearVelocity(btVector3(v.x, v.y, v.z));
+    }
+    
     //! Sets the angular velocity of the object.
     //! @param v the new angular velocity
-    virtual void angular_velocity(const Vector& v)=0;
+    inline void angular_velocity(const Vector& v) {
+        body_->setAngularVelocity(btVector3(v.x, v.y, v.z));
+    }
 
     //! Applies a force to the object, relative to the world coordinates.
     //! @param v the force to apply
-    virtual void apply_force(const Vector& v)=0;
+    void apply_force(const Vector& v);
 
     //! Applies a torque to the object, relative to the world coordinates.
     //! @param v the torque to apply
-    virtual void apply_torque(const Vector& v)=0;
+    void apply_torque(const Vector& v);
 
     //! Applies a force to the object, relative to the parent scene node's
     //! coordinates.
     //! @param v the force to apply
-    virtual void apply_local_force(const Vector& v)=0;
+    void apply_local_force(const Vector& v);
 
     //! Applies a torque to the object, relative to the parent scene node's
     //! coordinates.
     //! @param v the torque to apply
-    virtual void apply_local_torque(const Vector& v)=0;
+    void apply_local_torque(const Vector& v);
     
     //! Sets the mass of the rigid body.
-    virtual void mass(float mass)=0;
+    void mass(float mass);
+
+	//! Sets whether or not the rigid body is active.
+	void active(bool active);
+    
+    //! Updates the collision shapes attached to this rigid body
+    void update_collision_shapes();
+  
+    
+private:    
+    void getWorldTransform(btTransform& transform) const;
+    void setWorldTransform(const btTransform& transform);
+    void attach_mesh_object(const btTransform& trans, MeshObject* mesh_object);
+    void attach_node(const btTransform& transform, Node* node);
+    
+    Engine* engine_;
+    Node* parent_;
+    float mass_;
+	bool active_;
+
+    std::auto_ptr<btRigidBody> body_;
+    std::auto_ptr<btCompoundShape> shape_;
+    
+    friend class Node;
 };
 
-
-}
+}}

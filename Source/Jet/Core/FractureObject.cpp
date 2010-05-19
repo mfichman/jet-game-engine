@@ -21,9 +21,16 @@
  */
 
 #include <Jet/Core/FractureObject.hpp>
-#include <Jet/RigidBody.hpp>
+#include <Jet/Core/RigidBody.hpp>
 #include <Jet/Plane.hpp>
 #include <Jet/Box.hpp>
+#ifdef WINDOWS
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#endif
+#include <GL/glew.h>
+#include <GL/gl.h>
+#include <BulletCollision/CollisionShapes/btShapeHull.h>
 
 using namespace Jet;
 using namespace std;
@@ -119,7 +126,9 @@ void Core::FractureObject::fracture_indices(const Plane& plane) {
     
     // Initialize the index buffer for this object
     mesh_object_->mesh(mesh1.get());
-    parent_->rigid_body()->mass(m1);
+    RigidBody* rigid_body = static_cast<RigidBody*>(parent_->rigid_body());
+    rigid_body->mass(m1);
+    rigid_body->update_collision_shapes();
 }
 
 Core::FractureObject* Core::FractureObject::create_clone() {

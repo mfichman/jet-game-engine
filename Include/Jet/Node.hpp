@@ -76,6 +76,10 @@ public:
 	//! Creates a new fracturable model.
 	//! @param name the name of the new fracturable model
 	virtual FractureObject* fracture_object(const std::string& name="")=0;
+	
+	//! Creates a new fractal planet terrain.
+	//! @param name the name of the fractal planet
+	virtual FractalPlanet* fractal_planet(const std::string& name="")=0;
     
     //! Creates a new particle system at the given index.  Particle systems are
     //! used for fire, water, and other affects.

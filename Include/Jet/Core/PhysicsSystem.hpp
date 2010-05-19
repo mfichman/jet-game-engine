@@ -22,21 +22,46 @@
 #pragma once
 
 #include <Jet/Core/Types.hpp>
-#include <Jet/Core/Material.hpp>
+#include <Jet/Core/Engine.hpp>
+#include <vector>
+#include <memory>
+#include <Bullet/btBulletDynamicsCommon.h>
+#include <Bullet/btBulletCollisionCommon.h>
 
 namespace Jet { namespace Core {
 
-//! Loads a material from a MTL file.
-//! @class MaterialLoader
-//! @brief Loads a material from a MTL file
-class MaterialLoader : public Jet::Object {
+//! Physics system.  Animates physical objects and performs collision
+//! detection.
+//! @class PhysicsSystem
+//! @brief Rigid body physics engine
+class PhysicsSystem : public EngineListener {
 public:
+    PhysicsSystem(Engine* engine);
+
+    //! Destructor.
+    virtual ~PhysicsSystem();
     
-    //! Creates a new material loader that will load values in to the given
-    //! material.
-    //! @param material the material to load
-    //! @param path the path to the material file
-    MaterialLoader(Material* material, const std::string& path);
+    //! Returns the physics world
+    inline btDynamicsWorld* world() const {
+        return world_.get();
+    }
+
+private:
+    void on_tick() {}
+    void on_init();
+    void on_update();
+    void on_render() {}
+    
+    static void on_tick(btDynamicsWorld* world, btScalar step);    
+    Engine* engine_;
+    
+    std::auto_ptr<btCollisionConfiguration> config_;
+    std::auto_ptr<btCollisionDispatcher> dispatcher_;
+    std::auto_ptr<btBroadphaseInterface> broadphase_;
+    std::auto_ptr<btConstraintSolver> solver_;
+    std::auto_ptr<btDynamicsWorld> world_;
+
+    
 };
 
 }}

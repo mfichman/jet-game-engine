@@ -18,25 +18,44 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- */  
-#pragma once
+ */
 
-#include <Jet/Core/Types.hpp>
-#include <Jet/Core/Material.hpp>
+#include <Jet/Core/Sound.hpp>
+#include <Jet/Core/Engine.hpp>
+#include <Jet/Core/AudioSystem.hpp>
+#include <fmodex/fmod_errors.h>
 
-namespace Jet { namespace Core {
+using namespace Jet;
+using namespace std;
 
-//! Loads a material from a MTL file.
-//! @class MaterialLoader
-//! @brief Loads a material from a MTL file
-class MaterialLoader : public Jet::Object {
-public:
+
+inline void fmod_check(FMOD_RESULT result) {
+    if (result != FMOD_OK) {
+        throw std::runtime_error(FMOD_ErrorString(result));
+    }
+}
+
+Core::Sound::~Sound() {
+    state(UNLOADED);
+}
+
+void Core::Sound::state(ResourceState state) {
+    if (state_ == state) {
+        return;
+    }
     
-    //! Creates a new material loader that will load values in to the given
-    //! material.
-    //! @param material the material to load
-    //! @param path the path to the material file
-    MaterialLoader(Material* material, const std::string& path);
-};
-
-}}
+    if (UNLOADED == state_) {
+        string file = engine_->resource_path(name_);
+        
+        // Load the sound
+        FMOD_SYSTEM* system = engine_->audio_system()->system();
+        fmod_check(FMOD_System_CreateSound(system, file.c_str(), FMOD_HARDWARE|FMOD_3D, 0, &sound_));
+        fmod_check(FMOD_Sound_Set3DMinMaxDistance(sound_, 2.0f, 1000.0f));
+    }
+    
+    if (UNLOADED == state) {
+        fmod_check(FMOD_Sound_Release(sound_));
+    }
+    
+    state_ = state;
+}

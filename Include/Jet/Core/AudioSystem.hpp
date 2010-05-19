@@ -22,21 +22,36 @@
 #pragma once
 
 #include <Jet/Core/Types.hpp>
-#include <Jet/Core/Material.hpp>
+#include <Jet/Core/Engine.hpp>
+#include <fmodex/fmod.h>
 
 namespace Jet { namespace Core {
 
-//! Loads a material from a MTL file.
-//! @class MaterialLoader
-//! @brief Loads a material from a MTL file
-class MaterialLoader : public Jet::Object {
+//! Physics system.  Animates physical objects and performs collision
+//! detection.
+//! @class AudioSystem
+//! @brief Rigid body physics engine
+class AudioSystem : public EngineListener {
 public:
+    AudioSystem(Engine* engine);
+
+    //! Destructor.
+    virtual ~AudioSystem();
     
-    //! Creates a new material loader that will load values in to the given
-    //! material.
-    //! @param material the material to load
-    //! @param path the path to the material file
-    MaterialLoader(Material* material, const std::string& path);
+    //! Returns the physics world
+    inline FMOD_SYSTEM* system() const {
+        return system_;
+    }
+
+private:
+    void on_tick();
+    void on_init();
+    void on_update();
+    void on_render() {}
+    
+    Engine* engine_;
+    FMOD_SYSTEM* system_;
+    
 };
 
 }}

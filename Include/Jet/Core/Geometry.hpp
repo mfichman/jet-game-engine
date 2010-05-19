@@ -22,35 +22,56 @@
 #pragma once
 
 #include <Jet/Core/Types.hpp>
-#include <Jet/Core/Mesh.hpp>
-#include <vector>
-#include <map>
-#include <fstream>
+#include <Jet/Core/Engine.hpp>
+#include <Jet/Geometry.hpp>
+#include <Jet/Box.hpp>
+#include <Bullet/btBulletDynamicsCommon.h>
+#include <Bullet/btBulletCollisionCommon.h>
+#include <BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h>
 
 namespace Jet { namespace Core {
 
-//! Loads mesh data from an OBJ file.
-//! @class Mesh
-//! @brief Loads mesh data from an OBJ file.
-class MeshLoader : public Object {
+//! Class to hold mesh geometry for physics calculations.
+//! @class Shape
+//! @brief Class to hold mesh geometry for physics calculations.
+class Geometry : public Jet::Geometry {
 public:
-    //! Creates a new mesh loader for the given mesh, and loads data into
-    //! that mesh.
-    //! @param mesh the mesh to loader
-    //! @param file path to the file to be loaded
-    MeshLoader(Mesh* mesh, const std::string& path);
+    //! Creates a new geometry object.
+    inline Geometry(Engine* engine, const std::string& name) :
+        engine_(engine),
+        name_(name),
+        state_(UNLOADED) {        
+    }
     
-private:
-	void read_face();
-	void insert_face(Vertex face[3]);
+    //! Destructor
+    virtual ~Geometry();
     
-    MeshPtr mesh_;
-	std::map<Vertex, uint32_t> cache_;
-    std::ifstream in_;
-    std::string name_;
-    std::vector<Vector> position_;
-	std::vector<Vector> normal_;
-	std::vector<Texcoord> texcoord_;
-};
+    //! Returns the state of the shape
+    inline ResourceState state() const {
+        return state_;
+    }
+    
+    //! Returns the mesh associated with this geometric shape.
+    inline Jet::Mesh* mesh() const {
+        return engine_->mesh(name_);
+    }
+    
+    //! Returns the collision shape
+	inline btCollisionShape* shape() {
+		return &shape_;
+	}
+    
+    //! Sets the state of this shape.
+    void state(ResourceState state);
 
+private:
+    void update_collision_shape();
+    
+    Engine* engine_;
+    std::string name_;
+    ResourceState state_;
+    btConvexHullShape shape_;
+    Box bounding_box_;
+};
+    
 }}

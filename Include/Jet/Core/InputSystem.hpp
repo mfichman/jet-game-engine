@@ -22,21 +22,38 @@
 #pragma once
 
 #include <Jet/Core/Types.hpp>
-#include <Jet/Core/Material.hpp>
+#include <Jet/Core/Engine.hpp>
 
 namespace Jet { namespace Core {
 
-//! Loads a material from a MTL file.
-//! @class MaterialLoader
-//! @brief Loads a material from a MTL file
-class MaterialLoader : public Jet::Object {
+//! Physics system.  Animates physical objects and performs collision
+//! detection.
+//! @class InputSystem
+//! @brief Rigid body physics engine
+class InputSystem : public EngineListener {
 public:
+    //! Creates a new input system.
+    InputSystem(Engine* engine);
     
-    //! Creates a new material loader that will load values in to the given
-    //! material.
-    //! @param material the material to load
-    //! @param path the path to the material file
-    MaterialLoader(Material* material, const std::string& path);
+    //! Destructor.
+    ~InputSystem();
+
+private:
+    void on_tick() {}
+    void on_init();
+    void on_update();
+    void on_render() {}
+    
+	void on_key_pressed(const std::string& key);
+    void on_key_released(const std::string& key);
+    void on_mouse_pressed(int button, int x, int y);
+    void on_mouse_released(int button, int x, int y);
+	void on_mouse_moved(int x, int y);
+    void on_joystick(int button, int x, int y, int z);
+    
+    Point normalized_mouse(int x, int y);
+    
+    Engine* engine_;
 };
 
 }}

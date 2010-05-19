@@ -22,14 +22,9 @@
 #pragma once
 
 #include <Jet/Core/Types.hpp>
-#include <Jet/Engine.hpp>
 #include <Jet/Iterator.hpp>
-#include <Jet/Physics.hpp>
-#include <Jet/Network.hpp>
-#include <Jet/Script.hpp>
-#include <Jet/Audio.hpp>
-#include <Jet/Input.hpp>
-#include <Jet/Renderer.hpp>
+#include <Jet/Types.hpp>
+#include <Jet/Engine.hpp>
 #include <Jet/Camera.hpp>
 #include <Jet/Module.hpp>
 #include <Jet/Overlay.hpp>
@@ -78,8 +73,33 @@ public:
 		return camera_.get();
 	}
 	
+	//! Returns the physics system.
+	inline PhysicsSystem* physics_system() const {
+		return physics_system_.get();
+	}
+	
+	//! Returns the render system.
+	inline RenderSystem* render_system() const {
+		return render_system_.get();
+	}
+	
+	//! Returns the script system.
+	inline ScriptSystem* script_system() const {
+		return script_system_.get();
+	}
+	
+	//! Returns the audio system.
+	inline AudioSystem* audio_system() const {
+		return audio_system_.get();
+	}
+	
+	//! Returns the network system.
+	inline NetworkSystem* network_system() const {
+		return network_system_.get();
+	}
+	
 	//! Returns the current module.
-	inline Jet::Module* module() const {
+	inline Module* module() const {
 		return module_.get();
 	}
 	
@@ -161,65 +181,8 @@ public:
 	Jet::Geometry* geometry(const std::string& name="");
 		
 	//! Returns the network interface.
-	inline Jet::Network* network() const {
-		return network_.get();
-	}
-	
-	//! Returns the physics interface.
-	inline Jet::Physics* physics() const {
-		return physics_.get();
-	}
-	
-	//! Returns the audio module
-	inline Jet::Audio* audio() const {
-		return audio_.get();
-	}
-	
-	//! Returns script module
-	inline Jet::Script* script() const {
-		return script_.get();
-	}
-	
-	//! Returns renderer module
-	inline Jet::Renderer* renderer() const {
-		return renderer_.get();
-	}
-	
-	//! Returns the input system
-	inline Jet::Input* input() const {
-		return input_.get();
-	}
-	
-		//! Returns the network interface.
-	inline void network(Jet::Network* network) {
-		network_ = network;
-	}
-	
-	//! Returns the physics interface.
-	inline void physics(Jet::Physics* physics) {
-		physics_ = physics;
-	}
-	
-	//! Returns the audio module
-	inline void audio(Jet::Audio* audio) {
-		audio_ = audio;
-	}
-	
-	//! Returns script module
-	inline void script(Jet::Script* script) {
-		script_ = script;
-	}
-		
-	//! Returns renderer module
-	inline void renderer(Jet::Renderer* renderer) {
-		renderer_ = renderer;
-	}
-	
-	//! Sets the input module
-	inline void input(Jet::Input* input) {
-		input_ = input;
-	}
-	
+	Jet::Network* network() const;
+
     //! Adds a listener, which listens for engine events.
     //! @param listener the engine listener.
     inline void listener(EngineListener* listener) {
@@ -235,7 +198,7 @@ public:
 	
 	//! Sets the current module.
 	//! @param module the module
-	inline void module(Jet::Module* module) {
+	inline void module(Module* module) {
 		if (module_) {
 			module_->on_destroy();
 			module_.reset();
@@ -352,14 +315,13 @@ private:
 	// Listeners
     std::list<EngineListenerPtr> listener_;
 	
-
 	// Engine sub-systems
-	RendererPtr renderer_;
-	ScriptPtr script_;
-	InputPtr input_;
-	PhysicsPtr physics_;
-	AudioPtr audio_;
-	NetworkPtr network_;
+	PhysicsSystemPtr physics_system_;
+	RenderSystemPtr render_system_;
+	ScriptSystemPtr script_system_;
+	InputSystemPtr input_system_;
+	AudioSystemPtr audio_system_;
+	NetworkSystemPtr network_system_;
 
     // Record-keeping values for timing statistics
     bool running_;

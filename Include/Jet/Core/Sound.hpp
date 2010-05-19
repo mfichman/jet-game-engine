@@ -22,21 +22,53 @@
 #pragma once
 
 #include <Jet/Core/Types.hpp>
-#include <Jet/Core/Material.hpp>
+#include <Jet/Sound.hpp>
+#include <fmodex/fmod.h>
 
 namespace Jet { namespace Core {
 
-//! Loads a material from a MTL file.
-//! @class MaterialLoader
-//! @brief Loads a material from a MTL file
-class MaterialLoader : public Jet::Object {
+//! Class to hold a sound data.
+//! @class Sound
+//! @brief Class to hold sound data.
+class Sound : public Jet::Sound {
 public:
+    //! Creates a new sound with the given name.
+    inline Sound(Engine* engine, const std::string& name) :
+		engine_(engine),
+		name_(name),
+		state_(UNLOADED),
+        sound_(0) {
+			
+	}
     
-    //! Creates a new material loader that will load values in to the given
-    //! material.
-    //! @param material the material to load
-    //! @param path the path to the material file
-    MaterialLoader(Material* material, const std::string& path);
+    //! Destroys the sound.
+    virtual ~Sound();
+    
+	//! Sets the state of the shader
+	inline ResourceState state() const {
+        return state_;
+    }
+
+	//! Returns the name of the texture
+	inline const std::string& name() const {
+        return name_;
+    }
+    
+    //! Returns the sound.
+    inline FMOD_SOUND* sound() const {
+        return sound_;
+    }
+
+	//! Returns the resource state of the shader
+	void state(ResourceState state);
+    
+private:    
+    Engine* engine_;
+    std::string name_;
+    ResourceState state_;
+    FMOD_SOUND* sound_;
+    
+    friend class Engine;
 };
 
 }}
