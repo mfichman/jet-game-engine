@@ -87,6 +87,9 @@ public:
     //! load the underlying resource if load is set to true.
     //! @param name the name of the texture
     virtual Shader* shader(const std::string& name="")=0;
+	
+	//! Returns the geometric shape for an object
+	virtual Geometry* geometry(const std::string& name="")=0;
     
     //! Returns the full path to the file using the given resource name.
     //! @param name the name of the resource

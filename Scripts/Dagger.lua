@@ -99,7 +99,6 @@ function Dagger:on_fracture(node)
 end
 
 function Dagger:on_explode(first, second)
-print(first, second)
     local n = Vector(math.random()*2-1, math.random()*2-1, math.random()*2-1)
     self.mesh:fracture(Plane(n.unit, Vector(0, 0, 0)))
     local n = Vector(math.random()*2-1, math.random()*2-1, math.random()*2-1)

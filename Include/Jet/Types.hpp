@@ -59,6 +59,7 @@ namespace Jet {
     class FractureObject;
     class FractalPlanet;
     class Frustum;
+    class Geometry;
     class Light;
     class Matrix;
     class Material;
@@ -99,6 +100,7 @@ namespace Jet {
     typedef boost::intrusive_ptr<Font> FontPtr;
     typedef boost::intrusive_ptr<FractureObject> FractureObjectPtr;
     typedef boost::intrusive_ptr<FractalPlanet> FractalPlanetPtr;
+    typedef boost::intrusive_ptr<Geometry> GeometryPtr;
     typedef boost::intrusive_ptr<Light> LightPtr;
     typedef boost::intrusive_ptr<Material> MaterialPtr;
     typedef boost::intrusive_ptr<Mesh> MeshPtr;

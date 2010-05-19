@@ -54,7 +54,6 @@ end
 
 function SlideAnimation:on_run()
     while (self.overlay) do
-    print("go")
         local step = self.slide_velocity*engine.frame_delta
     
         if (math.abs(self.overlay.x - self.end_position) <= math.abs(step)) then
@@ -69,6 +68,4 @@ function SlideAnimation:on_run()
         
         coroutine.yield()
     end
-    
-    print("done")
 end

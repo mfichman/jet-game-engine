@@ -31,7 +31,6 @@
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <stdexcept>
-#include <BulletCollision/CollisionShapes/btShapeHull.h>
 
 using namespace Jet;
 using namespace std;
@@ -58,7 +57,6 @@ void Core::Mesh::state(ResourceState state) {
 	// Entering the LOADED state
 	if (LOADED == state) {
 		update_tangents();
-		update_collision_shape();
 		init_hardware_buffers();
 	}
 
@@ -77,6 +75,8 @@ void Core::Mesh::state(ResourceState state) {
 		}
 	}
 	
+	// Update the geometry
+	geometry_->state(state);
 	state_ = state;
 }
 
@@ -166,32 +166,6 @@ void Core::Mesh::update_tangents() {
 		for (size_t i = 0; i < vertex_.size(); i++) {
 			vertex_[i].tangent = vertex_[i].tangent.unit();
 		}
-	}
-}
-
-void Core::Mesh::update_collision_shape() {
-	// Create a triangle array using the data loaded from the disk
-	btIndexedMesh mesh;
-	mesh.m_numTriangles = index_count()/3;
-	mesh.m_triangleIndexBase = (uint8_t*)index_data();
-	mesh.m_triangleIndexStride = 3*sizeof(uint32_t);
-	mesh.m_numVertices = vertex_count();
-	mesh.m_vertexBase = (uint8_t*)vertex_data();
-	mesh.m_vertexStride = sizeof(Vertex);
-	btTriangleIndexVertexArray vertex_array;
-	vertex_array.addIndexedMesh(mesh);
-	
-	//! Create a temporary shape to hold the vertice;
-	btConvexTriangleMeshShape temp_shape(&vertex_array);
-	btShapeHull shape_hull(&temp_shape);
-	btScalar margin = temp_shape.getMargin();
-	shape_hull.buildHull(margin);
-	shape_ = btConvexHullShape();
-	temp_shape.setUserPointer(&shape_hull);
-
-	// Awesome! Create a hull using the hull vertices.
-	for (int i = 0; i < shape_hull.numVertices(); i++) {
-		shape_.addPoint(shape_hull.getVertexPointer()[i]);
 	}
 }
 

@@ -24,6 +24,7 @@
 #include <Jet/Core/MeshObject.hpp>
 #include <Jet/Core/FractureObject.hpp>
 #include <Jet/Core/PhysicsSystem.hpp>
+#include <Jet/Core/Geometry.hpp>
 #include <Jet/Vector.hpp>
 #include <Jet/Quaternion.hpp>
 
@@ -117,7 +118,8 @@ void Core::RigidBody::attach_mesh_object(const btTransform& transform, MeshObjec
             mesh->state(LOADED);
         }
         // This is for triangle mesh shapes
-        shape_->addChildShape(transform, mesh->shape());
+        Core::Geometry* geometry = static_cast<Core::Geometry*>(mesh->geometry());
+        shape_->addChildShape(transform, geometry->shape());
     }
 }
 

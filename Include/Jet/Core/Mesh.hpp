@@ -22,15 +22,11 @@
 #pragma once
 
 #include <Jet/Core/Types.hpp>
+#include <Jet/Core/Engine.hpp>
+#include <Jet/Geometry.hpp>
 #include <Jet/Mesh.hpp>
 #include <Jet/Vertex.hpp>
-#include <Jet/Box.hpp>
 #include <vector>
-#include <map>
-#include <iostream>
-#include <Bullet/btBulletDynamicsCommon.h>
-#include <Bullet/btBulletCollisionCommon.h>
-#include <BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h>
 
 namespace Jet { namespace Core {
 
@@ -40,8 +36,10 @@ namespace Jet { namespace Core {
 //! @brief Class to hold mesh geometry for rendering.
 class Mesh : public Jet::Mesh {
 public:
+	//! Creates a new mesh.
 	inline Mesh(Engine* engine, const std::string& name) :
 		engine_(engine),
+		geometry_(engine->geometry(name)),
 		destroyed_(false),
 		name_(name),
 		state_(UNLOADED),
@@ -51,8 +49,10 @@ public:
 		sync_mode_(STATIC_SYNC) {
 	}
 	
+	//! Creates a new mesh.
 	inline Mesh(Engine* engine, const std::string& name, Mesh* parent) :
 		engine_(engine),
+		geometry_(engine->geometry(name)),
 		parent_(parent),
 		destroyed_(false),
 		name_(name),
@@ -62,7 +62,6 @@ public:
 		nindices_(0),
 		sync_mode_(STATIC_SYNC) {
 	}
-	
 
 	//! Destructor.
 	virtual ~Mesh();
@@ -126,15 +125,15 @@ public:
     inline size_t index_count() const {
         return index_.size();
     }
-	
-	//! Returns the collision shape
-	inline btCollisionShape* shape() {
-		return &shape_;
-	}
 
 	//! Sets the sync mode of this mesh.
 	inline void sync_mode(SyncMode sync_mode) {
 		sync_mode_ = sync_mode;
+	}
+	
+	//! Returns the geometry object associated with this mesh
+	inline Jet::Geometry* geometry() const {
+		return geometry_.get();
 	}
 	
 	//! Sets the resource state
@@ -153,6 +152,7 @@ private:
     
     Engine* engine_;
 	MeshPtr parent_;
+	Jet::GeometryPtr geometry_;
 	bool destroyed_;
 	std::string name_;
 	ResourceState state_;
@@ -162,8 +162,6 @@ private:
 	uint32_t ibuffer_;
 	uint32_t nindices_;
 	SyncMode sync_mode_;
-	btConvexHullShape shape_;
-	Box bounding_box_;
 };
 
 }}

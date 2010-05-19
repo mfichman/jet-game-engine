@@ -44,6 +44,7 @@
 #include <Jet/Core/Light.hpp>
 #include <Jet/Core/Material.hpp>
 #include <Jet/Core/Mesh.hpp>
+#include <Jet/Core/Geometry.hpp>
 #include <Jet/Core/MeshObject.hpp>
 #include <Jet/Core/Node.hpp>
 #include <Jet/Core/ParticleSystem.hpp>
@@ -51,6 +52,7 @@
 #include <Jet/Core/QuadSet.hpp>
 #include <Jet/Core/RigidBody.hpp>
 #include <Jet/Core/Shader.hpp>
+#include <Jet/Core/Geometry.hpp>
 #include <Jet/Core/Overlay.hpp>
 
 #include <Jet/Iterator.hpp>
@@ -186,6 +188,17 @@ Jet::Mesh* Core::Engine::mesh(const std::string& name) {
 	}
 }
 
+Jet::Geometry* Core::Engine::geometry(const std::string& name) {
+    map<string, Jet::GeometryPtr>::iterator i = geometry_.find(name);
+    if (i == geometry_.end()) {
+        Core::GeometryPtr geometry(new Core::Geometry(this, name));
+        geometry_.insert(make_pair(name, geometry));
+        return geometry.get();
+	} else {
+		return i->second.get();
+	}
+}
+
 Jet::Mesh* Core::Engine::mesh(Jet::Mesh* parent) {
 	string name = "__" + lexical_cast<string>(auto_name_counter_++);
 	
@@ -195,7 +208,7 @@ Jet::Mesh* Core::Engine::mesh(Jet::Mesh* parent) {
 }
 
 Jet::Texture* Core::Engine::texture(const std::string& name) {
-    map<string,Jet::TexturePtr>::iterator i = texture_.find(name);
+    map<string, Jet::TexturePtr>::iterator i = texture_.find(name);
     if (i == texture_.end()) {
         Core::TexturePtr texture(new Core::Texture(this, name));
         texture_.insert(make_pair(name, texture));

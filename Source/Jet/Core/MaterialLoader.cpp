@@ -34,7 +34,7 @@ Core::MaterialLoader::MaterialLoader(Material* material, const std::string& file
     while (in.good()) {
         in >> command;
 
-		if (!in.good()) break;
+		if (in.bad()) break;
         
         if (command.find("#") == 0) {
             // Skip the comment line
@@ -70,6 +70,10 @@ Core::MaterialLoader::MaterialLoader(Material* material, const std::string& file
 			material->shininess(value);
 		} else if (command == "double_sided") {
             material->double_sided(true);
-        }
+		} else {
+			// Unknown command, skip the rest of the line
+			string line;
+            getline(in, line);
+		}
     }
 }

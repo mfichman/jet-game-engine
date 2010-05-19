@@ -176,6 +176,9 @@ public:
     //! load the underlying resource if load is set to true.
     //! @param name the name of the texture
     Jet::Shader* shader(const std::string& name="");
+	
+	//! Returns the geometry
+	Jet::Geometry* geometry(const std::string& name="");
 		
 	//! Returns the network interface.
 	Jet::Network* network() const;
@@ -301,6 +304,7 @@ private:
     std::map<std::string, Jet::TexturePtr> texture_;
 	std::map<std::string, Jet::ShaderPtr> shader_;
 	std::map<std::string, Jet::FontPtr> font_;
+	std::map<std::string, Jet::GeometryPtr> geometry_;
 
     Jet::NodePtr root_;
 	Jet::OverlayPtr screen_;

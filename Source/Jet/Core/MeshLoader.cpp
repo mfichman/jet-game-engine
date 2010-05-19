@@ -36,11 +36,11 @@ Core::MeshLoader::MeshLoader(Mesh* mesh, const std::string& file) :
     
 	// Read in the whole file, one commmand at a time.  Each line starts
 	// with a command word or "#" if the line is a comment.
-    while (in_.good() && !in_.eof()) {
+    while (in_.good()) {
 		string command;
         in_ >> command;
 
-		if (!in_.good()) break;
+		if (in_.bad()) break;
         
         if (command.find("#") == 0) {
             // Skip the comment line

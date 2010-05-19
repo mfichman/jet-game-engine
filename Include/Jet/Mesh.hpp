@@ -84,6 +84,9 @@ public:
 
     //! Returns the number of indices.
     virtual size_t index_count() const=0;
+	
+	//! Returns the physics geometry associated with this mesh.
+	virtual Geometry* geometry() const=0;
 };
 
 }

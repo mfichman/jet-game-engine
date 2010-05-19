@@ -23,6 +23,7 @@
 #include <Jet/Core/FractureObject.hpp>
 #include <Jet/Core/RigidBody.hpp>
 #include <Jet/Plane.hpp>
+#include <Jet/Box.hpp>
 #ifdef WINDOWS
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
