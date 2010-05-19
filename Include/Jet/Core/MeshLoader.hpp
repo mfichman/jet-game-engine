@@ -22,7 +22,7 @@
 #pragma once
 
 #include <Jet/Core/Types.hpp>
-#include <Jet/Core/Mesh.hpp>
+#include <Jet/Mesh.hpp>
 #include <vector>
 #include <map>
 #include <fstream>

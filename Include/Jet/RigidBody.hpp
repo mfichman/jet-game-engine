@@ -48,6 +48,9 @@ public:
     
     //! Returns the mass fo the object
     virtual float mass() const=0;
+    
+    //! Returns true if the rigid body is active
+    virtual bool active() const=0;
 
     //! Sets the linear velocity of the object.
     //! @param v the new linear velocity
@@ -77,6 +80,15 @@ public:
     
     //! Sets the mass of the rigid body.
     virtual void mass(float mass)=0;
+    
+    //! Sets whether or not the rigid body is active.
+	virtual void active(bool active)=0;
+    
+    //! Sets the rigid body position
+    virtual void position(const Vector& position)=0;
+    
+    //! Sets the rigid body rotation
+    virtual void rotation(const Quaternion& rotation)=0;
 };
 
 

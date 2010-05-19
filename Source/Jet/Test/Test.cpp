@@ -3,10 +3,6 @@
 #include <stdexcept>
 #include <SDL/SDL.h>
 
-#include <Jet/Core/NetworkSystem.hpp>
-#include <Jet/Core/Socket.hpp>
-#include <Jet/Core/SocketWriter.hpp>
-#include <Jet/Core/SocketReader.hpp>
 
 using namespace std;
 using namespace boost;

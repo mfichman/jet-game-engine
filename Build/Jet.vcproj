@@ -177,7 +177,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Source\Jet\Core\ScriptActor.cpp"
+				RelativePath="..\Source\Jet\Core\Actor.cpp"
 				>
 			</File>
 			<File
@@ -451,11 +451,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Core\ScriptActor.hpp"
+				RelativePath="..\Include\Jet\Core\Actor.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Core\ScriptModule.hpp"
+				RelativePath="..\Include\Jet\Core\Module.hpp"
 				>
 			</File>
 			<File
@@ -463,11 +463,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Core\ScriptTask.hpp"
+				RelativePath="..\Include\Jet\Core\Task.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Include\Jet\Core\ScriptWidget.hpp"
+				RelativePath="..\Include\Jet\Core\Widget.hpp"
 				>
 			</File>
 			<File
