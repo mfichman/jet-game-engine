@@ -48,7 +48,7 @@
 #endif
 
 namespace Jet {
-    class ActionQueue;
+    class Audio;
     class AudioSource;
     class Box;
     class Camera;
@@ -60,6 +60,7 @@ namespace Jet {
     class FractalPlanet;
     class Frustum;
     class Geometry;
+    class Input;
     class Light;
     class Matrix;
     class Material;
@@ -77,13 +78,15 @@ namespace Jet {
     class ParticleSystem;
     class Plane;
     class Point;
+    class Physics;
     class Quad;
     class QuadChain;
     class QuadSet;
     class Quaternion;
     class Range;
+    class Renderer;
     class RigidBody;
-    class ScriptWidget;
+    class Script;
     class Signal;
     class Shader;
     class Sound;
@@ -92,7 +95,7 @@ namespace Jet {
     class Vector;
     class Vertex;
 
-    typedef boost::intrusive_ptr<ActionQueue> ActionQueuePtr;
+    typedef boost::intrusive_ptr<Audio> AudioPtr;
     typedef boost::intrusive_ptr<AudioSource> AudioSourcePtr;
     typedef boost::intrusive_ptr<Camera> CameraPtr;
     typedef boost::intrusive_ptr<Engine> EnginePtr;
@@ -101,6 +104,7 @@ namespace Jet {
     typedef boost::intrusive_ptr<FractureObject> FractureObjectPtr;
     typedef boost::intrusive_ptr<FractalPlanet> FractalPlanetPtr;
     typedef boost::intrusive_ptr<Geometry> GeometryPtr;
+    typedef boost::intrusive_ptr<Input> InputPtr;
     typedef boost::intrusive_ptr<Light> LightPtr;
     typedef boost::intrusive_ptr<Material> MaterialPtr;
     typedef boost::intrusive_ptr<Mesh> MeshPtr;
@@ -114,9 +118,11 @@ namespace Jet {
     typedef boost::intrusive_ptr<Overlay> OverlayPtr;
     typedef boost::intrusive_ptr<OverlayListener> OverlayListenerPtr;
     typedef boost::intrusive_ptr<ParticleSystem> ParticleSystemPtr;
+    typedef boost::intrusive_ptr<Physics> PhysicsPtr;
     typedef boost::intrusive_ptr<QuadChain> QuadChainPtr;
     typedef boost::intrusive_ptr<RigidBody> RigidBodyPtr;
-    typedef boost::intrusive_ptr<ScriptWidget> ScriptWidgetPtr;
+    typedef boost::intrusive_ptr<Renderer> RendererPtr;
+    typedef boost::intrusive_ptr<Script> ScriptPtr;
     typedef boost::intrusive_ptr<Shader> ShaderPtr;
     typedef boost::intrusive_ptr<Sound> SoundPtr;
     typedef boost::intrusive_ptr<Texture> TexturePtr;

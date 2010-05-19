@@ -31,31 +31,29 @@
 #include <boost/lexical_cast.hpp>
 #include <SDL/SDL_image.h>
 
-#include <Jet/Core/RenderSystem.hpp>
-#include <Jet/Core/ScriptSystem.hpp>
-#include <Jet/Core/PhysicsSystem.hpp>
-#include <Jet/Core/InputSystem.hpp>
-#include <Jet/Core/AudioSystem.hpp>
-#include <Jet/Core/NetworkSystem.hpp>
-
-#include <Jet/Core/AudioSource.hpp>
-#include <Jet/Core/Camera.hpp>
-#include <Jet/Core/Sound.hpp>
-#include <Jet/Core/Light.hpp>
-#include <Jet/Core/Material.hpp>
-#include <Jet/Core/Mesh.hpp>
-#include <Jet/Core/Geometry.hpp>
+#include <Jet/FMOD/AudioSource.hpp>
+#include <Jet/FMOD/Sound.hpp>
+#include <Jet/OpenGL/Material.hpp>
+#include <Jet/OpenGL/Mesh.hpp>
+#include <Jet/OpenGL/ParticleSystem.hpp>
+#include <Jet/OpenGL/Overlay.hpp>
+#include <Jet/OpenGL/Shader.hpp>
+#include <Jet/Bullet/RigidBody.hpp>
+#include <Jet/Bullet/Geometry.hpp>
 #include <Jet/Core/MeshObject.hpp>
 #include <Jet/Core/Node.hpp>
-#include <Jet/Core/ParticleSystem.hpp>
 #include <Jet/Core/QuadChain.hpp>
 #include <Jet/Core/QuadSet.hpp>
-#include <Jet/Core/RigidBody.hpp>
-#include <Jet/Core/Shader.hpp>
-#include <Jet/Core/Geometry.hpp>
-#include <Jet/Core/Overlay.hpp>
-
+#include <Jet/Core/Camera.hpp>
+#include <Jet/Core/Light.hpp>
 #include <Jet/Iterator.hpp>
+
+#include <Jet/Sockets/NetworkSystem.hpp>
+#include <Jet/OpenGL/RenderSystem.hpp>
+#include <Jet/Lua/ScriptSystem.hpp>
+#include <Jet/SDL/InputSystem.hpp>
+#include <Jet/Bullet/PhysicsSystem.hpp>
+#include <Jet/FMOD/AudioSystem.hpp>
 #include <fstream>
 
 #define JET_MAX_TIME_LAG 0.5f
@@ -66,7 +64,15 @@ using namespace boost::filesystem;
 using namespace boost;
 
 Engine* Engine::create() {
-	return new Core::Engine();
+	Core::EnginePtr engine = new Core::Engine();
+	engine->refcount_inc();
+	engine->network(new Sockets::NetworkSystem(engine.get()));
+	engine->renderer(new OpenGL::RenderSystem(engine.get()));
+	engine->script(new Lua::ScriptSystem(engine.get()));
+	engine->input(new SDL::InputSystem(engine.get()));
+	engine->physics(new Bullet::PhysicsSystem(engine.get()));
+	engine->audio(new FMOD::AudioSystem(engine.get()));
+	return engine.get();
 }
 
 Core::Engine::Engine() :
@@ -93,15 +99,7 @@ Core::Engine::Engine() :
         
 	// Create the root node of the scene graph
     root_ = new Core::Node(this);
-	screen_ = new Core::Overlay(this);
-	
-	// Create subsystems and register them
-	render_system_ = new RenderSystem(this);
-	input_system_ = new InputSystem(this);
-	physics_system_ = new PhysicsSystem(this);
-	audio_system_ = new AudioSystem(this);
-	script_system_ = new ScriptSystem(this);
-	network_system_ = new NetworkSystem(this);
+	screen_ = new OpenGL::Overlay(this);
 	
 	// Platform-dependent timer code
 #ifdef WINDOWS
@@ -150,7 +148,7 @@ void Core::Engine::init_systems() {
 Jet::Font* Core::Engine::font(const std::string& name) {
 	map<string, Jet::FontPtr>::iterator i = font_.find(name);
     if (i == font_.end()) {
-        Core::FontPtr font(new Core::Font(this, name));
+        OpenGL::FontPtr font(new OpenGL::Font(this, name));
         font_.insert(make_pair(name, font));
         return font.get();
 	} else {
@@ -161,7 +159,7 @@ Jet::Font* Core::Engine::font(const std::string& name) {
 Jet::Sound* Core::Engine::sound(const std::string& name) {
 	map<string, Jet::SoundPtr>::iterator i = sound_.find(name);
     if (i == sound_.end()) {
-        Core::SoundPtr sound(new Core::Sound(this, name));
+        FMOD::SoundPtr sound(new FMOD::Sound(this, name));
         sound_.insert(make_pair(name, sound));
         return sound.get();
 	} else {
@@ -173,14 +171,14 @@ Jet::Sound* Core::Engine::sound(const std::string& name) {
 Jet::Mesh* Core::Engine::mesh(const std::string& name) {
 	if (name.empty()) {
 		string name = "__" + lexical_cast<string>(auto_name_counter_++);
-		Core::MeshPtr mesh(new Core::Mesh(this, name));
+		OpenGL::MeshPtr mesh(new OpenGL::Mesh(this, name));
 		mesh_.insert(make_pair(name, mesh));
 		return mesh.get();
 	}
 	
     map<string, Jet::MeshPtr>::iterator i = mesh_.find(name);
     if (i == mesh_.end()) {
-        Core::MeshPtr mesh(new Core::Mesh(this, name));
+        OpenGL::MeshPtr mesh(new OpenGL::Mesh(this, name));
         mesh_.insert(make_pair(name, mesh));
         return mesh.get();
 	} else {
@@ -191,7 +189,7 @@ Jet::Mesh* Core::Engine::mesh(const std::string& name) {
 Jet::Geometry* Core::Engine::geometry(const std::string& name) {
     map<string, Jet::GeometryPtr>::iterator i = geometry_.find(name);
     if (i == geometry_.end()) {
-        Core::GeometryPtr geometry(new Core::Geometry(this, name));
+        Bullet::GeometryPtr geometry(new Bullet::Geometry(this, name));
         geometry_.insert(make_pair(name, geometry));
         return geometry.get();
 	} else {
@@ -202,7 +200,7 @@ Jet::Geometry* Core::Engine::geometry(const std::string& name) {
 Jet::Mesh* Core::Engine::mesh(Jet::Mesh* parent) {
 	string name = "__" + lexical_cast<string>(auto_name_counter_++);
 	
-    Core::MeshPtr mesh(new Core::Mesh(this, name, static_cast<Mesh*>(parent)));
+    OpenGL::MeshPtr mesh(new OpenGL::Mesh(this, name, static_cast<OpenGL::Mesh*>(parent)));
     mesh_.insert(make_pair(name, mesh));
     return mesh.get();
 }
@@ -210,7 +208,7 @@ Jet::Mesh* Core::Engine::mesh(Jet::Mesh* parent) {
 Jet::Texture* Core::Engine::texture(const std::string& name) {
     map<string, Jet::TexturePtr>::iterator i = texture_.find(name);
     if (i == texture_.end()) {
-        Core::TexturePtr texture(new Core::Texture(this, name));
+        OpenGL::TexturePtr texture(new OpenGL::Texture(this, name));
         texture_.insert(make_pair(name, texture));
         return texture.get();
 	} else {
@@ -221,7 +219,7 @@ Jet::Texture* Core::Engine::texture(const std::string& name) {
 Jet::Material* Core::Engine::material(const std::string& name) {
     map<string, Jet::MaterialPtr>::iterator i = material_.find(name);
     if (i == material_.end()) {
-        Core::MaterialPtr material(new Core::Material(this, name));
+        OpenGL::MaterialPtr material(new OpenGL::Material(this, name));
         material_.insert(make_pair(name, material));
         return material.get();
 	} else {
@@ -232,7 +230,7 @@ Jet::Material* Core::Engine::material(const std::string& name) {
 Jet::Shader* Core::Engine::shader(const std::string& name) {
     map<string, Jet::ShaderPtr>::iterator i = shader_.find(name);
     if (i == shader_.end()) {
-        Core::ShaderPtr shader(new Core::Shader(this, name));
+        OpenGL::ShaderPtr shader(new OpenGL::Shader(this, name));
         shader_.insert(make_pair(name, shader));
         return shader.get();
 	} else {
@@ -240,9 +238,6 @@ Jet::Shader* Core::Engine::shader(const std::string& name) {
 	}
 }
 
-Jet::Network* Core::Engine::network() const {
-	return network_system_.get();
-}
 
 std::string Core::Engine::resource_path(const std::string& name) const {
     for (set<string>::const_iterator i = search_folder_.begin(); i != search_folder_.end(); i++) {
@@ -294,7 +289,7 @@ void Core::Engine::update() {
 		module_->on_update(frame_delta());
 	}
 	static_cast<Core::Node*>(root())->update();
-	static_cast<Core::Overlay*>(screen())->update();
+	static_cast<OpenGL::Overlay*>(screen())->update();
     
     // Fire render event
     for (list<EngineListenerPtr>::iterator i = listener_.begin(); i != listener_.end(); i++) {
@@ -313,7 +308,7 @@ void Core::Engine::update_fps() {
     fps_frame_count_++;
     if (fps_elapsed_time_ > 0.1f) {
 		option("stat_fps", fps_frame_count_/fps_elapsed_time_);
-		option("stat_memory", (float)script_system_->memory_usage());
+		option("stat_memory", (float)script_->memory_usage());
         fps_frame_count_ = 0;
         fps_elapsed_time_ = 0.0f;
     }

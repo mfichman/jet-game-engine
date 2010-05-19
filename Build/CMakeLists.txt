@@ -41,7 +41,15 @@ include_directories(${Jet_SOURCE_DIR}/../Include)
 add_definitions(-DFREEGLUT_STATIC)
 
 
-file(GLOB files "../Source/Jet/*.cpp" "../Source/Jet/Core/*.cpp")
+file(GLOB files
+    "../Source/Jet/*.cpp"
+    "../Source/Jet/Bullet/*.cpp"
+    "../Source/Jet/FMOD/*.cpp"
+    "../Source/Jet/Lua/*.cpp"
+    "../Source/Jet/OpenGL/*.cpp"
+    "../Source/Jet/SDL/*.cpp"
+    "../Source/Jet/Sockets/*.cpp"
+    "../Source/Jet/Core/*.cpp")
 add_library(Jet ${files})
 
 file(GLOB files "../Source/Jet/Test/*.cpp")

@@ -21,6 +21,9 @@
  */
 
 #include <Jet/Core/MeshLoader.hpp>
+#include <Jet/Vector.hpp>
+#include <Jet/Texcoord.hpp>
+#include <Jet/Vertex.hpp>
 #include <boost/lexical_cast.hpp>
 #include <sstream>
 #include <stdexcept>

@@ -45,8 +45,23 @@ public:
 	//! Returns the current module.
 	virtual Module* module() const=0;
 	
+	//! Returns the physics interface.
+	virtual Physics* physics() const=0;
+	
+	//! Returns the audio interface
+	virtual Audio* audio() const=0;
+	
 	//! Returns the network interface.
 	virtual Network* network() const=0;
+	
+	//! Returns the script interface
+	virtual Script* script() const=0;
+	
+	//! Returns the renderer interface
+	virtual Renderer* renderer() const=0;
+	
+	//! Returns the input interface
+	virtual Input* input() const=0;
         
     //! Returns true if the engine is running
     virtual bool running() const=0;

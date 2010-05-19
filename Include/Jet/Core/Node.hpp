@@ -97,7 +97,7 @@ public:
     //! the new node will be relative to this node.
     //! @param index the index where the new object will be placed; if this
     //! parameter is zero then the object will be created at any free location
-    Jet::Node* node(const std::string& name="");
+    Core::Node* node(const std::string& name="");
     
     //! Creates a new model at the given index.  Models are used for rendering
     //! static meshes with a material.
@@ -108,11 +108,7 @@ public:
 	//! Creates a new fracturable model.
 	//! @param name the name of the new fracturable model
 	Jet::FractureObject* fracture_object(const std::string& name="");
-	
-	//! Creates a new fractal planet terrain.
-	//! @param name the name of the fractal planet
-	Jet::FractalPlanet* fractal_planet(const std::string& name="");
-    
+
     //! Creates a new particle system at the given index.  Particle systems are
     //! used for fire, water, and other affects.
     //! @param index the index where the new object will be placed; if this
@@ -204,6 +200,23 @@ public:
 	//! Returns the linear velocity.
 	Vector linear_velocity() const;
 	
+	//! Sets the raw position of this node
+	void raw_position(const Vector& position) {
+		position_ = position;
+		transform_modified_count_++;
+	}
+	
+	//! Sets the raw position of the node
+	void raw_rotation(const Quaternion& rotation) {
+		rotation_ = rotation;
+		transform_modified_count_++;
+	}
+	
+	//! Sets the rigid body of this node.
+	void rigid_body(RigidBody* rigid_body) {
+		rigid_body_ = rigid_body;
+	}
+	
 	//! Sets the visibility of this node.
 	void visible(bool visible);
 
@@ -291,8 +304,6 @@ private:
 	size_t transform_modified_count_;
 	size_t transform_update_count_;
 	size_t auto_name_counter_;
-	
-	friend class RigidBody;
 };
 
 }}

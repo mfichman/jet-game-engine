@@ -24,11 +24,10 @@
 #include <Jet/Core/Types.hpp>
 #include <Jet/Core/Engine.hpp>
 #include <Jet/Core/Node.hpp>
-#include <Jet/Core/Material.hpp>
-#include <Jet/Core/Mesh.hpp>
-#include <Jet/Core/Texture.hpp>
-#include <Jet/Core/RigidBody.hpp>
-#include <Jet/MeshObject.hpp>
+#include <Jet/Material.hpp>
+#include <Jet/Mesh.hpp>
+#include <Jet/Texture.hpp>
+#include <Jet/RigidBody.hpp>
 #include <map>
 
 namespace Jet { namespace Core {
@@ -72,26 +71,17 @@ public:
     inline const boost::any& shader_param(const std::string& name) {
         return shader_param_[name];
     }
-    
-	//! Sets the custom index buffer for this mesh object.
-	inline uint32_t index_buffer() const {
-		return index_buffer_;
-	}
-	
-	//! Sets the index count for this mesh object.
-	inline size_t index_count() const {
-		return index_count_;
-	}
+
 	
     //! Sets the material used to render this object.
     //! @param material a pointer to the material
-    inline void material(Jet::Material* material) {
+    inline void material(Material* material) {
         material_ = static_cast<Material*>(material);
     }
     
     //! Sets the mesh used to render this object.
     //! @param mesh the mesh
-	inline void mesh(Jet::Mesh* mesh) {
+	inline void mesh(Mesh* mesh) {
 		mesh_ = static_cast<Mesh*>(mesh);
 	}
     
@@ -127,7 +117,6 @@ private:
     MeshPtr mesh_;
     std::map<std::string, boost::any> shader_param_;
     bool cast_shadows_;
-	uint32_t index_buffer_;
 	size_t index_count_;
 };
 

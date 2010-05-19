@@ -21,16 +21,15 @@
  */  
 
 #include <Jet/Core/Node.hpp>
-#include <Jet/Core/AudioSource.hpp>
+#include <Jet/FMOD/AudioSource.hpp>
+#include <Jet/OpenGL/ParticleSystem.hpp>
+#include <Jet/Bullet/RigidBody.hpp>
 #include <Jet/Core/Camera.hpp>
 #include <Jet/Core/Light.hpp>
 #include <Jet/Core/MeshObject.hpp>
 #include <Jet/Core/Node.hpp>
-#include <Jet/Core/ParticleSystem.hpp>
 #include <Jet/Core/QuadChain.hpp>
 #include <Jet/Core/QuadSet.hpp>
-#include <Jet/Core/RigidBody.hpp>
-#include <Jet/Core/FractalPlanet.hpp>
 #include <Jet/Core/FractureObject.hpp>
 
 #include <stdexcept>
@@ -84,7 +83,7 @@ RigidBody* Core::Node::rigid_body() {
 	// detection.  Thus, all geometry must be attached BEFORE the rigid body
 	// is created.
 	if (!rigid_body_) {
-		rigid_body_ = new RigidBody(engine_, this);
+		rigid_body_ = new Bullet::RigidBody(engine_, this);
 	}
 	return rigid_body_.get();
 }
@@ -92,7 +91,7 @@ RigidBody* Core::Node::rigid_body() {
 AudioSource* Core::Node::audio_source() {
 	// Create the audio source if it hasn't been loaded yet.
     if (!audio_source_) {
-        audio_source_ = new AudioSource(engine_, this);
+        audio_source_ = new FMOD::AudioSource(engine_, this);
     }
     return audio_source_.get();
 }
@@ -124,7 +123,7 @@ void Core::Node::delete_object(Object* object) {
     }
 }
 
-Jet::Node* Core::Node::node(const std::string& name) {
+Core::Node* Core::Node::node(const std::string& name) {
 	return get_object<Core::Node>(name);
 }
 
@@ -136,12 +135,8 @@ Jet::FractureObject* Core::Node::fracture_object(const std::string& name) {
 	return get_object<Core::FractureObject>(name);
 }
 
-Jet::FractalPlanet* Core::Node::fractal_planet(const std::string& name) {
-	return get_object<Core::FractalPlanet>(name);
-}
-
 Jet::ParticleSystem* Core::Node::particle_system(const std::string& name) {
-	return get_object<Core::ParticleSystem>(name);
+	return get_object<OpenGL::ParticleSystem>(name);
 }
 
 Jet::QuadSet* Core::Node::quad_set(const std::string& name) {
@@ -203,10 +198,7 @@ void Core::Node::position(const Vector& position) {
 	// If the rigid body exists, and this node is the parent of the
 	// rigid body, then set the transform for the rigid body.
 	if (rigid_body_ && rigid_body_->parent() == this) {
-		RigidBody* rigid_body = static_cast<RigidBody*>(rigid_body_.get());
-		btTransform transform = rigid_body->body_->getCenterOfMassTransform();
-		transform.setOrigin(btVector3(position.x, position.y, position.z));
-		rigid_body->body_->setCenterOfMassTransform(transform);
+		rigid_body_->position(position);
 	}
 }
 
@@ -218,10 +210,7 @@ void Core::Node::rotation(const Quaternion& rotation) {
 		// If the rigid body exists, and this node is the parent of the
 		// rigid body, then set the transform for the rigid body.
 	if (rigid_body_ && rigid_body_->parent() == this) {
-		RigidBody* rigid_body = static_cast<RigidBody*>(rigid_body_.get());
-		btTransform transform = rigid_body->body_->getCenterOfMassTransform();
-		transform.setRotation(btQuaternion(rotation.x, rotation.y, rotation.z, rotation.w));
-		rigid_body->body_->setCenterOfMassTransform(transform);
+		rigid_body_->rotation(rotation);
 	}
 }
 

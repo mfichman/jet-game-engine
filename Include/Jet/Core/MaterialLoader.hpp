@@ -22,7 +22,7 @@
 #pragma once
 
 #include <Jet/Core/Types.hpp>
-#include <Jet/Core/Material.hpp>
+#include <Jet/Material.hpp>
 
 namespace Jet { namespace Core {
 

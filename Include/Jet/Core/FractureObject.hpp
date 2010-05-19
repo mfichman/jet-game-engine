@@ -23,8 +23,6 @@
 
 #include <Jet/Core/Types.hpp>
 #include <Jet/Core/Node.hpp>
-#include <Jet/Core/Mesh.hpp>
-#include <Jet/Core/Material.hpp>
 #include <Jet/Core/MeshObject.hpp>
 #include <Jet/FractureObject.hpp>
 #include <vector>
@@ -82,13 +80,13 @@ public:
     
     //! Sets the material used to render this object.
     //! @param material a pointer to the material
-    inline void material(Jet::Material* material) {
+    inline void material(Material* material) {
         mesh_object_->material(material);
     }
     
     //! Sets the mesh used to render this object.
     //! @param mesh the mesh
-    inline void mesh(Jet::Mesh* mesh) {
+    inline void mesh(Mesh* mesh) {
         mesh_object_->mesh(mesh);
     }
 
@@ -138,8 +136,11 @@ public:
     //! @param plane the plane to split the object along
     void fracture(const Plane& plane);
     
-private:    
+private:
+    //! Creates a clone of this fracture object
     FractureObject* create_clone();
+    
+    //! Creates a new fracture on the given plane
     void fracture_indices(const Plane& plane);
     
     Engine* engine_;
