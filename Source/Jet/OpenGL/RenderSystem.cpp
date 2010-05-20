@@ -21,12 +21,14 @@
  */  
 
 #include <Jet/OpenGL/RenderSystem.hpp>
-#include <Jet/OpenGL/Overlay.hpp>
 #include <Jet/OpenGL/RenderTarget.hpp>
 #include <Jet/OpenGL/Mesh.hpp>
-#include <Jet/OpenGL/Material.hpp>
+#include <Jet/OpenGL/Shader.hpp>
+#include <Jet/Core/Overlay.hpp>
 #include <Jet/Core/Light.hpp>
 #include <Jet/Core/MeshObject.hpp>
+#include <Jet/OpenGL/Texture.hpp>
+#include <Jet/OpenGL/Material.hpp>
 #include <Jet/Core/Camera.hpp>
 #include <Jet/Matrix.hpp>
 #include <Jet/Box.hpp>
@@ -497,11 +499,16 @@ void OpenGL::RenderSystem::render_visible_mesh_objects() {
 
 void OpenGL::RenderSystem::render_visible_particle_systems() {
 	
-	for (vector<OpenGL::ParticleSystemPtr>::iterator i = particle_systems_.begin(); i != particle_systems_.end(); i++) {
-		OpenGL::ParticleSystem* particle_system = i->get();
+	for (vector<Core::ParticleSystemPtr>::iterator i = particle_systems_.begin(); i != particle_systems_.end(); i++) {
+		Core::ParticleSystem* particle_system = i->get();
+        particle_system->update();
 		
 		// Render the particle system using the buffer
-		particle_system->render(particle_buffer_.get());
+        particle_buffer_->texture(static_cast<OpenGL::Texture*>(particle_system->texture()));
+        particle_buffer_->shader(static_cast<OpenGL::Shader*>(particle_system->shader()));
+        for (Iterator<Particle*> i = particle_system->alive_particles(); i; i++) {
+            particle_buffer_->particle(**i);
+        }
 	}
 	particle_buffer_->flush();
 	particle_buffer_->shader(0);
@@ -529,7 +536,8 @@ void OpenGL::RenderSystem::render_overlays() {
 	glActiveTexture(GL_TEXTURE0);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	
-	static_cast<OpenGL::Overlay*>(engine_->screen())->render();
+	render_overlay(static_cast<Core::Overlay*>(engine_->screen()));
+    
 	
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
@@ -575,6 +583,53 @@ void OpenGL::RenderSystem::render_fullscreen_quad() {
     
 }
 
+void OpenGL::RenderSystem::render_overlay(Core::Overlay* overlay) {
+    if (!overlay->visible()) {
+        return;
+    }
+    
+    float x = overlay->corner_x();
+    float y = overlay->corner_y();
+    
+    // Now translate to the top-left corner of the overlay, and render
+    // the text and background image
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glTranslatef(x, y, 0.0f);
+    
+    // Render the background as a single quad
+    OpenGL::Texture* background = static_cast<OpenGL::Texture*>(overlay->background());
+    if (background) {
+        background->sampler(0);        
+        glBegin(GL_QUADS);
+        glTexCoord2f(0.0f, 0.0f);
+        glVertex2f(0.0f, 0.0f);
+        glTexCoord2f(1.0f, 0.0f);
+        glVertex2f(overlay->width(), 0.0f);
+        glTexCoord2f(1.0f, 1.0f);
+        glVertex2f(overlay->width(), overlay->height());
+        glTexCoord2f(0.0f, 1.0f);
+        glVertex2f(0.0f, overlay->height());    
+        glEnd();
+    }
+    
+    // Now render the text
+    OpenGL::Font* font = static_cast<OpenGL::Font*>(overlay->font());
+    if (!overlay->text().empty() && font) {
+        glColor4fv(overlay->text_color());
+        glPushMatrix();
+        glTranslatef(0, (float)font->height(), 0);
+        font->render(overlay->text());
+        glPopMatrix();
+    }
+    
+    // Render all the children
+    for (Iterator<Core::OverlayPtr> i = overlay->children(); i; i++) {
+        render_overlay(i->get());
+    }
+    
+    glPopMatrix();
+}
 
 void OpenGL::RenderSystem::generate_render_list(Core::Node* node) {
 	
@@ -602,9 +657,9 @@ void OpenGL::RenderSystem::generate_render_list(Core::Node* node) {
 			// Add all lights
 			lights_.push_back(static_cast<Core::Light*>(i->get()));
 			
-		} else if (typeid(OpenGL::ParticleSystem) == type) {
+		} else if (typeid(Core::ParticleSystem) == type) {
 			// Add particle systems with a valid texture
-			OpenGL::ParticleSystem* particle_system = static_cast<OpenGL::ParticleSystem*>(i->get());
+			Core::ParticleSystem* particle_system = static_cast<Core::ParticleSystem*>(i->get());
 			if (particle_system->texture()) {
 				particle_systems_.push_back(particle_system);
 			}

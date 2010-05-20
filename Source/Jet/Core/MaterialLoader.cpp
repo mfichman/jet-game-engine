@@ -34,7 +34,7 @@ Core::MaterialLoader::MaterialLoader(Material* material, const std::string& file
     while (in.good()) {
         in >> command;
 
-		if (in.bad()) break;
+		if (in.fail()) break;
         
         if (command.find("#") == 0) {
             // Skip the comment line

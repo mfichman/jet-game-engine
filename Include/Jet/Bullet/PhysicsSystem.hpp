@@ -22,7 +22,10 @@
 #pragma once
 
 #include <Jet/Bullet/Types.hpp>
+#include <Jet/Bullet/Geometry.hpp>
+#include <Jet/Bullet/RigidBody.hpp>
 #include <Jet/Core/Engine.hpp>
+#include <Jet/Core/Node.hpp>
 #include <Jet/Physics.hpp>
 #include <vector>
 #include <memory>
@@ -48,6 +51,14 @@ public:
     }
 
 private:
+    inline Geometry* geometry(const std::string& name) {
+        return new Bullet::Geometry(engine_, name);
+    }
+    
+    inline RigidBody* rigid_body(Node* parent) {
+        return new Bullet::RigidBody(engine_, static_cast<Core::Node*>(parent));
+    }
+    
     void on_tick() {}
     void on_init();
     void on_update();

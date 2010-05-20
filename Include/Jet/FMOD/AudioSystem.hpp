@@ -22,6 +22,8 @@
 #pragma once
 
 #include <Jet/FMOD/Types.hpp>
+#include <Jet/FMOD/AudioSource.hpp>
+#include <Jet/FMOD/Sound.hpp>
 #include <Jet/Core/Engine.hpp>
 #include <Jet/Audio.hpp>
 
@@ -44,6 +46,14 @@ public:
     }
 
 private:
+    inline Sound* sound(const std::string& name) {
+        return new FMOD::Sound(engine_, name);
+    }
+    
+    inline AudioSource* audio_source(Node* parent) {
+        return new FMOD::AudioSource(engine_, static_cast<Core::Node*>(parent));
+    }
+    
     void on_tick();
     void on_init();
     void on_update();

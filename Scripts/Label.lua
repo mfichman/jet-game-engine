@@ -18,35 +18,20 @@
 -- FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 -- IN THE SOFTWARE.
 
-require 'Module'
-require 'Menu'
-require 'MPScreen'
+require 'Widget'
+require 'Engine'
 
-class 'MPLogin' (Module)
+class 'Label' (Widget)
 
-function MPLogin:__init()
-    Module.__init(self)
-    
-    -- Overlay
-    self.menu = Menu {
-        name = "mplogin_menu",
-        title_text = "login.",
-        button_width = 230
-    }
-    self.menu:text_field("", bind("on_text_enter", self))
-    self.menu:button("ok", bind("on_ok_click", self))
-    self.menu:button("back", bind("on_back_click", self))
-    
-end
+function Label:__init(overlay, name)
+    Widget.__init(self, overlay, name)
 
-function MPLogin:on_text_enter(widget, button)
-
-end
-
-function MPLogin:on_ok_click(widget, button)
-    self.menu:next(MPScreen)
-end
-
-function MPLogin:on_back_click(widget, button)
-    self.menu:next(StartScreen)
+    -- Default options
+    self.overlay.font = "Russel.ttf#14"
+    self.overlay.text_color = Color(1, 1, 1, 1)
+    self.overlay.vertical_alignment = Overlay.TOP
+    self.overlay.x = 4
+    self.overlay.y = 4
+    self.overlay.width = 800
+    self.overlay.height = 16
 end

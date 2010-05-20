@@ -46,6 +46,27 @@ public:
     }
     
 private:
+       
+    //! Called when a game is found.
+    inline void on_player_join(const std::string& name) {
+        self_["on_player_join"](self_, name);
+    }
+    
+    //! Called when a game is lost.
+    inline void on_player_quit(const std::string& name) {
+        self_["on_player_quit"](self_, name);
+    }
+    
+    //! Called when a game is found.
+    inline void on_game_found(const std::string& name) {
+        self_["on_game_found"](self_, name);
+    }
+    
+    //! Called when a game is lost.
+    inline void on_game_lost(const std::string& name) {
+        self_["on_game_lost"](self_, name);
+    }
+    
     //! Called when a key is pressed.
     //! @param key the key
     //! @param x the x value of the mouse position in the range (-1.0, 1.0)

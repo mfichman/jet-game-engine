@@ -31,7 +31,11 @@ namespace Jet {
 //! @brief Physics subsystem
 class Physics : public virtual Object {
 public:
+    //! Creates a new geometry object with the given name
+    virtual Geometry* geometry(const std::string& name)=0;
     
+    //! Creates a new rigid body for the given node.
+    virtual RigidBody* rigid_body(Node* parent)=0;
     
 };
 

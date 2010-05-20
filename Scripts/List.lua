@@ -21,6 +21,7 @@
 require 'Widget'
 require 'Button'
 require 'TextField'
+require 'Label'
 require 'Engine'
 
 class 'List' (Widget)
@@ -37,35 +38,72 @@ function List:__init(options)
     self.button_spacing = options.button_spacing or 10
     self.overlay.x = options.x or 0
     self.overlay.y = options.y or 0
-    self.buttons = {}
+    self.buttons_list = {}
+    self.buttons_hash = {}
     self.overlay.height = 0
 end
 
+function List:clear()
+    for i,v in ipairs(self.buttons_list) do
+        v.overlay.visible = false
+        v.overlay.text = ""
+        v.on_click = function() end
+    end
+    self.buttons_hash = {}
+    self.buttons_list = {}
+end
 
-function List:text_field(text, callback)
+function List:label(text)
+print("here")
     -- Creates a new button
-    local n = table.getn(self.buttons)+1
-    local t = TextField(self.overlay, self.name..n)
-    t.overlay {
+    local n = table.getn(self.buttons_list)+1
+    local l = Label(self.overlay, self.name..n)
+    l.overlay {
+        visible = true,
+        text = text,
         font = self.font_face.."#"..self.font_size,
         height = self.font_size,
         width = self.button_width,
-        text = text,
         y = self.overlay.height
     }
-    t.on_enter = callback
     
     -- Increase the height of the list to accomodate the button
     self.overlay.height = self.overlay.height + self.button_spacing + self.font_size
+    self.buttons_list[n] = l
+    self.buttons_hash[text] = l
     
-    self.buttons[n] = t
+    return l
+end
+
+function List:text_field(label, text, callback)
+    -- Creates a new button
+    local n = table.getn(self.buttons_list)+1
+    local t = TextField(self.overlay, self.name..n)
+    t.overlay {
+        visible = true,
+        font = self.font_face.."#"..self.font_size,
+        height = self.font_size,
+        width = self.button_width,
+        y = self.overlay.height
+    }
+    t.on_enter = callback
+    t.label = label
+    t.buffer = text
+    
+    -- Increase the height of the list to accomodate the button
+    self.overlay.height = self.overlay.height + self.button_spacing + self.font_size
+    self.buttons_list[n] = t
+    self.buttons_hash[label] = t
+    
+    return t
 end
 
 function List:button(text, callback)
     -- Creates a new button
-    local n = table.getn(self.buttons)+1
+    local n = table.getn(self.buttons_list)+1
     local b = Button(self.overlay, self.name..n)
     b.overlay {
+        visible = true,
         font = self.font_face.."#"..self.font_size,
         height = self.font_size,
         width = self.button_width,
@@ -76,6 +114,8 @@ function List:button(text, callback)
     
     -- Increase the height of the list to accomodate the button
     self.overlay.height = self.overlay.height + self.button_spacing + self.font_size
+    self.buttons_list[n] = b
+    self.buttons_hash[text] = b
     
-    self.buttons[n] = b
+    return b
 end

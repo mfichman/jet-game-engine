@@ -32,6 +32,8 @@ namespace Jet { namespace Core {
     class Light;
     class MeshObject;
     class Node;
+    class Overlay;
+    class ParticleSystem;
     class QuadChain;
     class QuadSet;    
 
@@ -41,6 +43,8 @@ namespace Jet { namespace Core {
     typedef boost::intrusive_ptr<Light> LightPtr;
     typedef boost::intrusive_ptr<MeshObject> MeshObjectPtr;
     typedef boost::intrusive_ptr<Node> NodePtr;
+    typedef boost::intrusive_ptr<Overlay> OverlayPtr;
+    typedef boost::intrusive_ptr<ParticleSystem> ParticleSystemPtr;
     typedef boost::intrusive_ptr<QuadChain> QuadChainPtr;
     typedef boost::intrusive_ptr<QuadSet> QuadSetPtr;
 }}

@@ -24,18 +24,6 @@
 #include <Jet/Sockets/Types.hpp>
 #include <Jet/Object.hpp>
 #include <vector>
-#ifdef WINDOWS
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#else
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/time.h>
-#include <arpa/inet.h>
-#endif
-
-#include <boost/thread.hpp>
-#include <boost/bind.hpp>
 
 namespace Jet { namespace Sockets {
 
@@ -82,9 +70,19 @@ public:
     //! Returns a socket reader for this socket, or null if no data is
     //! available.
     SocketReader* reader();
+    
+    //! Returns the port
+    inline uint16_t port() const {
+        return port_;
+    }
+    
+    //! Returns the IP address
+    inline const std::string& address() const {
+        return address_;
+    }
    
 private:
-    Socket(const sockaddr_in& local, const sockaddr_in& remote, SocketType type);
+    Socket(const sockaddr_in& local, const sockaddr_in& remote, SocketType type, int socket=INVALID_SOCKET);
     
     void init_multicast();
     void init_client();
@@ -108,9 +106,12 @@ private:
     SocketType type_;
     size_t write_bytes_;
     size_t read_bytes_;
+    uint16_t port_;
+    std::string address_;
     
     friend class SocketReader;
     friend class SocketWriter;
+    friend class ServerSocket;
 };
 
 }}

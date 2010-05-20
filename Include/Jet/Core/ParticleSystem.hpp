@@ -21,15 +21,15 @@
  */  
 #pragma once
 
-#include <Jet/OpenGL/Types.hpp>
-#include <Jet/OpenGL/Texture.hpp>
-#include <Jet/OpenGL/Shader.hpp>
+#include <Jet/Core/Types.hpp>
 #include <Jet/Core/Node.hpp>
 #include <Jet/Core/Engine.hpp>
+#include <Jet/Texture.hpp>
+#include <Jet/Shader.hpp>
 #include <Jet/ParticleSystem.hpp>
 #include <Jet/Particle.hpp>
 
-namespace Jet { namespace OpenGL {
+namespace Jet { namespace Core {
 
 //! Class for generating particles effects, like smoke, rain, fire and dust.
 //! @class ParticleSystem
@@ -45,7 +45,6 @@ public:
 		next_emission_(0.0f) {
 
         shader("Particle");
-        particle_.resize(0);
     }
     
     //! Destructor.
@@ -209,6 +208,14 @@ public:
     inline void quota(size_t quota) {
         particle_.resize(quota);
         dead_particle_.clear();
+        
+        dead_particle_.reserve(quota);
+        alive_particle_.reserve(quota);
+        
+        for (size_t i = 0; i < particle_.size(); i++) {
+            dead_particle_.push_back(&particle_[i]);
+        }
+        
     }
     
     //! Sets the texture in use for his particle system by name.
@@ -240,8 +247,13 @@ public:
         }
     }
     
+    //! Returns a list of alive particles
+    Iterator<Particle*> alive_particles() {
+        return Iterator<Particle*>(alive_particle_.begin(), alive_particle_.end());
+    }
+    
     //! Renders this particle system using the given particle buffer
-    void render(ParticleBuffer* buffer);
+    void update();
     
 private:    
     void init_particle_box(Particle& p);
@@ -266,6 +278,7 @@ private:
     ShaderPtr shader_;
     std::vector<Particle> particle_;
     std::vector<Particle*> dead_particle_;
+    std::vector<Particle*> alive_particle_;
     float accumulator_;
 	float next_emission_;    
 };

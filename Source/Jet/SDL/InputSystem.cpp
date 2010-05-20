@@ -22,7 +22,7 @@
 
 #include <Jet/SDL/InputSystem.hpp>
 #include <Jet/Core/Engine.hpp>
-#include <Jet/OpenGL/Overlay.hpp> // TODO HACK HACK HACK
+#include <Jet/Core/Overlay.hpp> // TODO HACK HACK HACK
 #include <Jet/Point.hpp>
 #include <SDL/SDL.h>
 #include <cmath>
@@ -62,6 +62,14 @@ void SDL::InputSystem::on_update() {
 			case SDL_MOUSEMOTION: on_mouse_moved(evt.motion.x, evt.motion.y); break;
         }
     }
+    
+}
+
+void SDL::InputSystem::on_tick() {
+    int x, y;
+    SDL_GetMouseState(&x, &y);
+    Core::Overlay* overlay = static_cast<Core::Overlay*>(engine_->screen());
+	overlay->mouse_moved((float)x, (float)y);
 }
 
 void SDL::InputSystem::on_key_pressed(const std::string& key) {
@@ -73,7 +81,7 @@ void SDL::InputSystem::on_key_pressed(const std::string& key) {
     }
 
 
-    OpenGL::Overlay* overlay = static_cast<OpenGL::Overlay*>(engine_->focused_overlay());
+    Core::Overlay* overlay = static_cast<Core::Overlay*>(engine_->focused_overlay());
     if (overlay) {
 		if ((key.length() == 1) && (SDL_GetModState() & KMOD_LSHIFT || SDL_GetModState() & KMOD_RSHIFT)) {
 			//if (isalpha(key[0])) {
@@ -94,7 +102,7 @@ void SDL::InputSystem::on_key_released(const std::string& key) {
         SDL_GetMouseState(&x, &y);
         module->on_key_released(key, normalized_mouse(x, y));
     }
-    OpenGL::Overlay* overlay = static_cast<OpenGL::Overlay*>(engine_->focused_overlay());
+    Core::Overlay* overlay = static_cast<Core::Overlay*>(engine_->focused_overlay());
     if (overlay) {
         overlay->key_released(key);
     }
@@ -105,7 +113,7 @@ void SDL::InputSystem::on_mouse_pressed(int button, int x, int y) {
     if (module) {
         module->on_mouse_pressed(button, normalized_mouse(x, y));
     }
-	OpenGL::Overlay* overlay = static_cast<OpenGL::Overlay*>(engine_->screen());
+	Core::Overlay* overlay = static_cast<Core::Overlay*>(engine_->screen());
 	overlay->mouse_pressed(button, (float)x, (float)y);
 }
 
@@ -114,13 +122,12 @@ void SDL::InputSystem::on_mouse_released(int button, int x, int y) {
     if (module) {
         module->on_mouse_released(button, normalized_mouse(x, y));
     }
-	OpenGL::Overlay* overlay = static_cast<OpenGL::Overlay*>(engine_->screen());
+	Core::Overlay* overlay = static_cast<Core::Overlay*>(engine_->screen());
 	overlay->mouse_released(button, (float)x, (float)y);
 }
 
 void SDL::InputSystem::on_mouse_moved(int x, int y) {
-	OpenGL::Overlay* overlay = static_cast<OpenGL::Overlay*>(engine_->screen());
-	overlay->mouse_moved((float)x, (float)y);
+
 }
 
 void SDL::InputSystem::on_joystick(int button, int x, int y, int z) {

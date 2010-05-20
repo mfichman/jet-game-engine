@@ -29,7 +29,19 @@ namespace Jet {
 //! @class Module
 //! @brief A game module or level
 class Module : public Object {
-public:    
+public:
+    
+        //! Called when a network game is found
+    virtual void on_player_join(const std::string& name)=0;
+    
+    //! Called when a game is lost.
+    virtual void on_player_quit(const std::string& name)=0;
+    
+    //! Called when a network game is found
+    virtual void on_game_found(const std::string& game)=0;
+    
+    //! Called when a game is lost.
+    virtual void on_game_lost(const std::string& game)=0;
     
     //! Called when a key is pressed.
     //! @param key the key

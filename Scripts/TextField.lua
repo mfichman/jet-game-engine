@@ -37,6 +37,7 @@ function TextField:__init(overlay, name)
     self.overlay.focusable = true
     self.color_fade = -1;
     self.blink_time = 0
+    self.label = ""
     self.buffer = ""
 end
 
@@ -47,9 +48,9 @@ function TextField:on_update(delta)
     end
     
     if (self.blink_time < 0.5) then
-        self.overlay.text = ">"..self.buffer.."_"
+        self.overlay.text = self.label.."> "..self.buffer.."_"
     else
-        self.overlay.text = ">"..self.buffer..""
+        self.overlay.text = self.label.."> "..self.buffer..""
     end
 end
 

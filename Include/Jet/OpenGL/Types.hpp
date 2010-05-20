@@ -36,9 +36,7 @@ namespace Jet { namespace OpenGL {
     class Font;
     class Material;
     class Mesh;
-    class Overlay;
     class ParticleBuffer;
-    class ParticleSystem;
     class RenderSystem;
     class RenderTarget;
     class Shader;
@@ -47,8 +45,6 @@ namespace Jet { namespace OpenGL {
     typedef boost::intrusive_ptr<Font> FontPtr;
     typedef boost::intrusive_ptr<Material> MaterialPtr;
     typedef boost::intrusive_ptr<Mesh> MeshPtr;
-    typedef boost::intrusive_ptr<Overlay> OverlayPtr;
-    typedef boost::intrusive_ptr<ParticleSystem> ParticleSystemPtr;
     typedef boost::intrusive_ptr<ParticleBuffer> ParticleBufferPtr;
     typedef boost::intrusive_ptr<RenderSystem> RenderSystemPtr;
     typedef boost::intrusive_ptr<RenderTarget> RenderTargetPtr;

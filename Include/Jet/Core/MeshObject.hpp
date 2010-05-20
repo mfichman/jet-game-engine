@@ -27,7 +27,6 @@
 #include <Jet/Material.hpp>
 #include <Jet/Mesh.hpp>
 #include <Jet/Texture.hpp>
-#include <Jet/RigidBody.hpp>
 #include <map>
 
 namespace Jet { namespace Core {

@@ -31,8 +31,11 @@ namespace Jet {
 //! @brief Audio subsystem
 class Audio : public virtual Object {
 public:
+    //! Creates a new audio clip
+    virtual Sound* sound(const std::string& name)=0;
     
-    
+    //! Creates a new audio source
+    virtual AudioSource* audio_source(Node* parent)=0;
 };
 
 }

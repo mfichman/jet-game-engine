@@ -22,7 +22,7 @@ require 'Module'
 require 'List'
 require 'Menu'
 require 'SPGame'
-require 'MPLogin'
+require 'MPScreen'
 
 class 'StartScreen' (Module)
 
@@ -57,7 +57,7 @@ function StartScreen:on_key_pressed(key)
 end
 
 function StartScreen:on_mp_click(widget, buttton)
-    self.menu:next(MPLogin)
+    self.menu:next(MPScreen)
 end
 
 function StartScreen:on_sp_click(widget, buttton)

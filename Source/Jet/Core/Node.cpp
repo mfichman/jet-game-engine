@@ -21,9 +21,7 @@
  */  
 
 #include <Jet/Core/Node.hpp>
-#include <Jet/FMOD/AudioSource.hpp>
-#include <Jet/OpenGL/ParticleSystem.hpp>
-#include <Jet/Bullet/RigidBody.hpp>
+#include <Jet/Core/ParticleSystem.hpp>
 #include <Jet/Core/Camera.hpp>
 #include <Jet/Core/Light.hpp>
 #include <Jet/Core/MeshObject.hpp>
@@ -31,7 +29,6 @@
 #include <Jet/Core/QuadChain.hpp>
 #include <Jet/Core/QuadSet.hpp>
 #include <Jet/Core/FractureObject.hpp>
-
 #include <stdexcept>
 #include <boost/iterator/transform_iterator.hpp>
 #include <boost/function.hpp>
@@ -83,7 +80,7 @@ RigidBody* Core::Node::rigid_body() {
 	// detection.  Thus, all geometry must be attached BEFORE the rigid body
 	// is created.
 	if (!rigid_body_) {
-		rigid_body_ = new Bullet::RigidBody(engine_, this);
+		rigid_body_ = engine_->physics()->rigid_body(this);
 	}
 	return rigid_body_.get();
 }
@@ -91,7 +88,7 @@ RigidBody* Core::Node::rigid_body() {
 AudioSource* Core::Node::audio_source() {
 	// Create the audio source if it hasn't been loaded yet.
     if (!audio_source_) {
-        audio_source_ = new FMOD::AudioSource(engine_, this);
+        audio_source_ = engine_->audio()->audio_source(this);
     }
     return audio_source_.get();
 }
@@ -136,7 +133,7 @@ Jet::FractureObject* Core::Node::fracture_object(const std::string& name) {
 }
 
 Jet::ParticleSystem* Core::Node::particle_system(const std::string& name) {
-	return get_object<OpenGL::ParticleSystem>(name);
+	return get_object<Core::ParticleSystem>(name);
 }
 
 Jet::QuadSet* Core::Node::quad_set(const std::string& name) {

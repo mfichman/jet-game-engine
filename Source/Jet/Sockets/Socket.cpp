@@ -30,27 +30,6 @@
 using namespace Jet;
 using namespace std;
 
-#ifdef WINDOWS
-#define EWOULDBLOCK WSAEWOULDBLOCK
-typedef int socklen_t;
-const char* socket_errmsg() {
-    static char buffer[512];
-    FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, WSAGetLastError(), NULL, buffer, 512, NULL);
-    return buffer;
-}    
-int socket_errcode() {
-    return WSAGetLastError();
-}
-#else
-#define SD_BOTH SHUT_RDWR
-#define INVALID_SOCKET -1
-#define socket_errmsg() strerror(errno)
-#define socket_errcode() errno
-#define closesocket close
-#include <unistd.h>
-#include <fcntl.h>
-#endif
-
 Sockets::Socket* Sockets::Socket::server(uint16_t port) {
     sockaddr_in local;
     local.sin_family = AF_INET;
@@ -108,13 +87,14 @@ Sockets::Socket* Sockets::Socket::datagram(const std::string& ip, uint16_t port)
     return new Sockets::Socket(local, remote, DATAGRAM);
 }
 
-Sockets::Socket::Socket(const sockaddr_in& local, const sockaddr_in& remote, SocketType type) :
-    socket_(INVALID_SOCKET),
+Sockets::Socket::Socket(const sockaddr_in& local, const sockaddr_in& remote, SocketType type, int socket) :
+    socket_(socket),
     local_(local),
     remote_(remote),
 	type_(type),
     write_bytes_(0),
-    read_bytes_(0) {
+    read_bytes_(0),
+    port_(0) {
         
     switch (type_) {
         case DATAGRAM: init_datagram(); break;
@@ -136,6 +116,14 @@ Sockets::Socket::Socket(const sockaddr_in& local, const sockaddr_in& remote, Soc
 	fcntl(socket_, F_SETFL, flags);
 #endif
 
+    // Get the port we are bound to
+    socklen_t len = sizeof(local_);
+    if (getsockname(socket_, (sockaddr*)&local_, &len) < 0) {
+        throw runtime_error(socket_errmsg());
+    }
+    
+    port_ = ntohs(local_.sin_port);
+    address_ = inet_ntoa(local_.sin_addr);
 }
 
 Sockets::Socket::~Socket() {	
@@ -310,8 +298,8 @@ void Sockets::Socket::connect() {
 	timeval tv;
 	tv.tv_sec = 0;
 	tv.tv_usec = 0;
-	
-	if (select(socket_ + 1, &write, 0, 0, &tv)) {
+
+	if (select(socket_ + 1, 0, &write, 0, &tv)) {
 		if (FD_ISSET(socket_, &write)) {
 			type_ = STREAM;
 		}

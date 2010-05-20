@@ -27,5 +27,4 @@ camera = camera_node:camera("camera") {
 -- Set up FPS counter
 Stats(engine.screen, "stats")
 
-
 StartScreen()

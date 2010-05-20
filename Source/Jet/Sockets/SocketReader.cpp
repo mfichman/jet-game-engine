@@ -52,7 +52,7 @@ int Sockets::SocketReader::integer() {
         throw std::runtime_error("No more data in packet");
     }
     
-    int integer = *(int*)&socket_->in_[bytes_read_];
+    int integer = ntohl(*(int*)&socket_->in_[bytes_read_]);
     bytes_read_ += sizeof(integer);
     
     return integer;

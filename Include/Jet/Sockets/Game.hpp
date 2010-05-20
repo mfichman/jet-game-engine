@@ -18,20 +18,46 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- */
+ */  
 #pragma once
 
 #include <Jet/Types.hpp>
-#include <Jet/Object.hpp>
 
-namespace  Jet {
+namespace Jet { namespace Sockets {
 
-//! Controls network options for the engine.
-//! @class Network
-//! @brief Sets network options for the engine.
-class Network : public virtual Object {
+//! Structure for holding information about a multiplayer game.
+//! @class Game
+//! @brief Game value
+class Game {
 public:
-
-};
+    //! Creates a new game
+    Game() :
+        server_port(0),
+        last_time(0.0f) {
+    }
     
-}
+    bool operator==(const Game& other) const {
+        return name == other.name && server_port == other.server_port && server_address == other.server_address;
+    }
+    
+    bool operator<(const Game& other) const {
+        if (name != other.name) {
+            return name < other.name;
+        }
+        if (server_port != other.server_port) {
+            return server_port < other.server_port;
+        }
+        if (server_address != other.server_address) {
+            return server_address < other.server_address;
+        }
+        return false;
+    }
+    
+    std::string name;
+    uint16_t server_port;
+    std::string server_address;
+    float last_time;
+};
+
+}}
+

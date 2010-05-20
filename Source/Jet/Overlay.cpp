@@ -20,13 +20,23 @@
  * IN THE SOFTWARE.
  */
 
-#include <Jet/OpenGL/Overlay.hpp>
+#include <Jet/Core/Overlay.hpp>
+#include <boost/function.hpp>
+#include <boost/iterator/transform_iterator.hpp>
 
 using namespace Jet;
 using namespace std;
 using namespace std::tr1;
+using namespace boost;
 
-OpenGL::Overlay::~Overlay() {
+template <typename K, typename V>
+V& get_value(const std::pair<K, V>& p) {
+	// Small transform function used for transforming the object
+	// itrator.
+    return const_cast<V&>(p.second); 
+}
+
+Core::Overlay::~Overlay() {
 	if (!destroyed_) {
 		// If the node hasn't been destroyed, then mark it as destroyed
 		// and notify all the listeners to the node.  This case can
@@ -38,10 +48,10 @@ OpenGL::Overlay::~Overlay() {
 	}
 }
 
-OpenGL::Overlay* OpenGL::Overlay::overlay(const string& name) {
+Core::Overlay* Core::Overlay::overlay(const string& name) {
     unordered_map<string, OverlayPtr>::const_iterator i = overlay_.find(name);
     if (i == overlay_.end()) {
-        OverlayPtr overlay(new OpenGL::Overlay(engine_, this));
+        Core::OverlayPtr overlay(new Core::Overlay(engine_, this));
         overlay_.insert(make_pair(name, overlay));
         return overlay.get();
     } else {
@@ -49,7 +59,7 @@ OpenGL::Overlay* OpenGL::Overlay::overlay(const string& name) {
     }
 }
 
-float OpenGL::Overlay::corner_x() const {
+float Core::Overlay::corner_x() const {
     // Find the top-left corner of the overlay.  Depends on the horizontal
     // alignment of the overlay.
     if (LEFT == horizontal_alignment_) {
@@ -69,7 +79,7 @@ float OpenGL::Overlay::corner_x() const {
     }
 }
 
-float OpenGL::Overlay::corner_y() const {
+float Core::Overlay::corner_y() const {
     // Find the top-right corner of the overlay.  Depends on the vertical
     // alignment of the overlay.
     if (TOP == vertical_alignment_) {
@@ -89,59 +99,23 @@ float OpenGL::Overlay::corner_y() const {
     }
 }
 
-void OpenGL::Overlay::render() {
-    if (!visible_) {
-        return;
-    }
-    
-    float x = corner_x();
-    float y = corner_y();
-    
-    // Now translate to the top-left corner of the overlay, and render
-    // the text and background image
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glTranslatef(x, y, 0.0f);
-    
-    render_background();
-    render_text();
-    
-    // Render children
-    for (unordered_map<string, OverlayPtr>::const_iterator i = overlay_.begin(); i != overlay_.end(); i++) {
-        i->second->render();
-    }
-    
-    glPopMatrix();
-    
+    //! Returns an iterator over the objects connected to this node.
+Iterator<Core::OverlayPtr> Core::Overlay::children() const {
+    // Transform the unordered map iterator to a generic iterator over
+	// all objects attached to this node.  This hides implementation details
+	// about the node class.
+	typedef unordered_map<string, OverlayPtr> map_t;
+	typedef boost::function<map_t::mapped_type& (const map_t::value_type&)> fun_t;
+	typedef transform_iterator<fun_t, map_t::const_iterator> itr_t;
+	typedef pair<map_t::iterator, map_t::iterator> pair_t;
+
+	itr_t begin = make_transform_iterator(overlay_.begin(), &get_value<string, OverlayPtr>);
+	itr_t end = make_transform_iterator(overlay_.end(), &get_value<string, OverlayPtr>);
+
+	return Iterator<OverlayPtr>(begin, end);
 }
 
-void OpenGL::Overlay::render_background() {
-    if (background_) {
-        background_->sampler(0);        
-        glBegin(GL_QUADS);
-        glTexCoord2f(0.0f, 0.0f);
-        glVertex2f(0.0f, 0.0f);
-        glTexCoord2f(1.0f, 0.0f);
-        glVertex2f(width_, 0.0f);
-        glTexCoord2f(1.0f, 1.0f);
-        glVertex2f(width_, height_);
-        glTexCoord2f(0.0f, 1.0f);
-        glVertex2f(0.0f, height_);    
-        glEnd();
-    }
-}
-
-void OpenGL::Overlay::render_text() {
-    if (!text_.empty() && font_) {
-        glColor4fv(text_color_);
-        glPushMatrix();
-        glTranslatef(0, (float)font_->height(), 0);
-        font_->render(text_);
-        glPopMatrix();
-    }
-}
-
-void OpenGL::Overlay::delete_overlay(Overlay* overlay) {
+void Core::Overlay::delete_overlay(Overlay* overlay) {
     // Search through the has table to find the overlay
     for (unordered_map<string, OverlayPtr>::iterator i = overlay_.begin(); i != overlay_.end(); i++) {
         if (i->second == overlay) {
@@ -152,7 +126,7 @@ void OpenGL::Overlay::delete_overlay(Overlay* overlay) {
 }
 
 //! Adds a listener to the overlay.
-void OpenGL::Overlay::listener(OverlayListener* listener) {
+void Core::Overlay::listener(OverlayListener* listener) {
     if (destroyed_) {
 		throw std::runtime_error("Attempted to add a listener to a node marked for deletion");
 	} else {
@@ -160,7 +134,7 @@ void OpenGL::Overlay::listener(OverlayListener* listener) {
 	}
 }
 
-void OpenGL::Overlay::update() {
+void Core::Overlay::update() {
     if (visible_) {
         if (listener_) { 
               listener_->on_update(engine_->frame_delta());
@@ -172,7 +146,7 @@ void OpenGL::Overlay::update() {
     }
 }
 
-void OpenGL::Overlay::mouse_pressed(int button, float x, float y) {
+void Core::Overlay::mouse_pressed(int button, float x, float y) {
     if (visible_) {
         x -= corner_x();
         y -= corner_y();
@@ -194,7 +168,7 @@ void OpenGL::Overlay::mouse_pressed(int button, float x, float y) {
     }
 }
 
-void OpenGL::Overlay::mouse_released(int button, float x, float y) {
+void Core::Overlay::mouse_released(int button, float x, float y) {
     if (visible_) {
         x -= corner_x();
         y -= corner_y();
@@ -213,7 +187,7 @@ void OpenGL::Overlay::mouse_released(int button, float x, float y) {
     }
 }
 
-void OpenGL::Overlay::mouse_moved(float x, float y) {
+void Core::Overlay::mouse_moved(float x, float y) {
     if (visible_) {
         x -= corner_x();
         y -= corner_y();
@@ -240,19 +214,19 @@ void OpenGL::Overlay::mouse_moved(float x, float y) {
     }
 }
 
-void OpenGL::Overlay::key_pressed(const std::string& key) {
+void Core::Overlay::key_pressed(const std::string& key) {
     if (listener_ && visible_) {
         listener_->on_key_pressed(key);
     }
 }
 
-void OpenGL::Overlay::key_released(const std::string& key) {
+void Core::Overlay::key_released(const std::string& key) {
     if (listener_ && visible_) {
         listener_->on_key_released(key);
     }
 }
 
-void OpenGL::Overlay::destroy() {
+void Core::Overlay::destroy() {
     if (destroyed_) {
         return;
     } else {

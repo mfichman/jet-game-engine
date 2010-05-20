@@ -21,20 +21,55 @@
  */  
 #pragma once
 
+#ifdef WINDOWS
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#ifndef EWOULDBLOCK
+#define EWOULDBLOCK WSAEWOULDBLOCK
+#endif
+typedef int socklen_t;
+inline const char* socket_errmsg() {
+    static char buffer[512];
+    FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, WSAGetLastError(), NULL, buffer, 512, NULL);
+    return buffer;
+}    
+inline int socket_errcode() {
+    return WSAGetLastError();
+}
+#else
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <arpa/inet.h>
+#define SD_BOTH SHUT_RDWR
+#define INVALID_SOCKET -1
+#define socket_errmsg() strerror(errno)
+#define socket_errcode() errno
+#define closesocket close
+#include <unistd.h>
+#include <fcntl.h>
+#endif
 #include <boost/intrusive_ptr.hpp>
+
+
 
 namespace Jet { namespace Sockets {
 
+    class Game;
+    class Player;
     class NetworkSystem;
     class Shader;
+    class ServerSocket;
     class Socket;
     class SocketWriter;
     class SocketReader;
     
     typedef boost::intrusive_ptr<NetworkSystem> NetworkSystemPtr;
+    typedef boost::intrusive_ptr<ServerSocket> ServerSocketPtr;
     typedef boost::intrusive_ptr<Socket> SocketPtr;
     typedef boost::intrusive_ptr<SocketReader> SocketReaderPtr;
     typedef boost::intrusive_ptr<SocketWriter> SocketWriterPtr;
 
     enum SocketType { SERVER, CLIENT, MULTICAST, DATAGRAM, STREAM };
+    enum NetworkState { DISCOVER, HOST, JOIN, RUNNING, DISABLED };
 }}

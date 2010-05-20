@@ -20,8 +20,8 @@
  * IN THE SOFTWARE.
  */
 
-#include <Jet/Bullet/RigidBody.hpp>
 #include <Jet/Bullet/PhysicsSystem.hpp>
+#include <Jet/Bullet/RigidBody.hpp>
 #include <Jet/Bullet/Geometry.hpp>
 #include <Jet/Core/MeshObject.hpp>
 #include <Jet/Core/FractureObject.hpp>

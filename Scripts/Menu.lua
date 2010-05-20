@@ -35,7 +35,7 @@ function Menu:__init(options)
         height = 0,
         y = 120,
         text_color = Color(1, .4, .1, 1.0),
-        font = "Russel.ttf#90",
+        font = options.title_font or "Russel.ttf#90",
         text = options.title_text
     }
     
@@ -43,6 +43,8 @@ function Menu:__init(options)
     self.list = List {
         parent = self.overlay,
         name = options.name.."_list",
+        font_face = options.font_face,
+        font_size = options.font_size,
         y = 240,
         button_width = options.button_width
     }
@@ -56,12 +58,20 @@ function Menu:__init(options)
     }
 end
 
+function Menu:clear()
+    self.list:clear()
+end
+
+function Menu:label(...)
+    return self.list:label(...)
+end
+
 function Menu:button(...)
-    self.list:button(...)
+    return self.list:button(...)
 end
 
 function Menu:text_field(...)
-    self.list:text_field(...)
+    return self.list:text_field(...)
 end
 
 function Menu:next(on_complete)
@@ -69,7 +79,8 @@ function Menu:next(on_complete)
         overlay = self.overlay,
         end_position = "right",
         on_complete = function()
-            self.visible = false
+            self.overlay.visible = false
+            self:clear()
             on_complete()
         end
     }

@@ -43,7 +43,7 @@ Core::MeshLoader::MeshLoader(Mesh* mesh, const std::string& file) :
 		string command;
         in_ >> command;
 
-		if (in_.bad()) break;
+		if (in_.fail()) break;
         
         if (command.find("#") == 0) {
             // Skip the comment line

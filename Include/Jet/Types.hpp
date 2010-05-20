@@ -135,5 +135,4 @@ namespace Jet {
     enum SyncMode { STATIC_SYNC, DYNAMIC_SYNC };
     enum LayoutMode { RELATIVE_LAYOUT, ABSOLUTE_LAYOUT };
     enum Alignment { TOP, CENTER, BOTTOM, LEFT, RIGHT };
-    enum NetworkState { DISCOVER, HOST, RUNNING, DISABLED };
 }

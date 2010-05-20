@@ -20,8 +20,7 @@
  * IN THE SOFTWARE.
  */
 
-#include <Jet/OpenGL/ParticleSystem.hpp>
-#include <Jet/OpenGL/ParticleBuffer.hpp>
+#include <Jet/Core/ParticleSystem.hpp>
 #include <cmath>
 
 using namespace Jet;
@@ -43,26 +42,21 @@ static inline float rand_range2(const Range& range) {
     }
 }
 
-void OpenGL::ParticleSystem::render(OpenGL::ParticleBuffer* buffer) {
-    dead_particle_.clear();
-    
-    // Set the buffer's shader and pointer.  This may cause the
-    // buffer to flush, but that's what we want.
-	buffer->shader(shader_.get());
-    buffer->texture(texture_.get());
-    
+void Core::ParticleSystem::update() {    
     
     // Add particles that are alive to the particle buffer, and
     // add dead particles to the free list
-    for (size_t i = 0; i < particle_.size(); i++) {
-        Particle& p = particle_[i];
-        if ((engine_->frame_time() - p.init_time) > p.life || p.life <= 0.0f) {
-            dead_particle_.push_back(&p);
-        } else {
-            buffer->particle(p);
-        }
+	for (int i = alive_particle_.size()-1; i >= 0; i--) {
+        Particle* p = alive_particle_[i];
+        if ((engine_->frame_time() - p->init_time) > p->life || p->life <= 0.0f) {
+			if (i != alive_particle_.size()-1) {
+				swap(alive_particle_[i], alive_particle_[alive_particle_.size()-1]);
+			}
+			alive_particle_.pop_back();
+			dead_particle_.push_back(p);
+		}
     }
-    
+	
 	if (life_ <= 0.0f && life_ > -1.0f) {
 		return;
 	}
@@ -76,34 +70,35 @@ void OpenGL::ParticleSystem::render(OpenGL::ParticleBuffer* buffer) {
  
     // Spawn additional particles
     while (accumulator_ > next_emission_ && !dead_particle_.empty()) {
-        Particle& p = *dead_particle_.back();
+        Particle* p = dead_particle_.back();
         dead_particle_.pop_back();
-        p.init_time = engine_->frame_time();
-		p.init_size = rand_range(particle_size_);
-		p.init_rotation = rand_range(Range(0.0, PI));
-		p.life = rand_range(particle_life_);
-		p.growth_rate = rand_range(particle_growth_rate_);
+		alive_particle_.push_back(p);
+        p->init_time = engine_->frame_time();
+		p->init_size = rand_range(particle_size_);
+		p->init_rotation = rand_range(Range(0.0, PI));
+		p->life = rand_range(particle_life_);
+		p->growth_rate = rand_range(particle_growth_rate_);
         
         // Set up initial parameters
         if (BOX_EMITTER == type_) {
-            init_particle_box(p);
+            init_particle_box(*p);
             
         } else if (ELLIPSOID_EMITTER == type_) {
-            init_particle_ellipsoid(p);
+            init_particle_ellipsoid(*p);
 
         } else if (POINT_EMITTER == type_) {
-            init_particle_point(p);
+            init_particle_point(*p);
         }
-        p.init_position = parent_->matrix() * p.init_position;
-        p.init_velocity = parent_->matrix().rotate(p.init_velocity);
-		p.init_velocity += parent_->linear_velocity();
+        p->init_position = parent_->matrix() * p->init_position;
+        p->init_velocity = parent_->matrix().rotate(p->init_velocity);
+		p->init_velocity += parent_->linear_velocity();
         
         accumulator_ -= next_emission_;
 		next_emission_ = 1.0f/rand_range(emission_rate_);
     }
 }
     
-void OpenGL::ParticleSystem::init_particle_box(Particle& p) {
+void Core::ParticleSystem::init_particle_box(Particle& p) {
     float w = rand_range2(Range(0, 1));
     float h = rand_range2(Range(0, 1));
     float d = rand_range2(Range(0, 1));
@@ -115,7 +110,7 @@ void OpenGL::ParticleSystem::init_particle_box(Particle& p) {
     p.init_velocity = Vector(w, h, d).unit() * speed;
 }
 
-void OpenGL::ParticleSystem::init_particle_ellipsoid(Particle& p) {
+void Core::ParticleSystem::init_particle_ellipsoid(Particle& p) {
     float phi = rand_range(Range(0.0f, PI));
     float theta = rand_range(Range(0.0f, 2.0f*PI));
     float a = rand_range(width_);
@@ -131,7 +126,7 @@ void OpenGL::ParticleSystem::init_particle_ellipsoid(Particle& p) {
     p.init_velocity.z = speed * cosf(phi);
 }
 
-void OpenGL::ParticleSystem::init_particle_point(Particle& p) {
+void Core::ParticleSystem::init_particle_point(Particle& p) {
     p.init_position = Vector(0.0f, 0.0f, 0.0f);
     
     Vector forward = emission_direction_;

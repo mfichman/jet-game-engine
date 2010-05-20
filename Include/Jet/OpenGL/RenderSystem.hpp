@@ -23,10 +23,15 @@
 
 #include <Jet/OpenGL/Types.hpp>
 #include <Jet/OpenGL/RenderTarget.hpp>
-#include <Jet/OpenGL/ParticleSystem.hpp>
 #include <Jet/OpenGL/ParticleBuffer.hpp>
+#include <Jet/OpenGL/Shader.hpp>
+#include <Jet/OpenGL/Font.hpp>
+#include <Jet/OpenGL/Material.hpp>
+#include <Jet/OpenGL/Texture.hpp>
+#include <Jet/OpenGL/Mesh.hpp>
 #include <Jet/Core/Engine.hpp>
 #include <Jet/Core/MeshObject.hpp>
+#include <Jet/Core/ParticleSystem.hpp>
 #include <Jet/Renderer.hpp>
 #include <vector>
 
@@ -46,6 +51,30 @@ public:
     virtual ~RenderSystem();
 
 private:
+    inline Shader* shader(const std::string& name) {
+        return new OpenGL::Shader(engine_, name);
+    }
+    
+    inline Font* font(const std::string& name) {
+        return new OpenGL::Font(engine_, name);
+    }
+    
+    inline Material* material(const std::string& name) {
+        return new OpenGL::Material(engine_, name);
+    }
+    
+    inline Texture* texture(const std::string& name) {
+        return new OpenGL::Texture(engine_, name);
+    }
+    
+    inline Mesh* mesh(const std::string& name) {
+        return new OpenGL::Mesh(engine_, name);
+    }
+    
+    inline Mesh* mesh(const std::string& name, Jet::Mesh* parent) {
+        return new OpenGL::Mesh(engine_, name, static_cast<OpenGL::Mesh*>(parent));
+    }
+    
     void on_tick() {}
     void on_init();
     void on_update() {}
@@ -64,6 +93,7 @@ private:
     void render_visible_particle_systems();
     void render_fullscreen_quad();
     void render_overlays();
+    void render_overlay(Core::Overlay* overlay);
     void check_video_mode();
     
     static bool compare_mesh_objects(MeshObjectPtr o1, MeshObjectPtr o2);
@@ -77,7 +107,7 @@ private:
     ParticleBufferPtr particle_buffer_;
     
     std::vector<Core::MeshObjectPtr> mesh_objects_;
-    std::vector<ParticleSystemPtr> particle_systems_;
+    std::vector<Core::ParticleSystemPtr> particle_systems_;
     std::vector<Core::LightPtr> lights_;
 };
 

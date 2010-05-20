@@ -21,10 +21,10 @@
  */  
 #pragma once
 
-#include <Jet/OpenGL/Types.hpp>
-#include <Jet/OpenGL/Texture.hpp>
-#include <Jet/OpenGL/Font.hpp>
+#include <Jet/Core/Types.hpp>
 #include <Jet/Core/Engine.hpp>
+#include <Jet/Texture.hpp>
+#include <Jet/Font.hpp>
 #include <Jet/Overlay.hpp>
 
 #ifdef WINDOWS
@@ -33,7 +33,7 @@
 #include <tr1/unordered_map>
 #endif
 
-namespace Jet { namespace OpenGL {
+namespace Jet { namespace Core {
 
 //! Class to hold items that can be displayed on the screen.  Overlays can be
 //! nested, and have attached text and a background.
@@ -43,7 +43,7 @@ class Overlay : public Jet::Overlay {
 public:
     //! Creates a new overlay for the given engine.  This overlay will have no
     //! parent, so it should be the root.
-    Overlay(Core::Engine* engine) :
+    Overlay(Engine* engine) :
         engine_(engine),
         parent_(0),
         destroyed_(false),
@@ -61,7 +61,7 @@ public:
     }
     
     //! Creates a new overlay for the engine, with the given parent.
-    Overlay(Core::Engine* engine, Overlay* parent) :
+    Overlay(Engine* engine, Overlay* parent) :
         engine_(engine),
         parent_(parent),
         destroyed_(false),
@@ -157,13 +157,16 @@ public:
     
     //! Returns the text font.
     inline Font* font() const {
-        throw std::runtime_error("Not implemented");
+        return font_.get();
     }
     
     //! Returns the background texture of this overlay.
     inline Texture* background() const {
         return background_.get();
     }
+    
+    //! Returns an iterator over the objects connected to this node.
+	Iterator<OverlayPtr> children() const;
     
     //! Makes this overlay visible/invisible.
     inline void visible(bool visible) {
@@ -274,11 +277,9 @@ public:
     void key_released(const std::string& key);
     
 private:    
-    void render_background();
-    void render_text();
     void delete_overlay(Overlay* overlay);
     
-    Core::Engine* engine_;
+    Engine* engine_;
     Overlay* parent_;
     bool destroyed_;
     std::tr1::unordered_map<std::string, OverlayPtr> overlay_;

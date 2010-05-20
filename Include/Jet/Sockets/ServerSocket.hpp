@@ -21,33 +21,48 @@
  */  
 #pragma once
 
-#include <Jet/Types.hpp>
+#include <Jet/Sockets/Types.hpp>
 #include <Jet/Object.hpp>
+#include <vector>
 
-namespace Jet {
+namespace Jet { namespace Sockets {
 
-//! Interface for render engine subsystems
-//! @class Renderer
-//! @brief Renderer subsystem
-class Renderer : public virtual Object {
+//! Reads and writes data to a multicast, unicast TCP, or unicast UDP socket.
+//! @class Socket
+//! @brief Reads and writes data to a multicast, unicast TCP, or unicast UDP
+//! socket.  For TCP sockets, data is read as a packet even though the
+//! underlying protocol is stream-oriented.
+class ServerSocket : public Object {
 public:
-    //! Creates a new shader with the given name
-    virtual Shader* shader(const std::string& name)=0;
+    //! Destructor
+    ~ServerSocket();
     
-    //! Creates a new font with the given name
-    virtual Font* font(const std::string& font)=0;
+	//! Creates a unicast TCP socket connecting to the given port and IP
+    //! address.
+    //! @param ip the destination address
+    //! @param port the destination port
+    static ServerSocket* server(uint16_t port=0);
+        
+    //! Returns a socket if one is currently connected
+    Socket* socket();
     
-    //! Creates a new material with the given name
-    virtual Material* material(const std::string& material)=0;
+    //! Returns the port
+    inline uint16_t port() const {
+        return port_;
+    }
+    //! Returns the ip address
+    inline const std::string& address() const {
+        return address_;
+    }
+   
+private:
+    ServerSocket(const sockaddr_in& local, const sockaddr_in& remote);
     
-    //! Creates a new texture with the given name
-    virtual Texture* texture(const std::string& texture)=0;
-    
-    //! Creates a new mesh with the given name
-    virtual Mesh* mesh(const std::string& mesh)=0;
-    
-    //! Creates a new mesh with the given name and parent
-    virtual Mesh* mesh(const std::string& name, Mesh* parent)=0;
+    int socket_;
+    uint16_t port_;
+    std::string address_;
+    sockaddr_in local_;
+    sockaddr_in remote_;
 };
 
-}
+}}
