@@ -222,6 +222,9 @@ void OpenGL::RenderSystem::check_video_mode() {
 		for (Iterator<pair<const string, Jet::TexturePtr> > i = engine_->textures(); i; i++) {
 			i->second->state(CACHED);
 		}
+        for (Iterator<pair<const string, Jet::CubemapPtr> > i = engine_->cubemaps(); i; i++) {
+			i->second->state(CACHED);
+		}
 		for (Iterator<pair<const string, Jet::ShaderPtr> > i = engine_->shaders(); i; i++) {
 			i->second->state(CACHED);
 		}
@@ -325,7 +328,7 @@ void OpenGL::RenderSystem::generate_shadow_map(Core::Light* light) {
 		// Set up the projection matrix for the directional light
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		glOrtho(bounds.min_x, bounds.max_x, bounds.min_y, bounds.max_y, bounds.min_z, bounds.max_z);
+		glOrtho(bounds.min_x-8.0f, bounds.max_x+8.0f, bounds.min_y-8.0f, bounds.max_y+8.0f, bounds.min_z-24.0f, bounds.max_z+24.0f);
 	    
 		// Set up the view matrix for the directional light
 		glMatrixMode(GL_MODELVIEW);
@@ -414,6 +417,7 @@ void OpenGL::RenderSystem::render_final(Core::Light* light) {
     
     // Render to the back buffer.
 	render_visible_mesh_objects();
+    render_skysphere();
 	render_visible_particle_systems();
 }
 
@@ -589,7 +593,7 @@ void OpenGL::RenderSystem::render_overlay(Core::Overlay* overlay) {
     }
     
     float x = overlay->corner_x();
-    float y = overlay->corner_y();
+    float y = overlay->corner_y(); 
     
     // Now translate to the top-left corner of the overlay, and render
     // the text and background image
@@ -665,6 +669,30 @@ void OpenGL::RenderSystem::generate_render_list(Core::Node* node) {
 			}
 		}
     }
+}
+
+void OpenGL::RenderSystem::render_skysphere() {
+    Core::CameraPtr camera = static_cast<Core::Camera*>(engine_->camera());
+    string texture = engine_->option<string>("skysphere_texture");
+    OpenGL::Cubemap* cubemap = static_cast<OpenGL::Cubemap*>(engine_->cubemap(texture));
+    OpenGL::Mesh* mesh = static_cast<OpenGL::Mesh*>(engine_->mesh("Sphere.obj"));
+    OpenGL::Shader* shader = static_cast<OpenGL::Shader*>(engine_->shader("Sky"));
+    const Vector& eye = camera->parent()->matrix().origin();
+    
+    
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glTranslatef(eye.x, eye.y, eye.z);
+    glDisable(GL_CULL_FACE);
+    shader->enabled(true);
+    GLint sampler_loc = shader->uniform_location("cube_map");
+    glUniform1i(sampler_loc, 0);
+    cubemap->sampler(0);
+    mesh->render(shader);
+    glEnable(GL_CULL_FACE);
+    shader->enabled(false);
+    
+    glPopMatrix();
 }
 
 bool OpenGL::RenderSystem::compare_mesh_objects(MeshObjectPtr o1, MeshObjectPtr o2) {

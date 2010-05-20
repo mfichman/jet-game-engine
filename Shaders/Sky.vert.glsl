@@ -18,39 +18,19 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- */  
-#pragma once
+ */
 
-#include <Jet/Types.hpp>
-#include <Jet/Object.hpp>
+varying vec3 texcoord;
 
-namespace Jet {
+void main() {
+    gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * gl_Vertex;
+    
+    // Set z=w so that the skydome is always on the far z plane
+    // (Note: OpenGL needs a little bias so that z is almost to the far z
+    // plane, but not quite)
+    gl_Position.z = gl_Position.w-0.00001;
 
-//! Interface for render engine subsystems
-//! @class Renderer
-//! @brief Renderer subsystem
-class Renderer : public virtual Object {
-public:
-    //! Creates a new shader with the given name
-    virtual Shader* shader(const std::string& name)=0;
-    
-    //! Creates a new font with the given name
-    virtual Font* font(const std::string& font)=0;
-    
-    //! Creates a new material with the given name
-    virtual Material* material(const std::string& material)=0;
-    
-    //! Creates a new texture with the given name
-    virtual Texture* texture(const std::string& texture)=0;
-    
-    //! Creates a new texture with the given name
-    virtual Cubemap* cubemap(const std::string& cubemap)=0;
-    
-    //! Creates a new mesh with the given name
-    virtual Mesh* mesh(const std::string& mesh)=0;
-    
-    //! Creates a new mesh with the given name and parent
-    virtual Mesh* mesh(const std::string& name, Mesh* parent)=0;
-};
-
+    // Use the skymesh vertex position, in local space,
+    // as an index into the cubemap
+    texcoord = gl_Vertex.xyz;
 }

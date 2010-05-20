@@ -110,11 +110,11 @@ void Sockets::NetworkSystem::do_host() {
         }
 		// Write information about the players to the clients
 		for (list<SocketPtr>::iterator j = socket_.begin(); j != socket_.end(); j++) {
-			for (set<Player>::iterator i = player_.begin(); i != player_.end(); i++) {
-				if (SocketWriterPtr writer = (*j)->writer()) {
-					writer->string(i->name);
-				}
-			}
+            for (set<Player>::iterator i = player_.begin(); i != player_.end(); i++) {
+                if (SocketWriterPtr writer = (*j)->writer()) {
+                    writer->string(i->name);
+                }
+            }
 		}
 
         accumulator_ = 0;

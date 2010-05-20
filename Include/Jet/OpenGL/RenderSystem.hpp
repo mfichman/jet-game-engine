@@ -28,6 +28,7 @@
 #include <Jet/OpenGL/Font.hpp>
 #include <Jet/OpenGL/Material.hpp>
 #include <Jet/OpenGL/Texture.hpp>
+#include <Jet/OpenGL/Cubemap.hpp>
 #include <Jet/OpenGL/Mesh.hpp>
 #include <Jet/Core/Engine.hpp>
 #include <Jet/Core/MeshObject.hpp>
@@ -67,6 +68,10 @@ private:
         return new OpenGL::Texture(engine_, name);
     }
     
+    inline Cubemap* cubemap(const std::string& name) {
+        return new OpenGL::Cubemap(engine_, name);
+    }
+    
     inline Mesh* mesh(const std::string& name) {
         return new OpenGL::Mesh(engine_, name);
     }
@@ -83,7 +88,7 @@ private:
     void init_default_states();
     void init_window();
     void init_extensions();
-    void init_shadow_target();
+    void init_shadow_target();                                                                         
     
     void generate_render_list(Core::Node* node);
     void generate_shadow_map(Core::Light* light);
@@ -94,6 +99,7 @@ private:
     void render_fullscreen_quad();
     void render_overlays();
     void render_overlay(Core::Overlay* overlay);
+    void render_skysphere();
     void check_video_mode();
     
     static bool compare_mesh_objects(MeshObjectPtr o1, MeshObjectPtr o2);

@@ -64,7 +64,7 @@ function SPGame:on_load()
         local pos = Vector(x, y, z)
         self.rocks[i].node.position = pos
         self.rocks[i].body.angular_velocity = pos.unit * 0.2
-        --self.rocks[i].body.linear_velocity = -pos.unit * 5;
+        self.rocks[i].body.linear_velocity = -pos.unit * 5;
     end
     
     self.menu.overlay.visible = false

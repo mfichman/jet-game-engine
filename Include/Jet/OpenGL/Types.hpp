@@ -33,6 +33,7 @@
 #include <GL/glu.h>
 
 namespace Jet { namespace OpenGL {
+    class Cubemap;
     class Font;
     class Material;
     class Mesh;
@@ -42,6 +43,7 @@ namespace Jet { namespace OpenGL {
     class Shader;
     class Texture;
     
+    typedef boost::intrusive_ptr<Cubemap> CubemapPtr;
     typedef boost::intrusive_ptr<Font> FontPtr;
     typedef boost::intrusive_ptr<Material> MaterialPtr;
     typedef boost::intrusive_ptr<Mesh> MeshPtr;

@@ -97,6 +97,9 @@ public:
     //! load the underlying resource if load is set to true.
     //! @param name the name of the texture
     virtual Texture* texture(const std::string& name="")=0;
+	
+	//! Returns the given cube texture descriptor.
+	virtual Cubemap* cubemap(const std::string& name="")=0;
     
     //! Returns the given shader descriptor.  This function will attempt to
     //! load the underlying resource if load is set to true.

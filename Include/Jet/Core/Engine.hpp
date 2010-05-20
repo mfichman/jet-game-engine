@@ -151,7 +151,12 @@ public:
     //! load the underlying resource if load is set to true.
     //! @param name the name of the texture
     Jet::Texture* texture(const std::string& name="");
-    
+	
+	//! Returns the given texture descriptor.  This function will attempt to
+    //! load the underlying resource if load is set to true.
+    //! @param name the name of the texture
+    Jet::Cubemap* cubemap(const std::string& name="");
+
     //! Returns the given shader descriptor.  This function will attempt to
     //! load the underlying resource if load is set to true.
     //! @param name the name of the texture
@@ -288,6 +293,11 @@ public:
 	}
 	
 	//! Returns an iterator to the meshes
+	inline Iterator<std::pair<const std::string, Jet::CubemapPtr> > cubemaps() {
+		return Iterator<std::pair<const std::string, Jet::CubemapPtr> >(cubemap_.begin(), cubemap_.end());
+	}
+	
+	//! Returns an iterator to the meshes
 	inline Iterator<std::pair<const std::string, Jet::ShaderPtr> > shaders() {
 		return Iterator<std::pair<const std::string, Jet::ShaderPtr> >(shader_.begin(), shader_.end());
 	}
@@ -339,6 +349,7 @@ private:
     std::map<std::string, Jet::MaterialPtr> material_;
     std::map<std::string, Jet::MeshPtr> mesh_;
     std::map<std::string, Jet::TexturePtr> texture_;
+	std::map<std::string, Jet::CubemapPtr> cubemap_;
 	std::map<std::string, Jet::ShaderPtr> shader_;
 	std::map<std::string, Jet::FontPtr> font_;
 	std::map<std::string, Jet::GeometryPtr> geometry_;

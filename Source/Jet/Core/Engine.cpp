@@ -120,6 +120,7 @@ Core::Engine::~Engine() {
 	module_.reset();
 	mesh_.clear();
 	texture_.clear();
+	cubemap_.clear();
 	shader_.clear();
 	material_.clear();
 	
@@ -207,6 +208,18 @@ Jet::Texture* Core::Engine::texture(const std::string& name) {
 		return i->second.get();
 	}
 }
+
+Jet::Cubemap* Core::Engine::cubemap(const std::string& name) {
+    map<string, Jet::CubemapPtr>::iterator i = cubemap_.find(name);
+    if (i == cubemap_.end()) {
+        Jet::CubemapPtr cubemap(renderer_->cubemap(name));
+        cubemap_.insert(make_pair(name, cubemap));
+        return cubemap.get();
+	} else {
+		return i->second.get();
+	}
+}
+
 
 Jet::Material* Core::Engine::material(const std::string& name) {
     map<string, Jet::MaterialPtr>::iterator i = material_.find(name);

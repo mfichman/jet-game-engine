@@ -18,39 +18,14 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- */  
-#pragma once
+ */
 
-#include <Jet/Types.hpp>
-#include <Jet/Object.hpp>
+uniform samplerCube cube_map;
+varying vec3 texcoord;
 
-namespace Jet {
+void main() {
 
-//! Interface for render engine subsystems
-//! @class Renderer
-//! @brief Renderer subsystem
-class Renderer : public virtual Object {
-public:
-    //! Creates a new shader with the given name
-    virtual Shader* shader(const std::string& name)=0;
-    
-    //! Creates a new font with the given name
-    virtual Font* font(const std::string& font)=0;
-    
-    //! Creates a new material with the given name
-    virtual Material* material(const std::string& material)=0;
-    
-    //! Creates a new texture with the given name
-    virtual Texture* texture(const std::string& texture)=0;
-    
-    //! Creates a new texture with the given name
-    virtual Cubemap* cubemap(const std::string& cubemap)=0;
-    
-    //! Creates a new mesh with the given name
-    virtual Mesh* mesh(const std::string& mesh)=0;
-    
-    //! Creates a new mesh with the given name and parent
-    virtual Mesh* mesh(const std::string& name, Mesh* parent)=0;
-};
-
+    // Simply sample from the cube texture
+    gl_FragColor = textureCube(cube_map, texcoord);
+   // gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 }

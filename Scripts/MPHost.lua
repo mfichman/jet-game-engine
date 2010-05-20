@@ -44,16 +44,16 @@ function MPHost:__init()
     self.list = List {
         parent = self.menu.overlay,
         name = "player_list",
-        font_size = 24,
+        font_size = 32,
         y = 240,
-        x = 28
+        x = 40
     }
     
     -- Numbers
     self.numbers = List {
         parent = self.menu.overlay,
         name = "number_list",
-        font_size = 24,
+        font_size = 32,
         font_face = "Impact.ttf",
         y = 240,
         x = 4

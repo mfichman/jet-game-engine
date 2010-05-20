@@ -26,31 +26,20 @@
 
 namespace Jet {
 
-//! Interface for render engine subsystems
-//! @class Renderer
-//! @brief Renderer subsystem
-class Renderer : public virtual Object {
+//! Class to hold a texture data for rendering.
+//! @class Cubemap
+//! @brief Class to hold texture data.
+class Cubemap : public Object {
 public:
-    //! Creates a new shader with the given name
-    virtual Shader* shader(const std::string& name)=0;
     
-    //! Creates a new font with the given name
-    virtual Font* font(const std::string& font)=0;
-    
-    //! Creates a new material with the given name
-    virtual Material* material(const std::string& material)=0;
-    
-    //! Creates a new texture with the given name
-    virtual Texture* texture(const std::string& texture)=0;
-    
-    //! Creates a new texture with the given name
-    virtual Cubemap* cubemap(const std::string& cubemap)=0;
-    
-    //! Creates a new mesh with the given name
-    virtual Mesh* mesh(const std::string& mesh)=0;
-    
-    //! Creates a new mesh with the given name and parent
-    virtual Mesh* mesh(const std::string& name, Mesh* parent)=0;
+	//! Sets the state of the shader
+	virtual ResourceState state() const=0;
+
+	//! Returns the name of the texture
+	virtual const std::string& name() const=0;
+
+	//! Returns the resource state of the shader
+	virtual void state(ResourceState state)=0;
 };
 
 }
