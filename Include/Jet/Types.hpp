@@ -85,7 +85,7 @@ namespace Jet {
     class QuadSet;
     class Quaternion;
     class Range;
-    class Renderer;
+    class Graphics;
     class RigidBody;
     class Script;
     class Signal;
@@ -123,7 +123,7 @@ namespace Jet {
     typedef boost::intrusive_ptr<Physics> PhysicsPtr;
     typedef boost::intrusive_ptr<QuadChain> QuadChainPtr;
     typedef boost::intrusive_ptr<RigidBody> RigidBodyPtr;
-    typedef boost::intrusive_ptr<Renderer> RendererPtr;
+    typedef boost::intrusive_ptr<Graphics> GraphicsPtr;
     typedef boost::intrusive_ptr<Script> ScriptPtr;
     typedef boost::intrusive_ptr<Shader> ShaderPtr;
     typedef boost::intrusive_ptr<Sound> SoundPtr;

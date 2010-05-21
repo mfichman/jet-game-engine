@@ -72,19 +72,19 @@
 					>
 				</File>
 				<File
-					RelativePath="..\Source\Jet\Sockets\ServerSocket.cpp"
+					RelativePath="..\Source\Jet\Sockets\BSockServerSocket.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\Source\Jet\Sockets\Socket.cpp"
+					RelativePath="..\Source\Jet\Sockets\BSockSocket.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\Source\Jet\Sockets\SocketReader.cpp"
+					RelativePath="..\Source\Jet\Sockets\BSockReader.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\Source\Jet\Sockets\SocketWriter.cpp"
+					RelativePath="..\Source\Jet\Sockets\BSockWriter.cpp"
 					>
 				</File>
 			</Filter>
@@ -95,22 +95,22 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<Filter
-				Name="Bullet"
+				Name="Physics"
 				>
 				<File
-					RelativePath="..\Include\Jet\Bullet\Geometry.hpp"
+					RelativePath="..\Include\Jet\Physics\Geometry.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\Include\Jet\Bullet\PhysicsSystem.hpp"
+					RelativePath="..\Include\Jet\Physics\Physics.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\Include\Jet\Bullet\RigidBody.hpp"
+					RelativePath="..\Include\Jet\Physics\RigidBody.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\Include\Jet\Bullet\Types.hpp"
+					RelativePath="..\Include\Jet\Physics\Types.hpp"
 					>
 				</File>
 			</Filter>
@@ -278,15 +278,15 @@
 					>
 				</File>
 				<File
-					RelativePath="..\Include\Jet\Sockets\Socket.hpp"
+					RelativePath="..\Include\Jet\Sockets\BSockSocket.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\Include\Jet\Sockets\SocketReader.hpp"
+					RelativePath="..\Include\Jet\Sockets\BSockReader.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\Include\Jet\Sockets\SocketWriter.hpp"
+					RelativePath="..\Include\Jet\Sockets\BSockWriter.hpp"
 					>
 				</File>
 				<File

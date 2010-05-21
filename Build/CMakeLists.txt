@@ -43,12 +43,13 @@ add_definitions(-DFREEGLUT_STATIC)
 
 file(GLOB files
     "../Source/Jet/*.cpp"
-    "../Source/Jet/Bullet/*.cpp"
-    "../Source/Jet/FMOD/*.cpp"
-    "../Source/Jet/Lua/*.cpp"
-    "../Source/Jet/OpenGL/*.cpp"
-    "../Source/Jet/SDL/*.cpp"
-    "../Source/Jet/Sockets/*.cpp"
+    "../Source/Jet/Types/*.cpp"
+    "../Source/Jet/Physics/*.cpp"
+    "../Source/Jet/Audio/*.cpp"
+    "../Source/Jet/Script/*.cpp"
+    "../Source/Jet/Graphics/*.cpp"
+    "../Source/Jet/Input/*.cpp"
+    "../Source/Jet/Network/*.cpp"
     "../Source/Jet/Core/*.cpp")
 add_library(Jet ${files})
 

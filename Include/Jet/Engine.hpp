@@ -58,7 +58,7 @@ public:
 	virtual Script* script() const=0;
 	
 	//! Returns the renderer interface
-	virtual Renderer* renderer() const=0;
+	virtual Graphics* graphics() const=0;
 	
 	//! Returns the input interface
 	virtual Input* input() const=0;
