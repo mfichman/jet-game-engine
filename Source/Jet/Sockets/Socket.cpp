@@ -259,13 +259,22 @@ void Sockets::Socket::poll_write() {
         connect();
     }
     
+    // Get the current queue length
+    size_t queue_length = out_.size();
+    
     // If the output buffer is not empty, then continue writing the packet
     // if writing is permissible.
-    if (!out_.empty()) {
+    while (!out_.empty()) {
         if (MULTICAST == type_ || DATAGRAM == type_) {
             write_datagram();
         } else if (STREAM == type_) {
             write_stream();
+        }
+        
+        // Failed to send a packet, so we will break and wait for the next
+        // poll to happen
+        if (out_.size() == queue_length) {
+            break;
         }
     } 
 }
@@ -308,14 +317,15 @@ void Sockets::Socket::connect() {
 
 void Sockets::Socket::write_datagram() {
     int socklen = sizeof(remote_);
+    vector<char>& out = out_.front();
     
     // Write the length of the packet into the header.  This includes the
     // length of the header itself.
-    *(size_t*)&out_[0] = htonl(out_.size());
+    *(size_t*)&out[0] = htonl(out.size());
     
     // Get the packet pointer and length
-    char* pkt = &out_[0];
-    size_t len = out_.size();
+    char* pkt = &out[0];
+    size_t len = out.size();
         
     // Write to the socket
     int rt = sendto(socket_, pkt, len, 0, (sockaddr*)&remote_, socklen);
@@ -330,11 +340,10 @@ void Sockets::Socket::write_datagram() {
 		}
     } else if (rt != (int)len) {
         throw runtime_error("Failed to send datagram");
-	} else {
-		write_bytes_ += rt;
 	}
 
-	out_.clear();
+    // Remove the packet we just sent from the queue
+    out_.pop();
 }
 
 void Sockets::Socket::read_datagram() {
@@ -370,16 +379,18 @@ void Sockets::Socket::read_datagram() {
     in_.resize(ntohl(*(size_t*)&in_[0]));
 }
 
-void Sockets::Socket::write_stream() {        
+void Sockets::Socket::write_stream() {
+    vector<char>& out = out_.front();
+        
     // Write the length of the packet into the header.  This includes the
     // length of the header itself.
     if (!write_bytes_) {
-        *(size_t*)&out_[0] = htonl(out_.size());
+        *(size_t*)&out[0] = htonl(out.size());
     }
     
     // Attempt to send any bytes remaining in the buffer.
-    char* pkt = &out_[write_bytes_];
-    size_t len = out_.size() - write_bytes_;
+    char* pkt = &out[write_bytes_];
+    size_t len = out.size() - write_bytes_;
     
     // Write to the socket
     int rt = send(socket_, pkt, len, 0);
@@ -398,8 +409,8 @@ void Sockets::Socket::write_stream() {
     
     //!If the number of sent bytes equals the buffer size, then the packet
     // is done sending.  Thus, we can reset the buffer.
-    if (write_bytes_ == out_.size()) {
-        out_.clear();
+    if (write_bytes_ == out.size()) {
+        out_.pop();
         write_bytes_ = 0;
     }
 }
@@ -442,7 +453,11 @@ Sockets::SocketWriter* Sockets::Socket::writer() {
     // Return a socket writer if the buffer is empty.
 	poll_write();
 
-    if (out_.empty()) {
+    // We can write to the socket if we're using a stream socket (reliable,
+    // so it always queues the messages) or if we're using a UDP socket
+    // (no queues to minimize latency, plus a UDP packet that doesn't get
+    // sent is no big deal...just drop it)
+    if (out_.empty() || STREAM == type_) {
         return new Sockets::SocketWriter(this);
     } else {
         return 0;

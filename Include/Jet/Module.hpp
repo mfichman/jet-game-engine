@@ -31,11 +31,8 @@ namespace Jet {
 class Module : public Object {
 public:
     
-        //! Called when a network game is found
-    virtual void on_player_join(const std::string& name)=0;
-    
-    //! Called when a game is lost.
-    virtual void on_player_quit(const std::string& name)=0;
+    //! Called when a network game is found
+    virtual void on_player_update(int number, const std::string& name)=0;
     
     //! Called when a network game is found
     virtual void on_game_found(const std::string& game)=0;

@@ -33,7 +33,7 @@ public:
     //! Creates a new game
     Game() :
         server_port(0),
-        last_time(0.0f) {
+        time(0.0f) {
     }
     
     bool operator==(const Game& other) const {
@@ -56,7 +56,7 @@ public:
     std::string name;
     uint16_t server_port;
     std::string server_address;
-    float last_time;
+    float time;
 };
 
 }}

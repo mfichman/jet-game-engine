@@ -48,18 +48,31 @@ private:
     void on_init();
     
     void update_state();
+    void read_rpcs(Socket* socket);
     
     void do_discover();
     void do_host();
     void do_join();
     
-    void do_read_player(Socket* socket);
+    void rpc_game_info(Socket* socket);
+    void rpc_game_destroy(Socket* socket);
+    void rpc_player_join(Socket* socket);
+    void rpc_player_leave(Socket* socket);
+    void rpc_player_list(Socket* socket);
+    void rpc_player_list_all();
+
+    void on_game_info(SocketReader* reader);
+    void on_game_destroy(SocketReader* reader);
+    void on_player_join(SocketReader* reader);
+    void on_player_leave(SocketReader* reader);
+    void on_player_list(SocketReader* reader);
     
     Core::Engine* engine_;
     NetworkState state_;
     std::set<Game> game_;
-    std::set<Player> player_;
-    std::list<SocketPtr> socket_;
+    std::map<SocketPtr, size_t> socket_;
+    std::vector<Player> player_;
+    size_t player_count_;
     
     SocketPtr multicast_;
     SocketPtr client_;

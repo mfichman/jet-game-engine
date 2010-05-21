@@ -85,66 +85,59 @@ void Sockets::NetworkSystem::on_update() {
 
 void Sockets::NetworkSystem::do_discover() {
     // Read in a game structure from the user
-    while (SocketReaderPtr reader = multicast_->reader()) {
-        Game game;
-        game.name = reader->string();
-        game.server_port = (uint16_t)reader->integer();
-        game.server_address = reader->string();
-        game.last_time = engine_->frame_time();
-        if (game_.insert(game).second && engine_->module()) {
-            engine_->module()->on_game_found(game.name);
-        }
-    }
+    read_rpcs(multicast_.get());
 }
 
 void Sockets::NetworkSystem::do_host() {
-
-    // Send the hello message
+    // Send the "hello" message on the multicast socket channel
     accumulator_ += engine_->frame_delta();
     if (accumulator_ > 1.0f/engine_->option<float>("broadcast_rate")) {
-        // Write a game data structure
-        if (SocketWriterPtr writer = multicast_->writer()) {
-            writer->string(engine_->option<string>("network_game"));
-            writer->integer(server_->port());
-            writer->string(server_->address());
+        rpc_game_info(multicast_.get());
+		accumulator_ = 0.0f;
+    }
+    
+    // Check for incoming connections
+    if (SocketPtr socket = server_->socket()) {
+        // If there is an open slot, then assign the
+        // newly accepted socket to it.  Otherwise,
+        // the socket will close.
+        for (size_t i = 1; i < player_.size(); i++) {
+            if (!player_[i].time) {
+                rpc_player_list(socket.get());
+                socket_.insert(make_pair(socket, i));
+                player_[i].time = engine_->frame_time();
+
+			} else {
+				cout << "Game is full" << endl;
+			}
         }
-		// Write information about the players to the clients
-		for (list<SocketPtr>::iterator j = socket_.begin(); j != socket_.end(); j++) {
-            for (set<Player>::iterator i = player_.begin(); i != player_.end(); i++) {
-                if (SocketWriterPtr writer = (*j)->writer()) {
-                    writer->string(i->name);
-                }
-            }
-		}
-
-        accumulator_ = 0;
     }
-
-    // Accept a new socket if the game is not full
-    while (SocketPtr socket = server_->socket()) {
-		if (socket_.size() < engine_->option<float>("max_players")) {
-			socket_.push_back(socket);
+    
+    // Update the sockets by reading for data
+    for (map<SocketPtr, size_t>::iterator i = socket_.begin(); i != socket_.end(); i++) {
+		try {
+			i->first->poll_write();
+			read_rpcs(i->first.get());
+		} catch (std::exception&) {
+			player_[i->second].time = 0.0f;
+			player_[i->second].name = "";
 		}
     }
-
-	// For each socket, read information about players
-	for (std::list<SocketPtr>::iterator i = socket_.begin(); i != socket_.end(); i++) {
-		do_read_player(i->get());
+    
+    // Check for timed-out players and dead sockets
+	for (map<SocketPtr, size_t>::iterator i = socket_.begin(); i != socket_.end();) {
+		if (!player_[i->second].time) {
+			i = socket_.erase(i);
+		} else {
+			i++;
+		}
 	}
 }
 
 void Sockets::NetworkSystem::do_join() {
-	// Send 
-	accumulator_ += engine_->frame_delta();
-	if (accumulator_ > 1.0f/engine_->option<float>("broadcast_rate")) {
-		if (SocketWriterPtr writer = client_->writer()) {
-			writer->string(engine_->option<string>("network_player"));
-		}
-        accumulator_ = 0;
-	}
-
-	// For each socket, read information about other players
-	do_read_player(client_.get());
+    // Check for incoming messages from the server
+    client_->poll_write();
+    read_rpcs(client_.get());
 }
 
 void Sockets::NetworkSystem::update_state() {
@@ -172,65 +165,178 @@ void Sockets::NetworkSystem::update_state() {
             if (i->name == engine_->option<string>("network_game")) {
                 cout << "Joining " << i->name << " " << i->server_address << ":" << i->server_port << endl;
                 client_.reset(Socket::client(i->server_address, i->server_port));
+                rpc_player_join(client_.get());
             }
         }
 	}
     
     // If leaving state, disable the socket
     if (JOIN == state_) {
+        rpc_player_leave(client_.get());
         client_.reset();
-    }
-    
-	// If in the discover or host state, make sure we have
-	// a socket open and connected to the shared multicast address
-	// for game discovery
-    if (DISCOVER == state || HOST == state && !multicast_) {
-        string ip = engine_->option<string>("discover_ip");
-        uint16_t port = (uint16_t)engine_->option<float>("discover_port");
-        multicast_.reset(Socket::multicast(ip, port));
     }
     
     // If in host mode, enable the server socket on a random port
     if (HOST == state) {
 		server_.reset(ServerSocket::server(0));
-        cout << "Listening on " << server_->address() << ":" << server_->port() << endl;
-    }
-    
-    // Add the player to the player list and reset it
-    if (HOST == state) {
-        Player player;
-		player.name = engine_->option<string>("network_player");
-        player.socket = 0;
-        player_.clear();
-		player_.insert(player);
+        string ip = engine_->option<string>("discover_ip");
+        uint16_t port = (uint16_t)engine_->option<float>("discover_port");
+        multicast_.reset(Socket::multicast(ip, port));
+		player_.clear();
+        player_.resize((size_t)engine_->option<float>("max_players"));
+        player_[0].name = engine_->option<string>("network_player");
         if (engine_->module()) {
-            engine_->module()->on_player_join(player.name);
+            engine_->module()->on_player_update(0, player_[0].name);
         }
+        accumulator_ = FLT_MAX;
+        cout << "Listening on " << server_->address() << ":" << server_->port() << endl;
     }
     
     // If not in host mode, shut down the server socket
     if (HOST == state_) {
+        // Notify all that the game is destroyed..?
+        rpc_game_destroy(multicast_.get());
+        multicast_.reset();
         server_.reset();
+    }
+    
+    // If in the discover or host state, make sure we have
+	// a socket open and connected to the shared multicast address
+	// for game discovery
+    if (DISCOVER == state || HOST == state && !multicast_) {
+		game_.clear();
+        string ip = engine_->option<string>("discover_ip");
+        uint16_t port = (uint16_t)engine_->option<float>("discover_port");
+        multicast_.reset(Socket::multicast(ip, port));
     }
 
 	// If not in the discover or host state, then close down the socket.
 	if (DISCOVER != state && HOST != state) {
 		multicast_.reset();
-		game_.clear();
 	}
 
 	state_ = state;
 }
 
-void Sockets::NetworkSystem::do_read_player(Socket* socket) {
-	// Read a player message and save it
-	while (SocketReaderPtr reader = socket->reader()) {
-		Player player;
-		player.name = reader->string();
-		player.socket = socket;
-		player.last_time = engine_->frame_time();
-		if (player_.insert(player).second && engine_->module()) {
-			engine_->module()->on_player_join(player.name);
-		}
-	}
+void Sockets::NetworkSystem::read_rpcs(Socket* socket) {
+    while (SocketReaderPtr reader = socket->reader()) {
+        string rpc = reader->string();
+        if ("game_info" == rpc) {
+            on_game_info(reader.get());
+        } else if ("game_destroy" == rpc) {
+            on_game_destroy(reader.get());
+        } else if ("player_join" == rpc) {
+            on_player_join(reader.get());
+        } else if ("player_leave" == rpc) {
+            on_player_leave(reader.get());
+        } else if ("player_list" == rpc) {
+            on_player_list(reader.get());
+        } else {
+            cout << "Unknown RPC: " << rpc << endl;
+        }
+    }
+}
+
+void Sockets::NetworkSystem::rpc_game_info(Socket* socket) {
+    if (SocketWriterPtr writer = socket->writer()) {
+        writer->string("game_info");
+        writer->string(engine_->option<string>("network_game"));
+        writer->string(server_->address());
+        writer->integer(server_->port());
+    }
+}
+
+void Sockets::NetworkSystem::rpc_game_destroy(Socket* socket) {
+    if (SocketWriterPtr writer = socket->writer()) {
+        writer->string("game_destroy");
+        writer->string(engine_->option<string>("network_game"));
+        writer->string(server_->address());
+        writer->integer(server_->port());
+    }
+}
+
+void Sockets::NetworkSystem::rpc_player_join(Socket* socket) {
+    if (SocketWriterPtr writer = socket->writer()) {
+        writer->string("player_join");
+        writer->string(engine_->option<string>("network_player"));
+    }
+}
+
+void Sockets::NetworkSystem::rpc_player_leave(Socket* socket) {
+    if (SocketWriterPtr writer = socket->writer()) {
+        writer->string("player_leave");
+    }
+}
+
+void Sockets::NetworkSystem::rpc_player_list(Socket* socket) {
+    if (SocketWriterPtr writer = socket->writer()) {
+        writer->string("player_list");
+        writer->integer(player_.size());
+        for (size_t i = 0; i < player_.size(); i++) {
+            writer->string(player_[i].name);
+        }
+    }
+}
+
+void Sockets::NetworkSystem::rpc_player_list_all() {      
+    // Update the player list for all the players
+    for (map<SocketPtr, size_t>::iterator i = socket_.begin(); i != socket_.end(); i++) {
+        rpc_player_list(i->first.get());
+    }
+}
+
+void Sockets::NetworkSystem::on_game_info(SocketReader* reader) {
+    Game game;
+    game.name = reader->string();
+    game.server_address = reader->string();
+    game.server_port = (uint16_t)reader->integer();
+    game.time = engine_->frame_time();
+    if (game_.insert(game).second && engine_->module()) {
+        engine_->module()->on_game_found(game.name);
+    }
+}
+
+void Sockets::NetworkSystem::on_game_destroy(SocketReader* reader) {
+    Game game;
+    game.name = reader->string();
+    game.server_address = reader->string();
+    game.server_port = (uint16_t)reader->integer();
+    game_.erase(game);
+    if (engine_->module()) {
+        engine_->module()->on_game_lost(game.name);
+    }
+}
+
+void Sockets::NetworkSystem::on_player_join(SocketReader* reader) {
+    map<SocketPtr, size_t>::iterator j = socket_.find(reader->socket());
+    size_t i = j->second;
+    player_[i].name = reader->string();
+    player_[i].time = engine_->frame_time();
+    if (engine_->module()) {
+        engine_->module()->on_player_update(i, player_[i].name);
+    }
+    rpc_player_list_all();
+}
+
+void Sockets::NetworkSystem::on_player_leave(SocketReader* reader) {
+    // Read which player quic, and notify the GUI
+    map<SocketPtr, size_t>::iterator j = socket_.find(reader->socket());
+    size_t i = j->second;
+    player_[i].name = "";
+    player_[i].time = 0.0f;
+    if (engine_->module()) {
+        engine_->module()->on_player_update(i, player_[i].name);
+    }
+    rpc_player_list_all();
+}
+
+void Sockets::NetworkSystem::on_player_list(SocketReader* reader) {
+    player_.resize(reader->integer());
+    for (size_t i = 0; i < player_.size(); i++) {
+        player_[i].name = reader->string();
+        player_[i].time = engine_->frame_time();
+        if (engine_->module()) {
+            engine_->module()->on_player_update(i, player_[i].name);
+        }
+    }
 }

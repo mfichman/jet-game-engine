@@ -48,13 +48,8 @@ public:
 private:
        
     //! Called when a game is found.
-    inline void on_player_join(const std::string& name) {
-        self_["on_player_join"](self_, name);
-    }
-    
-    //! Called when a game is lost.
-    inline void on_player_quit(const std::string& name) {
-        self_["on_player_quit"](self_, name);
+    inline void on_player_update(int number, const std::string& name) {
+        self_["on_player_update"](self_, number, name);
     }
     
     //! Called when a game is found.

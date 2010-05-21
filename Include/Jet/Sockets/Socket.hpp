@@ -24,6 +24,7 @@
 #include <Jet/Sockets/Types.hpp>
 #include <Jet/Object.hpp>
 #include <vector>
+#include <queue>
 
 namespace Jet { namespace Sockets {
 
@@ -71,6 +72,12 @@ public:
     //! available.
     SocketReader* reader();
     
+    //! Receives data if possible
+    void poll_read();
+    
+    //! Send data if possible
+    void poll_write();
+    
     //! Returns the port
     inline uint16_t port() const {
         return port_;
@@ -91,8 +98,6 @@ private:
     
     void accept();
     void connect();
-    void poll_read();
-    void poll_write();
     void read_stream();
     void read_datagram();
     void write_stream();
@@ -102,7 +107,7 @@ private:
     sockaddr_in local_;
     sockaddr_in remote_;
     std::vector<char> in_;
-    std::vector<char> out_;
+    std::queue<std::vector<char> > out_;
     SocketType type_;
     size_t write_bytes_;
     size_t read_bytes_;

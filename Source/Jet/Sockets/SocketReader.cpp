@@ -67,3 +67,11 @@ std::string Sockets::SocketReader::string() {
     bytes_read_ += string.length() + 1;
     return string; 
 }
+    
+    
+    
+    
+    
+    
+    
+    

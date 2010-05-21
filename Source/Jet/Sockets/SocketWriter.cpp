@@ -29,7 +29,8 @@ Sockets::SocketWriter::SocketWriter(Socket* socket) :
     socket_(socket),
     bytes_written_(sizeof(size_t)) {
 
-    socket_->out_.resize(sizeof(size_t));
+    socket_->out_.push(vector<char>());
+    socket_->out_.back().resize(sizeof(size_t));
 }
 
 Sockets::SocketWriter::~SocketWriter() {
@@ -38,23 +39,27 @@ Sockets::SocketWriter::~SocketWriter() {
 }
 
 void Sockets::SocketWriter::real(float real) {
-    socket_->out_.resize(socket_->out_.size() + sizeof(real));
+    vector<char>& out = socket_->out_.back();
     
-    *(float*)&socket_->out_[bytes_written_] = real;
+    out.resize(out.size() + sizeof(real));
+    *(float*)&out[bytes_written_] = real;
     bytes_written_ += sizeof(real);
 }
 
 void Sockets::SocketWriter::integer(int integer) {
-    socket_->out_.resize(socket_->out_.size() + sizeof(integer));
-    
-    *(int*)&socket_->out_[bytes_written_] = htonl(integer);
+    vector<char>& out = socket_->out_.back();
+        
+    out.resize(out.size() + sizeof(integer));
+    *(int*)&out[bytes_written_] = htonl(integer);
     bytes_written_ += sizeof(integer);
 }
 
 void Sockets::SocketWriter::string(const std::string& string) {
-    size_t length = string.length() + 1;
-    socket_->out_.resize(socket_->out_.size() + length);
+    vector<char>& out = socket_->out_.back();
     
-    memcpy(&socket_->out_[bytes_written_], string.c_str(), length);
+    size_t length = string.length() + 1;
+    out.resize(out.size() + length);
+    
+    memcpy(&out[bytes_written_], string.c_str(), length);
     bytes_written_ += length;
 }

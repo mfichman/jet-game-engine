@@ -48,6 +48,8 @@ function StartScreen:__init()
     self.box_body = self.box_node:rigid_body()
     self.box_body.mass = 1000.0
     self.box_body.angular_velocity = Vector(.05, .2, 0)
+    
+    engine:option("network_mode", "disabled")
 end
 
 function StartScreen:on_key_pressed(key)

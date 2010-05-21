@@ -59,10 +59,8 @@ function MPHost:__init()
         x = 4
     }
     
-    self.labels = {}
-    self.free = { 2, 1 }
     for i=1,2 do
-        self.labels[i] = self.list:label("")
+        self.list:label("")
         self.numbers:label(tostring(i))
     end
     
@@ -71,12 +69,8 @@ function MPHost:__init()
     engine:option("network_mode", "host")
 end
 
-function MPHost:on_player_join(name)
-    local n = table.getn(self.free)
-    local i = self.free[n]
-    local l = self.labels[i]
-    self.free[n] = nil
-    l.overlay.text = name
+function MPHost:on_player_update(number, name)
+    self.list.buttons_list[number+1].overlay.text = name
 end
 
 function MPHost:on_ok_click(widget, button)

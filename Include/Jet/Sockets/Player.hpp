@@ -32,26 +32,11 @@ class Player {
 public:
     //! Creates a new player
     Player() :
-        last_time(0.0f) {
+        time(0.0f) {
     }
     
-    bool operator==(const Player& other) const {
-        return name == other.name && socket == other.socket;
-    }
-    
-    bool operator<(const Player& other) const {
-        if (name != other.name) {
-            return name < other.name;
-        }
-        if (socket != other.socket) {
-            return socket < other.socket;
-        }
-        return false;
-    }
-    
-    SocketPtr socket;
     std::string name;
-    float last_time;
+    float time;
 };
 
 }}

@@ -73,6 +73,11 @@ function MPScreen:on_game_found(game)
     self.list:button(game, bind("on_game_click", self))
 end
 
+function MPScreen:on_game_lost(game)
+print("lost")
+    self.list:remove(game)
+end
+
 function MPScreen:on_text_enter(widget, button)
 end
 

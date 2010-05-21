@@ -51,9 +51,15 @@ public:
     //! available.  Does not block.
     std::string string();
     
+    //! Returns the socket
+    inline Socket* socket() const {
+        return socket_.get();
+    }
+    
 private:
     SocketPtr socket_;
     size_t bytes_read_;
+    std::vector<char>* in_;
 };
 
 }}

@@ -24,8 +24,7 @@ function Module:__init()
     __adopt_module(self)
 end
 
-function Module:on_player_join(player) end
-function Module:on_player_quit(player) end
+function Module:on_player_update(number, name) end
 function Module:on_game_lost(game) end
 function Module:on_game_found(game) end
 function Module:on_key_pressed(key, point) end

@@ -672,6 +672,8 @@ void OpenGL::RenderSystem::generate_render_list(Core::Node* node) {
 }
 
 void OpenGL::RenderSystem::render_skysphere() {
+    return;
+    
     Core::CameraPtr camera = static_cast<Core::Camera*>(engine_->camera());
     string texture = engine_->option<string>("skysphere_texture");
     OpenGL::Cubemap* cubemap = static_cast<OpenGL::Cubemap*>(engine_->cubemap(texture));

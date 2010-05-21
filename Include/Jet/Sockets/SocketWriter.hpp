@@ -48,6 +48,11 @@ public:
     //! Writes a string to the socket
     void string(const std::string& string);
     
+    //! Returns the socket
+    inline Socket* socket() const {
+        return socket_.get();
+    }
+    
 private:
     SocketPtr socket_;
     size_t bytes_written_;

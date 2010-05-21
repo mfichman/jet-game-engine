@@ -178,5 +178,4 @@ public:
 	virtual void on_signal(const Signal& signal)=0;
 };
 
-
 }
