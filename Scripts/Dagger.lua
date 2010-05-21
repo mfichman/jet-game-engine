@@ -36,7 +36,7 @@ function Dagger:__init(node, name)
     }
     
     --[[self.exhaust = self.engine_node:particle_system() {
-        type = ParticleSystem.POINT_EMITTER,
+        type = ParticleSystem.ET_POINT,
         quota = 30,
         texture = "FireBlue.png",
         particle_life = Range(.40, .40),
@@ -53,7 +53,7 @@ function Dagger:__init(node, name)
     }]]
     
     self.flame = self.engine_node:particle_system() {
-        type = ParticleSystem.POINT_EMITTER,
+        type = ParticleSystem.ET_POINT,
         quota = 30,
         texture = "IncandescentBlue.png",
         particle_life = Range(.35, .35),
@@ -71,7 +71,7 @@ function Dagger:__init(node, name)
     }
     
     self.spark_template = {
-        type = ParticleSystem.BOX_EMITTER,
+        type = ParticleSystem.ET_BOX,
         quota = 100,
         texture = "Electricity.png",
         particle_life = Range(.1, .1),

@@ -28,7 +28,7 @@ function Build:__init(node, name)
     self.overlay.font = "Russel.ttf#14"
     self.overlay.text = engine:option("engine_build")
     self.overlay.text_color = Color(1, 1, 1, 0.7)
-    self.overlay.vertical_alignment = Overlay.TOP
+    self.overlay.vertical_alignment = Overlay.AL_TOP
     self.overlay.x = 4
     self.overlay.y = 4
     self.overlay.width = 800

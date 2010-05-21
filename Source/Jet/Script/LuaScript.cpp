@@ -490,7 +490,7 @@ void LuaScript::init_entity_type_bindings() {
             .property("emission_angle", (const Range& (ParticleSystem::*)() const)&ParticleSystem::emission_angle, (void (ParticleSystem::*)(const Range&))&ParticleSystem::emission_angle)
             .property("particle_growth_rate", (const Range& (ParticleSystem::*)() const)&ParticleSystem::particle_growth_rate, (void (ParticleSystem::*)(const Range&))&ParticleSystem::particle_growth_rate)
 			.property("texture", (Texture* (ParticleSystem::*)() const)&ParticleSystem::texture, (void (ParticleSystem::*)(const std::string&))&ParticleSystem::texture)
-            .enum_("EmitterType") [ value("BOX_EMITTER", BOX_EMITTER), value("POINT_EMITTER", POINT_EMITTER), value("ELLIPSOID_EMITTER", ELLIPSOID_EMITTER) ],
+            .enum_("EmitterType") [ value("ET_BOX", ET_BOX), value("ET_POINT", ET_POINT), value("ET_ELLIPSOID", ET_ELLIPSOID) ],
             
         luabind::class_<RigidBody, RigidBodyPtr>("RigidBody")
             .property("parent", &RigidBody::parent)
@@ -533,8 +533,8 @@ void LuaScript::init_entity_type_bindings() {
             .property("text_color", (const Color& (Overlay::*)() const)&Overlay::text_color, (void (Overlay::*)(const Color&))&Overlay::text_color)
             .property("font", (Font* (Overlay::*)() const)&Overlay::font, (void (Overlay::*)(const std::string&))&Overlay::font)
             .property("background", (Texture* (Overlay::*)() const)&Overlay::background, (void (Overlay::*)(const std::string&))&Overlay::background)
-            .enum_("Alignment") [ value("LEFT", LEFT), value("RIGHT", RIGHT), value("CENTER", CENTER), value("TOP", TOP), value("BOTTOM", BOTTOM) ]
-            .enum_("LayoutMode") [ value("RELATIVE_LAYOUT", RELATIVE_LAYOUT), value("ABSOLUTE_LAYOUT", ABSOLUTE_LAYOUT) ]
+            .enum_("Alignment") [ value("AL_LEFT", AL_LEFT), value("AL_RIGHT", AL_RIGHT), value("AL_CENTER", AL_CENTER), value("AL_TOP", AL_TOP), value("AL_BOTTOM", AL_BOTTOM) ]
+            .enum_("LayoutMode") [ value("LM_RELATIVE", LM_RELATIVE), value("LM_ABSOLUTE", LM_ABSOLUTE) ]
             
     ];
 }

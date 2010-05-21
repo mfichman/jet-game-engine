@@ -37,7 +37,7 @@ public:
     inline OpenGLShader(CoreEngine* engine, const std::string& name) :
 		engine_(engine),
 		name_(name),
-		state_(UNLOADED),
+		state_(RS_UNLOADED),
 		vshader_(0),
 		fshader_(0),
 		program_(0),

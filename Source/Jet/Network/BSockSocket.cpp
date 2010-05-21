@@ -41,7 +41,7 @@ BSockSocket* BSockSocket::server(uint16_t port) {
     remote.sin_addr.s_addr = htonl(INADDR_ANY);
     remote.sin_port = 0;
     
-    return new BSockSocket(local, remote, SERVER);
+    return new BSockSocket(local, remote, ST_SERVER);
 }
 
 BSockSocket* BSockSocket::client(const std::string& ip, uint16_t port) {
@@ -55,7 +55,7 @@ BSockSocket* BSockSocket::client(const std::string& ip, uint16_t port) {
     remote.sin_addr.s_addr = inet_addr(ip.c_str());
     remote.sin_port = htons(port);
     
-    return new BSockSocket(local, remote, CLIENT);
+    return new BSockSocket(local, remote, ST_CLIENT);
 }
 
 BSockSocket* BSockSocket::multicast(const std::string& ip, uint16_t port) {
@@ -69,7 +69,7 @@ BSockSocket* BSockSocket::multicast(const std::string& ip, uint16_t port) {
     remote.sin_addr.s_addr = inet_addr(ip.c_str());
     remote.sin_port = htons(port);
     
-    return new BSockSocket(local, remote, MULTICAST);
+    return new BSockSocket(local, remote, ST_MULTICAST);
 
 }
 
@@ -84,7 +84,7 @@ BSockSocket* BSockSocket::datagram(const std::string& ip, uint16_t port) {
     remote.sin_addr.s_addr = inet_addr(ip.c_str());
     remote.sin_port = htons(port);
     
-    return new BSockSocket(local, remote, DATAGRAM);
+    return new BSockSocket(local, remote, ST_DATAGRAM);
 }
 
 BSockSocket::BSockSocket(const sockaddr_in& local, const sockaddr_in& remote, SocketType type, int socket) :
@@ -97,10 +97,10 @@ BSockSocket::BSockSocket(const sockaddr_in& local, const sockaddr_in& remote, So
     port_(0) {
         
     switch (type_) {
-        case DATAGRAM: init_datagram(); break;
-        case MULTICAST: init_multicast(); break;
-        case SERVER: init_server(); break;
-        case CLIENT: init_client(); break;
+        case ST_DATAGRAM: init_datagram(); break;
+        case ST_MULTICAST: init_multicast(); break;
+        case ST_SERVER: init_server(); break;
+        case ST_CLIENT: init_client(); break;
         default: return;
     }
     
@@ -234,18 +234,18 @@ void BSockSocket::init_datagram() {
 void BSockSocket::poll_read() {
     
     // Attempt to accept the incoming connection
-    if (SERVER == type_) {
+    if (ST_SERVER == type_) {
         accept();
-    } else if (CLIENT == type_) {
+    } else if (ST_CLIENT == type_) {
         connect();
     }
     
     // If the input buffer is empty or a read is in progress, then continue
     // reading the packet if data is available.
     if (in_.empty() || in_.size() != read_bytes_) {
-        if (MULTICAST == type_ || DATAGRAM == type_) {
+        if (ST_MULTICAST == type_ || ST_DATAGRAM == type_) {
             read_datagram();
-        } else if (STREAM == type_) {
+        } else if (ST_STREAM == type_) {
             read_stream();
         }
     }
@@ -253,9 +253,9 @@ void BSockSocket::poll_read() {
 
 void BSockSocket::poll_write() {
     // Attempt to accept the incoming connection
-    if (SERVER == type_) {
+    if (ST_SERVER == type_) {
         accept();
-    } else if (CLIENT == type_) {
+    } else if (ST_CLIENT == type_) {
         connect();
     }
     
@@ -265,9 +265,9 @@ void BSockSocket::poll_write() {
     // If the output buffer is not empty, then continue writing the packet
     // if writing is permissible.
     while (!out_.empty()) {
-        if (MULTICAST == type_ || DATAGRAM == type_) {
+        if (ST_MULTICAST == type_ || ST_DATAGRAM == type_) {
             write_datagram();
-        } else if (STREAM == type_) {
+        } else if (ST_STREAM == type_) {
             write_stream();
         }
         
@@ -296,7 +296,7 @@ void BSockSocket::accept() {
     shutdown(socket_, SD_BOTH);
     closesocket(socket_);
     socket_ = sd;
-    type_ = STREAM;
+    type_ = ST_STREAM;
 }
 
 void BSockSocket::connect() {
@@ -310,7 +310,7 @@ void BSockSocket::connect() {
 
 	if (select(socket_ + 1, 0, &write, 0, &tv)) {
 		if (FD_ISSET(socket_, &write)) {
-			type_ = STREAM;
+			type_ = ST_STREAM;
 		}
 	}
 }
@@ -457,7 +457,7 @@ BSockWriter* BSockSocket::writer() {
     // so it always queues the messages) or if we're using a UDP socket
     // (no queues to minimize latency, plus a UDP packet that doesn't get
     // sent is no big deal...just drop it)
-    if (out_.empty() || STREAM == type_) {
+    if (out_.empty() || ST_STREAM == type_) {
         return new BSockWriter(this);
     } else {
         return 0;

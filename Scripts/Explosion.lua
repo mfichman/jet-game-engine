@@ -26,7 +26,7 @@ function Explosion:__init(node, name)
     Actor.__init(self, node, name)
     
     self.explosion = self.node:particle_system() {
-        type = ParticleSystem.ELLIPSOID_EMITTER,
+        type = ParticleSystem.ET_ELLIPSOID,
         quota = 800,
         texture = "BurstGold.png",
         particle_life = Range(.7, .7),
@@ -40,7 +40,7 @@ function Explosion:__init(node, name)
     }
     
     self.sparks = self.node:particle_system() {
-        type = ParticleSystem.ELLIPSOID_EMITTER,
+        type = ParticleSystem.ET_ELLIPSOID,
         quota = 9,
         texture = "IncandescentGold.png",
         particle_life = Range(.6, .6),
@@ -54,7 +54,7 @@ function Explosion:__init(node, name)
     }
     
     self.smoke = self.node:particle_system() {
-        type = ParticleSystem.ELLIPSOID_EMITTER,
+        type = ParticleSystem.ET_ELLIPSOID,
         quota = 2,
         texture = "SmokeWhite.png",
         particle_life = Range(1, 1),

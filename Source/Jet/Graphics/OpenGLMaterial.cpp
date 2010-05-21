@@ -32,8 +32,8 @@ using namespace std;
 
 void OpenGLMaterial::state(ResourceState state) {
 
-	// Leaving the UNLOADED state
-	if (UNLOADED == state_) {
+	// Leaving the RS_UNLOADED state
+	if (RS_UNLOADED == state_) {
 		read_material_data();
 	}
 
@@ -58,7 +58,7 @@ void OpenGLMaterial::shader(Shader* shader) {
 		// If the shader was set to null, turn on the default shader
 		OpenGLMaterial::shader("Default");
 	} else if (engine_->option<bool>("shaders_enabled")) {
-		shader_->state(LOADED);
+		shader_->state(RS_LOADED);
 		cascade_count_loc_ = shader_->uniform_location("cascade_count");
 		diffuse_map_loc_ = shader_->uniform_location("diffuse_map");
 		specular_map_loc_ = shader_->uniform_location("specular_map");
@@ -80,7 +80,7 @@ void OpenGLMaterial::enabled(bool enabled) {
 	
 	if (enabled) {
 		// Make sure the material is properly loaded into memory
-		state(LOADED);
+		state(RS_LOADED);
 		
 		if (engine_->option<bool>("shaders_enabled")) {
 			// Enable the material using the shader.
@@ -129,8 +129,8 @@ void OpenGLMaterial::begin_shader() {
 	// Set up texture samplers.  Samplers are enabled if the corresponding
 	// texture in the material is non-null.
 	if (diffuse_map_) {
-		diffuse_map_->sampler(DIFFUSE_MAP_SAMPLER);
-		glUniform1i(diffuse_map_loc_, DIFFUSE_MAP_SAMPLER);
+		diffuse_map_->sampler(TS_DIFFUSE);
+		glUniform1i(diffuse_map_loc_, TS_DIFFUSE);
 		glUniform1i(diffuse_map_enabled_, true);
 	} else {
 		glUniform1i(diffuse_map_enabled_, false);
@@ -138,8 +138,8 @@ void OpenGLMaterial::begin_shader() {
 
 	// Specular mapping must be enabled to use a specular map in the shader
 	if (specular_map_ && engine_->option<bool>("specular_mapping_enabled")) {
-		specular_map_->sampler(SPECULAR_MAP_SAMPLER);
-		glUniform1i(specular_map_loc_, SPECULAR_MAP_SAMPLER);
+		specular_map_->sampler(TS_SPECULAR);
+		glUniform1i(specular_map_loc_, TS_SPECULAR);
 		glUniform1i(specular_map_enabled_, true);
 	} else {
 		glUniform1i(specular_map_enabled_, false);
@@ -147,8 +147,8 @@ void OpenGLMaterial::begin_shader() {
 	
 	// Normal mapping must be enabled to use a normal map in the shader
 	if (normal_map_ && engine_->option<bool>("normal_mapping_enabled")) {
-		normal_map_->sampler(NORMAL_MAP_SAMPLER);
-		glUniform1i(normal_map_loc_, NORMAL_MAP_SAMPLER);
+		normal_map_->sampler(TS_NORMAL);
+		glUniform1i(normal_map_loc_, TS_NORMAL);
 		glUniform1i(normal_map_enabled_, true);
 	} else {
 		glUniform1i(normal_map_enabled_, false);
@@ -168,7 +168,7 @@ void OpenGLMaterial::begin_shader() {
 		for (size_t i = 0; i < cascades; i++) {
 			float r = (float)(i+1)/(float)cascades;
 			shadow_z[i] = alpha*n*pow(f/n, r) + (1-alpha)*(n+r*(f-n));
-			shadow_sampler[i] = SHADOW_MAP_SAMPLER+i;
+			shadow_sampler[i] = TS_SHADOW+i;
 		}
 		
 		// Enable the shadow map sampler only if this object should receive

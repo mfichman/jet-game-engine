@@ -37,7 +37,7 @@ public:
 	inline OpenGLCubemap(CoreEngine* engine, const std::string& name) :
 		engine_(engine),
 		name_(name),
-		state_(UNLOADED),
+		state_(RS_UNLOADED),
 		width_(0),
 		height_(0),
 		texture_(0),

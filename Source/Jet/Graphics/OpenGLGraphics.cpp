@@ -214,23 +214,23 @@ void OpenGLGraphics::check_video_mode() {
 		glClear(GL_COLOR_BUFFER_BIT);
 		SDL_GL_SwapBuffers();
 		
-		// Demote all resources to the CACHED state, because the OpenGL context
-		// is about to be destroyed.  They will return to the LOADED state
+		// Demote all resources to the RS_CACHED state, because the OpenGL context
+		// is about to be destroyed.  They will return to the RS_LOADED state
 		// when needed
 		for (Iterator<pair<const string, MeshPtr> > i = engine_->meshes(); i; i++) {
-			i->second->state(CACHED);
+			i->second->state(RS_CACHED);
 		}
 		for (Iterator<pair<const string, TexturePtr> > i = engine_->textures(); i; i++) {
-			i->second->state(CACHED);
+			i->second->state(RS_CACHED);
 		}
         for (Iterator<pair<const string, CubemapPtr> > i = engine_->cubemaps(); i; i++) {
-			i->second->state(CACHED);
+			i->second->state(RS_CACHED);
 		}
 		for (Iterator<pair<const string, ShaderPtr> > i = engine_->shaders(); i; i++) {
-			i->second->state(CACHED);
+			i->second->state(RS_CACHED);
 		}
 		for (Iterator<pair<const string, FontPtr> > i = engine_->fonts(); i; i++) {
-			i->second->state(CACHED);
+			i->second->state(RS_CACHED);
 		}
 		shadow_target_.clear();
 		particle_buffer_.reset();
@@ -363,7 +363,7 @@ void OpenGLGraphics::generate_shadow_map(CoreLight* light) {
 		Matrix light_modelview;
 		glGetFloatv(GL_PROJECTION_MATRIX, light_projection);
 		glGetFloatv(GL_MODELVIEW_MATRIX, light_modelview);
-		glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_SAMPLER + i);
+		glActiveTexture(GL_TEXTURE0 + TS_SHADOW + i);
 		glMatrixMode(GL_TEXTURE);
 		glLoadMatrixf(light_bias);
 		glMultMatrixf(light_projection);
@@ -400,7 +400,7 @@ void OpenGLGraphics::render_final(CoreLight* light) {
     glLightfv(GL_LIGHT0, GL_AMBIENT, light->ambient_color());
     
     // Set light location/direction.
-	if (light->type() == POINT_LIGHT) {
+	if (light->type() == LT_POINT) {
         const Vector& position = light->parent()->position();
         GLfloat lposition[4] = { position.x, position.y, position.z, 1.0f };
         glLightfv(GL_LIGHT0, GL_POSITION, lposition);
@@ -413,7 +413,7 @@ void OpenGLGraphics::render_final(CoreLight* light) {
 		
 	// Bind the shadow sampler to the shadow texture
 	for (size_t i = 0; i < shadow_target_.size(); i++) {
-		shadow_target_[i]->sampler(SHADOW_MAP_SAMPLER + i);
+		shadow_target_[i]->sampler(TS_SHADOW + i);
 	}
     
     // Render to the back buffer.

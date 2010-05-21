@@ -113,8 +113,8 @@ void BulletRigidBody::attach_mesh_object(const btTransform& transform, CoreMeshO
     // transform.  
     Mesh* mesh = mesh_object->mesh();
     if (mesh) {
-        if (UNLOADED == mesh->state()) {
-            mesh->state(LOADED);
+        if (RS_UNLOADED == mesh->state()) {
+            mesh->state(RS_LOADED);
         }
         // This is for triangle mesh shapes
         BulletGeometry* geometry = static_cast<BulletGeometry*>(mesh->geometry());

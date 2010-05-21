@@ -28,7 +28,7 @@ using namespace Jet;
 using namespace std;
 
 FMODSound::~FMODSound() {
-    state(UNLOADED);
+    state(RS_UNLOADED);
 }
 
 void FMODSound::state(ResourceState state) {
@@ -36,7 +36,7 @@ void FMODSound::state(ResourceState state) {
         return;
     }
     
-    if (UNLOADED == state_) {
+    if (RS_UNLOADED == state_) {
         string file = engine_->resource_path(name_);
         
         // Load the sound
@@ -46,7 +46,7 @@ void FMODSound::state(ResourceState state) {
         fmod_check(FMOD_Sound_Set3DMinMaxDistance(sound_, 2.0f, 1000.0f));
     }
     
-    if (UNLOADED == state) {
+    if (RS_UNLOADED == state) {
         fmod_check(FMOD_Sound_Release(sound_));
     }
     

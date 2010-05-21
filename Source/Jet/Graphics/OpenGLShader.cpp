@@ -30,7 +30,7 @@ using namespace std;
 
 
 OpenGLShader::~OpenGLShader() {
-	state(UNLOADED);
+	state(RS_UNLOADED);
 }
 
 void OpenGLShader::state(ResourceState state) {
@@ -38,8 +38,8 @@ void OpenGLShader::state(ResourceState state) {
 		return;
 	}
 	
-	// Leaving the UNLOADED state
-	if (UNLOADED == state_) {
+	// Leaving the RS_UNLOADED state
+	if (RS_UNLOADED == state_) {
 		// Load source files
 		string frag_path = engine_->resource_path(name() + ".frag.glsl");
 		string vert_path = engine_->resource_path(name() + ".vert.glsl");
@@ -48,13 +48,13 @@ void OpenGLShader::state(ResourceState state) {
 		read_source(vert_path, vsource_);
 	}
 	
-	// Entering the LOADED state
-	if (LOADED == state) {
+	// Entering the RS_LOADED state
+	if (RS_LOADED == state) {
 		init_program();
 	}
 	
-	// Leaving the LOADED state
-	if (LOADED == state_) {
+	// Leaving the RS_LOADED state
+	if (RS_LOADED == state_) {
 		assert(program_ && vshader_ && fshader_);
 		glUseProgram(0);
 		glDeleteShader(vshader_);
@@ -65,8 +65,8 @@ void OpenGLShader::state(ResourceState state) {
 		fshader_ = 0;
 	}
 	
-	// Entering the UNLOADED state
-	if (UNLOADED == state) {
+	// Entering the RS_UNLOADED state
+	if (RS_UNLOADED == state) {
 		fsource_.clear();
 		vsource_.clear();
 	}
@@ -141,7 +141,7 @@ void OpenGLShader::enabled(bool enabled) {
 	}
 	
 	if (enabled) {
-		state(LOADED);
+		state(RS_LOADED);
 		glUseProgram(program_);
 	} else {
 		glUseProgram(0);

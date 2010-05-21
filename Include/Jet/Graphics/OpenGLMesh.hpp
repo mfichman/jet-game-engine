@@ -41,11 +41,11 @@ public:
 		engine_(engine),
 		geometry_(engine->geometry(name)),
         name_(name),
-		state_(UNLOADED),
+		state_(RS_UNLOADED),
 		vbuffer_(0),
 		ibuffer_(0),
 		nindices_(0),
-		sync_mode_(STATIC_SYNC) {
+		sync_mode_(SM_STATIC) {
 	}
 	
 	//! Creates a new mesh.
@@ -54,11 +54,11 @@ public:
 		geometry_(engine->geometry(name)),
 		parent_(parent),
 		name_(name),
-		state_(UNLOADED),
+		state_(RS_UNLOADED),
 		vbuffer_(0),
 		ibuffer_(0),
 		nindices_(0),
-		sync_mode_(STATIC_SYNC) {
+		sync_mode_(SM_STATIC) {
 	}
 
 	//! Destructor.

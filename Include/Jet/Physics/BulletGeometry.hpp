@@ -37,7 +37,7 @@ public:
     inline BulletGeometry(CoreEngine* engine, const std::string& name) :
         engine_(engine),
         name_(name),
-        state_(UNLOADED) {        
+        state_(RS_UNLOADED) {        
     }
     
     //! Destructor

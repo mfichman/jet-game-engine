@@ -34,7 +34,7 @@ using namespace boost;
 OpenGLMesh::~OpenGLMesh() {
 	
 	// Free the buffer from memory
-	state(UNLOADED);
+	state(RS_UNLOADED);
 }
 
 void OpenGLMesh::state(ResourceState state) {
@@ -42,25 +42,25 @@ void OpenGLMesh::state(ResourceState state) {
 		return; // No change
 	}
 	
-	// Leaving the UNLOADED state
-	if (UNLOADED == state_) {
+	// Leaving the RS_UNLOADED state
+	if (RS_UNLOADED == state_) {
 		// Load the data from the file
 		read_mesh_data();
 	}
 	
-	// Entering the LOADED state
-	if (LOADED == state) {
+	// Entering the RS_LOADED state
+	if (RS_LOADED == state) {
 		update_tangents();
 		init_hardware_buffers();
 	}
 
-	// Leaving the LOADED state
-	if (LOADED == state_) {
+	// Leaving the RS_LOADED state
+	if (RS_LOADED == state_) {
 		free_hardware_buffers();
 	}
 	
 	// Entering the unloaded state
-	if (UNLOADED == state) {
+	if (RS_UNLOADED == state) {
 		vertex_.clear();
 		index_.clear();
 	}
@@ -91,7 +91,7 @@ void OpenGLMesh::init_hardware_buffers() {
 	// Choose the appropriate buffer mode.  TODO: Calling glBufferData
 	// below may be destructive in terms of performance; investigate
 	GLenum mode;
-	if (STATIC_SYNC == sync_mode_) {
+	if (SM_STATIC == sync_mode_) {
 		mode = GL_STATIC_DRAW;
 	} else {
 		mode = GL_DYNAMIC_DRAW;
@@ -104,7 +104,7 @@ void OpenGLMesh::init_hardware_buffers() {
 		glBufferData(GL_ARRAY_BUFFER, vertex_count()*sizeof(Vertex), vertex_data(), mode);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	} else {
-		parent_->state(LOADED);
+		parent_->state(RS_LOADED);
 		vbuffer_ = parent_->vbuffer_;
 	}
 
@@ -176,9 +176,9 @@ void OpenGLMesh::read_mesh_data() {
 void OpenGLMesh::render(OpenGLShader* shader) {
 	
 	// Make sure that all vertex data is synchronized
-	state(LOADED);
+	state(RS_LOADED);
 	if (parent_) {
-		parent_->state(LOADED);
+		parent_->state(RS_LOADED);
 	}
 	
 	// Bind and enable the vertex and index buffers

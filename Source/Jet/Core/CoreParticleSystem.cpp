@@ -81,13 +81,13 @@ void CoreParticleSystem::update() {
 		p->growth_rate = rand_range(particle_growth_rate_);
         
         // Set up initial parameters
-        if (BOX_EMITTER == type_) {
+        if (ET_BOX == type_) {
             init_particle_box(*p);
             
-        } else if (ELLIPSOID_EMITTER == type_) {
+        } else if (ET_ELLIPSOID == type_) {
             init_particle_ellipsoid(*p);
 
-        } else if (POINT_EMITTER == type_) {
+        } else if (ET_POINT == type_) {
             init_particle_point(*p);
         }
         p->init_position = parent_->matrix() * p->init_position;

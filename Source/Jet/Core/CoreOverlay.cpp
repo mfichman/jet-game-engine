@@ -62,9 +62,9 @@ CoreOverlay* CoreOverlay::overlay(const string& name) {
 float CoreOverlay::corner_x() const {
     // Find the top-left corner of the overlay.  Depends on the horizontal
     // alignment of the overlay.
-    if (LEFT == horizontal_alignment_) {
+    if (AL_LEFT == horizontal_alignment_) {
         return x_;
-    } else if (RIGHT == horizontal_alignment_) {
+    } else if (AL_RIGHT == horizontal_alignment_) {
         if (parent_) {
             return parent_->width() - width_ + x_;
         } else {
@@ -82,9 +82,9 @@ float CoreOverlay::corner_x() const {
 float CoreOverlay::corner_y() const {
     // Find the top-right corner of the overlay.  Depends on the vertical
     // alignment of the overlay.
-    if (TOP == vertical_alignment_) {
+    if (AL_TOP == vertical_alignment_) {
         return y_;
-    } else if (BOTTOM == vertical_alignment_) {
+    } else if (AL_BOTTOM == vertical_alignment_) {
         if (parent_) {
             return parent_->height() - height_ + y_;
         } else {

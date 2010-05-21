@@ -37,7 +37,7 @@ using namespace std;
 BSockNetwork::BSockNetwork(CoreEngine* engine) :
     engine_(engine),
     accumulator_(0.0f),
-	state_(DISABLED) {
+	state_(NS_DISABLED) {
         
     engine_->option("network_mode", string("disabled"));
     engine_->option("network_player", string("anonymous"));
@@ -74,9 +74,9 @@ void BSockNetwork::on_update() {
     update_state();
 	//try {
 		switch (state_) {
-			case DISCOVER: do_discover(); break;
-			case HOST: do_host(); break;
-			case JOIN: do_join(); break;
+			case NS_DISCOVER: do_discover(); break;
+			case NS_HOST: do_host(); break;
+			case NS_JOIN: do_join(); break;
 		}
 	//} catch (std::runtime_error& ex) {
 	//	cout << ex.what();
@@ -144,13 +144,13 @@ void BSockNetwork::update_state() {
     string mode = engine_->option<string>("network_mode");
     NetworkState state;
     if ("discover" == mode) {
-        state = DISCOVER;
+        state = NS_DISCOVER;
     } else if ("host" == mode) {
-        state = HOST;
+        state = NS_HOST;
     } else if ("disabled" == mode) {
-        state = DISABLED;
+        state = NS_DISABLED;
     } else if ("join" == mode) {
-        state = JOIN;
+        state = NS_JOIN;
     } else {
         return;
     }
@@ -160,7 +160,7 @@ void BSockNetwork::update_state() {
     }
 
 	// Joining game, connect to server
-	if (JOIN == state) {
+	if (NS_JOIN == state) {
 	    for (std::set<BSockGame>::iterator i = game_.begin(); i != game_.end(); i++) {
             if (i->name == engine_->option<string>("network_game")) {
                 cout << "Joining " << i->name << " " << i->server_address << ":" << i->server_port << endl;
@@ -171,13 +171,13 @@ void BSockNetwork::update_state() {
 	}
     
     // If leaving state, disable the socket
-    if (JOIN == state_) {
+    if (NS_JOIN == state_) {
         rpc_player_leave(client_.get());
         client_.reset();
     }
     
     // If in host mode, enable the server socket on a random port
-    if (HOST == state) {
+    if (NS_HOST == state) {
 		server_.reset(BSockServerSocket::server(0));
         string ip = engine_->option<string>("discover_ip");
         uint16_t port = (uint16_t)engine_->option<float>("discover_port");
@@ -193,7 +193,7 @@ void BSockNetwork::update_state() {
     }
     
     // If not in host mode, shut down the server socket
-    if (HOST == state_) {
+    if (NS_HOST == state_) {
         // Notify all that the game is destroyed..?
         rpc_game_destroy(multicast_.get());
         multicast_.reset();
@@ -203,7 +203,7 @@ void BSockNetwork::update_state() {
     // If in the discover or host state, make sure we have
 	// a socket open and connected to the shared multicast address
 	// for game discovery
-    if (DISCOVER == state || HOST == state && !multicast_) {
+    if (NS_DISCOVER == state || NS_HOST == state && !multicast_) {
 		game_.clear();
         string ip = engine_->option<string>("discover_ip");
         uint16_t port = (uint16_t)engine_->option<float>("discover_port");
@@ -211,7 +211,7 @@ void BSockNetwork::update_state() {
     }
 
 	// If not in the discover or host state, then close down the socket.
-	if (DISCOVER != state && HOST != state) {
+	if (NS_DISCOVER != state && NS_HOST != state) {
 		multicast_.reset();
 	}
 

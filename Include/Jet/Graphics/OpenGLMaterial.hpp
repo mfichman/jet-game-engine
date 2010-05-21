@@ -37,7 +37,7 @@ public:
 	inline OpenGLMaterial(CoreEngine* engine, const std::string& name) :
 		engine_(engine),
 		name_(name),
-		state_(UNLOADED),
+		state_(RS_UNLOADED),
 		shininess_(40.0f),
 		enabled_(false),
 		receive_shadows_(true),

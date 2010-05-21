@@ -54,9 +54,9 @@ namespace Jet {
     typedef boost::intrusive_ptr<OpenGLTexture> OpenGLTexturePtr;
 
     enum OpenGLTextureSampler {
-        DIFFUSE_MAP_SAMPLER = 0,
-        SPECULAR_MAP_SAMPLER = 1,
-        NORMAL_MAP_SAMPLER = 2,
-        SHADOW_MAP_SAMPLER = 3
+        TS_DIFFUSE = 0,
+        TS_SPECULAR = 1,
+        TS_NORMAL = 2,
+        TS_SHADOW = 3
     };
 }

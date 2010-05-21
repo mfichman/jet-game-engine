@@ -113,6 +113,6 @@ BSockSocket* BSockServerSocket::socket() {
 		}
     }
     
-    return new BSockSocket(local_, remote_, STREAM, sd);
+    return new BSockSocket(local_, remote_, ST_STREAM, sd);
 }
 

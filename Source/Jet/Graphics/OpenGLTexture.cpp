@@ -29,7 +29,7 @@ using namespace Jet;
 using namespace std;
 
 OpenGLTexture::~OpenGLTexture() {
-	state(UNLOADED);
+	state(RS_UNLOADED);
 }
 
 void OpenGLTexture::state(ResourceState state) {
@@ -37,24 +37,24 @@ void OpenGLTexture::state(ResourceState state) {
 		return;
 	}
 	
-	// Leaving the UNLOADED state
-	if (UNLOADED == state_) {
+	// Leaving the RS_UNLOADED state
+	if (RS_UNLOADED == state_) {
 		read_texture_data();
 	}
 	
-	// Entering the LOADED state
-	if (LOADED == state) {
+	// Entering the RS_LOADED state
+	if (RS_LOADED == state) {
 		init_texture();
 	}
 	
-	// Leaving the LOADED state
-	if (LOADED == state_) {
+	// Leaving the RS_LOADED state
+	if (RS_LOADED == state_) {
 		glDeleteTextures(1, &texture_);
 		texture_ = 0;
 	}
 	
-	// Entering the UNLOADED state
-	if (UNLOADED == state) {
+	// Entering the RS_UNLOADED state
+	if (RS_UNLOADED == state) {
 		data_.clear();
 	}
 	
@@ -117,7 +117,7 @@ void OpenGLTexture::init_texture() {
 }
 
 void OpenGLTexture::sampler(uint32_t sampler) {
-	state(LOADED);
+	state(RS_LOADED);
 	glActiveTexture(GL_TEXTURE0 + sampler);
 	glBindTexture(GL_TEXTURE_2D, texture_);
 }

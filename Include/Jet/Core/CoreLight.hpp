@@ -35,7 +35,7 @@ public:
     inline CoreLight(CoreEngine* engine, CoreNode* parent) :
         engine_(engine),
         parent_(parent),
-        type_(DIRECTIONAL_LIGHT),
+        type_(LT_DIRECTIONAL),
         cast_shadows_(true) {
             
     }

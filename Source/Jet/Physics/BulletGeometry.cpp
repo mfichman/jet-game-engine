@@ -31,7 +31,7 @@ using namespace boost;
 BulletGeometry::~BulletGeometry() {
     
     // Free the buffer from memory
-    state(UNLOADED);
+    state(RS_UNLOADED);
 }
 
 void BulletGeometry::state(ResourceState state) {
@@ -39,7 +39,7 @@ void BulletGeometry::state(ResourceState state) {
         return;
     }
 
-    if (LOADED == state) {
+    if (RS_LOADED == state) {
         update_collision_shape();
     }
     

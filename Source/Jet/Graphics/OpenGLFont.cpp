@@ -38,7 +38,7 @@ inline int next_p2(int a) {
 OpenGLFont::OpenGLFont(CoreEngine* engine, const std::string& name) :
     engine_(engine),
     name_(name),
-    state_(UNLOADED),
+    state_(RS_UNLOADED),
     list_(0) {
         
     size_t pos = name.find("#");
@@ -50,7 +50,7 @@ OpenGLFont::OpenGLFont(CoreEngine* engine, const std::string& name) :
 }
 
 OpenGLFont::~OpenGLFont() {
-    state(UNLOADED);
+    state(RS_UNLOADED);
 }
 
 void OpenGLFont::state(ResourceState state) {
@@ -58,11 +58,11 @@ void OpenGLFont::state(ResourceState state) {
         return;
     }
     
-    if (LOADED == state) {
+    if (RS_LOADED == state) {
         read_font_data();
     }
     
-    if (LOADED == state_) {
+    if (RS_LOADED == state_) {
         if (list_ && !texture_.empty()) {
             glDeleteLists(list_, texture_.size());
             glDeleteTextures(128, &texture_[0]);
@@ -182,7 +182,7 @@ void OpenGLFont::create_bitmap(FT_Face face, unsigned char ch) {
 }
 
 void OpenGLFont::render(const std::string& text) {
-    state(LOADED);
+    state(RS_LOADED);
 
     // Push some parameters to enable proper texturing
     glListBase(list_);

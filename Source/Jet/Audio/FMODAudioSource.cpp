@@ -28,16 +28,16 @@ PlaybackState FMODAudioSource::state(size_t chan) const {
     
     // If the channel is not allocated, then stop
     if (chan >= channel_.size()) {
-        return STOP;
+        return PS_STOP;
     }
     
     // If the channel is set to null, then the audio has stopped.
     if (!channel_[chan]) {
-        return STOP;
+        return PS_STOP;
     }
     
     // Otherwise, the audio is playing and the channel is allocated
-    return PLAY;
+    return PS_PLAY;
 }
 
 void FMODAudioSource::sound(size_t chan, Sound* sound) {
@@ -63,15 +63,15 @@ void FMODAudioSource::state(size_t chan, PlaybackState state) {
         return;
     }
     
-    if (STOP == state && channel_[chan]) {
+    if (PS_STOP == state && channel_[chan]) {
         // Stop the clip
         fmod_check(FMOD_Channel_Stop(channel_[chan]));
     }
     
-    if (PLAY == state && sound_[chan] && !channel_[chan]) {
+    if (PS_PLAY == state && sound_[chan] && !channel_[chan]) {
         // Make sure the sound is loaded, and that the channel is not in use.
         // Then play the sound and register callbacks
-        sound_[chan]->state(LOADED);
+        sound_[chan]->state(RS_LOADED);
         FMODAudio* audio = static_cast<FMODAudio*>(engine_->audio());
         FMOD_SYSTEM* system = audio->system();
         FMOD_SOUND* sound = sound_[chan]->sound();

@@ -29,7 +29,7 @@ function Stats:__init(overlay, name)
     -- Default options
     self.overlay.font = "Russel.ttf#14"
     self.overlay.text_color = Color(1, 1, 1, 0.7)
-    self.overlay.vertical_alignment = Overlay.BOTTOM
+    self.overlay.vertical_alignment = Overlay.AL_BOTTOM
     self.overlay.x = 4
     self.overlay.y = -4
     self.overlay.width = 800

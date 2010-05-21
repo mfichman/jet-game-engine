@@ -130,11 +130,11 @@ namespace Jet {
     typedef boost::intrusive_ptr<Texture> TexturePtr;
     typedef boost::intrusive_ptr<QuadSet> QuadSetPtr;
  
-    enum LightType { POINT_LIGHT, DIRECTIONAL_LIGHT };
-    enum EmitterType { BOX_EMITTER, ELLIPSOID_EMITTER, POINT_EMITTER };
-    enum PlaybackState { PLAY, STOP };
-    enum ResourceState { UNLOADED, CACHED, LOADED };
-    enum SyncMode { STATIC_SYNC, DYNAMIC_SYNC };
-    enum LayoutMode { RELATIVE_LAYOUT, ABSOLUTE_LAYOUT };
-    enum Alignment { TOP, CENTER, BOTTOM, LEFT, RIGHT };
+    enum LightType { LT_POINT, LT_DIRECTIONAL };
+    enum EmitterType { ET_BOX, ET_ELLIPSOID, ET_POINT };
+    enum PlaybackState { PS_PLAY, PS_STOP };
+    enum ResourceState { RS_UNLOADED, RS_CACHED, RS_LOADED };
+    enum SyncMode { SM_STATIC, SM_DYNAMIC };
+    enum LayoutMode { LM_RELATIVE, LM_ABSOLUTE };
+    enum Alignment { AL_TOP, AL_CENTER, AL_BOTTOM, AL_LEFT, AL_RIGHT };
 }

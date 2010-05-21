@@ -50,7 +50,7 @@ inline int socket_errcode() {
 #include <fcntl.h>
 #endif
 #include <boost/intrusive_ptr.hpp>
-
+#undef ST_CLIENT
 
 
 namespace Jet {
@@ -70,6 +70,6 @@ namespace Jet {
     typedef boost::intrusive_ptr<BSockReader> BSockSocketReaderPtr;
     typedef boost::intrusive_ptr<BSockWriter> BSockSocketWriterPtr;
 
-    enum SocketType { SERVER, CLIENT, MULTICAST, DATAGRAM, STREAM };
-    enum NetworkState { DISCOVER, HOST, JOIN, RUNNING, DISABLED };
+    enum SocketType { ST_SERVER, ST_CLIENT, ST_MULTICAST, ST_DATAGRAM, ST_STREAM };
+    enum NetworkState { NS_DISCOVER, NS_HOST, NS_JOIN, NS_RUNNING, NS_DISABLED };
 }
