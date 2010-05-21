@@ -20,9 +20,9 @@
 
 require 'Task'
 
-class 'SlideAnimation' (Task)
+class 'Slide' (Task)
 
-function SlideAnimation:__init(options)
+function Slide:__init(options)
     Task.__init(self)
 
     self.overlay = options.overlay
@@ -52,7 +52,7 @@ function SlideAnimation:__init(options)
     self.tag = math.random()
 end
 
-function SlideAnimation:on_run()
+function Slide:on_run()
     while (self.overlay) do
         local step = self.slide_velocity*engine.frame_delta
     

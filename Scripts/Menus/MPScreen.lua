@@ -74,7 +74,6 @@ function MPScreen:on_game_found(game)
 end
 
 function MPScreen:on_game_lost(game)
-print("lost")
     self.list:remove(game)
 end
 

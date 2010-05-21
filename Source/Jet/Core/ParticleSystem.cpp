@@ -67,6 +67,7 @@ void Core::ParticleSystem::update() {
 	}
 
 	accumulator_ += engine_->frame_delta();
+    accumulator_ = min(accumulator_, 2*emission_rate_.begin);
  
     // Spawn additional particles
     while (accumulator_ > next_emission_ && !dead_particle_.empty()) {
