@@ -72,6 +72,10 @@
 				RelativePath="..\Source\Jet\Physics\BulletRigidBody.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\Source\Jet\Graphics\OpenGLGraphics.cpp"
+				>
+			</File>
 			<Filter
 				Name="Sockets"
 				>

@@ -329,7 +329,7 @@ void OpenGLGraphics::generate_shadow_map(CoreLight* light) {
         // add a little bit of overlap in the +z direction to take care of
         // precision issues.
         bounds.min_z -= 500.0f;
-        bounds.max_z += 20.0f;
+        bounds.max_z += 500.0f;
 		
 		// Set up the projection matrix for the directional light
 		glMatrixMode(GL_PROJECTION);

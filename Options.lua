@@ -3,9 +3,9 @@
 
 if (true) then
     engine:option("shadow_texture_size", 2048)
-    engine:option("display_width", 1440)
-    engine:option("display_height", 900)
-    engine:option("fullscreen_enabled", false)
+    engine:option("display_width", 1680)
+    engine:option("display_height", 1050)
+    engine:option("fullscreen_enabled", true)
     engine:option("fsaa_enabled", true)
     engine:option("fsaa_samples", 4)
     engine:option("shadows_enabled", true)

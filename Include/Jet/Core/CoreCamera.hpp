@@ -74,7 +74,7 @@ public:
     }
     
     //! Returns the shadow frustum
-    Frustum frustum(float near, float far, float bias=0.0f) const;
+    Frustum frustum(float near, float far) const;
     
     //! Sets the field of view
     inline void field_of_view(float fov) {
