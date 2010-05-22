@@ -61,12 +61,18 @@ function SPGame:on_load()
     self.rocks = {}
     for i=1,10 do
         self.rocks[i] = Rock()
-        local x = math.random(-50, 50)
-        local y = math.random(-50, 50)
-        local z = math.random(-50, 50)
+        local x = math.random(-100, 100)
+        local y = math.random(-100, 100)
+        local z = math.random(-100, 100)
         local pos = Vector(x, y, z)
         self.rocks[i].node.position = pos
-        self.rocks[i].body.angular_velocity = pos.unit * 0.2
+        
+        local x = math.random(-100, 100)
+        local y = math.random(-100, 100)
+        local z = math.random(-100, 100)
+        local pos = Vector(x, y, z)
+        self.rocks[i].body.angular_velocity = pos.unit * 0.4
+
         --self.rocks[i].body.linear_velocity = -pos.unit * 5;
     end
     
@@ -109,13 +115,13 @@ end
 function SPGame:update_camera(delta)
     if (not self.ship) then return end
 
-    local alpha1 = .05
-    local alpha2 = .05
+    local alpha1 = .09
+    local alpha2 = .06
     
     -- Do a slerp on the expected rotation
     self.camera_rotation = self.camera_rotation:slerp(self.ship.node.rotation, alpha1)
     
-    local position = self.camera_rotation * Vector(0, 4, -22)
+    local position = self.camera_rotation * Vector(0, 4, -18)
     local up = self.camera_rotation * Vector(0, 1, 0)
     local target = self.camera_rotation * Vector(0, 0, 20)
     

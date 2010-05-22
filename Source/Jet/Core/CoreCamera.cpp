@@ -28,7 +28,7 @@ using namespace std;
 
 #define JET_RADIANS(x) ((x)*3.14f/180.0f)
 
-Frustum CoreCamera::frustum(float near_dist, float far_dist, float bias) const {
+Frustum CoreCamera::frustum(float near_dist, float far_dist) const {
     // Ge the height, width, and shadow distance of the frustum
     const Matrix& matrix = parent_->matrix();
     float width = engine_->option<float>("display_width");
@@ -45,17 +45,11 @@ Frustum CoreCamera::frustum(float near_dist, float far_dist, float bias) const {
     // Get "look at" vectors.  The AT vector is simply a vector somewhere
     // along the local +z axis for the camera.
     Vector eye = matrix.origin();
-    Vector at = matrix * Vector(0.0, 0.0, 1.0f);
-    Vector up = matrix.up();
-       
+
     // Construct orthogonal basis.
-    Vector z = (eye - at).unit();
-    Vector x = (up.cross(z)).unit();
-    Vector y = z.cross(x);
-    
-    // Back up the eye by the bias amount.
-    eye -= z * bias;
-    at -= z * bias;
+    Vector z = -matrix.forward();
+    Vector x = matrix.right();
+    Vector y = matrix.up();
     
     // Compute the centers of the near and far planes
     Vector nc = eye - z * near_dist;
