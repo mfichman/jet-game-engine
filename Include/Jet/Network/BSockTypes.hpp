@@ -21,6 +21,7 @@
  */  
 #pragma once
 
+#include <stdexcept>
 #ifdef WINDOWS
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -37,21 +38,22 @@ inline int socket_errcode() {
     return WSAGetLastError();
 }
 #else
+#include <netdb.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <arpa/inet.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <cerrno>
+#include <boost/intrusive_ptr.hpp>
 #define SD_BOTH SHUT_RDWR
 #define INVALID_SOCKET -1
 #define socket_errmsg() strerror(errno)
 #define socket_errcode() errno
 #define closesocket close
-#include <unistd.h>
-#include <fcntl.h>
 #endif
-#include <boost/intrusive_ptr.hpp>
 #undef ST_CLIENT
-
 
 namespace Jet {
 

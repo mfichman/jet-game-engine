@@ -40,10 +40,10 @@ using namespace std::tr1;
 using namespace boost;
 
 template <typename K, typename V>
-V& get_value(const std::pair<K, V>& p) {
+V& get_value(std::pair<K, V>& p) {
 	// Small transform function used for transforming the object
 	// itrator.
-    return const_cast<V&>(p.second); 
+    return p.second; 
 }
 
 CoreNode::~CoreNode() {
@@ -157,12 +157,12 @@ Iterator<ObjectPtr> CoreNode::objects() const {
 	// all objects attached to this node.  This hides implementation details
 	// about the node class.
 	typedef unordered_map<string, ObjectPtr> map_t;
-	typedef boost::function<map_t::mapped_type& (const map_t::value_type&)> fun_t;
+	typedef boost::function<map_t::mapped_type& (map_t::value_type&)> fun_t;
 	typedef transform_iterator<fun_t, map_t::const_iterator> itr_t;
 	typedef pair<map_t::iterator, map_t::iterator> pair_t;
 
-	itr_t begin = make_transform_iterator(object_.begin(), &get_value<string, ObjectPtr>);
-	itr_t end = make_transform_iterator(object_.end(), &get_value<string, ObjectPtr>);
+	itr_t begin = make_transform_iterator(object_.begin(), &get_value<const string, ObjectPtr>);
+	itr_t end = make_transform_iterator(object_.end(), &get_value<const string, ObjectPtr>);
 
 	return Iterator<ObjectPtr>(begin, end);
 }

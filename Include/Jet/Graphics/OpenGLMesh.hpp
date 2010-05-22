@@ -51,8 +51,8 @@ public:
 	//! Creates a new mesh.
 	inline OpenGLMesh(CoreEngine* engine, const std::string& name, OpenGLMesh* parent) :
 		engine_(engine),
-		geometry_(engine->geometry(name)),
 		parent_(parent),
+		geometry_(engine->geometry(name)),
 		name_(name),
 		state_(RS_UNLOADED),
 		vbuffer_(0),

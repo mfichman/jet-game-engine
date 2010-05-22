@@ -26,6 +26,7 @@
 #include <Jet/Network/BSockGame.hpp>
 #include <Jet/Network/BSockPlayer.hpp>
 #include <Jet/Core/CoreEngine.hpp>
+#include <cfloat>
 
 #ifdef WINDOWS
 #include <winsock2.h>
@@ -77,6 +78,7 @@ void BSockNetwork::on_update() {
 			case NS_DISCOVER: do_discover(); break;
 			case NS_HOST: do_host(); break;
 			case NS_JOIN: do_join(); break;
+			default: break;
 		}
 	//} catch (std::runtime_error& ex) {
 	//	cout << ex.what();
@@ -126,10 +128,10 @@ void BSockNetwork::do_host() {
     
     // Check for timed-out players and dead sockets
 	for (map<BSockSocketPtr, size_t>::iterator i = socket_.begin(); i != socket_.end();) {
-		if (!player_[i->second].time) {
-			i = socket_.erase(i);
-		} else {
-			i++;
+		map<BSockSocketPtr, size_t>::iterator j = i;
+		i++;
+		if (!player_[j->second].time) {
+			socket_.erase(j);
 		}
 	}
 }

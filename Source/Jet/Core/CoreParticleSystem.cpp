@@ -46,11 +46,11 @@ void CoreParticleSystem::update() {
     
     // Add particles that are alive to the particle buffer, and
     // add dead particles to the free list
-	for (int i = alive_particle_.size()-1; i >= 0; i--) {
-        Particle* p = alive_particle_[i];
+	for (size_t i = alive_particle_.size(); i > 0; i--) {
+        Particle* p = alive_particle_[i-1];
         if ((engine_->frame_time() - p->init_time) > p->life || p->life <= 0.0f) {
-			if (i != alive_particle_.size()-1) {
-				swap(alive_particle_[i], alive_particle_[alive_particle_.size()-1]);
+			if (i != alive_particle_.size()) {
+				swap(alive_particle_[i-1], alive_particle_[alive_particle_.size()-1]);
 			}
 			alive_particle_.pop_back();
 			dead_particle_.push_back(p);

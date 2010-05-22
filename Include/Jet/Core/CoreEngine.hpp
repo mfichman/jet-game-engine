@@ -22,15 +22,22 @@
 #pragma once
 
 #include <Jet/Core/CoreTypes.hpp>
-#include <Jet/Engine.hpp>
 #include <Jet/Types/Iterator.hpp>
+#include <Jet/Resources/Texture.hpp>
+#include <Jet/Resources/Cubemap.hpp>
+#include <Jet/Resources/Geometry.hpp>
+#include <Jet/Resources/Shader.hpp>
+#include <Jet/Resources/Sound.hpp>
+#include <Jet/Resources/Mesh.hpp>
+#include <Jet/Resources/Font.hpp>
+#include <Jet/Scene/Camera.hpp>
+#include <Jet/Engine.hpp>
 #include <Jet/Physics.hpp>
 #include <Jet/Network.hpp>
 #include <Jet/Script.hpp>
 #include <Jet/Audio.hpp>
 #include <Jet/Input.hpp>
 #include <Jet/Graphics.hpp>
-#include <Jet/Scene/Camera.hpp>
 #include <Jet/Module.hpp>
 #include <Jet/Interface/Overlay.hpp>
 #include <list>

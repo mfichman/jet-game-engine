@@ -91,7 +91,8 @@ void BulletRigidBody::attach_node(const btTransform& transform, CoreNode* node) 
 	// make sure they are attached to the rigid body.  For child Nodes, make
 	// sure that the node has a reference to the new rigid body.
     for (Iterator<ObjectPtr> i = node->objects(); i; i++) {
-        const type_info& info = typeid(**i);
+		Object& obj = **i;
+		const type_info& info = typeid(obj);
         if (typeid(CoreNode) == info) {
             // Add mesh objects connected to the child node
             CoreNode* node = static_cast<CoreNode*>(i->get());

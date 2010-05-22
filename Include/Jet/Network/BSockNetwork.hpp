@@ -68,6 +68,7 @@ private:
     void on_player_list(BSockReader* reader);
     
     CoreEngine* engine_;
+    float accumulator_;
     NetworkState state_;
     std::set<BSockGame> game_;
     std::map<BSockSocketPtr, size_t> socket_;
@@ -77,7 +78,6 @@ private:
     BSockSocketPtr multicast_;
     BSockSocketPtr client_;
     BSockServerSocketPtr server_;
-    float accumulator_;
 };
 
 }

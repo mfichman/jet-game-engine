@@ -59,7 +59,7 @@ function SPGame:on_load()
     -- Create rocks
     print("Creating rocks")
     self.rocks = {}
-    for i=1,25 do
+    for i=1,10 do
         self.rocks[i] = Rock()
         local x = math.random(-50, 50)
         local y = math.random(-50, 50)
@@ -67,7 +67,7 @@ function SPGame:on_load()
         local pos = Vector(x, y, z)
         self.rocks[i].node.position = pos
         self.rocks[i].body.angular_velocity = pos.unit * 0.2
-        self.rocks[i].body.linear_velocity = -pos.unit * 5;
+        --self.rocks[i].body.linear_velocity = -pos.unit * 5;
     end
     
     self.menu.overlay.visible = false

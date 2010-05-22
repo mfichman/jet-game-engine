@@ -28,6 +28,7 @@ add_definitions(-g)
 add_definitions(-Wall -Werror)
 include_directories(/usr/local/include/Bullet/)
 include_directories(/Developer/FMOD Programmers API Mac/api/inc) 
+include_directories(/usr/local/include/freetype2/)
 endif()
 
 if(UNIX AND NOT APPLE)

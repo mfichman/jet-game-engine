@@ -39,7 +39,7 @@ public:
     virtual ~BaseIterator() {}
 
     //! Returns the current iterator value.
-    virtual T value()=0;
+    virtual T* value()=0;
 
     //! Increments the iterator.
     virtual void next()=0;
@@ -65,8 +65,8 @@ public:
     }
 
     //! Returns the current iterator value.
-    virtual T value() {
-        return *begin_;
+    virtual T* value() {
+        return begin_.operator->();
     }
 
     //! Increments the iterator.
@@ -107,7 +107,7 @@ public:
     //! sequence, and an any_iterator that points to the end of the sequence.
     template <typename I>
     Iterator(I begin, I end) :
-        base_(new ConcreteIterator<T&, I>(begin, end)) {
+        base_(new ConcreteIterator<T, I>(begin, end)) {
     }
 
     //! Copy constructor
@@ -124,12 +124,12 @@ public:
     //! Overrides operator-> so that element methods may be accessed directly
     //! from the iterator, as in itr->my_function().
     T* operator->() {
-        return &base_->value();
+        return base_->value();
     }
     
     //! Overrides operator*.
     T& operator*() {
-        return base_->value();
+        return *base_->value();
     }
 
     //! Increments the iterator. (Prefix)
@@ -143,7 +143,7 @@ public:
     }
 
 private:
-    std::auto_ptr<BaseIterator<T&> > base_;
+    std::auto_ptr<BaseIterator<T> > base_;
 };
 
 }

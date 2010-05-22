@@ -59,10 +59,10 @@ private:
     BSockServerSocket(const sockaddr_in& local, const sockaddr_in& remote);
     
     int socket_;
-    uint16_t port_;
     std::string address_;
     sockaddr_in local_;
     sockaddr_in remote_;
+    uint16_t port_;
 };
 
 }

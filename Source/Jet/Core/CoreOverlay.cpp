@@ -30,10 +30,10 @@ using namespace std::tr1;
 using namespace boost;
 
 template <typename K, typename V>
-V& get_value(const std::pair<K, V>& p) {
+V& get_value(std::pair<K, V>& p) {
 	// Small transform function used for transforming the object
 	// itrator.
-    return const_cast<V&>(p.second); 
+    return p.second; 
 }
 
 CoreOverlay::~CoreOverlay() {
@@ -105,12 +105,12 @@ Iterator<CoreOverlayPtr> CoreOverlay::children() const {
 	// all objects attached to this node.  This hides implementation details
 	// about the node class.
 	typedef unordered_map<string, CoreOverlayPtr> map_t;
-	typedef boost::function<map_t::mapped_type& (const map_t::value_type&)> fun_t;
+	typedef boost::function<map_t::mapped_type& (map_t::value_type&)> fun_t;
 	typedef transform_iterator<fun_t, map_t::const_iterator> itr_t;
 	typedef pair<map_t::iterator, map_t::iterator> pair_t;
 
-	itr_t begin = make_transform_iterator(overlay_.begin(), &get_value<string, CoreOverlayPtr>);
-	itr_t end = make_transform_iterator(overlay_.end(), &get_value<string, CoreOverlayPtr>);
+	itr_t begin = make_transform_iterator(overlay_.begin(), &get_value<const string, CoreOverlayPtr>);
+	itr_t end = make_transform_iterator(overlay_.end(), &get_value<const string, CoreOverlayPtr>);
 
 	return Iterator<CoreOverlayPtr>(begin, end);
 }
