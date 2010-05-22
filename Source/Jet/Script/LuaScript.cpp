@@ -35,6 +35,7 @@
 #include <Jet/Types/Plane.hpp>
 #include <Jet/Types/Box.hpp>
 #include <Jet/Types/Point.hpp>
+#include <Jet/Types/Matrix.hpp>
 #include <Jet/Scene/MeshObject.hpp>
 #include <Jet/Scene/Node.hpp>
 #include <Jet/Scene/FractureObject.hpp>
@@ -403,7 +404,23 @@ void LuaScript::init_value_type_bindings() {
 			.def_readwrite("min_z", &Box::min_x)
 			.def_readwrite("max_x", &Box::max_x)
 			.def_readwrite("max_y", &Box::max_y)
-			.def_readwrite("max_z", &Box::max_z)
+			.def_readwrite("max_z", &Box::max_z),
+            
+        luabind::class_<Matrix>("Matrix")
+            .def(luabind::constructor<>())
+            .def(luabind::constructor<const Quaternion&, const Vector&>())
+            .def(luabind::constructor<const Quaternion&>())
+            .def(luabind::constructor<const Vector&>())
+            .def(luabind::constructor<const Vector&, const Vector&, const Vector&>())
+            .property("inverse", &Matrix::inverse)
+            .def("__mul", (Matrix (Matrix::*)(const Matrix&) const)&Matrix::operator*)
+            .def("__mul", (Vector (Matrix::*)(const Vector&) const)&Matrix::operator*)
+            .def("rotate", &Matrix::rotate)
+            .def("forward", &Matrix::forward)
+            .def("right", &Matrix::right)
+            .def("up", &Matrix::up)
+            .def("origin", &Matrix::origin)
+            .def("rotation", &Matrix::rotation)
     ];
 }
     
@@ -443,6 +460,9 @@ void LuaScript::init_entity_type_bindings() {
             .property("position", (const Vector& (Node::*)() const)&Node::position, (void (Node::*)(const Vector&))&Node::position)
             .property("rotation", (const Quaternion& (Node::*)() const)&Node::rotation, (void (Node::*)(const Quaternion&))&Node::rotation)
             .property("visible", (bool (Node::*)() const)&Node::visible, (void (Node::*)(bool))&Node::visible)
+            .property("matrix", &Node::matrix)
+            .property("world_position", &Node::world_position)
+            .property("world_rotation", &Node::world_rotation)
             .def("node", &Node::node)
             .def("mesh_object", &Node::mesh_object)
             .def("particle_system", &Node::particle_system)

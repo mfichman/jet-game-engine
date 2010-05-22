@@ -321,7 +321,7 @@ void OpenGLGraphics::generate_shadow_map(CoreLight* light) {
 
 		// Transform the view frustum into light space and calculate
 		// the bounding box 
-		Box bounds(matrix * camera->frustum(near_dist, far_dist));
+		Box bounds(matrix * camera->frustum(near_dist, far_dist+5.0f));
 		
 		// Causes the shadow map cascades to overlap
 		//bounds.max_z += 5.0f;
@@ -329,7 +329,7 @@ void OpenGLGraphics::generate_shadow_map(CoreLight* light) {
 		// Set up the projection matrix for the directional light
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		glOrtho(bounds.min_x-8.0f, bounds.max_x+8.0f, bounds.min_y-8.0f, bounds.max_y+8.0f, bounds.min_z-24.0f, bounds.max_z+24.0f);
+		glOrtho(bounds.min_x, bounds.max_x, bounds.min_y, bounds.max_y, bounds.min_z, bounds.max_z);
 	    
 		// Set up the view matrix for the directional light
 		glMatrixMode(GL_MODELVIEW);

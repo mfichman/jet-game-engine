@@ -62,6 +62,9 @@ public:
 	//! affect the world rotation of the node.
 	virtual const Quaternion& world_rotation() const=0;
     
+    //! Returns the node's current absolute transform
+    virtual const Matrix& matrix() const=0;
+    
     //! Creates a new node at the given index.  The position and rotation of
     //! the new node will be relative to this node.
     //! @param index the index where the new object will be placed; if this
