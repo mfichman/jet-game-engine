@@ -28,24 +28,38 @@ function Bullet:__init(node, name)
     self.flame = self.node:particle_system() {
         type = ParticleSystem.ET_POINT,
         quota = 300,
-        texture = "IncandescentGold.png",
+        texture = "FireBlue.png",
         particle_life = Range(.1, .1),
         particle_size = Range(.45, .45),
-        particle_growth_rate = Range(0, 0),
+        particle_growth_rate = Range(-8, -8),
         life = -1,
         width = Range(0, 0),
         height = Range(0, 0),
         depth = Range(0, 0),
-        emission_speed = Range(0, 0),
+        emission_speed = Range(-70, -70),
         emission_angle = Range(0, 0),
         emission_direction = Vector(0, 0, 1),
         emission_rate = Range(800, 800),
     }
     
     self.shape = self.node:collision_sphere()
-    self.shape.radius = 1
+    self.shape.radius = 0.4
 
     self.body = self.node:rigid_body()
     self.body.mass = .1
 end
 
+function Bullet:on_tick()
+    local forward = self.body.linear_velocity.unit
+    local up = forward.orthogonal
+    local right = forward:cross(up)
+    self.node.rotation = Quaternion(up, right, forward)
+    self.body.angular_velocity = Vector()
+end
+
+function Bullet:on_collision(node, position)
+    self.explosion = self.explosion or Explosion()
+    self.explosion:reset()
+    self.explosion.node.position = position
+    --self.node.position = position
+end

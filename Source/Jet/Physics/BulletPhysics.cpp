@@ -98,9 +98,15 @@ void BulletPhysics::on_tick(btDynamicsWorld* world, btScalar step) {
 
         BulletRigidBody* ca = static_cast<BulletRigidBody*>(a->getUserPointer());
         BulletRigidBody* cb = static_cast<BulletRigidBody*>(b->getUserPointer());
-
-        ca->parent()->collision(cb->parent());
-        cb->parent()->collision(ca->parent());
+        
+        if (manifold->getNumContacts() > 0) {
+        
+            btVector3 pa = manifold->getContactPoint(0).getPositionWorldOnA();
+            btVector3 pb = manifold->getContactPoint(0).getPositionWorldOnB();
+    
+            ca->parent()->collision(cb->parent(), Vector(pa.x(), pa.y(), pa.z()));
+            cb->parent()->collision(ca->parent(), Vector(pb.x(), pb.y(), pb.z()));
+        }
     }
     
     return;

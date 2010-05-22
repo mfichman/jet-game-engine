@@ -282,10 +282,10 @@ void CoreNode::render() {
 	}
 }
 
-void CoreNode::collision(Node* node) {
+void CoreNode::collision(Node* node, const Vector& position) {
 	// Handle a collision event by notifying all listeners
     if (listener_) {
-		listener_->on_collision(node);
+		listener_->on_collision(node, position);
 	}
 }
 

@@ -168,7 +168,7 @@ public:
     virtual void on_render()=0;
     
     //! Called when a colllision is detected by the physics engine.
-    virtual void on_collision(Node* node)=0;
+    virtual void on_collision(Node* node, const Vector& position)=0;
     
     //! Called when the node is destroyed.
     virtual void on_destroy()=0;

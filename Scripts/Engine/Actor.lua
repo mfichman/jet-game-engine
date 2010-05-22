@@ -28,7 +28,7 @@ end
 
 function Actor:on_update() end
 function Actor:on_render() end
-function Actor:on_collision(node) end
+function Actor:on_collision(node, position) end
 function Actor:on_destroy() end
 function Actor:on_fracture(node) end
 function Actor:on_tick(delta) end

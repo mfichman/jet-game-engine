@@ -56,10 +56,10 @@ function SPGame:on_load()
     
     -- Set up scene objects and apply some forces
     print("Creating objects")
-    self.ship = Dagger()
+    self.ship = Shark()
     self.ship.node.position = Vector(-5, -5, 5)
     
-    local dagger = Dagger()
+    local dagger = Shark()
     dagger.node.position = Vector(10, 10, 10)
 
     -- Create rocks
@@ -100,13 +100,11 @@ function SPGame:on_mouse_motion(point)
 end
 
 function SPGame:on_mouse_pressed(button, point)
-    self.explosion = self.explosion or Explosion()
-    self.explosion:reset()
-    
     self.bullet[self.bullet_index] = self.bullet[self.bullet_index] or Bullet()
-    self.bullet[self.bullet_index].node.position = self.ship.node.position
-    self.bullet[self.bullet_index].body.linear_velocity = self.ship.node.matrix.forward * 200 + self.ship.body.linear_velocity
     
+    local forward = self.ship.node.matrix.forward
+    self.bullet[self.bullet_index].node.position = self.ship.node.position + forward * 4
+    self.bullet[self.bullet_index].body.linear_velocity = forward * 80 + self.ship.body.linear_velocity    
     self.bullet_index = (self.bullet_index + 1) % 10
 end
 
@@ -132,28 +130,36 @@ end
 function SPGame:update_camera(delta)
     if (not self.ship) then return end
 
-    local alpha1 = .09
-    local alpha2 = .06
-    
-    -- Do a slerp on the expected rotation
-    self.camera_rotation = self.camera_rotation:slerp(self.ship.node.rotation, alpha1)
-    
-    local position = self.camera_rotation * Vector(0, 4, -18)
-    local up = self.camera_rotation * Vector(0, 1, 0)
-    local target = self.camera_rotation * Vector(0, 0, 20)
-    
-    
-    -- Now do a lerp to bring the position into line
-    self.camera_position = self.camera_position:lerp(position, alpha2)
-    
-    camera_node.position = self.camera_position + self.ship.node.position
-    camera_node:look(self.ship.node.position + target, up)
-    --camera_node.position
+    if (self.ship.dead) then
+        camera_node.position = camera_node.position + camera_velocity * delta
+        camera_node:look(self.ship.node.position, camera_node.matrix.up)
+    else
+        local alpha1 = .09
+        local alpha2 = .06
+        
+        
+        camera_velocity = self.ship.body.linear_velocity
+        
+        -- Do a slerp on the expected rotation
+        self.camera_rotation = self.camera_rotation:slerp(self.ship.node.rotation, alpha1)
+        
+        local position = self.camera_rotation * Vector(0, 4, -18)
+        local up = self.camera_rotation * Vector(0, 1, 0)
+        local target = self.camera_rotation * Vector(0, 0, 20)
+        
+        
+        -- Now do a lerp to bring the position into line
+        self.camera_position = self.camera_position:lerp(position, alpha2)
+        
+        camera_node.position = self.camera_position + self.ship.node.position
+        camera_node:look(self.ship.node.position + target, up)
+        --camera_node.position
 
+    end
 end
 
 function SPGame:update_ship()
-    if (not self.ship) then return end
+    if (not self.ship or self.ship.dead) then return end
 
 
     local max_force = 35

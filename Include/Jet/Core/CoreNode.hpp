@@ -259,7 +259,7 @@ public:
 	void fracture(Node* node);
 
 	//! Called to notify of a collision event.
-	void collision(Node* node);
+	void collision(Node* node, const Vector& position);
 	
 	//! Called once per game loop.  This is called before the
 	//! render event, which also happens once per game loop.

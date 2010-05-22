@@ -120,6 +120,7 @@ void CoreParticleSystem::update() {
         
         // Rotate the velocity vector by the node's rotation
         p->init_velocity = rotation * p->init_velocity;
+        p->init_velocity = parent_->linear_velocity() + p->init_velocity;
         
         // Rotate the start position by the node's rotation, and then
         // translate it to the node's position

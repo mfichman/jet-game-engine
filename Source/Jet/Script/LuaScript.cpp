@@ -322,6 +322,7 @@ void LuaScript::init_value_type_bindings() {
             .def("__unm", (Vector (Vector::*)() const)&Vector::operator-)
             .def("__mul", (Vector (Vector::*)(float) const)&Vector::operator*)
             .property("unit", &Vector::unit)
+            .property("orthogonal", &Vector::orthogonal)
             .def(luabind::tostring(luabind::const_self)),
             
         luabind::class_<Vertex>("Vertex")

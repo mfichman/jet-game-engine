@@ -46,7 +46,7 @@ function Dagger:__init(node, name)
         width = Range(0, 0),
         height = Range(0, 0),
         depth = Range(0, 0),
-        emission_speed = Range(-10, -10),
+        emission_speed = Range(-28, -28),
         emission_angle = Range(0, 0),
         emission_direction = Vector(0, 0, 1),
         emission_rate = Range(200, 200),
@@ -87,4 +87,9 @@ function Dagger:on_explode(first, second)
 end
 
 function Dagger:on_collision(node)
+    self.explosion = self.explosion or Explosion()
+    self.explosion:reset()
+    self.explosion.node.position = self.node.position
+    self:on_explode()
+    self.dead = true
 end

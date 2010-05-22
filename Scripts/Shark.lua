@@ -25,11 +25,74 @@ class 'Shark' (Actor)
 function Shark:__init(node, name)
     Actor.__init(self, node, name)
 
-    self.mesh = self.node:mesh_object() {
+
+    self.mesh = self.node:fracture_object() {
         mesh = "Shark.obj",
-        material = "Shark.mtl"
+        material = "Shark.mtl",
+        fracture_count = 2
     }
     
+    self.engine_node = self.node:node() {
+        position = Vector(0, 0.2, -1.4)
+    }
+    
+    self.flame = self.engine_node:particle_system() {
+        type = ParticleSystem.ET_POINT,
+        quota = 500,
+        texture = "IncandescentBlue.png",
+        particle_life = Range(.1, .1),
+        particle_size = Range(2.2, 2.2),
+        particle_growth_rate = Range(-24, -24),
+        life = -1,
+        width = Range(0, 0),
+        height = Range(0, 0),
+        depth = Range(0, 0),
+        emission_speed = Range(-28, -28),
+        emission_angle = Range(0, 0),
+        emission_direction = Vector(0, 0, 1),
+        emission_rate = Range(200, 200),
+    }
+    
+    self.spark_template = {
+        type = ParticleSystem.ET_BOX,
+        quota = 100,
+        texture = "Electricity.png",
+        particle_life = Range(.1, .1),
+        particle_size = Range(1, 3),
+        life = -1,
+        width = Range(0, .3),
+        height = Range(0, .7),
+        depth = Range(0, .2),
+        emission_speed = Range(0, 0),
+        emission_rate = Range(1, 90)
+    }
+
     self.body = self.node:rigid_body()
-    self.body.mass = 10.0
+    self.body.mass = 1.0
+end
+
+
+
+function Shark:on_fracture(node)
+    self.flame.life = 0
+    self.sparks = self.sparks or self.node:particle_system()(self.spark_template)
+    self.sparks.life = math.random() * 3 + 2
+    
+    node.sparks = node:particle_system()(self.spark_template)
+    node.sparks.life = math.random() * 3 + 2
+end
+
+function Shark:on_explode(first, second)
+    local n = Vector(math.random()*2-1, math.random()*2-1, math.random()*2-1)
+    self.mesh:fracture(Plane(n.unit, Vector(0, 0, 0)))
+    local n = Vector(math.random()*2-1, math.random()*2-1, math.random()*2-1)
+    self.mesh:fracture(Plane(n.unit, Vector(0, 0, 0)))
+end
+
+function Shark:on_collision(node)
+    self.explosion = self.explosion or Explosion()
+    self.explosion:reset()
+    self.explosion.node.position = self.node.position
+    self:on_explode()
+    self.dead = true
 end

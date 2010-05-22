@@ -55,7 +55,7 @@ float shadow_pcf_lookup(sampler2DShadow shadow_sampler, vec4 shadow_coord, vec2 
     float y_offset = 1.0/2048.0;
     shadow_coord.x += offset.x * x_offset * shadow_coord.w;
     shadow_coord.y += offset.y * y_offset * shadow_coord.w;
-    shadow_coord.z -= 0.00005;
+    shadow_coord.z -= 0.005;
     return shadow2DProj(shadow_sampler, shadow_coord).w;
 }
 

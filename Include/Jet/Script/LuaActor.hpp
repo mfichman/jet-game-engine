@@ -62,8 +62,8 @@ private:
 		self_["on_render"](self_);
 	}
 
-	inline void on_collision(Node* node) {
-		self_["on_collision"](self_, node);
+	inline void on_collision(Node* node, const Vector& position) {
+		self_["on_collision"](self_, node, position);
 	}
 
     inline void on_destroy() {
