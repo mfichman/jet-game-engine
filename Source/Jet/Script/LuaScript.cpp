@@ -311,6 +311,7 @@ void LuaScript::init_value_type_bindings() {
             .def_readwrite("x", &Vector::x)
             .def_readwrite("y", &Vector::y)
             .def_readwrite("z", &Vector::z)
+            .def("lerp", &Vector::lerp)
             .def("distance", &Vector::distance)
             .def("distance2", &Vector::distance2)
             .def("dot", &Vector::dot)
@@ -347,6 +348,7 @@ void LuaScript::init_value_type_bindings() {
             .def("slerp", &Quaternion::slerp)
             .property("inverse", &Quaternion::inverse)
             .property("unit", &Quaternion::unit)
+            .def("__mul", (Vector (Quaternion::*)(const Vector&) const)&Quaternion::operator*)
             .def("__mul", (Quaternion (Quaternion::*)(const Quaternion&) const)&Quaternion::operator*)
             .def(luabind::tostring(luabind::const_self)),
             
@@ -416,11 +418,11 @@ void LuaScript::init_value_type_bindings() {
             .def("__mul", (Matrix (Matrix::*)(const Matrix&) const)&Matrix::operator*)
             .def("__mul", (Vector (Matrix::*)(const Vector&) const)&Matrix::operator*)
             .def("rotate", &Matrix::rotate)
-            .def("forward", &Matrix::forward)
-            .def("right", &Matrix::right)
-            .def("up", &Matrix::up)
-            .def("origin", &Matrix::origin)
-            .def("rotation", &Matrix::rotation)
+            .property("forward", &Matrix::forward)
+            .property("right", &Matrix::right)
+            .property("up", &Matrix::up)
+            .property("origin", &Matrix::origin)
+            .property("rotation", &Matrix::rotation)
     ];
 }
     

@@ -107,6 +107,9 @@ public:
     //! Returns an arbitrary vector perpindicular to this one.
     Vector orthogonal() const;
     
+    //! Interpolates the vector.
+    Vector lerp(const Vector& other, float alpha) const;
+    
     //! Returns a pointer to the vector data.
     operator const float*() const {
         return &x;

@@ -28,7 +28,7 @@ using namespace std;
 
 #define JET_RADIANS(x) ((x)*3.14f/180.0f)
 
-Frustum CoreCamera::frustum(float near_dist, float far_dist) const {
+Frustum CoreCamera::frustum(float near_dist, float far_dist, float bias) const {
     // Ge the height, width, and shadow distance of the frustum
     const Matrix& matrix = parent_->matrix();
     float width = engine_->option<float>("display_width");
@@ -52,6 +52,10 @@ Frustum CoreCamera::frustum(float near_dist, float far_dist) const {
     Vector z = (eye - at).unit();
     Vector x = (up.cross(z)).unit();
     Vector y = z.cross(x);
+    
+    // Back up the eye by the bias amount.
+    eye -= z * bias;
+    at -= z * bias;
     
     // Compute the centers of the near and far planes
     Vector nc = eye - z * near_dist;

@@ -55,7 +55,7 @@ public:
 
 private:
     inline void on_update(float delta) {
-		self_["on_update"](self_, delta);
+		//self_["on_update"](self_, delta);
 	}
 
     inline void on_render() {

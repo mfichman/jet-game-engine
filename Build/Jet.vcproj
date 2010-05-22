@@ -64,11 +64,19 @@
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
+			<File
+				RelativePath="..\Source\Jet\Physics\BulletPhysics.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Jet\Physics\BulletRigidBody.cpp"
+				>
+			</File>
 			<Filter
 				Name="Sockets"
 				>
 				<File
-					RelativePath="..\Source\Jet\Sockets\NetworkSystem.cpp"
+					RelativePath="..\Source\Jet\Sockets\BSockReader.cpp"
 					>
 				</File>
 				<File
@@ -80,11 +88,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\Source\Jet\Sockets\BSockReader.cpp"
+					RelativePath="..\Source\Jet\Sockets\BSockWriter.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\Source\Jet\Sockets\BSockWriter.cpp"
+					RelativePath="..\Source\Jet\Sockets\NetworkSystem.cpp"
 					>
 				</File>
 			</Filter>
@@ -97,6 +105,10 @@
 			<Filter
 				Name="Physics"
 				>
+				<File
+					RelativePath="..\Include\Jet\Physics\BulletRigidBody.hpp"
+					>
+				</File>
 				<File
 					RelativePath="..\Include\Jet\Physics\Geometry.hpp"
 					>
@@ -274,7 +286,7 @@
 				Name="Sockets"
 				>
 				<File
-					RelativePath="..\Include\Jet\Sockets\NetworkSystem.hpp"
+					RelativePath="..\Include\Jet\Sockets\BSockReader.hpp"
 					>
 				</File>
 				<File
@@ -282,11 +294,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\Include\Jet\Sockets\BSockReader.hpp"
+					RelativePath="..\Include\Jet\Sockets\BSockWriter.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\Include\Jet\Sockets\BSockWriter.hpp"
+					RelativePath="..\Include\Jet\Sockets\NetworkSystem.hpp"
 					>
 				</File>
 				<File

@@ -59,6 +59,10 @@ float Vector::dot(const Vector& other) const {
     return x*other.x + y*other.y + z*other.z;
 }
 
+Vector Vector::lerp(const Vector& other, float alpha) const {
+    return *this * (1-alpha) + other * (alpha);
+}
+
 Vector Vector::cross(const Vector& other) const {
     return Vector(
         y*other.z - z*other.y,

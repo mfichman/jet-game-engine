@@ -59,6 +59,10 @@ function Slide:on_run()
         if (math.abs(self.overlay.x - self.end_position) <= math.abs(step)) then
             self.overlay.x = self.end_position
             self.overlay = nil
+            -- Yield for one frame so that it gets drawn
+            -- at the final position before the complete
+            -- callback is invoked
+            coroutine.yield()
             if (self.on_complete) then
                 self.on_complete()
             end

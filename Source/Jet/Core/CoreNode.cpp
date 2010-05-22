@@ -329,17 +329,17 @@ void CoreNode::tick() {
 }
 
 void CoreNode::update_transform() {
-	bool needs_update = true;
+	bool needs_update = false;
 	
-	if (parent_ && parent_->transform_update_count_ != transform_modified_count_) {
+	if (parent_ && parent_->transform_modified_count_ != transform_update_count_) {
 		// If the parent transform has been recalculated more times than
 		// the node's data hs been modified, then we know that our
 		// transform is out of date.  Therefore, we set the transform counts
 		// equal to the parent node count and recalculate our
-		transform_update_count_ = parent_->transform_update_count_;
-		transform_modified_count_ = parent_->transform_modified_count_;
+		transform_update_count_ = parent_->transform_modified_count_;
+		//transform_modified_count_ = parent_->transform_modified_count_;
 		needs_update = true;
-	} else if (transform_update_count_ != transform_modified_count_) {
+	} else if (transform_modified_count_ != transform_update_count_) {
 		// If the node has been modified since the last update, then we
 		// need to update the transform.
 		transform_update_count_ = transform_modified_count_;
@@ -356,6 +356,5 @@ void CoreNode::update_transform() {
 		}
 		world_position_ = matrix_.origin();
 		world_rotation_ = matrix_.rotation();
-		transform_update_count_ = transform_modified_count_;
 	}
 }

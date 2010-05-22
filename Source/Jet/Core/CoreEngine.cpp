@@ -78,7 +78,7 @@ CoreEngine::CoreEngine() :
 		
 	cout << "Starting kernel" << endl;
 	
-	option("engine_build", string("Jet BSockGame Engine 2.0.1 "__DATE__" "__TIME__));
+	option("engine_build", string("Jet Game Engine 2.0.1 "__DATE__" "__TIME__));
 		
 	// Add some default search folders
 	search_folder(".");

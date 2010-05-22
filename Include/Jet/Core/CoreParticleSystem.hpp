@@ -41,8 +41,7 @@ public:
         parent_(parent),
 		life_(0.0f),
 		type_(ET_POINT),
-        accumulator_(0.0f), 
-		next_emission_(0.0f) {
+        accumulator_(0.0f) {
 
         shader("Particle");
     }
@@ -262,6 +261,7 @@ private:
     
     CoreEngine* engine_;
     CoreNode* parent_;
+    Matrix prev_matrix_;
     float life_;
     Range width_;
     Range height_;
@@ -279,8 +279,7 @@ private:
     std::vector<Particle> particle_;
     std::vector<Particle*> dead_particle_;
     std::vector<Particle*> alive_particle_;
-    float accumulator_;
-	float next_emission_;    
+    float accumulator_;  
 };
 
 }

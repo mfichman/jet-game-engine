@@ -67,6 +67,9 @@ public:
     //! Dot product.
     //! @param other another quaternion
     float dot(const Quaternion& other) const;
+    
+    //! Vector multiplication
+    Vector operator*(const Vector& other) const;
 
     //! Scalar multiplication.
     //! @param s the scalar

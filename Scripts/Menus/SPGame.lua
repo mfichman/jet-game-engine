@@ -33,7 +33,10 @@ function SPGame:__init()
     Module.__init(self)
     math.randomseed(os.time())
 
-    self.camera_velocity = Vector()
+    self.yaw = 0
+    self.pitch = 0
+    self.camera_position = Vector()
+    self.camera_rotation = Quaternion()
     
     -- Start overlay
     self.menu = Menu {
@@ -50,13 +53,13 @@ function SPGame:on_load()
     
     -- Set up scene objects and apply some forces
     print("Creating objects")
-    self.s1 = Dagger()
-    self.s1.node.position = Vector(-5, -5, 5)
+    self.ship = Dagger()
+    self.ship.node.position = Vector(-5, -5, 5)
 
     -- Create rocks
     print("Creating rocks")
     self.rocks = {}
-    for i=1,15 do
+    for i=1,25 do
         self.rocks[i] = Rock()
         local x = math.random(-50, 50)
         local y = math.random(-50, 50)
@@ -68,77 +71,114 @@ function SPGame:on_load()
     end
     
     self.menu.overlay.visible = false
+    self.thrust = true
 end
 
-function SPGame:on_update(delta)    
-    delta = delta / engine:option("simulation_speed");
-    camera_node.position = self.camera_velocity*(60*delta) + camera_node.position
-    camera_node:look(Vector(0, 0, 0), Vector(0, 1, 0))
+function SPGame:on_update(delta)
+    self:update_camera(delta)
 end
 
-function SPGame:on_key_pressed(key, x, y)
+function SPGame:on_tick()
+    self:update_ship()
+end
+
+function SPGame:on_mouse_motion(point)
+    self.yaw = point.x
+    self.pitch = point.y
+end
+
+function SPGame:on_key_pressed(key, point)
 
     if (key == 'q') then
         engine.running = false
-    elseif (key == 's') then
-        if (engine:option("simulation_speed") < 1) then
-            engine:option("simulation_speed", 1)
-        else
-            engine:option("simulation_speed", 1/30)
-        end
-    elseif (key == 'n') then
-        engine:option("normal_mapping_enabled", not engine:option("normal_mapping_enabled"))
-    elseif (key == 'h') then
-        engine:option("shadows_enabled", not engine:option("shadows_enabled"))
-    elseif (key == 'f') then
-        if (engine:option("fullscreen_enabled")) then
-            engine:option("display_width", 1024)
-            engine:option("display_height", 768)
-            engine:option("fullscreen_enabled", false)
-        else
-            engine:option("display_width", 1680)
-            engine:option("display_height", 1050)
-            engine:option("fullscreen_enabled", true)
-        end
-        
-        engine:option("video_mode_synced", false)
-    elseif (key == 'e') then
-        if (not self.explosion) then
-            self.explosion = Explosion()
-        else
-            self.explosion:reset()
-        end
-        self.explosion.node.position = self.s1.node.position;
-        self.s1.node:signal(Signal("explode", Vector(0, 0, 9), "hello"))
-        
-    elseif (key == 'j') then
-        self.camera_velocity = self.camera_velocity + Vector(-1, 0, 0)
-    elseif (key == 'l') then
-        self.camera_velocity = self.camera_velocity + Vector(1, 0, 0)
     elseif (key == 'i') then
-        self.camera_velocity = self.camera_velocity + Vector(0, 1, 0)
-    elseif (key == 'k') then
-        self.camera_velocity = self.camera_velocity + Vector(0, -1, 0)
-    elseif (key == 'u') then
-        self.camera_velocity = self.camera_velocity + Vector(0, 0, -1)
-    elseif (key == 'o') then
-        self.camera_velocity = self.camera_velocity + Vector(0, 0, 1)
+        --self.thrust = true
+        --self.ship.flame.life = -1
     end
 end
 
-function SPGame:on_key_released(key, x, y)
-    if (key == 'j') then
-        self.camera_velocity = self.camera_velocity + Vector(1, 0, 0)
-    elseif (key == 'l') then
-        self.camera_velocity = self.camera_velocity + Vector(-1, 0, 0)
-    elseif (key == 'i') then
-        self.camera_velocity = self.camera_velocity + Vector(0, -1, 0)
-    elseif (key == 'k') then
-        self.camera_velocity = self.camera_velocity + Vector(0, 1, 0)
-    elseif (key == 'u') then
-        self.camera_velocity = self.camera_velocity + Vector(0, 0, 1)
-    elseif (key == 'o') then
-        self.camera_velocity = self.camera_velocity + Vector(0, 0, -1)
+function SPGame:on_key_released(key, point)
+    
+    if (key == 'i') then
+        --self.thrust = false
+        --self.ship.flame.life = 0
     end
     
+end
+
+function SPGame:update_camera(delta)
+    if (not self.ship) then return end
+
+    local alpha1 = .05
+    local alpha2 = .05
+    
+    -- Do a slerp on the expected rotation
+    self.camera_rotation = self.camera_rotation:slerp(self.ship.node.rotation, alpha1)
+    
+    local position = self.camera_rotation * Vector(0, 4, -22)
+    local up = self.camera_rotation * Vector(0, 1, 0)
+    local target = self.camera_rotation * Vector(0, 0, 20)
+    
+    
+    -- Now do a lerp to bring the position into line
+    self.camera_position = self.camera_position:lerp(position, alpha2)
+    
+    camera_node.position = self.camera_position + self.ship.node.position
+    camera_node:look(self.ship.node.position + target, up)
+    --camera_node.position
+
+end
+
+function SPGame:update_ship()
+    if (not self.ship) then return end
+
+
+    local max_force = 35
+    local max_speed = 19
+    
+    local mass = self.ship.body.mass
+
+    -- Handle the thrust and automatic course correction
+    if (self.thrust) then
+        
+        -- Auto-correct if the thruster is on
+        local forward = self.ship.node.matrix.forward*max_speed
+        local direction = forward - self.ship.body.linear_velocity
+        
+        -- Correct for differences in the direction of the velocity
+        -- vector (this is the auto-correct activated after collision or
+        -- during a turn)
+        local difference = direction.length
+        
+        -- Select the magnitude of the force applied.  This is always
+        -- less than the total force the thrusters can apply
+        local magnitude = math.min(max_force, difference*100)
+        
+        
+        if (math.abs(magnitude) < 0.01) then
+            -- Do the final correction to get the speed where we want it
+            self.ship.body.linear_velocity = forward
+        else
+            -- Apply the velocity correction by using a force in the
+            -- velocity difference direction
+            self.ship.body:apply_force(direction.unit * magnitude)
+        end
+    end
+    
+    -- Handle each turn individually if the key is pressed, and
+    -- add total angular velocity at the end
+    
+    -- Calculate horizontal circular motion
+    local hmagnitude = -max_force * self.yaw
+    local hradius = mass * math.pow(max_speed, 2) / hmagnitude
+    local hangular = Vector(0, max_speed/hradius, 0)
+    hangular = self.ship.node.rotation * hangular
+    
+    -- Calculate the vertical circular motion
+    local vmagnitude = max_force * self.pitch
+    local vradius = mass * math.pow(max_speed, 2) / vmagnitude
+    local vangular = Vector(max_speed/vradius, 0, 0)
+    vangular = self.ship.node.rotation * vangular
+    
+    self.ship.body.angular_velocity = hangular + vangular
 end

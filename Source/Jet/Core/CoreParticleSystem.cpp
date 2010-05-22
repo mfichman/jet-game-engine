@@ -58,6 +58,7 @@ void CoreParticleSystem::update() {
     }
 	
 	if (life_ <= 0.0f && life_ > -1.0f) {
+        accumulator_ = 0.0f;
 		return;
 	}
     
@@ -65,16 +66,32 @@ void CoreParticleSystem::update() {
     if (life_ > -1.0f) {
 		life_ = max(0.0f, life_ - engine_->frame_delta());
 	}
+    
+    if (!accumulator_) {
+        accumulator_ = engine_->frame_time();
+    }
 
-	accumulator_ += engine_->frame_delta();
-    accumulator_ = min(accumulator_, 2*emission_rate_.begin);
+    float init = accumulator_;
+    
+    const Vector& old_position = prev_matrix_.origin();
+    const Vector& new_position = parent_->matrix().origin();
+    const Quaternion& old_rotation = prev_matrix_.rotation();
+    const Quaternion& new_rotation = parent_->matrix().rotation();
  
     // Spawn additional particle
-    while (accumulator_ > next_emission_ && !dead_particle_.empty()) {
+    while (accumulator_ < engine_->frame_time()) {
+        
+        if (dead_particle_.empty()) {
+            accumulator_ = engine_->frame_delta();
+            break;
+        }
+        
+        // Initialize the particle to the current time and
+        // set up the randomized parameters
         Particle* p = dead_particle_.back();
         dead_particle_.pop_back();
 		alive_particle_.push_back(p);
-        p->init_time = engine_->frame_time();
+        p->init_time = accumulator_;
 		p->init_size = rand_range(particle_size_);
 		p->init_rotation = rand_range(Range(0.0, PI));
 		p->life = rand_range(particle_life_);
@@ -90,13 +107,30 @@ void CoreParticleSystem::update() {
         } else if (ET_POINT == type_) {
             init_particle_point(*p);
         }
-        p->init_position = parent_->matrix() * p->init_position;
-        p->init_velocity = parent_->matrix().rotate(p->init_velocity);
-		p->init_velocity += parent_->linear_velocity();
         
-        accumulator_ -= next_emission_;
-		next_emission_ = 1.0f/rand_range(emission_rate_);
+        // Ratio of etween-frame time to the total time difference
+        // between frames
+        float alpha = (accumulator_ - init)/(engine_->frame_time() - init);
+    
+        // Interpolate position and rotation between this frame and
+        // the last frame renderered
+        Vector position = old_position.lerp(new_position, alpha);
+        Quaternion rotation = old_rotation.slerp(new_rotation, alpha);
+
+        
+        // Rotate the velocity vector by the node's rotation
+        p->init_velocity = rotation * p->init_velocity;
+        
+        // Rotate the start position by the node's rotation, and then
+        // translate it to the node's position
+        p->init_position = rotation * p->init_position;
+        p->init_position = position + p->init_position;
+        
+        // Increment time to the next particle emission
+        accumulator_ += 1.0f/rand_range(emission_rate_);
     }
+    
+    prev_matrix_ = parent_->matrix();
 }
     
 void CoreParticleSystem::init_particle_box(Particle& p) {

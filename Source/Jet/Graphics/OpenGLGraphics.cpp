@@ -321,10 +321,15 @@ void OpenGLGraphics::generate_shadow_map(CoreLight* light) {
 
 		// Transform the view frustum into light space and calculate
 		// the bounding box 
-		Box bounds(matrix * camera->frustum(near_dist, far_dist+5.0f));
-		
-		// Causes the shadow map cascades to overlap
-		//bounds.max_z += 5.0f;
+		Box bounds(matrix * camera->frustum(near_dist, far_dist));
+	
+        // Back up the shadow camera to hold a lot of the scene.  This doesn't
+        // affect shadow resultion, but theoretically if the camera is backed
+        // up too far there will be depth buffer resolution issues.  Also
+        // add a little bit of overlap in the +z direction to take care of
+        // precision issues.
+        bounds.min_z -= 500.0f;
+        bounds.max_z += 20.0f;
 		
 		// Set up the projection matrix for the directional light
 		glMatrixMode(GL_PROJECTION);

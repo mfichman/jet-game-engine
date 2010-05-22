@@ -116,7 +116,6 @@ private:
     MeshPtr mesh_;
     std::map<std::string, boost::any> shader_param_;
     bool cast_shadows_;
-	size_t index_count_;
 };
 
 }

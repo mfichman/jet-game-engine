@@ -66,7 +66,7 @@ void BulletPhysics::on_tick(btDynamicsWorld* world, btScalar step) {
     
     // Clear force, and apply gravity to all rigid bodies
     btCollisionObjectArray objects = world->getCollisionObjectArray();
-    world->clearForces();
+    //world->clearForces();
     for (int i = 0; i < objects.size(); i++) {
          btRigidBody* rigid_body = btRigidBody::upcast(objects[i]);
          if (rigid_body) {

@@ -127,6 +127,10 @@ void SDLInput::on_mouse_released(int button, int x, int y) {
 }
 
 void SDLInput::on_mouse_moved(int x, int y) {
+    Module* module = engine_->module();
+    if (module) {
+        module->on_mouse_motion(normalized_mouse(x, y));
+    }
 
 }
 
@@ -145,8 +149,8 @@ Point SDLInput::normalized_mouse(int x, int y) {
     float height = any_cast<float>(engine_->option("display_height"));
     point.x = 2.0f*(float)x/width - 1.0f;
     point.y = 2.0f*(float)y/height - 1.0f;
-    point.y = max(-1.0f, min(1.0f, point.x));
-    point.x = max(-1.0f, min(1.0f, point.y));
+    point.y = max(-1.0f, min(1.0f, point.y));
+    point.x = max(-1.0f, min(1.0f, point.x));
     
     return point;
 }

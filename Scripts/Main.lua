@@ -6,7 +6,7 @@ require 'Stats'
 print("Creating lights")
 light_node = engine.root:node();
 light = light_node:light("light") {
-    ambient_color = Color(.1, .1, .1, 1),
+    ambient_color = Color(.3, .3, .3, 1),
     diffuse_color = Color(1, 1, 1, 1),
     specular_color = Color(1, 1, 1, 1),
     direction = Vector(1, 0, 1)
@@ -15,8 +15,8 @@ light = light_node:light("light") {
 -- Set up the camera
 print("Creating camera")
 camera_node = engine.root:node("camera")
-camera_node.position = Vector(35, 0, 35)
-camera_node:look(Vector(0, 0, 0), Vector(0, 1, 0))
+camera_node.position = Vector(0, 0, 40)
+camera_node:look(Vector(-5, -5, 5), Vector(0, 1, 0))
 camera = camera_node:camera("camera") {
     active = true,
     field_of_view = 45,

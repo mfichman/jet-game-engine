@@ -136,6 +136,17 @@ float Quaternion::dot(const Quaternion& other) const {
     return w*other.w + x*other.x + y*other.y + z*other.z;
 }
 
+Vector Quaternion::operator*(const Vector& v) const {
+    // nVidia SDK implementation
+    Vector uv, uuv;
+    Vector qvec(x, y, z);
+    uv = qvec.cross(v);
+    uuv = qvec.cross(uv);
+    uv = uv * (2.0f * w);
+    uuv = uuv * 2.0f;
+    return v + uv + uuv;
+}
+
 Quaternion Quaternion::operator*(float s) const {
     return Quaternion(w*s, x*s, y*s, z*s);
 }
