@@ -27,6 +27,7 @@
 
 namespace Jet {
     class CoreCamera;
+    class CoreCollisionSphere;
     class CoreEngine;
     class CoreFractureObject;
     class CoreLight;
@@ -38,6 +39,7 @@ namespace Jet {
     class CoreQuadSet;    
 
     typedef boost::intrusive_ptr<CoreCamera> CoreCameraPtr;
+    typedef boost::intrusive_ptr<CoreCollisionSphere> CoreCollisionSpherePtr;
     typedef boost::intrusive_ptr<CoreEngine> CoreEnginePtr;
     typedef boost::intrusive_ptr<CoreFractureObject> CoreFractureObjectPtr;
     typedef boost::intrusive_ptr<CoreLight> CoreLightPtr;

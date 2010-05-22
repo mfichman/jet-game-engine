@@ -1,7 +1,7 @@
 -- This file declares engine options.  Only two functions should be called from
 -- this file:
 
-if (false) then
+if (true) then
     engine:option("shadow_texture_size", 2048)
     engine:option("display_width", 1440)
     engine:option("display_height", 900)
@@ -23,7 +23,7 @@ else
     engine:option("specular_mapping_enabled", false)
 end
 engine:option("skysphere_texture", "Nebula.png")
-engine:option("vsync_enabled", false)
+engine:option("vsync_enabled", true)
 engine:option("shadow_distance", 400)
 engine:option("shadow_cascades", 4)
 engine:option("shadow_correction", 0.55)

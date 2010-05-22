@@ -133,6 +133,9 @@ public:
 	//! Returns the camera.
 	Camera* camera(const std::string& name="");
     
+    //! Returns the collision sphere
+    CollisionSphere* collision_sphere(const std::string& name="");
+    
     //! Returns the rigid body attached to this node.
     RigidBody* rigid_body();
     

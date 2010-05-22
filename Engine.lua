@@ -77,6 +77,12 @@ function Node:node(name)
     return callable(node_node(self, name))
 end
 
+local node_collision_sphere = engine.root.collision_sphere;
+function Node:collision_sphere(name)
+    name = name or ""
+    return callable(node_collision_sphere(self, name))
+end
+
 local node_mesh_object = engine.root.mesh_object;
 function Node:mesh_object(name)
     name = name or ""

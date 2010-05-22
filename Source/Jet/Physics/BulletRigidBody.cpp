@@ -23,10 +23,10 @@
 #include <Jet/Physics/BulletPhysics.hpp>
 #include <Jet/Physics/BulletRigidBody.hpp>
 #include <Jet/Physics/BulletGeometry.hpp>
-#include <Jet/Core/CoreMeshObject.hpp>
-#include <Jet/Core/CoreFractureObject.hpp>
 #include <Jet/Types/Vector.hpp>
 #include <Jet/Types/Quaternion.hpp>
+#include <Jet/Core/CoreMeshObject.hpp>
+#include <Jet/Core/CoreCollisionSphere.hpp>
 
 using namespace Jet;
 using namespace std;
@@ -79,6 +79,9 @@ void BulletRigidBody::update_collision_shapes() {
     while (shape_->getNumChildShapes() > 0) {
         shape_->removeChildShapeByIndex(shape_->getNumChildShapes() - 1);
     }
+    
+    // Clear old shapes
+    component_.clear();
 
     attach_node(btTransform::getIdentity(), parent_);
 }
@@ -91,8 +94,7 @@ void BulletRigidBody::attach_node(const btTransform& transform, CoreNode* node) 
 	// make sure they are attached to the rigid body.  For child Nodes, make
 	// sure that the node has a reference to the new rigid body.
     for (Iterator<ObjectPtr> i = node->objects(); i; i++) {
-		Object& obj = **i;
-		const type_info& info = typeid(obj);
+		const type_info& info = typeid(**i);
         if (typeid(CoreNode) == info) {
             // Add mesh objects connected to the child node
             CoreNode* node = static_cast<CoreNode*>(i->get());
@@ -105,8 +107,12 @@ void BulletRigidBody::attach_node(const btTransform& transform, CoreNode* node) 
             CoreMeshObject* mesh_object = static_cast<CoreMeshObject*>(i->get());
             attach_mesh_object(transform, mesh_object);
             
+        } else if (typeid(CoreCollisionSphere) == info) {
+            // Found a collision sphere
+            CoreCollisionSphere* collision_sphere = static_cast<CoreCollisionSphere*>(i->get());
+            attach_collision_sphere(transform, collision_sphere);
         }
-    }
+	}
 }
 
 void BulletRigidBody::attach_mesh_object(const btTransform& transform, CoreMeshObject* mesh_object) {
@@ -121,6 +127,13 @@ void BulletRigidBody::attach_mesh_object(const btTransform& transform, CoreMeshO
         BulletGeometry* geometry = static_cast<BulletGeometry*>(mesh->geometry());
         shape_->addChildShape(transform, geometry->shape());
     }
+}
+
+void BulletRigidBody::attach_collision_sphere(const btTransform& transform, CoreCollisionSphere* collision_sphere) {
+    // Attach a new sphere shape
+    boost::shared_ptr<btCollisionShape> sphere(new btSphereShape(collision_sphere->radius()));
+    shape_->addChildShape(transform, sphere.get());
+    component_.push_back(sphere);
 }
 
 void BulletRigidBody::apply_force(const Vector& v) {

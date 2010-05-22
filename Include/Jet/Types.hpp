@@ -53,6 +53,7 @@ namespace Jet {
     class Box;
     class Camera;
     class Color;
+    class CollisionSphere;
     class Cubemap;
     class Engine;
     class EngineListener;
@@ -99,6 +100,7 @@ namespace Jet {
     typedef boost::intrusive_ptr<Audio> AudioPtr;
     typedef boost::intrusive_ptr<AudioSource> AudioSourcePtr;
     typedef boost::intrusive_ptr<Camera> CameraPtr;
+    typedef boost::intrusive_ptr<CollisionSphere> CollisionSpherePtr;
     typedef boost::intrusive_ptr<Cubemap> CubemapPtr;
     typedef boost::intrusive_ptr<Engine> EnginePtr;
     typedef boost::intrusive_ptr<EngineListener> EngineListenerPtr;

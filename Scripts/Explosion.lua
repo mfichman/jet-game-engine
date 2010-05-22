@@ -45,7 +45,7 @@ function Explosion:__init(node, name)
         texture = "IncandescentGold.png",
         particle_life = Range(.6, .6),
         particle_size = Range(.8, .8),
-        life = .01,
+        life = .1,
         width = Range(.8, .8),
         height = Range(.8, .8),
         depth = Range(.8, .8),
@@ -59,7 +59,7 @@ function Explosion:__init(node, name)
         texture = "SmokeWhite.png",
         particle_life = Range(1, 1),
         particle_size = Range(9, 10),
-        life = .01,
+        life = .1,
         width = Range(1, 3),
         height = Range(1, 3),
         depth = Range(1, 3),
@@ -69,7 +69,7 @@ function Explosion:__init(node, name)
 end
 
 function Explosion:reset()
-    self.sparks.life = .01
-    self.explosion.life = .05
-    self.smoke.life = .01
+    self.sparks.life = .1
+    self.explosion.life = .14
+    self.smoke.life = .1
 end

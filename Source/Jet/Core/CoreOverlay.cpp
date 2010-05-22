@@ -106,11 +106,13 @@ Iterator<CoreOverlayPtr> CoreOverlay::children() const {
 	// about the node class.
 	typedef unordered_map<string, CoreOverlayPtr> map_t;
 	typedef boost::function<map_t::mapped_type& (map_t::value_type&)> fun_t;
-	typedef transform_iterator<fun_t, map_t::const_iterator> itr_t;
+	typedef transform_iterator<fun_t, map_t::iterator> itr_t;
 	typedef pair<map_t::iterator, map_t::iterator> pair_t;
+    
+    map_t& map = const_cast<map_t&>(overlay_);
 
-	itr_t begin = make_transform_iterator(overlay_.begin(), &get_value<const string, CoreOverlayPtr>);
-	itr_t end = make_transform_iterator(overlay_.end(), &get_value<const string, CoreOverlayPtr>);
+	itr_t begin = make_transform_iterator(map.begin(), &get_value<const string, CoreOverlayPtr>);
+	itr_t end = make_transform_iterator(map.end(), &get_value<const string, CoreOverlayPtr>);
 
 	return Iterator<CoreOverlayPtr>(begin, end);
 }

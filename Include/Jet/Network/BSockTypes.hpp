@@ -22,6 +22,7 @@
 #pragma once
 
 #include <stdexcept>
+#include <boost/intrusive_ptr.hpp>
 #ifdef WINDOWS
 #include <winsock2.h>
 #include <ws2tcpip.h>

@@ -46,6 +46,7 @@
 #include <Jet/Scene/Light.hpp>
 #include <Jet/Scene/RigidBody.hpp>
 #include <Jet/Scene/AudioSource.hpp>
+#include <Jet/Scene/CollisionSphere.hpp>
 #include <Jet/Resources/Material.hpp>
 #include <Jet/Resources/Mesh.hpp>
 #include <Jet/Resources/Texture.hpp>
@@ -475,6 +476,7 @@ void LuaScript::init_entity_type_bindings() {
             .def("audio_source", &Node::audio_source)
             .def("camera", &Node::camera)
             .def("fracture_object", &Node::fracture_object)
+            .def("collision_sphere", &Node::collision_sphere)
             .def("look", &Node::look)
             .def("signal", &Node::signal)
 			.def("destroy", &Node::destroy),
@@ -539,6 +541,11 @@ void LuaScript::init_entity_type_bindings() {
         luabind::class_<Mesh, MeshPtr>("Mesh")
             .def("vertex", (void (Mesh::*)(size_t, const Vertex&))&Mesh::vertex)
             .def("index", (void (Mesh::*)(size_t, uint32_t))&Mesh::index),
+              
+        luabind::class_<CollisionSphere, CollisionSpherePtr>("CollisionSphere")
+            .property("parent", &CollisionSphere::parent)
+            .property("radius", (float (CollisionSphere::*)() const)&CollisionSphere::radius, (void (CollisionSphere::*)(float))&CollisionSphere::radius),
+
                     
         luabind::class_<Overlay, OverlayPtr>("Overlay")
             .def("overlay", &Overlay::overlay)

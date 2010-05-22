@@ -47,6 +47,7 @@
 #include <Jet/Physics/BulletPhysics.hpp>
 #include <Jet/Audio/FMODAudio.hpp>
 #include <fstream>
+#include <memory>
 
 #define JET_MAX_TIME_LAG 0.5f
 
@@ -56,15 +57,14 @@ using namespace boost::filesystem;
 using namespace boost;
 
 Engine* Engine::create() {
-	CoreEnginePtr engine = new CoreEngine();
-	engine->refcount_inc();
+	auto_ptr<CoreEngine> engine(new CoreEngine());
 	engine->network(new BSockNetwork(engine.get()));
 	engine->graphics(new OpenGLGraphics(engine.get()));
 	engine->script(new LuaScript(engine.get()));
 	engine->input(new SDLInput(engine.get()));
 	engine->physics(new BulletPhysics(engine.get()));
 	engine->audio(new FMODAudio(engine.get()));
-	return engine.get();
+	return engine.release();
 }
 
 CoreEngine::CoreEngine() :

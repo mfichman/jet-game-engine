@@ -99,6 +99,10 @@
 					RelativePath="..\Source\Jet\Sockets\NetworkSystem.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\Source\Jet\Test\Test.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
@@ -106,6 +110,10 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath="..\Source\Jet\Core\CoreNode.cpp"
+				>
+			</File>
 			<Filter
 				Name="Physics"
 				>

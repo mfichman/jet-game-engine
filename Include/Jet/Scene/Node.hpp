@@ -102,6 +102,9 @@ public:
 	//! Returns the camera attached to this node.
 	virtual Camera* camera(const std::string& name="")=0;
     
+    //! Creates a new collision sphere
+    virtual CollisionSphere* collision_sphere(const std::string& name="")=0;
+    
     //! Returns the rigid body attached to this node.
     virtual RigidBody* rigid_body()=0;
     

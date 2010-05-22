@@ -29,6 +29,7 @@
 #include <Jet/Core/CoreQuadChain.hpp>
 #include <Jet/Core/CoreQuadSet.hpp>
 #include <Jet/Core/CoreFractureObject.hpp>
+#include <Jet/Core/CoreCollisionSphere.hpp>
 #include <stdexcept>
 #include <boost/iterator/transform_iterator.hpp>
 #include <boost/function.hpp>
@@ -152,17 +153,23 @@ Camera* CoreNode::camera(const std::string& name) {
 	return get_object<CoreCamera>(name);
 }
 
+CollisionSphere* CoreNode::collision_sphere(const std::string& name) {
+	return get_object<CoreCollisionSphere>(name);
+}
+
 Iterator<ObjectPtr> CoreNode::objects() const {
 	// Transform the unordered map iterator to a generic iterator over
 	// all objects attached to this node.  This hides implementation details
 	// about the node class.
 	typedef unordered_map<string, ObjectPtr> map_t;
 	typedef boost::function<map_t::mapped_type& (map_t::value_type&)> fun_t;
-	typedef transform_iterator<fun_t, map_t::const_iterator> itr_t;
+	typedef transform_iterator<fun_t, map_t::iterator> itr_t;
 	typedef pair<map_t::iterator, map_t::iterator> pair_t;
+    
+    map_t& map = const_cast<map_t&>(object_);
 
-	itr_t begin = make_transform_iterator(object_.begin(), &get_value<const string, ObjectPtr>);
-	itr_t end = make_transform_iterator(object_.end(), &get_value<const string, ObjectPtr>);
+	itr_t begin = make_transform_iterator(map.begin(), &get_value<const string, ObjectPtr>);
+	itr_t end = make_transform_iterator(map.end(), &get_value<const string, ObjectPtr>);
 
 	return Iterator<ObjectPtr>(begin, end);
 }

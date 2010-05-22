@@ -25,6 +25,7 @@ require 'Monkey'
 require 'Rock'
 require 'Box'
 require 'Explosion'
+require 'Bullet'
 require 'Build'
 
 class 'SPGame' (Module)
@@ -37,6 +38,8 @@ function SPGame:__init()
     self.pitch = 0
     self.camera_position = Vector()
     self.camera_rotation = Quaternion()
+    self.bullet = {}
+    self.bullet_index = 0
     
     -- Start overlay
     self.menu = Menu {
@@ -55,6 +58,9 @@ function SPGame:on_load()
     print("Creating objects")
     self.ship = Dagger()
     self.ship.node.position = Vector(-5, -5, 5)
+    
+    local dagger = Dagger()
+    dagger.node.position = Vector(10, 10, 10)
 
     -- Create rocks
     print("Creating rocks")
@@ -91,6 +97,17 @@ end
 function SPGame:on_mouse_motion(point)
     self.yaw = point.x
     self.pitch = point.y
+end
+
+function SPGame:on_mouse_pressed(button, point)
+    self.explosion = self.explosion or Explosion()
+    self.explosion:reset()
+    
+    self.bullet[self.bullet_index] = self.bullet[self.bullet_index] or Bullet()
+    self.bullet[self.bullet_index].node.position = self.ship.node.position
+    self.bullet[self.bullet_index].body.linear_velocity = self.ship.node.matrix.forward * 200 + self.ship.body.linear_velocity
+    
+    self.bullet_index = (self.bullet_index + 1) % 10
 end
 
 function SPGame:on_key_pressed(key, point)

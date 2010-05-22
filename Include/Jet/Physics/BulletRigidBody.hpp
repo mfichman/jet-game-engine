@@ -25,8 +25,9 @@
 #include <Jet/Physics/BulletPhysics.hpp>
 #include <Jet/Core/CoreEngine.hpp>
 #include <Jet/Core/CoreNode.hpp>
-#include <Jet/Core/CoreMeshObject.hpp>
+
 #include <Jet/Scene/RigidBody.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace Jet {
 
@@ -126,12 +127,14 @@ private:
     void setWorldTransform(const btTransform& transform);
     void attach_mesh_object(const btTransform& trans, CoreMeshObject* mesh_object);
     void attach_node(const btTransform& transform, CoreNode* node);
+    void attach_collision_sphere(const btTransform& transform, CoreCollisionSphere* collision_shape);
     
     CoreEngine* engine_;
     CoreNode* parent_;
     float mass_;
 	bool active_;
 
+    std::vector<boost::shared_ptr<btCollisionShape>> component_;
     std::auto_ptr<btRigidBody> body_;
     std::auto_ptr<btCompoundShape> shape_;
     
