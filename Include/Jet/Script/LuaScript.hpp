@@ -59,7 +59,7 @@ private:
     void init_value_type_bindings();
     void init_entity_type_bindings();
     
-    static int adopt_actor(lua_State* env);
+    static int adopt_actor_state(lua_State* env);
     static int adopt_widget(lua_State* env);
     static int adopt_module(lua_State* env);
     static int adopt_task(lua_State* env);

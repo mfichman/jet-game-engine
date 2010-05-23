@@ -18,12 +18,10 @@
 -- FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 -- IN THE SOFTWARE.
 
-require 'Actor'
+class 'Rock'
 
-class 'Rock' (Actor)
-
-function Rock:__init(node, name)
-    Actor.__init(self, node, name)
+function Rock:__init()
+    self.node = engine.root:node()
 
     self.mesh = self.node:mesh_object() {
         mesh = "Rock.obj",

@@ -18,28 +18,30 @@
 -- FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 -- IN THE SOFTWARE.
 
-require 'Actor'
+require 'ActorSupport'
 
-class 'Bullet' (Actor)
+class 'Bullet' (ActorSupport)
+state 'Bullet.Alive'
 
-function Bullet:__init(node, name)
-    Actor.__init(self, node, name)
-
+function Bullet:__init()
+    self.node = engine.root:node()
+    ActorSupport.__init(self, Bullet)
+    
     self.flame = self.node:particle_system() {
         type = ParticleSystem.ET_POINT,
         quota = 300,
-        texture = "FireBlue.png",
-        particle_life = Range(.1, .1),
-        particle_size = Range(.45, .45),
+        texture = "IncandescentBlue.png",
+        particle_life = Range(1, 1),
+        particle_size = Range(1.45, 1.45),
         particle_growth_rate = Range(-8, -8),
         life = -1,
         width = Range(0, 0),
         height = Range(0, 0),
         depth = Range(0, 0),
-        emission_speed = Range(-70, -70),
+        emission_speed = Range(0, 0),
         emission_angle = Range(0, 0),
         emission_direction = Vector(0, 0, 1),
-        emission_rate = Range(800, 800),
+        emission_rate = Range(10, 10),
     }
     
     self.shape = self.node:collision_sphere()
@@ -47,9 +49,11 @@ function Bullet:__init(node, name)
 
     self.body = self.node:rigid_body()
     self.body.mass = .1
+    
+    self.actor.state = "Alive"
 end
 
-function Bullet:on_tick()
+function Bullet.Alive:on_tick()
     local forward = self.body.linear_velocity.unit
     local up = forward.orthogonal
     local right = forward:cross(up)
@@ -57,9 +61,8 @@ function Bullet:on_tick()
     self.body.angular_velocity = Vector()
 end
 
-function Bullet:on_collision(node, position)
+function Bullet.Alive:on_collision(node, position)
     self.explosion = self.explosion or Explosion()
-    self.explosion:reset()
+    self.explosion.actor.state = "Alive"
     self.explosion.node.position = position
-    --self.node.position = position
 end

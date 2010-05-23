@@ -32,6 +32,7 @@
 #include <Jet/Scene/QuadChain.hpp>
 #include <Jet/Scene/FractureObject.hpp>
 #include <Jet/Scene/Camera.hpp>
+#include <Jet/Scene/Actor.hpp>
 #include <Jet/Types/Quaternion.hpp>
 #include <Jet/Types/Vector.hpp>
 #include <Jet/Types/Matrix.hpp>
@@ -145,6 +146,9 @@ public:
 	//! Returns the network monitor attached to this node.
 	NetworkMonitor* network_monitor();
     
+    //! Returns the actor attached to this node
+    Actor* actor();
+    
 	//! Creates and returns an extension object, if it doesn't already exist.
 	//! @param name the name of the extension object
 	//! @param type the type of the object
@@ -229,18 +233,10 @@ public:
     //! @param rotation the rotation of the node
 	void rotation(const Quaternion& rotation);
     
-    //! Adds a listener to this node.
-    //! @param listener the node listener
-    void listener(NodeListener* listener);
-    
     //! Orients this node to point at the given position.
     //! @param target the vector to look at
     //! @param up the up vector
     void look(const Vector& target, const Vector& up=Vector(0.0f, 1.0f, 0.0f));
-
-	//! Sends a signal to this node.  Note that if the node is owned by
-	//! a remote machine, then the signal will be sent by RPC.
-	void signal(const Signal& signal);
 
 	//! Marks this node for destruction.  The node is removed from the scene 
 	//! graph immediately, but won't be garbage collected until all references
@@ -298,7 +294,7 @@ private:
     
     RigidBodyPtr rigid_body_;
     AudioSourcePtr audio_source_;
-    NodeListenerPtr listener_;
+    ActorPtr actor_;
     std::tr1::unordered_map<std::string, ObjectPtr> object_;
 	std::queue<std::vector<Signal> > signal_;
     bool destroyed_;

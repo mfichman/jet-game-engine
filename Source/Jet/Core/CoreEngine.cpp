@@ -58,7 +58,7 @@ using namespace boost;
 
 Engine* Engine::create() {
 	auto_ptr<CoreEngine> engine(new CoreEngine());
-	engine->network(new BSockNetwork(engine.get()));
+    engine->network(new BSockNetwork(engine.get()));
 	engine->graphics(new OpenGLGraphics(engine.get()));
 	engine->script(new LuaScript(engine.get()));
 	engine->input(new SDLInput(engine.get()));

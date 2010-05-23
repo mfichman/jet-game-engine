@@ -18,12 +18,20 @@
 -- FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 -- IN THE SOFTWARE.
 
-require 'Actor'
+require 'ActorSupport'
 
-class 'Explosion' (Actor)
+class 'Explosion' (ActorSupport)
+--class 'Explosion.Alive' (ActorState)
+--class 'Explosion.Dead' (ActorState)
 
-function Explosion:__init(node, name)
-    Actor.__init(self, node, name)
+state 'Explosion.Alive'
+state 'Explosion.Dead'
+
+function Explosion:__init()
+
+    self.node = engine.root:node()
+    ActorSupport.__init(self, Explosion)
+    
     
     self.explosion = self.node:particle_system() {
         type = ParticleSystem.ET_ELLIPSOID,
@@ -31,7 +39,7 @@ function Explosion:__init(node, name)
         texture = "BurstGold.png",
         particle_life = Range(.7, .7),
         particle_size = Range(9, 9),
-        life = .14,
+        life = .12,
         width = Range(.3, 4),
         height = Range(.3, 4),
         depth = Range(.3, 4),
@@ -66,10 +74,20 @@ function Explosion:__init(node, name)
         emission_speed = Range(.6, .6),
         emission_rate = Range(300, 300)
     }
+    
+    self.actor.state = "Alive"
 end
 
-function Explosion:reset()
+
+function Explosion.Alive:on_state_enter()
     self.sparks.life = .1
-    self.explosion.life = .14
+    self.explosion.life = .12
     self.smoke.life = .1
 end
+
+function Explosion.Alive:on_tick()
+    if (self.explosion.life <= 0) then
+        self.actor.state = "Dead"
+    end
+end
+

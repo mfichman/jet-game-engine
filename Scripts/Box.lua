@@ -18,12 +18,10 @@
 -- FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 -- IN THE SOFTWARE.
 
-require 'Actor'
 
-class 'Box' (Actor)
+class 'Box'
 
 function Box:__init(node, name)
-    Actor.__init(self, node, name)
 
     self.mesh = self.node:mesh_object() {
         mesh = "Box.obj",

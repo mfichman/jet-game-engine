@@ -18,12 +18,15 @@
 -- FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 -- IN THE SOFTWARE.
 
-require 'Actor'
+require 'ActorSupport'
 
-class 'Dagger' (Actor)
+class 'Dagger' (ActorSupport)
+state 'Dagger.Alive'
+state 'Dagger.Dead'
 
-function Dagger:__init(node, name)
-    Actor.__init(self, node, name)
+function Dagger:__init()
+    self.node = engine.root:node()
+    ActorSupport.__init(self, Dagger)
 
     self.mesh = self.node:fracture_object() {
         mesh = "Dagger.obj",
@@ -68,9 +71,14 @@ function Dagger:__init(node, name)
 
     self.body = self.node:rigid_body()
     self.body.mass = 1.0
+    
+    self.actor.state = "Alive"
 end
 
-function Dagger:on_fracture(node)
+function Dagger.Alive:on_tick()
+end
+
+function Dagger.Alive:on_fracture(node)
     self.flame.life = 0
     self.sparks = self.sparks or self.node:particle_system()(self.spark_template)
     self.sparks.life = math.random() * 3 + 2
@@ -79,17 +87,15 @@ function Dagger:on_fracture(node)
     node.sparks.life = math.random() * 3 + 2
 end
 
-function Dagger:on_explode(first, second)
-    local n = Vector(math.random()*2-1, math.random()*2-1, math.random()*2-1)
-    self.mesh:fracture(Plane(n.unit, Vector(0, 0, 0)))
-    local n = Vector(math.random()*2-1, math.random()*2-1, math.random()*2-1)
-    self.mesh:fracture(Plane(n.unit, Vector(0, 0, 0)))
-end
-
-function Dagger:on_collision(node)
+function Dagger.Alive:on_collision(node, position)
     self.explosion = self.explosion or Explosion()
-    self.explosion:reset()
-    self.explosion.node.position = self.node.position
-    self:on_explode()
-    self.dead = true
+    self.explosion.node.position = position
+    --self.explosion:state("alive")
+    
+    local n = Vector(math.random()*2-1, math.random()*2-1, math.random()*2-1)
+    self.mesh:fracture(Plane(n.unit, Vector(0, 0, 0)))
+    local n = Vector(math.random()*2-1, math.random()*2-1, math.random()*2-1)
+    self.mesh:fracture(Plane(n.unit, Vector(0, 0, 0)))
+    
+    self.actor.state = "Dead"
 end

@@ -17,6 +17,7 @@ print("Creating camera")
 camera_node = engine.root:node("camera")
 camera_node.position = Vector(0, 0, 40)
 camera_node:look(Vector(-5, -5, 5), Vector(0, 1, 0))
+--camera_node:look(Vector(0, 0, 0), Vector(0, 0, 1))
 camera = camera_node:camera("camera") {
     active = true,
     field_of_view = 45,
@@ -26,5 +27,9 @@ camera = camera_node:camera("camera") {
 
 -- Set up FPS counter
 Stats(engine.screen, "stats")
+
+require 'Rock'
+
+--ock()
 
 StartScreen()

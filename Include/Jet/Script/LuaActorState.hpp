@@ -24,38 +24,32 @@
 #include <Jet/Script/LuaTypes.hpp>
 #include <Jet/Script/LuaScript.hpp>
 #include <Jet/Core/CoreNode.hpp>
+#include <Jet/Scene/Actor.hpp>
+#include <iostream>
 
 namespace Jet {
 
 //! Base class for objects that are connected to a scene node, and control it.
 //! This class is used to attach logic to a node.
-//! @class Actor
+//! @class ActorState
 //! @brief Attaches script logic to a node
-class LuaActor : public NodeListener {
+class LuaActorState : public ActorState {
 public:
     //! Creates a new script controller with a new node.
-	inline  LuaActor(CoreEngine* engine, CoreNode* node, int ref, const std::string& name) :
-		engine_(engine),
-		node_(node->node(name)) {
-        
+	inline LuaActorState(CoreEngine* engine, int ref) :
+        engine_(engine) {
+            
         LuaScript* script = static_cast<LuaScript*>(engine_->script());
 		lua_State* env = script->env();
 		lua_getref(env, ref);
 		lua_unref(env, ref);
 
-		node_->listener(this);
-		self_ = luabind::object(luabind::from_stack(env, -1));
-        self_["node"] = static_cast<Node*>(node_);
-    }
-    
-    //! Destructor
-    inline virtual ~ LuaActor() {
-        self_["node"] = luabind::nil;
+        
+        self_ = luabind::object(luabind::from_stack(env, -1));  
     }
 
-private:
     inline void on_update(float delta) {
-		//self_["on_update"](self_, delta);
+        self_["on_update"](self_, delta);
 	}
 
     inline void on_render() {
@@ -68,7 +62,6 @@ private:
 
     inline void on_destroy() {
 		self_["on_destroy"](self_);
-		node_ = 0;
 	}
 
 	inline void on_fracture(Node* node) {
@@ -79,14 +72,17 @@ private:
         self_["on_tick"](self_);
     }
     
-    inline void on_signal(const Signal& signal) {
-        self_["on_" + signal.name](self_, signal.first, signal.second);
+    inline void on_state_enter() {
+        self_["on_state_enter"](self_);
     }
     
-	CoreEngine* engine_;
-    CoreNode* node_;
+    inline void on_state_exit() {
+        self_["on_state_exit"](self_);
+    }
+
+private:
+    CoreEngine* engine_;
     luabind::object self_;
-    
 };
 
 }

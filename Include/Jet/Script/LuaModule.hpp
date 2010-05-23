@@ -135,6 +135,7 @@ private:
         self_["on_tick"](self_);
     }
     
+private:
 	CoreEngine* engine_;
     luabind::object self_;
 };

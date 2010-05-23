@@ -26,7 +26,6 @@ function Task:__init(delegate)
 end
 
 function Task:on_run()
-print("RUNNIIG")
     if (self.delegate) then
         self.delegate()
     end

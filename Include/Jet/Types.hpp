@@ -48,6 +48,8 @@
 #endif
 
 namespace Jet {
+    class Actor;
+    class ActorState;
     class Audio;
     class AudioSource;
     class Box;
@@ -72,7 +74,6 @@ namespace Jet {
     class Network;
     class NetworkMonitor;
     class Node;
-    class NodeListener;
     class Object;
     class Overlay;
     class OverlayListener;
@@ -97,6 +98,8 @@ namespace Jet {
     class Vector;
     class Vertex;
 
+    typedef boost::intrusive_ptr<Actor> ActorPtr;
+    typedef boost::intrusive_ptr<ActorState> ActorStatePtr;
     typedef boost::intrusive_ptr<Audio> AudioPtr;
     typedef boost::intrusive_ptr<AudioSource> AudioSourcePtr;
     typedef boost::intrusive_ptr<Camera> CameraPtr;
@@ -117,7 +120,6 @@ namespace Jet {
     typedef boost::intrusive_ptr<Network> NetworkPtr;
     typedef boost::intrusive_ptr<NetworkMonitor> NetworkMonitorPtr;
     typedef boost::intrusive_ptr<Node> NodePtr;
-    typedef boost::intrusive_ptr<NodeListener> NodeListenerPtr;
     typedef boost::intrusive_ptr<Object> ObjectPtr;
     typedef boost::intrusive_ptr<Overlay> OverlayPtr;
     typedef boost::intrusive_ptr<OverlayListener> OverlayListenerPtr;

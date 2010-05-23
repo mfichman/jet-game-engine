@@ -113,6 +113,9 @@ public:
 	
 	//! Returns the network monitor attached to this node.
 	virtual NetworkMonitor* network_monitor()=0;
+    
+    //! Returns the actor attached to this node, or creates it.
+    virtual Actor* actor()=0;
 
     //! Returns a component that is attached to this node.  If the object
 	//! does not exist, this function returns null.
@@ -130,58 +133,14 @@ public:
     //! @param rotation the rotation of the node
 	virtual void rotation(const Quaternion& rotation)=0;
     
-    //! Adds a listener to this node.
-    //! @param listener the node listener
-    virtual void listener(NodeListener* listener)=0;
-    
     //! Orients this node to point at the given position.
     //! @param target the vector to look at
     //! @param up the up vector
     virtual void look(const Vector& target, const Vector& up)=0;
-	
-	//! Sends a signal to this node.  Note that if the node is owned by a
-	//! remote machine, then the signal will be sent by RPC.
-	virtual void signal(const Signal& signal)=0;
 
 	//! Marks this node for destruction.  The node is removed from the scene 
 	//! graph immediately, but won't be garbage collected until all references
 	//! to the node are destroyed.
 	virtual void destroy()=0;
 };
-
-
-//! Listens for node events.  Examples include on_pre_render (called before
-//! rendering), on_post_render (called after rendering), on_render (called
-//! during rendering), and on_update (called with each tick of the physics
-//! engine.
-//! @class NodeListener
-//! @brief Interface for handling node events.
-class NodeListener : public virtual Object {
-public: 
-    //! Called once per frame.  The value passed in is the game
-	//! time elapsed since the last frame.  Note that this will
-	//! not be a realtime value if the game is running in slow
-	//! motion.
-    virtual void on_update(float delta)=0;
-    
-    //! Called during each frame if the node is visible.
-    virtual void on_render()=0;
-    
-    //! Called when a colllision is detected by the physics engine.
-    virtual void on_collision(Node* node, const Vector& position)=0;
-    
-    //! Called when the node is destroyed.
-    virtual void on_destroy()=0;
-
-	//! Called when a node is fractured from a child of this node.
-	//! @param node the node that fractured off of this node
-	virtual void on_fracture(Node* node)=0;
-	
-	// Called once for each physics update.
-	virtual void on_tick()=0;
-	
-	//! Called when a signal is received from another node.
-	virtual void on_signal(const Signal& signal)=0;
-};
-
 }

@@ -22,7 +22,7 @@
 
 #include <Jet/Script/LuaTypes.hpp>
 #include <Jet/Script/LuaScript.hpp>
-#include <Jet/Script/LuaActor.hpp>
+#include <Jet/Script/LuaActorState.hpp>
 #include <Jet/Script/LuaModule.hpp>
 #include <Jet/Script/LuaWidget.hpp>
 #include <Jet/Script/LuaTask.hpp>
@@ -38,6 +38,7 @@
 #include <Jet/Types/Matrix.hpp>
 #include <Jet/Scene/MeshObject.hpp>
 #include <Jet/Scene/Node.hpp>
+#include <Jet/Scene/Actor.hpp>
 #include <Jet/Scene/FractureObject.hpp>
 #include <Jet/Scene/ParticleSystem.hpp>
 #include <Jet/Scene/QuadSet.hpp>
@@ -145,56 +146,64 @@ namespace luabind {
 LuaScript::LuaScript(CoreEngine* engine) :
     engine_(engine),
     env_(lua_open()) {
+	
+	try {
+		// Open default libraries and Luabind
+		luaL_openlibs(env_);
+		luabind::open(env_);
+	    
+		// Load all Luabind bindings
+		init_value_type_bindings();
+		init_entity_type_bindings();
+	    
+		// Called when an error occurs
+		luabind::set_pcall_callback(&LuaScript::on_error);
         
+        lua_getglobal(env_, "Actor");
+        lua_pushlightuserdata(env_, this);
+        lua_pushcclosure(env_, &LuaScript::adopt_actor_state, 1);
+        lua_setfield(env_, -2, "actor_state");
+        lua_pop(env_, 1);
+	    
+		// Add __adopt_widget function
+		lua_pushlightuserdata(env_, this);
+		lua_pushcclosure(env_, &LuaScript::adopt_widget, 1);
+		lua_setglobal(env_, "__adopt_widget");
+	    
+		// Add __adopt_module function
+		lua_pushlightuserdata(env_, this);
+		lua_pushcclosure(env_, &LuaScript::adopt_module, 1);
+		lua_setglobal(env_, "__adopt_module");
+	    
+		// Add __adopt_task function
+		lua_pushlightuserdata(env_, this);
+		lua_pushcclosure(env_, &LuaScript::adopt_task, 1);
+		lua_setglobal(env_, "__adopt_task");
+	    
+		// Set a variable for the engine
+		luabind::globals(env_)["engine"] = static_cast<Engine*>(engine_);
+	    
+		//! Load some utility functions related to the engine
+		string engine_path = engine_->resource_path("Engine.lua");
+		if (luaL_dofile(env_, engine_path.c_str())) {
+			string message(lua_tostring(env_, -1));
+			throw runtime_error("Could not load script: " + message);
+		}
+
+		//! Load the options file
+		string options_path = engine_->resource_path("Options.lua");
+		if (luaL_dofile(env_, options_path.c_str())) {
+			string message(lua_tostring(env_, -1));
+			throw runtime_error("Could not load script: " + message);
+		}
+
+	} catch(...) {
+		lua_close(env_);
+		throw;
+	}
+    
     engine_->listener(this);
         
-    // Open default libraries and Luabind
-    luaL_openlibs(env_);
-    luabind::open(env_);
-    
-    // Load all Luabind bindings
-    init_value_type_bindings();
-    init_entity_type_bindings();
-    
-    // Called when an error occurs
-    luabind::set_pcall_callback(&LuaScript::on_error);
-    
-    // Add __adopt_actor function
-    lua_pushlightuserdata(env_, this);
-    lua_pushcclosure(env_, &LuaScript::adopt_actor, 1);
-    lua_setglobal(env_, "__adopt_actor");
-    
-    // Add __adopt_widget function
-    lua_pushlightuserdata(env_, this);
-    lua_pushcclosure(env_, &LuaScript::adopt_widget, 1);
-    lua_setglobal(env_, "__adopt_widget");
-    
-    // Add __adopt_module function
-    lua_pushlightuserdata(env_, this);
-    lua_pushcclosure(env_, &LuaScript::adopt_module, 1);
-    lua_setglobal(env_, "__adopt_module");
-    
-    // Add __adopt_task function
-    lua_pushlightuserdata(env_, this);
-    lua_pushcclosure(env_, &LuaScript::adopt_task, 1);
-    lua_setglobal(env_, "__adopt_task");
-    
-    // Set a variable for the engine
-    luabind::globals(env_)["engine"] = static_cast<Engine*>(engine_);
-    
-	//! Load some utility functions related to the engine
-	string engine_path = engine_->resource_path("Engine.lua");
-    if (luaL_dofile(env_, engine_path.c_str())) {
-        string message(lua_tostring(env_, -1));
-        throw runtime_error("Could not load script: " + message);
-    }
-
-	//! Load the options file
-    string options_path = engine_->resource_path("Options.lua");
-    if (luaL_dofile(env_, options_path.c_str())) {
-        string message(lua_tostring(env_, -1));
-        throw runtime_error("Could not load script: " + message);
-    }
 }
 
 //! Destructor
@@ -239,18 +248,25 @@ void LuaScript::on_update() {
     }
 }
 
-int LuaScript::adopt_actor(lua_State* env) {
+int LuaScript::adopt_actor_state(lua_State* env) {
     using namespace luabind;
+    LuaScript* self = static_cast<LuaScript*>(lua_touserdata(env, lua_upvalueindex(1)));
+	
     
-	LuaScript* self = static_cast<LuaScript*>(lua_touserdata(env, lua_upvalueindex(1)));
-	lua_pushvalue(env, 1);
+    // Arg 1
+    Actor* actor = object_cast<Actor*>(object(from_stack(env, 1)));
+    
+    // Arg 2
+    string name = lua_tostring(env, 2);
+    
+    // Arg 3, the table
     int ref = lua_ref(env, LUA_REGISTRYINDEX);
-	CoreNode* node = static_cast<CoreNode*>(object_cast<Node*>(object(from_stack(env, 2))));
-    string name = lua_tostring(env, 3);
     
-    ObjectPtr obj = new LuaActor(self->engine_, node, ref, name);
+    LuaActorStatePtr state(new LuaActorState(self->engine_, ref));
     
-    return 0;
+    actor->actor_state(name, state.get());
+
+	return 0;
 }
 
 int LuaScript::adopt_widget(lua_State* env) {
@@ -306,6 +322,7 @@ void LuaScript::init_value_type_bindings() {
         
         luabind::class_<Vector>("Vector")
             .def(luabind::constructor<>())
+            .def(luabind::constructor<const Vector&>())
             .def(luabind::constructor<float, float, float>())
             .property("length", &Vector::length)
             .property("length2", &Vector::length2)
@@ -341,6 +358,7 @@ void LuaScript::init_value_type_bindings() {
             
         luabind::class_<Quaternion>("Quaternion")
             .def(luabind::constructor<>())
+            .def(luabind::constructor<const Quaternion&>())
             .def(luabind::constructor<float, float, float, float>())
             .def(luabind::constructor<const Vector&, float>())
             .def(luabind::constructor<const Vector&, const Vector&, const Vector&>())
@@ -433,7 +451,8 @@ void LuaScript::init_entity_type_bindings() {
     using namespace luabind;
 
     // Load script bindings for entity types used by the engine
-    luabind::module(env_) [     
+    luabind::module(env_) [
+              
         luabind::class_<Light, LightPtr>("Light")
             .property("ambient_color", (const Color& (Light::*)() const)&Light::ambient_color, (void (Light::*)(const Color&))&Light::ambient_color)
             .property("diffuse_color", (const Color& (Light::*)() const)&Light::diffuse_color, (void (Light::*)(const Color&))&Light::diffuse_color)
@@ -478,9 +497,13 @@ void LuaScript::init_entity_type_bindings() {
             .def("camera", &Node::camera)
             .def("fracture_object", &Node::fracture_object)
             .def("collision_sphere", &Node::collision_sphere)
+			.def("actor", &Node::actor)
             .def("look", &Node::look)
-            .def("signal", &Node::signal)
 			.def("destroy", &Node::destroy),
+            
+        luabind::class_<Actor, ActorPtr>("Actor")
+            .property("parent", &Actor::parent)
+            .property("state", (const std::string& (Actor::*)() const)&Actor::state, (void (Actor::*)(const std::string&))&Actor::state),
             
         luabind::class_<MeshObject, MeshObjectPtr>("MeshObject")
             .property("parent", &MeshObject::parent)

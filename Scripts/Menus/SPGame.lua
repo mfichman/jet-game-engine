@@ -19,11 +19,8 @@
 -- IN THE SOFTWARE.
 
 require 'Module'
-require 'Shark'
 require 'Dagger'
-require 'Monkey'
 require 'Rock'
-require 'Box'
 require 'Explosion'
 require 'Bullet'
 require 'Build'
@@ -53,14 +50,16 @@ function SPGame:on_load()
     -- Create overlay
     print("Creating overlay")
     self.build = Build(nil, "build")
+
     
     -- Set up scene objects and apply some forces
     print("Creating objects")
-    self.ship = Shark()
+    self.ship = Dagger()
     self.ship.node.position = Vector(-5, -5, 5)
     
-    local dagger = Shark()
-    dagger.node.position = Vector(10, 10, 10)
+    
+  --  local dagger = Dagger()
+  --  dagger.node.position = Vector(10, 10, 10)
 
     -- Create rocks
     print("Creating rocks")
@@ -81,6 +80,7 @@ function SPGame:on_load()
 
         --self.rocks[i].body.linear_velocity = -pos.unit * 5;
     end
+    
     
     self.menu.overlay.visible = false
     self.thrust = true
@@ -130,36 +130,38 @@ end
 function SPGame:update_camera(delta)
     if (not self.ship) then return end
 
-    if (self.ship.dead) then
-        camera_node.position = camera_node.position + camera_velocity * delta
-        camera_node:look(self.ship.node.position, camera_node.matrix.up)
-    else
-        local alpha1 = .09
-        local alpha2 = .06
-        
-        
-        camera_velocity = self.ship.body.linear_velocity
-        
-        -- Do a slerp on the expected rotation
-        self.camera_rotation = self.camera_rotation:slerp(self.ship.node.rotation, alpha1)
-        
-        local position = self.camera_rotation * Vector(0, 4, -18)
-        local up = self.camera_rotation * Vector(0, 1, 0)
-        local target = self.camera_rotation * Vector(0, 0, 20)
-        
-        
-        -- Now do a lerp to bring the position into line
-        self.camera_position = self.camera_position:lerp(position, alpha2)
-        
-        camera_node.position = self.camera_position + self.ship.node.position
-        camera_node:look(self.ship.node.position + target, up)
-        --camera_node.position
-
+   
+    if (self.ship.actor.state == "Alive") then
+        self.ship_position = Vector(self.ship.node.position)
+        self.ship_rotation = Quaternion(self.ship.node.rotation)
     end
+    
+
+    local alpha1 = .09
+    local alpha2 = .06
+    
+    -- Do a slerp on the expected rotation
+    self.camera_rotation = self.camera_rotation:slerp(self.ship_rotation, alpha1)
+    
+    local position = self.camera_rotation * Vector(0, 4, -18)
+    local up = self.camera_rotation * Vector(0, 1, 0)
+    local target = self.camera_rotation * Vector(0, 0, 20)
+    
+    
+    -- Now do a lerp to bring the position into line
+    self.camera_position = self.camera_position:lerp(position, alpha2)
+    camera_node.position = self.camera_position + self.ship_position
+    
+    if (self.ship.actor.state == "Dead") then
+        camera_node:look(self.ship.node.position + target, up)
+    else
+        camera_node:look(self.ship_position + target, up)
+    end
+    --camera_node.position
 end
 
 function SPGame:update_ship()
-    if (not self.ship or self.ship.dead) then return end
+    if (not self.ship or self.ship.actor.state == "Dead") then return end
 
 
     local max_force = 35

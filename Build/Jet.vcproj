@@ -114,6 +114,10 @@
 				RelativePath="..\Source\Jet\Core\CoreNode.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\Include\Jet\Script\LuaActorState.hpp"
+				>
+			</File>
 			<Filter
 				Name="Physics"
 				>

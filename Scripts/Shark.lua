@@ -18,13 +18,15 @@
 -- FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 -- IN THE SOFTWARE.
 
-require 'Actor'
+require 'ActorSupport'
 
-class 'Shark' (Actor)
+class 'Shark' (ActorSupport)
+class 'Shark.Alive' 
+class 'Shark.Dead'
 
-function Shark:__init(node, name)
-    Actor.__init(self, node, name)
-
+function Shark:__init()
+    self.node = engine.root:node()
+    ActorSupport.__init(self, Shark)
 
     self.mesh = self.node:fracture_object() {
         mesh = "Shark.obj",
@@ -69,11 +71,11 @@ function Shark:__init(node, name)
 
     self.body = self.node:rigid_body()
     self.body.mass = 1.0
+    
+    self.actor.state = "Alive"
 end
 
-
-
-function Shark:on_fracture(node)
+function Shark.Alive:on_fracture(node)
     self.flame.life = 0
     self.sparks = self.sparks or self.node:particle_system()(self.spark_template)
     self.sparks.life = math.random() * 3 + 2
@@ -82,17 +84,18 @@ function Shark:on_fracture(node)
     node.sparks.life = math.random() * 3 + 2
 end
 
-function Shark:on_explode(first, second)
+function Shark.Alive:on_explode(first, second)
     local n = Vector(math.random()*2-1, math.random()*2-1, math.random()*2-1)
     self.mesh:fracture(Plane(n.unit, Vector(0, 0, 0)))
     local n = Vector(math.random()*2-1, math.random()*2-1, math.random()*2-1)
     self.mesh:fracture(Plane(n.unit, Vector(0, 0, 0)))
 end
 
-function Shark:on_collision(node)
+function Shark.Alive:on_collision(node)
     self.explosion = self.explosion or Explosion()
-    self.explosion:reset()
+    self.explosion.actor.state = "Alive"
     self.explosion.node.position = self.node.position
     self:on_explode()
-    self.dead = true
+    self.actor.state = "Dead"
 end
+

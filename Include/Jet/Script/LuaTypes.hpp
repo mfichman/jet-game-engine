@@ -26,13 +26,13 @@
 #include <lua/lua.hpp>
 
 namespace Jet { 
-    class LuaActor;
+    class LuaActorState;
     class LuaScriptSystem;
     class LuaTask;
     class LuaModule;
 
     typedef boost::intrusive_ptr<LuaScriptSystem> LuaScriptSystemPtr;
-    typedef boost::intrusive_ptr<LuaActor> LuaActorPtr;
+    typedef boost::intrusive_ptr<LuaActorState> LuaActorStatePtr;
     typedef boost::intrusive_ptr<LuaTask> LuaTaskPtr;
     typedef boost::intrusive_ptr<LuaModule> LuaModulePtr;
 }

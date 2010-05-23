@@ -28,6 +28,7 @@
 #include <Jet/Core/CoreNode.hpp>
 #include <Jet/Core/CoreQuadChain.hpp>
 #include <Jet/Core/CoreQuadSet.hpp>
+#include <Jet/Core/CoreActor.hpp>
 #include <Jet/Core/CoreFractureObject.hpp>
 #include <Jet/Core/CoreCollisionSphere.hpp>
 #include <stdexcept>
@@ -53,13 +54,14 @@ CoreNode::~CoreNode() {
 		// and notify all the listeners to the node.  This case can
 		// happen if the parent node is destroyed.
 		destroyed_ = true;
-		if (listener_) {
-			listener_->on_destroy();
+        CoreActor* actor = static_cast<CoreActor*>(actor_.get());
+		if (actor && actor->current_state_) {
+			//actor->current_state_->on_destroy();
 		}
 	}
 }
 
-Object* CoreNode::object(const std::string& name)  {
+Object* CoreNode::object(const std::string& name) {
 	// Find the given object.  Empty names are invalid, so return
 	// null for the empty string.
 	if (name.empty()) {
@@ -96,6 +98,14 @@ AudioSource* CoreNode::audio_source() {
 
 NetworkMonitor* CoreNode::network_monitor() {
 	return 0;
+}
+
+Actor* CoreNode::actor() {
+    // Create an actor
+    if (!actor_) {
+        actor_.reset(new CoreActor(engine_, this));
+    }
+    return actor_.get();
 }
 
 void CoreNode::add_object(const std::string& name, Object* object) {
@@ -174,16 +184,6 @@ Iterator<ObjectPtr> CoreNode::objects() const {
 	return Iterator<ObjectPtr>(begin, end);
 }
 
-void CoreNode::listener(NodeListener* listener) {
-	// Add the listener if the node hasn't been destroyed already.  This keeps
-	// listeners from being added while the node is being reclaimed.
-	if (destroyed_) {
-		throw std::runtime_error("Attempted to add a listener to a node marked for deletion");
-	} else {
-		listener_ = listener;
-	}
-}
-
 Vector CoreNode::linear_velocity() const {
 	// Return the linear velocity of the rigid body.  Return a zero vector
 	// if this mesh does not have a rigid body.
@@ -239,15 +239,6 @@ void CoreNode::look(const Vector& target, const Vector& up) {
     rotation_ = Quaternion(xaxis, yaxis, zaxis);   
 }
 
-void CoreNode::signal(const Signal& signal) {
-	if (true /*!network_monitor*/) {
-		// Send signal immediately to the object, or else delay the object.
-		if (listener_) {
-			listener_->on_signal(signal);
-		}
-	}
-}
-
 void CoreNode::destroy() {
     if (!destroyed_) {
 		destroyed_ = true;
@@ -264,36 +255,40 @@ void CoreNode::destroy() {
         }
 		
 		// Notify all listeners that this node will be deleted.
-        if (listener_) {
-            listener_->on_destroy();
+        CoreActor* actor = static_cast<CoreActor*>(actor_.get());
+		if (actor && actor->current_state_) {
+			actor->current_state_->on_destroy();
         }
 		
 		// Break cycle between listeners and the node.  If the listeners have
 		// a strong reference to this node, they will still be reclaimed
 		// properly.
-        listener_.reset(); 
+        actor_.reset(); 
     }
 }
 
 void CoreNode::render() {
 	// Handle a render event by notifying all listeners
-    if (listener_) {
-		listener_->on_render();
+    CoreActor* actor = static_cast<CoreActor*>(actor_.get());
+	if (actor && actor->current_state_) {
+		actor->current_state_->on_render();
 	}
 }
 
 void CoreNode::collision(Node* node, const Vector& position) {
 	// Handle a collision event by notifying all listeners
-    if (listener_) {
-		listener_->on_collision(node, position);
+    CoreActor* actor = static_cast<CoreActor*>(actor_.get());
+	if (actor && actor->current_state_) {
+			actor->current_state_->on_collision(node, position);
 	}
 }
 
 void CoreNode::fracture(Node* node) {
 	// Handle a fracture event (i.e., a new node is created using this
 	// node as a template of some kind)
-    if (listener_) {
-		listener_->on_fracture(node);
+    CoreActor* actor = static_cast<CoreActor*>(actor_.get());
+	if (actor && actor->current_state_) {
+			actor->current_state_->on_fracture(node);
 	}
 }
 
@@ -311,8 +306,9 @@ void CoreNode::update() {
 	}
 	
 	// Notify all listeners that a tick is happening
-    if (listener_) {
-		listener_->on_update(engine_->frame_delta());
+    CoreActor* actor = static_cast<CoreActor*>(actor_.get());
+	if (actor && actor->current_state_) {
+			actor->current_state_->on_update(engine_->frame_delta());
 	}
 }
 
@@ -330,8 +326,9 @@ void CoreNode::tick() {
 	}
 	
 	// Notify listeners that an update is happening
-    if (listener_) {
-		listener_->on_tick();
+    CoreActor* actor = static_cast<CoreActor*>(actor_.get());
+	if (actor && actor->current_state_) {
+		actor->current_state_->on_tick();
 	}
 }
 

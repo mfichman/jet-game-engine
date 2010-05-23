@@ -18,21 +18,49 @@
 -- FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 -- IN THE SOFTWARE.
 
-class 'Actor'
+class 'ActorSupport'
 
-function Actor:__init(node, name)
-    node = node or engine.root
-    name = name or ""
-    __adopt_actor(self, node, name)
+
+local registry = {}
+
+
+function ActorSupport:__init(class)
+    
+    -- Initialize states for the actor
+    for k,v in pairs(registry[class]) do
+        self.actor = self.actor or self.node:actor()
+        
+        local o = {}
+        setmetatable(o, o)
+        o.__index = function(t, k)
+            return rawget(t, k) or self[k] or v[k]
+        end
+        
+        self.actor:actor_state(k, o)
+    end
 end
 
-function Actor:on_update() end
-function Actor:on_render() end
-function Actor:on_collision(node, position) end
-function Actor:on_destroy() end
-function Actor:on_fracture(node) end
-function Actor:on_tick(delta) end
-
-function Actor:destroy()
-    self.node:destroy()
+function state(name)
+    local i = name:gfind("%a+")
+    
+    local classname = i()
+    local statename = i()
+    
+    local class = _G[classname]
+    class[statename] = {}
+    
+    local state = class[statename]
+    
+    state.on_update = function() end
+    state.on_render = function() end
+    state.on_collision = function()  end
+    state.on_destroy = function() end
+    state.on_fracture = function()  end
+    state.on_tick = function() end
+    state.on_state_enter = function() end
+    state.on_state_exit = function() end
+    
+    registry[class] = registry[class] or {}
+    registry[class][statename] = state
 end
+
