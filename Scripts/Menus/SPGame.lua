@@ -33,6 +33,7 @@ function SPGame:__init()
 
     self.yaw = 0
     self.pitch = 0
+    self.roll = 0
     self.camera_position = Vector()
     self.camera_rotation = Quaternion()
     self.bullet = {}
@@ -57,6 +58,9 @@ function SPGame:on_load()
     self.ship = Dagger("Red")
     self.ship.node.position = Vector(0, 0, -80)
     
+    
+    self.audio = engine.root:audio_source()
+    self.audio:sound(0, "Zap2.wav")
     
     self.dagger = Dagger("Orange")
     self.dagger.node.position = Vector(-20, -20, -20)
@@ -102,6 +106,8 @@ function SPGame:on_mouse_motion(point)
 end
 
 function SPGame:on_mouse_pressed(button, point)
+    self.audio:state(0, AudioSource.PS_PLAY)
+
     self.bullet[self.bullet_index] = self.bullet[self.bullet_index] or Bullet()
     
     local forward = self.ship.node.matrix.forward
@@ -119,6 +125,10 @@ function SPGame:on_key_pressed(key, point)
         --self.thrust = true
         --self.ship.flame.life = -1
         self.dagger.actor.state = "Dead"
+    elseif (key == 'u') then
+        self.roll = -1
+    elseif (key == 'o') then
+        self.roll = 1
     end
 end
 
@@ -127,6 +137,10 @@ function SPGame:on_key_released(key, point)
     if (key == 'i') then
         --self.thrust = false
         --self.ship.flame.life = 0
+    elseif (key == 'u') then
+        self.roll = 0
+    elseif (key == 'o') then
+        self.roll = 0
     end
     
 end
@@ -202,12 +216,17 @@ function SPGame:update_enemy()
     local hangular = Vector(0, max_speed/hradius, 0)
     hangular = self.dagger.node.rotation * hangular
         
-    local vmagnitude = max_force * 0.8
+    local vmagnitude = max_force * 0.2
     local vradius = mass * math.pow(max_speed, 2) / vmagnitude
     local vangular = Vector(max_speed/vradius, 0, 0)
     vangular = self.ship.node.rotation * vangular
     
-    self.dagger.body.angular_velocity = hangular;
+    local zmagnitude = max_force * 1.2
+    local zradius = mass * math.pow(max_speed, 2) / zmagnitude
+    local zangular = Vector(0, 0, max_speed/zradius)
+    zangular = self.ship.node.rotation * zangular
+    
+    self.dagger.body.angular_velocity = hangular + vangular + zangular;
 
 end
 
@@ -264,5 +283,10 @@ function SPGame:update_ship()
     local vangular = Vector(max_speed/vradius, 0, 0)
     vangular = self.ship.node.rotation * vangular
     
-    self.ship.body.angular_velocity = hangular + vangular
+    local zmagnitude = max_force * self.roll
+    local zradius = mass * math.pow(max_speed, 2) / zmagnitude
+    local zangular = Vector(0, 0, max_speed/zradius)
+    zangular = self.ship.node.rotation * zangular
+    
+    self.ship.body.angular_velocity = hangular + vangular + zangular
 end

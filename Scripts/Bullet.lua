@@ -50,6 +50,7 @@ function Bullet:__init()
 
     self.body = self.node:rigid_body()
     self.body.mass = 1
+
     
     self.actor.state = "Alive"
 end

@@ -43,7 +43,7 @@ PlaybackState FMODAudioSource::state(size_t chan) const {
 void FMODAudioSource::sound(size_t chan, Sound* sound) {
     // If we don't have enough space, then allocate another slot in the set
     // of vectors for this channel.
-    if (chan > sound_.size()) {
+    if (chan >= sound_.size()) {
         sound_.resize(chan + 1);
         channel_.resize(chan + 1);
     }
@@ -53,22 +53,17 @@ void FMODAudioSource::sound(size_t chan, Sound* sound) {
 void FMODAudioSource::state(size_t chan, PlaybackState state) {
     // If we don't have enough space, then allocate another slot in the set
     // of vectors for this channel.
-    if (chan > channel_.size()) {
+    if (chan >= channel_.size()) {
         sound_.resize(chan + 1);
         channel_.resize(chan + 1);
     }
     
-    // If the state is the same, quit (idempotence)
-    if (FMODAudioSource::state(chan) == state) {
-        return;
-    }
-    
-    if (PS_STOP == state && channel_[chan]) {
+    if (PS_STOP == state && PS_STOP != FMODAudioSource::state(chan)) {
         // Stop the clip
         fmod_check(FMOD_Channel_Stop(channel_[chan]));
     }
     
-    if (PS_PLAY == state && sound_[chan] && !channel_[chan]) {
+    if (PS_PLAY == state && sound_[chan]) {
         // Make sure the sound is loaded, and that the channel is not in use.
         // Then play the sound and register callbacks
         sound_[chan]->state(RS_LOADED);

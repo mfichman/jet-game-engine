@@ -121,6 +121,7 @@ CoreEngine::~CoreEngine() {
 	module_.reset();
 	mesh_.clear();
 	texture_.clear();
+	sound_.clear();
 	cubemap_.clear();
 	shader_.clear();
 	material_.clear();

@@ -59,7 +59,7 @@ function Dagger:__init(color)
     
     self.body = self.node:rigid_body()
     self.body.mass = 1
-    self.armor = 500
+    self.armor = 20
     
     self.actor.state = "Alive"
 end

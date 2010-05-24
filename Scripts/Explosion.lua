@@ -76,6 +76,12 @@ function Explosion:__init()
         emission_rate = Range(300, 300)
     }
     
+    self.audio = self.node:audio_source()
+    self.audio:sound(0, "Grenade1.wav")
+    self.audio:sound(1, "Grenade2.wav")
+    self.audio:sound(2, "Grenade3.wav")
+    self.audio:sound(3, "Grenade4.wav")
+    
     self.actor.state = "Alive"
 end
 
@@ -84,6 +90,7 @@ function Explosion.Alive:on_state_enter()
     self.sparks.life = .1
     self.explosion.life = .12
     self.smoke.life = .1
+    self.audio:state(math.random(0, 3), AudioSource.PS_PLAY)
 end
 
 function Explosion.Alive:on_tick()

@@ -453,6 +453,7 @@ void LuaScript::init_entity_type_bindings() {
     // Load script bindings for entity types used by the engine
     luabind::module(env_) [
               
+              
         luabind::class_<Light, LightPtr>("Light")
             .property("ambient_color", (const Color& (Light::*)() const)&Light::ambient_color, (void (Light::*)(const Color&))&Light::ambient_color)
             .property("diffuse_color", (const Color& (Light::*)() const)&Light::diffuse_color, (void (Light::*)(const Color&))&Light::diffuse_color)
@@ -540,6 +541,13 @@ void LuaScript::init_entity_type_bindings() {
             .property("particle_growth_rate", (const Range& (ParticleSystem::*)() const)&ParticleSystem::particle_growth_rate, (void (ParticleSystem::*)(const Range&))&ParticleSystem::particle_growth_rate)
 			.property("texture", (Texture* (ParticleSystem::*)() const)&ParticleSystem::texture, (void (ParticleSystem::*)(const std::string&))&ParticleSystem::texture)
             .enum_("EmitterType") [ value("ET_BOX", ET_BOX), value("ET_POINT", ET_POINT), value("ET_ELLIPSOID", ET_ELLIPSOID) ],
+            
+        luabind::class_<AudioSource, AudioSourcePtr>("AudioSource")
+            .property("parent", &AudioSource::parent)
+            .def("sound", (void (AudioSource::*)(size_t, const std::string&))&AudioSource::sound)
+            .def("state", (void (AudioSource::*)(size_t, PlaybackState))&AudioSource::state)
+            .def("state", (PlaybackState (AudioSource::*)(size_t) const)&AudioSource::state)
+            .enum_("PlaybackState") [ value("PS_PLAY", PS_PLAY), value("PS_STOP", PS_STOP) ],
             
         luabind::class_<RigidBody, RigidBodyPtr>("RigidBody")
             .property("parent", &RigidBody::parent)
