@@ -24,14 +24,16 @@ class 'Dagger' (ActorSupport)
 state 'Dagger.Alive'
 state 'Dagger.Dead'
 
-function Dagger:__init()
+function Dagger:__init(color)
     self.node = engine.root:node()
     ActorSupport.__init(self, Dagger)
+    
+    color = color or "Red"
 
     self.mesh = self.node:fracture_object() {
         mesh = "Dagger.obj",
-        material = "Dagger.mtl",
-        fracture_count = 2
+        material = "Dagger"..color..".mtl",
+        fracture_count = 1
     }
     
     self.engine_node = self.node:node() {
@@ -55,47 +57,53 @@ function Dagger:__init()
         emission_rate = Range(200, 200),
     }
     
-    self.spark_template = {
-        type = ParticleSystem.ET_BOX,
-        quota = 100,
-        texture = "Electricity.png",
-        particle_life = Range(.1, .1),
-        particle_size = Range(1, 3),
-        life = -1,
-        width = Range(0, .3),
-        height = Range(0, .7),
-        depth = Range(0, .2),
-        emission_speed = Range(0, 0),
-        emission_rate = Range(1, 90)
-    }
-
     self.body = self.node:rigid_body()
-    self.body.mass = 1.0
+    self.body.mass = 1
+    self.armor = 500
     
     self.actor.state = "Alive"
 end
 
-function Dagger.Alive:on_tick()
+function Dagger.Dead:on_state_enter()
+    self.explosion = self.explosion or Explosion()
+    self.explosion.node.position = self.node.position
+    self.explosion.actor.state = "Alive"
+
+    self.flame.life = 0
+    self.mesh.fracture_count = 2
+    
+    local n = Vector(math.random()*2-1, math.random()*2-1, math.random()*2-1)
+    self.mesh:fracture(Plane(n.unit, Vector(0, 0, .3)))
+    local n = Vector(math.random()*2-1, math.random()*2-1, math.random()*2-1)
+    self.mesh:fracture(Plane(n.unit, Vector(0, 0, -.3)))
 end
 
-function Dagger.Alive:on_fracture(node)
-    self.flame.life = 0
-    self.sparks = self.sparks or self.node:particle_system()(self.spark_template)
-    self.sparks.life = math.random() * 3 + 2
+function Dagger.Dead:on_fracture(node)
+    local n = Vector(math.random()*2-1, math.random()*2-1, math.random()*2-1) * 100
+    node:rigid_body():apply_force(n)
     
-    node.sparks = node:particle_system()(self.spark_template)
-    node.sparks.life = math.random() * 3 + 2
+    node:particle_system() {
+        type = ParticleSystem.ET_ELLIPSOID,
+        quota = 300,
+        inherit_velocity = false,
+        particle_growth_rate = Range(-10, -10),
+        texture = "BurstGold.png",
+        particle_life = Range(.2, 1),
+        particle_size = Range(.2, .7),
+        life = math.random(10, 20),
+        width = Range(0, .3),
+        height = Range(0, .3),
+        depth = Range(0, .3),
+        emission_speed = Range(0, 3),
+        emission_rate = Range(.01, 2000)
+    }
 end
 
 function Dagger.Alive:on_collision(node, position)
-    self.explosion = self.explosion or Explosion()
-    self.explosion.node.position = position
-    --self.explosion:state("alive")
-    
-    local n = Vector(math.random()*2-1, math.random()*2-1, math.random()*2-1)
-    self.mesh:fracture(Plane(n.unit, Vector(0, 0, 0)))
-    local n = Vector(math.random()*2-1, math.random()*2-1, math.random()*2-1)
-    self.mesh:fracture(Plane(n.unit, Vector(0, 0, 0)))
-    
-    self.actor.state = "Dead"
+    self.armor = self.armor - 20
+    self.collision_position = position
+
+    if (self.armor <= 0) then
+        self.actor.state = "Dead"
+    end
 end

@@ -106,7 +106,7 @@ void CoreFractureObject::fracture_indices(const Plane& plane) {
         swap(mesh1, mesh2);
     }
     
-    if (mesh2->index_count() > 120) {
+    if (mesh2->index_count() > 20) {
         // Create a new fracture object that is an approximate "clone" of this
         // one.  Material, mesh, and other attributes should be copied, but
         // the indices will be different.
@@ -120,6 +120,7 @@ void CoreFractureObject::fracture_indices(const Plane& plane) {
     // Initialize the index buffer for this object
     mesh_object_->mesh(mesh1.get());
     parent_->rigid_body()->mass(m1);
+    parent_->fracture(parent_);
 }
 
 CoreFractureObject* CoreFractureObject::create_clone() {

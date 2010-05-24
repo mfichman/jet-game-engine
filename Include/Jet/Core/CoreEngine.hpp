@@ -110,6 +110,11 @@ public:
 		return frame_time_;
 	}
     
+    //! Returns the frame ide
+    inline uint32_t frame_id() const {
+        return frame_id_;
+    }
+    
     //! Returns an engine option.  This method will return nil if the option
     //! cannot bet found.
     //! @param name the name of the option
@@ -394,6 +399,7 @@ private:
 #else
 	timeval prev_time_;
 #endif
+    uint32_t frame_id_;
 };
 
 }

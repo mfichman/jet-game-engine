@@ -74,7 +74,8 @@ CoreEngine::CoreEngine() :
 	frame_time_(0.0f),
 	fps_frame_count_(0),
 	fps_elapsed_time_(0.0f),
-	auto_name_counter_(0) {
+	auto_name_counter_(0),
+    frame_id_(0) {
 		
 	cout << "Starting kernel" << endl;
 	
@@ -305,6 +306,7 @@ void CoreEngine::update() {
 	}
 	
 	frame_time_ += frame_delta_ * option<float>("simulation_speed");
+    frame_id_++;
 }
 
 void CoreEngine::update_fps() {

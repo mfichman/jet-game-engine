@@ -22,6 +22,7 @@ require 'ActorSupport'
 
 class 'Bullet' (ActorSupport)
 state 'Bullet.Alive'
+state 'Bullet.Dead'
 
 function Bullet:__init()
     self.node = engine.root:node()
@@ -48,9 +49,13 @@ function Bullet:__init()
     self.shape.radius = 0.4
 
     self.body = self.node:rigid_body()
-    self.body.mass = .1
+    self.body.mass = 1
     
     self.actor.state = "Alive"
+end
+
+function Bullet.Alive:on_state_enter()
+    self.node.visible = true
 end
 
 function Bullet.Alive:on_tick()
@@ -65,4 +70,9 @@ function Bullet.Alive:on_collision(node, position)
     self.explosion = self.explosion or Explosion()
     self.explosion.actor.state = "Alive"
     self.explosion.node.position = position
+    self.actor.state = "Dead"
+end
+
+function Bullet.Dead:on_state_enter()
+    self.node.visible = false
 end

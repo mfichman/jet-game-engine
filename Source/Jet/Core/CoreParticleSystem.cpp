@@ -58,17 +58,20 @@ void CoreParticleSystem::update() {
     }
 	
 	if (life_ <= 0.0f && life_ > -1.0f) {
-        accumulator_ = 0.0f;
 		return;
 	}
-    
         
     if (life_ > -1.0f) {
 		life_ = max(0.0f, life_ - engine_->frame_delta());
 	}
     
-    if (!accumulator_) {
+    if (frame_id_ != engine_->frame_id() || !accumulator_) {
+        // If the frame id is different from the engine ID, then we must've
+        // skipped a frame (probably because the parent wasn't visible)
+        // so reset the particle emitter
         accumulator_ = engine_->frame_time();
+        prev_matrix_ = parent_->matrix();
+        frame_id_ = engine_->frame_id();
     }
 
     float init = accumulator_;
@@ -120,7 +123,9 @@ void CoreParticleSystem::update() {
         
         // Rotate the velocity vector by the node's rotation
         p->init_velocity = rotation * p->init_velocity;
-        p->init_velocity = parent_->linear_velocity() + p->init_velocity;
+        if (inherit_velocity_) {
+            p->init_velocity = parent_->linear_velocity() + p->init_velocity;
+        }
         
         // Rotate the start position by the node's rotation, and then
         // translate it to the node's position
@@ -132,6 +137,7 @@ void CoreParticleSystem::update() {
     }
     
     prev_matrix_ = parent_->matrix();
+    frame_id_++;
 }
     
 void CoreParticleSystem::init_particle_box(Particle& p) {

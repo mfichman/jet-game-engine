@@ -41,7 +41,9 @@ public:
         parent_(parent),
 		life_(0.0f),
 		type_(ET_POINT),
-        accumulator_(0.0f) {
+        accumulator_(0.0f),
+        frame_id_(0),
+        inherit_velocity_(true) {
 
         shader("Particle");
     }
@@ -57,6 +59,11 @@ public:
     //! Returns the life of this particle system.
     inline float life() const {
         return life_;
+    }
+    
+    //! Whether or not the particls inherit veelocity
+    inline bool inherit_velocity() const {
+        return inherit_velocity_;
     }
     
     //! Returns the width this particle system.  This describes the range of
@@ -138,6 +145,11 @@ public:
     //! @param life the min and max life of the particle system.
     inline void life(float life) {
         life_ = life;
+    }
+    
+    //! Inherit velocity
+    inline void inherit_velocity(bool inherit) {
+        inherit_velocity_ = inherit;
     }
     
     //! Sets the range of x-values that particles will be created at.
@@ -279,7 +291,9 @@ private:
     std::vector<Particle> particle_;
     std::vector<Particle*> dead_particle_;
     std::vector<Particle*> alive_particle_;
-    float accumulator_;  
+    float accumulator_;
+    uint32_t frame_id_;
+    bool inherit_velocity_;
 };
 
 }

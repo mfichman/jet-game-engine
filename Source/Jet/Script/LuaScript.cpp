@@ -525,6 +525,7 @@ void LuaScript::init_entity_type_bindings() {
         luabind::class_<ParticleSystem, ParticleSystemPtr>("ParticleSystem")
             .property("parent", &ParticleSystem::parent)
             .property("life", (float (ParticleSystem::*)() const)&ParticleSystem::life, (void (ParticleSystem::*)(float))&ParticleSystem::life)
+            .property("inherit_velocity", (bool (ParticleSystem::*)() const)&ParticleSystem::inherit_velocity, (void (ParticleSystem::*)(bool))&ParticleSystem::inherit_velocity)
             .property("quota", (size_t (ParticleSystem::*)() const)&ParticleSystem::quota, (void (ParticleSystem::*)(size_t))&ParticleSystem::quota)
 			.property("width", (const Range& (ParticleSystem::*)() const)&ParticleSystem::width, (void (ParticleSystem::*)(const Range&))&ParticleSystem::width)
             .property("height", (const Range& (ParticleSystem::*)() const)&ParticleSystem::height, (void (ParticleSystem::*)(const Range&))&ParticleSystem::height)

@@ -54,12 +54,13 @@ function SPGame:on_load()
     
     -- Set up scene objects and apply some forces
     print("Creating objects")
-    self.ship = Dagger()
-    self.ship.node.position = Vector(-5, -5, 5)
+    self.ship = Dagger("Red")
+    self.ship.node.position = Vector(0, 0, -80)
     
     
-  --  local dagger = Dagger()
-  --  dagger.node.position = Vector(10, 10, 10)
+    self.dagger = Dagger("Orange")
+    self.dagger.node.position = Vector(-20, -20, -20)
+    self.dagger.body.linear_velocity = Vector(0, 0, 20)
 
     -- Create rocks
     print("Creating rocks")
@@ -78,7 +79,7 @@ function SPGame:on_load()
         local pos = Vector(x, y, z)
         self.rocks[i].body.angular_velocity = pos.unit * 0.4
 
-        --self.rocks[i].body.linear_velocity = -pos.unit * 5;
+    ---self.rocks[i].body.linear_velocity = -pos.unit * 5;
     end
     
     
@@ -92,6 +93,7 @@ end
 
 function SPGame:on_tick()
     self:update_ship()
+    self:update_enemy()
 end
 
 function SPGame:on_mouse_motion(point)
@@ -103,8 +105,9 @@ function SPGame:on_mouse_pressed(button, point)
     self.bullet[self.bullet_index] = self.bullet[self.bullet_index] or Bullet()
     
     local forward = self.ship.node.matrix.forward
-    self.bullet[self.bullet_index].node.position = self.ship.node.position + forward * 4
-    self.bullet[self.bullet_index].body.linear_velocity = forward * 80 + self.ship.body.linear_velocity    
+    self.bullet[self.bullet_index].node.position = self.ship.node.position + forward * 2.5
+    self.bullet[self.bullet_index].body.linear_velocity = forward * 120 + self.ship.body.linear_velocity
+    self.bullet[self.bullet_index].actor.state = "Alive"
     self.bullet_index = (self.bullet_index + 1) % 10
 end
 
@@ -115,6 +118,7 @@ function SPGame:on_key_pressed(key, point)
     elseif (key == 'i') then
         --self.thrust = true
         --self.ship.flame.life = -1
+        self.dagger.actor.state = "Dead"
     end
 end
 
@@ -137,8 +141,8 @@ function SPGame:update_camera(delta)
     end
     
 
-    local alpha1 = .09
-    local alpha2 = .06
+    local alpha1 = .09*delta*60
+    local alpha2 = .06*delta*60
     
     -- Do a slerp on the expected rotation
     self.camera_rotation = self.camera_rotation:slerp(self.ship_rotation, alpha1)
@@ -160,6 +164,53 @@ function SPGame:update_camera(delta)
     --camera_node.position
 end
 
+function SPGame:update_enemy()
+
+    if (not self.dagger or self.dagger.actor.state == "Dead") then return end
+    
+
+    local max_force = 24
+    local max_speed = 20
+
+    local mass = self.dagger.body.mass
+    
+        -- Auto-correct if the thruster is on
+    local forward = self.dagger.node.matrix.forward*max_speed
+    local direction = forward - self.dagger.body.linear_velocity
+    
+    -- Correct for differences in the direction of the velocity
+    -- vector (this is the auto-correct activated after collision or
+    -- during a turn)
+    local difference = direction.length
+    
+    -- Select the magnitude of the force applied.  This is always
+    -- less than the total force the thrusters can apply
+    local magnitude = math.min(max_force, difference*100)
+    
+    
+    if (math.abs(magnitude) < 0.01) then
+        -- Do the final correction to get the speed where we want it
+        self.dagger.body.linear_velocity = forward
+    else
+        -- Apply the velocity correction by using a force in the
+        -- velocity difference direction
+        self.dagger.body:apply_force(direction.unit * magnitude)
+    end
+
+    local hmagnitude = -max_force * -0.4
+    local hradius = mass * math.pow(max_speed, 2) / hmagnitude
+    local hangular = Vector(0, max_speed/hradius, 0)
+    hangular = self.dagger.node.rotation * hangular
+        
+    local vmagnitude = max_force * 0.8
+    local vradius = mass * math.pow(max_speed, 2) / vmagnitude
+    local vangular = Vector(max_speed/vradius, 0, 0)
+    vangular = self.ship.node.rotation * vangular
+    
+    self.dagger.body.angular_velocity = hangular;
+
+end
+
 function SPGame:update_ship()
     if (not self.ship or self.ship.actor.state == "Dead") then return end
 
@@ -168,6 +219,8 @@ function SPGame:update_ship()
     local max_speed = 19
     
     local mass = self.ship.body.mass
+    
+    
 
     -- Handle the thrust and automatic course correction
     if (self.thrust) then

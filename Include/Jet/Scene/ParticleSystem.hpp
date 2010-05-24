@@ -36,6 +36,9 @@ public:
     //! Returns the parent node.
     virtual Node* parent() const=0;
     
+    //! Whether or not the particles inherit velocity
+    virtual bool inherit_velocity() const=0;
+    
     //! Returns the life of this particle system.
     virtual float life() const=0;
     
@@ -85,6 +88,9 @@ public:
     
     //! Returns the shader in user for this particle system.
     virtual Shader* shader() const=0;
+    
+    //! Sets whether or not the particles inherit velocity of the parent
+    virtual void inherit_velocity(bool inherit)=0;
     
     //! Sets the life of this particle system.
     //! @param life the min and max life of the particle system.
