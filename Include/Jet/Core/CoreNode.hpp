@@ -209,6 +209,9 @@ public:
 	void raw_position(const Vector& position) {
 		position_ = position;
 		transform_modified_count_++;
+        if (audio_source_) {
+            audio_source_->position(position);
+        }
 	}
 	
 	//! Sets the raw position of the node

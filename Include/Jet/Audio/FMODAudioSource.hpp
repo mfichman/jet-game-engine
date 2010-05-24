@@ -73,7 +73,7 @@ public:
     //! @param mode the audio state
     void state(size_t chan, PlaybackState state);
     
-    //! Sets the position of this audio system.
+    //! Sets the position of this audio source.
     void position(const Vector& position);
     
 private:    

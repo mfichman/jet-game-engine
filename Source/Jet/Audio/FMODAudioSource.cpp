@@ -77,6 +77,20 @@ void FMODAudioSource::state(size_t chan, PlaybackState state) {
     }
 }
 
+    
+//! Sets the rigid body position
+void FMODAudioSource::position(const Vector& position) {
+    for (size_t i = 0; i < channel_.size(); i++) {
+        if (channel_[i]) {
+            
+            FMOD_VECTOR* u = (FMOD_VECTOR*)&position;
+            FMOD_VECTOR* v = (FMOD_VECTOR*)&parent_->linear_velocity();
+            
+            fmod_check(FMOD_Channel_Set3DAttributes(channel_[i], u, v));
+        }
+    }
+}
+
 FMOD_RESULT F_CALLBACK FMODAudioSource::on_channel_event(FMOD_CHANNEL* ch, FMOD_CHANNEL_CALLBACKTYPE type, void* data1, void* data2) {
     FMODAudioSource* self;
     fmod_check(FMOD_Channel_GetUserData(ch, (void**)&self));

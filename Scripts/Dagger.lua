@@ -89,7 +89,7 @@ function Dagger.Dead:on_fracture(node)
         particle_growth_rate = Range(-10, -10),
         texture = "BurstGold.png",
         particle_life = Range(.2, 1),
-        particle_size = Range(.2, .7),
+        particle_size = Range(.4,  .7),
         life = math.random(10, 20),
         width = Range(0, .3),
         height = Range(0, .3),

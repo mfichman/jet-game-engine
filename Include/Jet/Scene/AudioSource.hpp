@@ -56,6 +56,9 @@ public:
     //! @param chan the channel to use
     //! @param mode the audio state
     virtual void state(size_t chan, PlaybackState state)=0;
+    
+    //! Sets the rigid body position
+    virtual void position(const Vector& position)=0;
 };
 
 }

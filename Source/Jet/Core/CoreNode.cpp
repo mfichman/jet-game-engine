@@ -204,6 +204,9 @@ void CoreNode::position(const Vector& position) {
 	if (rigid_body_ && rigid_body_->parent() == this) {
 		rigid_body_->position(position);
 	}
+    if (audio_source_) {
+        audio_source_->position(position);
+    }
 }
 
 void CoreNode::rotation(const Quaternion& rotation) {
@@ -308,7 +311,7 @@ void CoreNode::update() {
 	// Notify all listeners that a tick is happening
     CoreActor* actor = static_cast<CoreActor*>(actor_.get());
 	if (actor && actor->current_state_) {
-			actor->current_state_->on_update(engine_->frame_delta());
+		actor->current_state_->on_update(engine_->frame_delta());
 	}
 }
 
