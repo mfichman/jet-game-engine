@@ -95,9 +95,9 @@ function Dagger.Dead:on_fracture(node)
         particle_life = Range(.2, 1),
         particle_size = Range(.4,  .7),
         life = math.random(10, 20),
-        width = Range(0, .3),
-        height = Range(0, .3),
-        depth = Range(0, .3),
+        width = Range(0, .6),
+        height = Range(0, .6),
+        depth = Range(0, .6),
         emission_speed = Range(0, 3),
         emission_rate = Range(.01, 2000)
     }

@@ -44,7 +44,7 @@ function StartScreen:__init()
     self.quit_button.on_click = bind("on_quit_click", self)
 
     -- Set up the box
-    --[[self.box_node = engine.root:node("box")
+    self.box_node = engine.root:node("box")
     self.box_node.position = Vector(0, 0, -14)
     self.box = self.box_node:mesh_object("box") {
         mesh = "Box.obj",
@@ -53,7 +53,7 @@ function StartScreen:__init()
     self.box_body = self.box_node.rigid_body
     self.box_body.mass = 10000.0
 
-    self.box_body.angular_velocity = Vector(.05, .2, 0)]]
+    self.box_body.angular_velocity = Vector(.05, .2, 0)
     
 
     engine.network.state = Network.NS_DISABLED

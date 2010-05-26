@@ -73,7 +73,9 @@ end
 function BulletActive:__finalize()
 	-- Make sure that the explosion node we created is destroyed
 	-- as well when the bullet is destroyed
-	--self.explosion:destroy()
+	if (self.explosion) then 
+		self.explosion:destroy()
+	end
 end	
 
 function BulletActive:on_state_enter()

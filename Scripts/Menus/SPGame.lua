@@ -221,7 +221,7 @@ function SPGame:update_enemy()
     local vangular = Vector(max_speed/vradius, 0, 0)
     vangular = self.ship.node.rotation * vangular
     
-    local zmagnitude = max_force * 1.2
+    local zmagnitude = max_force * 0.2
     local zradius = mass * math.pow(max_speed, 2) / zmagnitude
     local zangular = Vector(0, 0, max_speed/zradius)
     zangular = self.ship.node.rotation * zangular
