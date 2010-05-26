@@ -29,13 +29,15 @@ function MPLobby:__init()
     -- Overlay
     self.menu = Menu {
         name = "mplobby_menu",
-        title_text = engine:option("network_game"),
+        title_text = engine.network.current_match.name,
         title_font = "Russel.ttf#48",
         button_width = 230
     }
+    
     self.menu.title.y = 10
     self.menu.list.overlay.y = 70
-    self.menu:button("back", bind("on_back_click", self))
+    self.back_button = self.menu:button("back")
+    self.back_button.on_click = bind("on_back_click", self)
     
     -- Player list
     self.list = List {
@@ -56,18 +58,21 @@ function MPLobby:__init()
         x = 4
     }
     
-    for i=1,2 do
-        self.list:label("")
-        self.numbers:label(tostring(i))
-    end
-    
     -- Set put us into host mode
-    engine:option("network_game", engine:option("network_game"))
-    engine:option("network_mode", "join")
+    engine.network.state = Network.NS_JOIN
 end
 
-function MPLobby:on_player_update(number, name)
-    self.list.buttons_list[number+1].overlay.text = name
+function MPLobby:on_player_list_update(number, name)
+    self.list:clear()
+    self.numbers:clear()
+    for i=1,engine.network.player_count do
+        self.list:label(engine.network:player(i-1).name)
+        self.numbers:label(tostring(i))
+    end
+end
+
+function MPLobby:on_network_error()
+    self.menu:next(MPScreen)
 end
 
 function MPLobby:on_go_click(widget, button)

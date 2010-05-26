@@ -26,20 +26,25 @@ class 'MPHost' (Module)
 function MPHost:__init()
     Module.__init(self)
     
-    local game = engine:option("network_player").."'s game"
+    local match = Match(engine.network.current_player.name.."'s game")
     
     -- Overlay
     self.menu = Menu {
         name = "mphost_menu",
-        title_text = game,
+        title_text = match.name,
         title_font = "Russel.ttf#48",
         button_width = 230
     }
+    
     self.menu.title.y = 10
     self.menu.list.overlay.y = 70
-    self.menu:button("back", bind("on_back_click", self))
-    self.menu:button("ok", bind("on_ok_click", self))
     
+    self.back_button = self.menu:button("back")
+    self.back_button.on_click = bind("on_back_click", self)
+    self.ok_button = self.menu:button("ok")
+    self.ok_button.on_click = bind("on_ok_click", self)
+    
+
     -- Player list
     self.list = List {
         parent = self.menu.overlay,
@@ -59,18 +64,18 @@ function MPHost:__init()
         x = 4
     }
     
-    for i=1,2 do
-        self.list:label("")
-        self.numbers:label(tostring(i))
-    end
-    
     -- Set put us into host mode
-    engine:option("network_game", game)
-    engine:option("network_mode", "host")
+    engine.network.current_match = match
+    engine.network.state = Network.NS_HOST
 end
 
-function MPHost:on_player_update(number, name)
-    self.list.buttons_list[number+1].overlay.text = name
+function MPHost:on_player_list_update()
+    self.list:clear()
+    self.numbers:clear()
+    for i=1,engine.network.player_count do
+        self.list:label(engine.network:player(i-1).name)
+        self.numbers:label(tostring(i))
+    end
 end
 
 function MPHost:on_ok_click(widget, button)

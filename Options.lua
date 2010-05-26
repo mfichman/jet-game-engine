@@ -23,7 +23,7 @@ else
     engine:option("specular_mapping_enabled", false)
 end
 engine:option("skysphere_texture", "Nebula.png")
-engine:option("vsync_enabled", true)
+engine:option("vsync_enabled", false)
 engine:option("shadow_distance", 400)
 engine:option("shadow_cascades", 4)
 engine:option("shadow_correction", 0.55)

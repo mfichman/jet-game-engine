@@ -32,13 +32,13 @@ class Module : public Object {
 public:
     
     //! Called when a network game is found
-    virtual void on_player_update(int number, const std::string& name)=0;
+    virtual void on_player_list_update()=0;
     
     //! Called when a network game is found
-    virtual void on_game_found(const std::string& game)=0;
-    
-    //! Called when a game is lost.
-    virtual void on_game_lost(const std::string& game)=0;
+    virtual void on_match_list_update()=0;
+
+	//! Called when there is a network error
+	virtual void on_network_error()=0;
     
     //! Called when a key is pressed.
     //! @param key the key

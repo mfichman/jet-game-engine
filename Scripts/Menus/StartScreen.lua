@@ -34,22 +34,29 @@ function StartScreen:__init()
         name = "startscreen_menu",
         title_text = "zero combat."
     }
-    self.menu:button("multiplayer", bind("on_mp_click", self))
-    self.menu:button("single player", bind("on_sp_click", self))
-    self.menu:button("quit", bind("on_quit_click", self))
+    self.mp_button = self.menu:button("multiplayer")
+    self.mp_button.on_click = bind("on_mp_click", self)
     
+    self.sp_button = self.menu:button("single player")
+    self.sp_button.on_click = bind("on_sp_click", self)
+    
+    self.quit_button = self.menu:button("quit")
+    self.quit_button.on_click = bind("on_quit_click", self)
+
     -- Set up the box
-    self.box_node = engine.root:node("box")
+    --[[self.box_node = engine.root:node("box")
     self.box_node.position = Vector(0, 0, -14)
     self.box = self.box_node:mesh_object("box") {
         mesh = "Box.obj",
         material = "Metal.mtl"
-    }
-    self.box_body = self.box_node:rigid_body()
+    }    
+    self.box_body = self.box_node.rigid_body
     self.box_body.mass = 10000.0
-    self.box_body.angular_velocity = Vector(.05, .2, 0)
+
+    self.box_body.angular_velocity = Vector(.05, .2, 0)]]
     
-    engine:option("network_mode", "disabled")
+
+    engine.network.state = Network.NS_DISABLED
 end
 
 function StartScreen:on_key_pressed(key)

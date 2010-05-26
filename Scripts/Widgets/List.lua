@@ -38,28 +38,29 @@ function List:__init(options)
     self.button_spacing = options.button_spacing or 10
     self.overlay.x = options.x or 0
     self.overlay.y = options.y or 0
-    self.buttons_list = {}
+    self.elements = {}
     self.overlay.height = 0
 end
 
 function List:clear()
-    for i,v in ipairs(self.buttons_list) do
+    for i,v in ipairs(self.elements) do
         v.overlay.visible = false
         v.overlay.text = ""
         v.on_click = function() end
     end
-    self.buttons_list = {}
+    self.elements = {}
+    self.overlay.height = 0
 end
 
 function List:remove(name)
-    for i,v in ipairs(self.buttons_list) do
+    for i,v in ipairs(self.elements) do
         if (v.overlay.text == name) then
             local temp = v;
-            local n = table.getn(self.buttons_list)
-            self.buttons_list[i].overlay.text = self.buttons_list[n].overlay.text
-            self.buttons_list[n].overlay.text = ""
-            self.buttons_list[n].visible = false
-            self.buttons_list[n] = nil
+            local n = table.getn(self.elements)
+            self.elements[i].overlay.text = self.elements[n].overlay.text
+            self.elements[n].overlay.text = ""
+            self.elements[n].visible = false
+            self.elements[n] = nil
             self.overlay.height = self.overlay.height - self.button_spacing - self.font_size
             break
         end
@@ -68,7 +69,7 @@ end
 
 function List:label(text)
     -- Creates a new button
-    local n = table.getn(self.buttons_list)+1
+    local n = table.getn(self.elements)+1
     local l = Label(self.overlay, self.name..n)
     l.overlay {
         visible = true,
@@ -81,14 +82,14 @@ function List:label(text)
     
     -- Increase the height of the list to accomodate the button
     self.overlay.height = self.overlay.height + self.button_spacing + self.font_size
-    self.buttons_list[n] = l
+    self.elements[n] = l
     
     return l
 end
 
-function List:text_field(label, text, callback)
+function List:text_field(label)
     -- Creates a new button
-    local n = table.getn(self.buttons_list)+1
+    local n = table.getn(self.elements)+1
     local t = TextField(self.overlay, self.name..n)
     t.overlay {
         visible = true,
@@ -97,20 +98,19 @@ function List:text_field(label, text, callback)
         width = self.button_width,
         y = self.overlay.height
     }
-    t.on_enter = callback
     t.label = label
     t.buffer = text
     
     -- Increase the height of the list to accomodate the button
     self.overlay.height = self.overlay.height + self.button_spacing + self.font_size
-    self.buttons_list[n] = t
+    self.elements[n] = t
     
     return t
 end
 
-function List:button(text, callback)
+function List:button(text)
     -- Creates a new button
-    local n = table.getn(self.buttons_list)+1
+    local n = table.getn(self.elements)+1
     local b = Button(self.overlay, self.name..n)
     b.overlay {
         visible = true,
@@ -120,11 +120,10 @@ function List:button(text, callback)
         text = text,
         y = self.overlay.height
     }
-    b.on_click = callback
     
     -- Increase the height of the list to accomodate the button
     self.overlay.height = self.overlay.height + self.button_spacing + self.font_size
-    self.buttons_list[n] = b
+    self.elements[n] = b
     
     return b
 end

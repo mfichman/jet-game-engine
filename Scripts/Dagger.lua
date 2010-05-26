@@ -25,10 +25,14 @@ state 'Dagger.Alive'
 state 'Dagger.Dead'
 
 function Dagger:__init(color)
+
+
     self.node = engine.root:node()
     ActorSupport.__init(self, Dagger)
     
+    
     color = color or "Red"
+    
 
     self.mesh = self.node:fracture_object() {
         mesh = "Dagger.obj",
@@ -57,7 +61,7 @@ function Dagger:__init(color)
         emission_rate = Range(200, 200),
     }
     
-    self.body = self.node:rigid_body()
+    self.body = self.node.rigid_body
     self.body.mass = 1
     self.armor = 20
     
@@ -80,7 +84,7 @@ end
 
 function Dagger.Dead:on_fracture(node)
     local n = Vector(math.random()*2-1, math.random()*2-1, math.random()*2-1) * 100
-    node:rigid_body():apply_force(n)
+    self.body:apply_force(n)
     
     node:particle_system() {
         type = ParticleSystem.ET_ELLIPSOID,

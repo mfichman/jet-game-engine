@@ -82,6 +82,9 @@ public:
     //! Returns the background texture of this overlay.
     virtual Texture* background() const=0;
     
+    //! Returns true if the mouse is over this overlay
+    virtual bool mouse_over() const=0;
+    
     //! Sets the visibility of the overlay.
     virtual void visible(bool visible)=0;
     

@@ -29,19 +29,20 @@ class 'MPScreen' (Module)
 function MPScreen:__init()
     Module.__init(self)
     
-    if (engine:option("network_player") == "anonymous") then
-        engine:option("network_player", "han solo")
-    end
-
     -- Screen overlay
     self.menu = Menu {
         name = "mpscreen_menu",
         title_text = "multiplayer.",
-        button_width = 230
+        button_width = 330
     }
-    self.player_name = self.menu:text_field("name", engine:option("network_player"), bind("on_text_enter", self))
-    self.menu:button("host game", bind("on_host_click", self))
-    self.menu:button("back", bind("on_back_click", self))
+    self.player_name = self.menu:text_field("name")
+    self.player_name.buffer = "anonymous"
+    
+    self.host_button = self.menu:button("host game")
+    self.host_button.on_click = bind("on_host_click", self)
+    
+    self.back_button = self.menu:button("back")
+    self.back_button.on_click = bind("on_back_click", self)
     
     -- Games list
     self.list = List {
@@ -52,36 +53,33 @@ function MPScreen:__init()
         x = 380
     }
     
-    --self.list:button("matt's game", bind("on_null", self))
-    --self.list:button("bob's game", bind("on_null", self))
-    --self.list:button("mikes's game", bind("on_null", self))
-    --self.list:button("jim's game", bind("on_null", self))
-    --self.list:button("jon's game", bind("on_null", self))
-    --self.list:button("bill's game", bind("on_null", self))
-    
     -- Put the network into discover mode
-    engine:option("network_mode", "discover")
+    engine.network.state = Network.NS_DISCOVER
 end
 
 function MPScreen:on_game_click(widget, button)
-    engine:option("network_game", widget.overlay.text)
-    engine:option("network_player", self.player_name.buffer)
+
+    for i=1,engine.network.match_count do
+        local match = engine.network:match(i-1)
+        if (widget.overlay.text == match.name) then
+            engine.network.current_match = match
+            break
+        end
+    end
+
+    engine.network.current_player = Player(self.player_name.buffer)
     self.menu:next(MPLobby)
 end
 
-function MPScreen:on_game_found(game)
-    self.list:button(game, bind("on_game_click", self))
-end
-
-function MPScreen:on_game_lost(game)
-    self.list:remove(game)
-end
-
-function MPScreen:on_text_enter(widget, button)
+function MPScreen:on_match_list_update()
+    self.list:clear()
+    for i=1,engine.network.match_count do
+        self.list:button(engine.network:match(i-1).name, bind("on_game_click", self))
+    end
 end
 
 function MPScreen:on_host_click(widget, button)
-    engine:option("network_player", self.player_name.buffer)
+    engine.network.current_player = Player(self.player_name.buffer)
     self.menu:next(MPHost)
 end
 

@@ -46,20 +46,20 @@ public:
     }
     
 private:
+    
+    //! Called during a network error
+    inline void on_network_error() {
+        self_["on_network_error"](self_);
        
+    }
     //! Called when a game is found.
-    inline void on_player_update(int number, const std::string& name) {
-        self_["on_player_update"](self_, number, name);
+    inline void on_player_list_update() {
+        self_["on_player_list_update"](self_);
     }
     
     //! Called when a game is found.
-    inline void on_game_found(const std::string& name) {
-        self_["on_game_found"](self_, name);
-    }
-    
-    //! Called when a game is lost.
-    inline void on_game_lost(const std::string& name) {
-        self_["on_game_lost"](self_, name);
+    inline void on_match_list_update() {
+        self_["on_match_list_update"](self_);
     }
     
     //! Called when a key is pressed.

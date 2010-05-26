@@ -55,6 +55,7 @@ public:
         vertical_alignment_(AL_TOP),
         horizontal_alignment_(AL_LEFT),
         text_color_(1.0f, 1.0f, 1.0f, 1.0f),
+        mouse_over_(false),
         visible_(true),
         focusable_(false) {
         
@@ -73,7 +74,7 @@ public:
         vertical_alignment_(AL_TOP),
         horizontal_alignment_(AL_LEFT),
         text_color_(1.0f, 1.0f, 1.0f, 1.0f),
-        mouse_inside_(false),
+        mouse_over_(false),
         visible_(true),
         focusable_(false) {
             
@@ -163,6 +164,11 @@ public:
     //! Returns the background texture of this overlay.
     inline Texture* background() const {
         return background_.get();
+    }
+    
+    //! Returns true if the mouse is over this overlay
+    inline bool mouse_over() const {
+        return mouse_over_;
     }
     
     //! Returns an iterator over the objects connected to this node.
@@ -294,7 +300,7 @@ private:
     Color text_color_;
     TexturePtr background_;
     FontPtr font_;
-    bool mouse_inside_;
+    bool mouse_over_;
     bool visible_;
     bool focusable_;
     OverlayListenerPtr listener_;

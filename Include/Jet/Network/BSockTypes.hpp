@@ -74,5 +74,4 @@ namespace Jet {
     typedef boost::intrusive_ptr<BSockWriter> BSockSocketWriterPtr;
 
     enum SocketType { ST_SERVER, ST_CLIENT, ST_MULTICAST, ST_DATAGRAM, ST_STREAM };
-    enum NetworkState { NS_DISCOVER, NS_HOST, NS_JOIN, NS_RUNNING, NS_DISABLED };
 }

@@ -63,6 +63,7 @@ namespace Jet {
     class FractureObject;
     class FractalPlanet;
     class Frustum;
+    class Match;
     class Geometry;
     class Input;
     class Light;
@@ -79,6 +80,7 @@ namespace Jet {
     class OverlayListener;
     class Particle;
     class ParticleSystem;
+    class Player;
     class Plane;
     class Point;
     class Physics;
@@ -141,4 +143,5 @@ namespace Jet {
     enum SyncMode { SM_STATIC, SM_DYNAMIC };
     enum LayoutMode { LM_RELATIVE, LM_ABSOLUTE };
     enum Alignment { AL_TOP, AL_CENTER, AL_BOTTOM, AL_LEFT, AL_RIGHT };
+    enum NetworkState { NS_DISCOVER, NS_HOST, NS_JOIN, NS_RUNNING, NS_DISABLED };
 }

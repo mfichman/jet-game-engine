@@ -27,7 +27,10 @@
 #include <Jet/Script/LuaWidget.hpp>
 #include <Jet/Script/LuaTask.hpp>
 #include <Jet/Types.hpp>
+#include <Jet/Network.hpp>
 #include <Jet/Interface/Overlay.hpp>
+#include <Jet/Types/Player.hpp>
+#include <Jet/Types/Match.hpp>
 #include <Jet/Types/Vector.hpp>
 #include <Jet/Types/Quaternion.hpp>
 #include <Jet/Types/Range.hpp>
@@ -252,18 +255,11 @@ int LuaScript::adopt_actor_state(lua_State* env) {
     using namespace luabind;
     LuaScript* self = static_cast<LuaScript*>(lua_touserdata(env, lua_upvalueindex(1)));
 	
-    
-    // Arg 1
     Actor* actor = object_cast<Actor*>(object(from_stack(env, 1)));
-    
-    // Arg 2
     string name = lua_tostring(env, 2);
-    
-    // Arg 3, the table
     int ref = lua_ref(env, LUA_REGISTRYINDEX);
     
     LuaActorStatePtr state(new LuaActorState(self->engine_, ref));
-    
     actor->actor_state(name, state.get());
 
 	return 0;
@@ -442,7 +438,18 @@ void LuaScript::init_value_type_bindings() {
             .property("right", &Matrix::right)
             .property("up", &Matrix::up)
             .property("origin", &Matrix::origin)
-            .property("rotation", &Matrix::rotation)
+            .property("rotation", &Matrix::rotation),
+
+		luabind::class_<Player>("Player")
+			.def(luabind::constructor<const string&>())
+			.def_readonly("name", &Player::name)
+			.def_readonly("uuid", &Player::uuid),
+
+		luabind::class_<Match>("Match")
+			.def(luabind::constructor<const string&>())
+			.def_readonly("name", &Match::name)
+			.def_readonly("uuid", &Match::uuid)
+
     ];
 }
     
@@ -487,18 +494,18 @@ void LuaScript::init_entity_type_bindings() {
             .property("matrix", &Node::matrix)
             .property("world_position", &Node::world_position)
             .property("world_rotation", &Node::world_rotation)
-            .def("node", &Node::node)
+            .property("rigid_body", &Node::rigid_body)
+            .property("audio_source", &Node::audio_source)
+			.property("actor", &Node::actor)
+			.def("node", &Node::node)
             .def("mesh_object", &Node::mesh_object)
             .def("particle_system", &Node::particle_system)
             .def("quad_set", &Node::quad_set)
             .def("quad_chain", &Node::quad_chain)
             .def("light", &Node::light)
-            .def("rigid_body", &Node::rigid_body)
-            .def("audio_source", &Node::audio_source)
             .def("camera", &Node::camera)
             .def("fracture_object", &Node::fracture_object)
             .def("collision_sphere", &Node::collision_sphere)
-			.def("actor", &Node::actor)
             .def("look", &Node::look)
 			.def("destroy", &Node::destroy),
             
@@ -562,14 +569,27 @@ void LuaScript::init_entity_type_bindings() {
         luabind::class_<Engine, EnginePtr>("Engine")
             .property("root", &Engine::root)
             .property("screen", &Engine::screen)
-            .def("option", (void (Engine::*)(const std::string&, const boost::any&))&Engine::option)
-            .def("option", (const boost::any& (Engine::*)(const std::string&) const)&Engine::option)
-            .def("search_folder", &Engine::search_folder)
             .property("frame_time", &Engine::frame_time)
-            .property("frame_delta", &Engine::frame_delta)
+            .property("frame_delta", &Engine::frame_delta)           
+			.property("network", &Engine::network)
+            .property("running", (bool (Engine::*)() const)&Engine::running, (void (Engine::*)(bool))&Engine::running)
 			.def("mesh", (Mesh* (Engine::*)(const std::string&))&Engine::mesh)
             .def("material", &Engine::material)
-            .property("running", (bool (Engine::*)() const)&Engine::running, (void (Engine::*)(bool))&Engine::running),
+			.def("option", (void (Engine::*)(const std::string&, const boost::any&))&Engine::option)
+            .def("option", (const boost::any& (Engine::*)(const std::string&) const)&Engine::option)
+            .def("search_folder", &Engine::search_folder),
+
+            
+        luabind::class_<Network, NetworkPtr>("Network")
+            .property("state", (NetworkState (Network::*)() const)&Network::state, (void (Network::*)(NetworkState))&Network::state)
+            .property("current_match", (const Match& (Network::*)() const)&Network::current_match, (void (Network::*)(const Match&))&Network::current_match)
+            .property("current_player", (const Player& (Network::*)() const)&Network::current_player, (void (Network::*)(const Player&))&Network::current_player)
+            .property("match_count", &Network::match_count)
+            .property("player_count", &Network::player_count)
+            .def("match", &Network::match)
+            .def("player", &Network::player)
+            .enum_("NetworkState") [ value("NS_JOIN", NS_JOIN), value("NS_HOST", NS_HOST), value("NS_DISCOVER", NS_DISCOVER), value("NS_DISABLED", NS_DISABLED) ],
+
             
         luabind::class_<Mesh, MeshPtr>("Mesh")
             .def("vertex", (void (Mesh::*)(size_t, const Vertex&))&Mesh::vertex)
@@ -595,6 +615,7 @@ void LuaScript::init_entity_type_bindings() {
             .property("text_color", (const Color& (Overlay::*)() const)&Overlay::text_color, (void (Overlay::*)(const Color&))&Overlay::text_color)
             .property("font", (Font* (Overlay::*)() const)&Overlay::font, (void (Overlay::*)(const std::string&))&Overlay::font)
             .property("background", (Texture* (Overlay::*)() const)&Overlay::background, (void (Overlay::*)(const std::string&))&Overlay::background)
+            .property("mouse_over", &Overlay::mouse_over)
             .enum_("Alignment") [ value("AL_LEFT", AL_LEFT), value("AL_RIGHT", AL_RIGHT), value("AL_CENTER", AL_CENTER), value("AL_TOP", AL_TOP), value("AL_BOTTOM", AL_BOTTOM) ]
             .enum_("LayoutMode") [ value("LM_RELATIVE", LM_RELATIVE), value("LM_ABSOLUTE", LM_ABSOLUTE) ]
             

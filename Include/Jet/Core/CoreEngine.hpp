@@ -178,34 +178,22 @@ public:
 	Geometry* geometry(const std::string& name="");
 		
 	//! Returns the network interface.
-	inline Network* network() const {
-		return network_.get();
-	}
+	Network* network() const;
 	
 	//! Returns the physics interface.
-	inline Physics* physics() const {
-		return physics_.get();
-	}
+	Physics* physics() const;
 	
 	//! Returns the audio module
-	inline Audio* audio() const {
-		return audio_.get();
-	}
+	Audio* audio() const;
 	
 	//! Returns script module
-	inline Script* script() const {
-		return script_.get();
-	}
+	Script* script() const;
 	
 	//! Returns renderer module
-	inline Graphics* graphics() const {
-		return graphics_.get();
-	}
+	Graphics* graphics() const;
 	
 	//! Returns the input system
-	inline Input* input() const {
-		return input_.get();
-	}
+	Input* input() const;
 	
 		//! Returns the network interface.
 	inline void network(Network* network) {

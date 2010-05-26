@@ -18,62 +18,95 @@
 -- FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 -- IN THE SOFTWARE.
 
-require 'ActorSupport'
+require 'ActorState'
 
-class 'Bullet' (ActorSupport)
-state 'Bullet.Alive'
-state 'Bullet.Dead'
+Bullet = {}
+setmetatable(Bullet, Bullet)
 
-function Bullet:__init()
-    self.node = engine.root:node()
-    ActorSupport.__init(self, Bullet)
+class 'BulletActive' (ActorState)
+class 'BulletInactive' (ActorState)
+
+-- This function creates a blue energy bullet node that creates an
+-- explosion when it hits something
+function Bullet.__call()
+	-- Create a new node
+    local node = engine.root:node()
     
-    self.flame = self.node:particle_system() {
-        type = ParticleSystem.ET_POINT,
-        quota = 300,
-        texture = "IncandescentBlue.png",
-        particle_life = Range(1, 1),
-        particle_size = Range(1.45, 1.45),
-        particle_growth_rate = Range(-8, -8),
-        life = -1,
-        width = Range(0, 0),
-        height = Range(0, 0),
-        depth = Range(0, 0),
-        emission_speed = Range(0, 0),
-        emission_angle = Range(0, 0),
-        emission_direction = Vector(0, 0, 1),
-        emission_rate = Range(10, 10),
-    }
+    -- Create a blue particle effect for the bullet
+    local flame = node:particle_system()
+    flame.type = ParticleSystem.ET_POINT
+    flame.quota = 300
+    flame.texture = "IncandescentBlue.png"
+    flame.particle_life = Range(1, 1)
+    flame.particle_size = Range(1.45, 1.45)
+    flame.particle_growth_rate = Range(-8, -8)
+    flame.life = -1
+    flame.width = Range(0, 0)
+    flame.height = Range(0, 0)
+    flame.depth = Range(0, 0)
+    flame.emission_speed = Range(0, 0)
+    flame.emission_angle = Range(0, 0)
+    flame.emission_direction = Vector(0, 0, 1)
+    flame.emission_rate = Range(10, 10)
+        
+    -- Create a sphere for detecting collisions with the
+    -- node/particle system
+    local sphere = node:collision_sphere()
+    sphere.radius = 0.4
     
-    self.shape = self.node:collision_sphere()
-    self.shape.radius = 0.4
-
-    self.body = self.node:rigid_body()
-    self.body.mass = 1
-
+    -- Create an actor to handle state transitions for the
+    -- node
+    node.actor:actor_state("Active", BulletActive(node))
+    node.actor:actor_state("Inactive", BulletInactive(node))
+    node.actor.state = "Inactive"
     
-    self.actor.state = "Alive"
+    -- Give the sphere mass and a rigid body
+    node.rigid_body.mass = 1
+    
+    return node
 end
 
-function Bullet.Alive:on_state_enter()
+function BulletActive:__init(node)
+	self.node = node
+end
+
+function BulletActive:__finalize()
+	-- Make sure that the explosion node we created is destroyed
+	-- as well when the bullet is destroyed
+	--self.explosion:destroy()
+end	
+
+function BulletActive:on_state_enter()
     self.node.visible = true
 end
 
-function Bullet.Alive:on_tick()
-    local forward = self.body.linear_velocity.unit
+function BulletActive:on_tick()
+	-- Create an orthogonal basis using the velocity vector 
+	-- as the forward vector
+    local forward = self.node.rigid_body.linear_velocity.unit
     local up = forward.orthogonal
     local right = forward:cross(up)
+    
+    -- Set the rotation and the angular velocity
     self.node.rotation = Quaternion(up, right, forward)
-    self.body.angular_velocity = Vector()
+    --self.node.rigid_body.angular_velocity = Vector()
 end
 
-function Bullet.Alive:on_collision(node, position)
+function BulletActive:on_collision(node, position)
+    -- Create an explosion object if one doesn't exist, and
+    -- set its position to the collision contact point
     self.explosion = self.explosion or Explosion()
-    self.explosion.actor.state = "Alive"
     self.explosion.node.position = position
-    self.actor.state = "Dead"
+    self.explosion.actor.state = "Alive"
+    
+    -- Switch states to inactive
+    self.node.actor.state = "Inactive"
 end
 
-function Bullet.Dead:on_state_enter()
+function BulletInactive:__init(node)
+	self.node = node
+end
+
+function BulletInactive:on_state_enter()
     self.node.visible = false
 end

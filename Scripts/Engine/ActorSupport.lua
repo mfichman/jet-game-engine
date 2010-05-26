@@ -20,15 +20,13 @@
 
 class 'ActorSupport'
 
-
 local registry = {}
-
 
 function ActorSupport:__init(class)
     
     -- Initialize states for the actor
     for k,v in pairs(registry[class]) do
-        self.actor = self.actor or self.node:actor()
+        self.actor = self.actor or self.node.actor
         
         local o = {}
         setmetatable(o, o)

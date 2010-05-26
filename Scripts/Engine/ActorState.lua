@@ -18,45 +18,17 @@
 -- FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 -- IN THE SOFTWARE.
 
-require 'Widget'
-require 'Engine'
+class 'ActorState'
 
-class 'Button' (Widget)
-
-function Button:__init(overlay, name)
-    Widget.__init(self, overlay, name)
-
-    -- Default options
-    self.overlay.font = "Russel.ttf#14"
-    self.overlay.vertical_alignment = Overlay.AL_TOP
-    self.overlay.x = 4
-    self.overlay.y = 4
-    self.overlay.width = 800
-    self.overlay.height = 16
-    
-    if (self.overlay.mouse_over) then
-        self.overlay.text_color = Color(1, 1, 1, 1)
-        self.color_fade = 1
-    else
-        self.overlay.text_color = Color(1, 1, 1, 0.7)
-        self.color_fade = -1
-    end
-    
+function ActorState.__init()
 end
 
-function Button:on_update(delta)
-    local alpha = self.overlay.text_color.alpha + 2*self.color_fade*delta
-    self.overlay.text_color = Color(1, 1, 1, math.clamp(alpha, .7, 1))
-end
 
-function Button:on_mouse_pressed(button)
-    self:on_click(button)
-end
-
-function Button:on_mouse_enter()
-    self.color_fade = 1;
-end
-
-function Button:on_mouse_exit()
-    self.color_fade = -1;
-end
+function ActorState.on_update() end
+function ActorState.on_render() end
+function ActorState.on_collision()  end
+function ActorState.on_destroy() end
+function ActorState.on_fracture()  end
+function ActorState.on_tick() end
+function ActorState.on_state_enter() end
+function ActorState.on_state_exit() end

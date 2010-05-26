@@ -31,7 +31,38 @@ namespace  Jet {
 //! @brief Sets network options for the engine.
 class Network : public virtual Object {
 public:
-
+    //! Creates a new network monitor.
+    virtual NetworkMonitor* network_monitor() const=0;
+    
+    //! Returns the current network state
+    virtual NetworkState state() const=0;
+    
+    //! Returns the number of games available.
+    virtual size_t match_count() const=0;
+    
+    //! Returns the number of players in the current game.
+    virtual size_t player_count() const=0;
+    
+    //! Returns information about a game.
+    virtual const Match& match(size_t index) const=0;
+    
+    //! Returns information about a player in the game.
+    virtual const Player& player(size_t index) const=0;
+    
+    //! Returns information about the current local match
+    virtual const Match& current_match() const=0;
+    
+    //! Returns information about the current player.
+    virtual const Player& current_player() const=0;
+    
+    //! Sets the current mode of the network
+    virtual void state(NetworkState state)=0;
+    
+    //! Sets the current game.
+    virtual void current_match(const Match& match)=0;
+    
+    //! Sets information about the current player.
+    virtual void current_player(const Player& player)=0;
 };
     
 }

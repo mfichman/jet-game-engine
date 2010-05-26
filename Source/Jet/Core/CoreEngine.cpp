@@ -67,6 +67,11 @@ Engine* Engine::create() {
 	return engine.release();
 }
 
+Engine* Engine::create_custom() {
+    auto_ptr<CoreEngine> engine(new CoreEngine());
+    return engine.release();
+}
+
 CoreEngine::CoreEngine() :
     running_(true),
 	initialized_(false),
@@ -143,7 +148,7 @@ void CoreEngine::init_systems() {
 Font* CoreEngine::font(const std::string& name) {
 	map<string, FontPtr>::iterator i = font_.find(name);
     if (i == font_.end()) {
-        FontPtr font(graphics_->font(name));
+        FontPtr font(graphics()->font(name));
         font_.insert(make_pair(name, font));
         return font.get();
 	} else {
@@ -154,7 +159,7 @@ Font* CoreEngine::font(const std::string& name) {
 Sound* CoreEngine::sound(const std::string& name) {
 	map<string, SoundPtr>::iterator i = sound_.find(name);
     if (i == sound_.end()) {
-        SoundPtr sound(audio_->sound(name));
+        SoundPtr sound(audio()->sound(name));
         sound_.insert(make_pair(name, sound));
         return sound.get();
 	} else {
@@ -166,14 +171,14 @@ Sound* CoreEngine::sound(const std::string& name) {
 Mesh* CoreEngine::mesh(const std::string& name) {
 	if (name.empty()) {
 		string name = "__" + lexical_cast<string>(auto_name_counter_++);
-		MeshPtr mesh(graphics_->mesh(name));
+		MeshPtr mesh(graphics()->mesh(name));
 		mesh_.insert(make_pair(name, mesh));
 		return mesh.get();
 	}
 	
     map<string, MeshPtr>::iterator i = mesh_.find(name);
     if (i == mesh_.end()) {
-        MeshPtr mesh(graphics_->mesh(name));
+        MeshPtr mesh(graphics()->mesh(name));
         mesh_.insert(make_pair(name, mesh));
         return mesh.get();
 	} else {
@@ -184,7 +189,7 @@ Mesh* CoreEngine::mesh(const std::string& name) {
 Geometry* CoreEngine::geometry(const std::string& name) {
     map<string, GeometryPtr>::iterator i = geometry_.find(name);
     if (i == geometry_.end()) {
-        GeometryPtr geometry(physics_->geometry(name));
+        GeometryPtr geometry(physics()->geometry(name));
         geometry_.insert(make_pair(name, geometry));
         return geometry.get();
 	} else {
@@ -195,7 +200,7 @@ Geometry* CoreEngine::geometry(const std::string& name) {
 Mesh* CoreEngine::mesh(Mesh* parent) {
 	string name = "__" + lexical_cast<string>(auto_name_counter_++);
 	
-    MeshPtr mesh(graphics_->mesh(name, parent));
+    MeshPtr mesh(graphics()->mesh(name, parent));
     mesh_.insert(make_pair(name, mesh));
     return mesh.get();
 }
@@ -203,7 +208,7 @@ Mesh* CoreEngine::mesh(Mesh* parent) {
 Texture* CoreEngine::texture(const std::string& name) {
     map<string, TexturePtr>::iterator i = texture_.find(name);
     if (i == texture_.end()) {
-        TexturePtr texture(graphics_->texture(name));
+        TexturePtr texture(graphics()->texture(name));
         texture_.insert(make_pair(name, texture));
         return texture.get();
 	} else {
@@ -214,7 +219,7 @@ Texture* CoreEngine::texture(const std::string& name) {
 Cubemap* CoreEngine::cubemap(const std::string& name) {
     map<string, CubemapPtr>::iterator i = cubemap_.find(name);
     if (i == cubemap_.end()) {
-        CubemapPtr cubemap(graphics_->cubemap(name));
+        CubemapPtr cubemap(graphics()->cubemap(name));
         cubemap_.insert(make_pair(name, cubemap));
         return cubemap.get();
 	} else {
@@ -226,7 +231,7 @@ Cubemap* CoreEngine::cubemap(const std::string& name) {
 Material* CoreEngine::material(const std::string& name) {
     map<string, MaterialPtr>::iterator i = material_.find(name);
     if (i == material_.end()) {
-        MaterialPtr material(graphics_->material(name));
+        MaterialPtr material(graphics()->material(name));
         material_.insert(make_pair(name, material));
         return material.get();
 	} else {
@@ -237,7 +242,7 @@ Material* CoreEngine::material(const std::string& name) {
 Shader* CoreEngine::shader(const std::string& name) {
     map<string, ShaderPtr>::iterator i = shader_.find(name);
     if (i == shader_.end()) {
-        ShaderPtr shader(graphics_->shader(name));
+        ShaderPtr shader(graphics()->shader(name));
         shader_.insert(make_pair(name, shader));
         return shader.get();
 	} else {
@@ -316,7 +321,7 @@ void CoreEngine::update_fps() {
     fps_frame_count_++;
     if (fps_elapsed_time_ > 0.1f) {
 		option("stat_fps", fps_frame_count_/fps_elapsed_time_);
-		option("stat_memory", (float)script_->memory_usage());
+		option("stat_memory", (float)script()->memory_usage());
         fps_frame_count_ = 0;
         fps_elapsed_time_ = 0.0f;
     }
@@ -353,4 +358,52 @@ void CoreEngine::update_frame_delta() {
 
 void CoreEngine::delete_mesh(const std::string& name) {
 	mesh_.erase(name);	
+}
+
+Network* CoreEngine::network() const {
+    if (network_) {
+        return network_.get();
+    } else {
+        throw std::runtime_error("Network subsystem not loaded");
+    }
+}
+
+Physics* CoreEngine::physics() const {
+    if (physics_) {
+        return physics_.get();
+    } else {
+        throw std::runtime_error("Physics subsystem not loaded");
+    }
+}
+
+Audio* CoreEngine::audio() const {
+    if (audio_) {
+        return audio_.get();
+    } else {
+        throw std::runtime_error("Audio subsystem not loaded");
+    }
+}
+
+Script* CoreEngine::script() const {
+    if (script_) {
+        return script_.get();
+    } else {
+        throw std::runtime_error("Script subsystem not loaded");
+    }
+}
+
+Graphics* CoreEngine::graphics() const {
+    if (graphics_) {
+        return graphics_.get();
+    } else {
+        throw std::runtime_error("Graphics subsystem not loaded");
+    }
+}
+
+Input* CoreEngine::input() const {
+    if (input_) {
+        return input_.get();
+    } else {
+        throw std::runtime_error("Input subsystem not loaded");
+    }
 }

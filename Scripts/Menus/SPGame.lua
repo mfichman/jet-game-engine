@@ -52,15 +52,14 @@ function SPGame:on_load()
     print("Creating overlay")
     self.build = Build(nil, "build")
 
-    
     -- Set up scene objects and apply some forces
     print("Creating objects")
     self.ship = Dagger("Red")
-    self.ship.node.position = Vector(0, 0, -80)
+    self.ship.node.position = Vector(0, 0, -80)    
     
-    
-    self.audio = engine.root:audio_source()
+    self.audio = engine.root.audio_source
     self.audio:sound(0, "Zap2.wav")
+    
     
     self.dagger = Dagger("Orange")
     self.dagger.node.position = Vector(-20, -20, -20)
@@ -89,6 +88,7 @@ function SPGame:on_load()
     
     self.menu.overlay.visible = false
     self.thrust = true
+    
 end
 
 function SPGame:on_update(delta)
@@ -106,14 +106,14 @@ function SPGame:on_mouse_motion(point)
 end
 
 function SPGame:on_mouse_pressed(button, point)
-    self.audio:state(0, AudioSource.PS_PLAY)
+    --self.audio:state(0, AudioSource.PS_PLAY)
 
     self.bullet[self.bullet_index] = self.bullet[self.bullet_index] or Bullet()
     
     local forward = self.ship.node.matrix.forward
-    self.bullet[self.bullet_index].node.position = self.ship.node.position + forward * 2.5
-    self.bullet[self.bullet_index].body.linear_velocity = forward * 120 + self.ship.body.linear_velocity
-    self.bullet[self.bullet_index].actor.state = "Alive"
+    self.bullet[self.bullet_index].position = self.ship.node.position + forward * 2.5
+    self.bullet[self.bullet_index].rigid_body.linear_velocity = forward * 120 + self.ship.body.linear_velocity
+    self.bullet[self.bullet_index].actor.state = "Active"
     self.bullet_index = (self.bullet_index + 1) % 10
 end
 

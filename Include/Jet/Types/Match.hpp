@@ -23,21 +23,47 @@
 
 #include <Jet/Types.hpp>
 
-namespace Jet { 
+namespace Jet {
 
-//! Structure for holding information about a multiplayer game.
-//! @class BSockGame
-//! @brief BSockGame value
-class BSockPlayer {
+//! Holds information about a multiplayer game.
+//! @class Match
+//! @brief Holds information about a multiplayer game.
+class Match {
 public:
-    //! Creates a new player
-    BSockPlayer() :
-        time(0.0f) {
+    //! Creates a new game with the given name.
+    inline Match(const std::string& name) :
+        name(name),
+        server_port(0),
+        multicast_port(0),
+        uuid(rand()),
+        timestamp(0.0f) {
+        
+    }
+    
+    //! Creates a new game
+    inline Match() :
+        name("Unknown"),
+        server_port(0),
+        multicast_port(0),
+        uuid(rand()),
+        timestamp(0.0f) {
+    }
+    
+    inline bool operator==(const Match& other) const {
+        return uuid == other.uuid;
+    }
+    
+    inline bool operator<(const Match& other) const {
+        return uuid < other.uuid;
     }
     
     std::string name;
-    float time;
+    std::string server_address;
+    std::string multicast_address;
+    uint16_t server_port;
+    uint16_t multicast_port;
+    uint32_t uuid;
+    float timestamp;
 };
 
 }
-

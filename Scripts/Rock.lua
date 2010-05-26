@@ -28,6 +28,6 @@ function Rock:__init()
         material = "Rock.mtl"
     }
     
-    self.body = self.node:rigid_body()
+    self.body = self.node.rigid_body
     self.body.mass = 10.0
 end

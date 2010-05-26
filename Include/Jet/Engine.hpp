@@ -143,8 +143,11 @@ public:
     //! elapsed time.
     virtual void update()=0;
 	
-	//! Creates a new engine.
+	//! Creates a new engine with the standard subsystems plugged in.
 	static Engine* create();
+    
+    //! Creates an engine with no subsystems automatically plugged in.
+    static Engine* create_custom();
 };
 
 //! Listens for engine events.  Examples include on_pre_render (called before

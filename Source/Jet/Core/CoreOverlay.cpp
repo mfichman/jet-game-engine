@@ -196,17 +196,17 @@ void CoreOverlay::mouse_moved(float x, float y) {
         
         // If the point is inside the overlay's bounding box, generate an event.
         if (x >= 0 && y >= 0 && x <= width_ && y <= height_) {
-            if (!mouse_inside_) {
+            if (!mouse_over_) {
                 if (listener_) {
                     listener_->on_mouse_enter();
                 }
-                mouse_inside_ = true;
+                mouse_over_ = true;
             }
-        } else if (mouse_inside_) {
+        } else if (mouse_over_) {
             if (listener_) {
                  listener_->on_mouse_exit();
             }
-            mouse_inside_ = false;
+            mouse_over_ = false;
         }
         
         // Generate a mouse pressed event for children

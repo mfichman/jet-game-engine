@@ -6,7 +6,7 @@ require 'Stats'
 print("Creating lights")
 light_node = engine.root:node();
 light = light_node:light("light") {
-    ambient_color = Color(.3, .3, .3, 1),
+    ambient_color = Color(.6, .6, .6, 1),
     diffuse_color = Color(1, 1, 1, 1),
     specular_color = Color(1, 1, 1, 1),
     direction = Vector(1, 0, 1)
@@ -27,9 +27,5 @@ camera = camera_node:camera("camera") {
 
 -- Set up FPS counter
 Stats(engine.screen, "stats")
-
-require 'Rock'
-
---ock()
 
 StartScreen()
