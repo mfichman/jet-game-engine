@@ -141,9 +141,9 @@ private:
 	void on_sync_tick(BSockReader* reader);
 	void on_state(BSockReader* reader);
 	void on_ping(BSockReader* reader);
+
+	void update_stats();
     
-
-
     CoreEngine* engine_;
 
 	// Various recordkeeping structures
@@ -153,6 +153,10 @@ private:
     std::vector<Player> player_;
     Match current_match_;
     Player current_player_;
+
+	uint32_t tx_bytes_;
+	uint32_t rx_bytes_;
+	float stats_elapsed_time_;
 
 	// Buffered state from other hosts
 	std::priority_queue<BSockState> input_state_;
@@ -167,6 +171,7 @@ private:
 	// displayed on the screen
 	std::map<uint32_t, BSockNetworkMonitorPtr> network_monitor_;
 
+	friend class BSockSocket;
 };
 
 }

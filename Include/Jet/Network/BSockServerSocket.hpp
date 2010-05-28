@@ -22,6 +22,7 @@
 #pragma once
 
 #include <Jet/Network/BSockTypes.hpp>
+#include <Jet/Core/CoreEngine.hpp>
 #include <Jet/Types/Address.hpp>
 #include <Jet/Object.hpp>
 #include <vector>
@@ -42,7 +43,7 @@ public:
     //! address.
     //! @param ip the destination address
     //! @param port the destination port
-    static BSockServerSocket* server(const Address& address=Address());
+    static BSockServerSocket* server(CoreEngine* engine, const Address& address=Address());
         
     //! Returns a socket if one is currently connected
     BSockSocket* socket();
@@ -53,8 +54,9 @@ public:
     }
    
 private:
-    BSockServerSocket(const sockaddr_in& local, const sockaddr_in& remote);
+    BSockServerSocket(CoreEngine* engine, const sockaddr_in& local, const sockaddr_in& remote);
     
+	CoreEngine* engine_;
     int socket_;
     sockaddr_in local_;
     sockaddr_in remote_;

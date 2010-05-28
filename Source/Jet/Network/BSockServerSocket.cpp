@@ -26,7 +26,8 @@
 using namespace Jet;
 using namespace std;
 
-BSockServerSocket* BSockServerSocket::server(const Address& address) {
+BSockServerSocket* BSockServerSocket::server(CoreEngine* engine, const Address& address) {
+
     sockaddr_in local;
     local.sin_family = AF_INET;
     local.sin_addr.s_addr = htonl(INADDR_ANY); // Choose any address
@@ -37,10 +38,11 @@ BSockServerSocket* BSockServerSocket::server(const Address& address) {
     remote.sin_addr.s_addr = htonl(INADDR_ANY);
     remote.sin_port = 0;
     
-    return new BSockServerSocket(local, remote);
+    return new BSockServerSocket(engine, local, remote);
 }
 
-BSockServerSocket::BSockServerSocket(const sockaddr_in& local, const sockaddr_in& remote) :
+BSockServerSocket::BSockServerSocket(CoreEngine* engine, const sockaddr_in& local, const sockaddr_in& remote) :
+	engine_(engine),
 	local_(local),
 	remote_(remote) {
 
@@ -112,6 +114,6 @@ BSockSocket* BSockServerSocket::socket() {
 		}
     }
     
-    return new BSockSocket(local_, remote_, ST_STREAM, sd);
+    return new BSockSocket(engine_, local_, remote_, ST_STREAM, sd);
 }
 

@@ -39,15 +39,20 @@ using namespace std;
 BSockNetwork::BSockNetwork(CoreEngine* engine) :
     engine_(engine),
     accumulator_(0.0f),
-	state_(NS_DISABLED) {
+	state_(NS_DISABLED),
+	tx_bytes_(0),
+	rx_bytes_(0),
+	stats_elapsed_time_(0) {
         
     engine_->option("broadcast_rate", 1.0f);
     engine_->option("discover_ip", string("228.5.6.7"));
     engine_->option("discover_port", (float)6789);
-	engine_->option("max_players", (float)2);
+	engine_->option("max_players", (float)3);
 	engine_->option("network_smoothness", 0.5f);
 	engine_->option("network_tick_delay", (float)12); // Delay input by 12 ticks before processing
 	engine_->option("network_packet_rate", (float)6); // Send 1 packet every 6 ticks
+	engine_->option("stat_tx_rate", (float)0);
+	engine_->option("stat_rx_rate", (float)0);
     
 #ifdef WINDOWS
     WSAData data;
@@ -74,7 +79,9 @@ void BSockNetwork::on_tick() {
 		// Send and packet every 6th physics tick (i.e., every 100ms)
 		if (NS_HOST == state_) {// || NS_CLIENT == state_) {
 			uint32_t packet_rate = (uint32_t)engine_->option<float>("network_packet_rate");
-			rpc_state(datagram_.get());
+			if (engine_->tick_id() % packet_rate == 0) {
+				rpc_state(datagram_.get());
+			}
 		}
 
 		// Remove packets that are too old
@@ -118,6 +125,8 @@ void BSockNetwork::on_update() {
 			engine_->module()->on_network_error();
 		}
 	}
+
+	update_stats();
 }
 
 void BSockNetwork::do_discover() {
@@ -145,6 +154,7 @@ void BSockNetwork::do_host() {
 				stream_[i].reset(socket.get());
                 player_[i].timestamp = engine_->frame_time();
 				rpc_sync_tick(socket.get());
+				break;
 			}
         }
     }
@@ -232,7 +242,7 @@ void BSockNetwork::enter_discover() {
     //! Initialize the multicast socket		
     string ip = engine_->option<string>("discover_ip");
     uint16_t port = (uint16_t)engine_->option<float>("discover_port");
-    multicast_.reset(BSockSocket::multicast(Address(ip, port)));
+    multicast_.reset(BSockSocket::multicast(engine_, Address(ip, port)));
     
     // Clear the match list
     match_.clear();
@@ -241,7 +251,7 @@ void BSockNetwork::enter_discover() {
 void BSockNetwork::enter_host() {
     
     // Initialize the server socket
-    server_.reset(BSockServerSocket::server(0));
+    server_.reset(BSockServerSocket::server(engine_, 0));
 
 	// Seed the random number generator
 	::srand((uint32_t)time(NULL));
@@ -249,12 +259,12 @@ void BSockNetwork::enter_host() {
 	// Initialize the datagram socket to send and receive on a
 	// random port with a random multicast group
 	uint32_t rand_ip = 0xE4000100 | (::rand() & 0xFF);
-	datagram_.reset(BSockSocket::multicast(Address(rand_ip, 0)));
+	datagram_.reset(BSockSocket::multicast(engine_, Address(rand_ip, 0)));
     
     // Initialize the discover multicast socket
     string ip = engine_->option<string>("discover_ip");
     uint16_t port = (uint16_t)engine_->option<float>("discover_port");
-    multicast_.reset(BSockSocket::multicast(Address(ip, port)));
+    multicast_.reset(BSockSocket::multicast(engine_, Address(ip, port)));
     
     // Clear the match list
     match_.clear();
@@ -281,10 +291,10 @@ void BSockNetwork::enter_client() {
 	stream_.resize(1);
     
     // Create a new client socket to connect to the server
-	stream_[0].reset(BSockSocket::client(current_match_.stream_address));
+	stream_[0].reset(BSockSocket::client(engine_, current_match_.stream_address));
 	
 	// Initialize the datagram socket to send to the server's multicast address
-	datagram_.reset(BSockSocket::multicast(current_match_.datagram_address));
+	datagram_.reset(BSockSocket::multicast(engine_, current_match_.datagram_address));
 	
 	rpc_player_join(stream_[0].get());
 }
@@ -575,6 +585,17 @@ void BSockNetwork::on_sync_tick(BSockReader* reader) {
 	uint32_t tick = reader->integer();
 	engine_->tick_id(tick);
 
+}
+
+void BSockNetwork::update_stats() {
+	stats_elapsed_time_ += engine_->frame_delta();
+	if (stats_elapsed_time_ > 0.5f) {
+		engine_->option("stat_rx_rate", (float)rx_bytes_/stats_elapsed_time_*8.0f/1000.0f);
+		engine_->option("stat_tx_rate", (float)tx_bytes_/stats_elapsed_time_*8.0f/1000.0f);
+		rx_bytes_ = 0;
+		tx_bytes_ = 0;
+		stats_elapsed_time_ = 0.0f;
+	}
 }
 
 /*

@@ -31,6 +31,7 @@ engine:option("shaders_enabled", true)
 engine:option("window_title", "zero combat")
 engine:option("gravity", 0)
 engine:option("network_smoothness", 0.1)
+engine:option("network_packet_rate", 6)
 
 --[[
 engine:option("display_width", 1680)

@@ -23,6 +23,7 @@
 #include <Jet/Network/BSockSocket.hpp>
 #include <Jet/Network/BSockWriter.hpp>
 #include <Jet/Network/BSockReader.hpp>
+#include <Jet/Network/BSockNetwork.hpp>
 #include <stdexcept>
 #include <cstring>
 #include <iostream>
@@ -30,7 +31,7 @@
 using namespace Jet;
 using namespace std;
 
-BSockSocket* BSockSocket::server(const Address& address) {
+BSockSocket* BSockSocket::server(CoreEngine* engine, const Address& address) {
     sockaddr_in local;
     local.sin_family = AF_INET;
     local.sin_addr.s_addr = htonl(INADDR_ANY); // Choose any address
@@ -41,10 +42,10 @@ BSockSocket* BSockSocket::server(const Address& address) {
     remote.sin_addr.s_addr = htonl(INADDR_ANY);
     remote.sin_port = 0;
     
-    return new BSockSocket(local, remote, ST_SERVER);
+    return new BSockSocket(engine, local, remote, ST_SERVER);
 }
 
-BSockSocket* BSockSocket::client(const Address& address) {
+BSockSocket* BSockSocket::client(CoreEngine* engine, const Address& address) {
     sockaddr_in local;
     local.sin_family = AF_INET;
     local.sin_addr.s_addr = htonl(INADDR_ANY); // Choose any address
@@ -55,11 +56,11 @@ BSockSocket* BSockSocket::client(const Address& address) {
     remote.sin_addr.s_addr = htonl(address.address);
     remote.sin_port = htons(address.port);
     
-    return new BSockSocket(local, remote, ST_CLIENT);
+    return new BSockSocket(engine, local, remote, ST_CLIENT);
 
 }
 
-BSockSocket* BSockSocket::multicast(const Address& address) {
+BSockSocket* BSockSocket::multicast(CoreEngine* engine, const Address& address) {
     sockaddr_in local;
     local.sin_family = AF_INET;
     local.sin_addr.s_addr = htonl(INADDR_ANY); // Choose any address
@@ -70,11 +71,11 @@ BSockSocket* BSockSocket::multicast(const Address& address) {
     remote.sin_addr.s_addr = htonl(address.address);
     remote.sin_port = htons(address.port);
     
-    return new BSockSocket(local, remote, ST_MULTICAST);
+    return new BSockSocket(engine, local, remote, ST_MULTICAST);
 
 }
 
-BSockSocket* BSockSocket::datagram(const Address& address) {
+BSockSocket* BSockSocket::datagram(CoreEngine* engine, const Address& address) {
     sockaddr_in local;
     local.sin_family = AF_INET;
     local.sin_addr.s_addr = htonl(INADDR_ANY); // Choose any address
@@ -85,11 +86,12 @@ BSockSocket* BSockSocket::datagram(const Address& address) {
     remote.sin_addr.s_addr = 0;
     remote.sin_port = 0;
     
-    return new BSockSocket(local, remote, ST_DATAGRAM);
+    return new BSockSocket(engine, local, remote, ST_DATAGRAM);
 }
 
-BSockSocket::BSockSocket(const sockaddr_in& local, const sockaddr_in& remote, SocketType type, int socket) :
-    socket_(socket),
+BSockSocket::BSockSocket(CoreEngine* engine, const sockaddr_in& local, const sockaddr_in& remote, SocketType type, int socket) :
+    engine_(engine),
+	socket_(socket),
     local_(local),
     remote_(remote),
 	type_(type),
@@ -353,6 +355,9 @@ void BSockSocket::write_datagram() {
         throw runtime_error("Failed to send datagram");
 	}
 
+	BSockNetwork* network = static_cast<BSockNetwork*>(engine_->network());
+	network->tx_bytes_ += rt;
+
     // Remove the packet we just sent from the queue
     out_.pop();
 }
@@ -384,6 +389,9 @@ void BSockSocket::read_datagram() {
 	} else {
 		read_bytes_ += rt;
 	}
+
+	BSockNetwork* network = static_cast<BSockNetwork*>(engine_->network());
+	network->rx_bytes_ += rt;
     
     // Read the length of the packet from the beginning of the packet, as
     // long as there are at least 4 bytes in the packet (size of an int).
@@ -417,6 +425,9 @@ void BSockSocket::write_stream() {
     } else {
         write_bytes_ += rt;
     }
+
+	BSockNetwork* network = static_cast<BSockNetwork*>(engine_->network());
+	network->tx_bytes_ += rt;
     
     //!If the number of sent bytes equals the buffer size, then the packet
     // is done sending.  Thus, we can reset the buffer.
@@ -453,6 +464,9 @@ void BSockSocket::read_stream() {
     } else {
         read_bytes_ += rt;
     }
+
+	BSockNetwork* network = static_cast<BSockNetwork*>(engine_->network());
+	network->rx_bytes_ += rt;
     
     //! Check if all the bytes from the packet have been read.
     if (read_bytes_ >= sizeof(size_t)) {

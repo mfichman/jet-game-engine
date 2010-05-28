@@ -40,7 +40,9 @@ end
 function Stats:on_update(delta)
     local stat_fps = math.round(engine:option("stat_fps"))
     local stat_memory = engine:option("stat_memory")
+    local stat_rx = math.round(engine:option("stat_rx_rate"))
+    local stat_tx = math.round(engine:option("stat_tx_rate"))
     
-    self.overlay.text = stat_fps.." FPS "..stat_memory.." KB"
+    self.overlay.text = stat_fps.." FPS "..stat_tx.." Kbps "..stat_rx.." Kbps "..stat_memory.." KB"
 end
 

@@ -61,7 +61,7 @@ namespace Jet {
     class BSockGame;
     class BSockPlayer;
 	class BSockNetworkMonitor;
-    class BSockNetworkSystem;
+    class BSockNetwork;
     class BSockShader;
     class BSockServerSocket;
     class BSockSocket;
@@ -70,7 +70,7 @@ namespace Jet {
     class BSockReader;
     
 	typedef boost::intrusive_ptr<BSockNetworkMonitor> BSockNetworkMonitorPtr;
-	typedef boost::intrusive_ptr<BSockNetworkSystem> BSockNetworkSystemPtr;
+	typedef boost::intrusive_ptr<BSockNetwork> BSockNetworkPtr;
     typedef boost::intrusive_ptr<BSockServerSocket> BSockServerSocketPtr;
     typedef boost::intrusive_ptr<BSockSocket> BSockSocketPtr;
     typedef boost::intrusive_ptr<BSockReader> BSockReaderPtr;

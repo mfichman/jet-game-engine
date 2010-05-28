@@ -22,6 +22,7 @@
 #pragma once
 
 #include <Jet/Network/BSockTypes.hpp>
+#include <Jet/Core/CoreEngine.hpp>
 #include <Jet/Types/Address.hpp>
 #include <Jet/Object.hpp>
 #include <vector>
@@ -43,27 +44,27 @@ public:
     //! address.
     //! @param ip the destination address
     //! @param port the destination port
-    static BSockSocket* client(const Address& addres);
+    static BSockSocket* client(CoreEngine* engine, const Address& addres);
     
     //! Creates a unicast TCP socket serving on the given port and IP
     //! address.
     //! @param ip the destination address
     //! @param port the destination port
-    static BSockSocket* server(const Address& address);
+    static BSockSocket* server(CoreEngine* engine, const Address& address);
     
     //! Creates a multicast UDP socket on the given port and using the
     //! specified multicast IP.  Returns immediately if the port is free,
     //! or throws an std::runtime_error if the operation fails.
     //! @param ip the destination address
     //! @param port the destination port
-    static BSockSocket* multicast(const Address& address);
+    static BSockSocket* multicast(CoreEngine* engine, const Address& address);
     
     //! Creates a unicast UDP socket on the given port.  Returns immediately
     //! if the port is free, or throws an std::runtime_error if the operation
     //! fails
     //! @param ip the group ip
     //! @param port the group port
-    static BSockSocket* datagram(const Address& address);
+    static BSockSocket* datagram(CoreEngine* engine, const Address& address);
         
     //! Returns a packet writer for this socket, or null if no data is
     //! available.
@@ -85,7 +86,7 @@ public:
 	}
    
 private:
-    BSockSocket(const sockaddr_in& local, const sockaddr_in& remote, SocketType type, int socket=INVALID_SOCKET);
+    BSockSocket(CoreEngine* engine, const sockaddr_in& local, const sockaddr_in& remote, SocketType type, int socket=INVALID_SOCKET);
     
     void init_multicast();
     void init_client();
@@ -99,6 +100,7 @@ private:
     void write_stream();
     void write_datagram();
     
+	CoreEngine* engine_;
     int socket_;
     sockaddr_in local_;
     sockaddr_in remote_;

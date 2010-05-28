@@ -96,6 +96,4 @@ void BSockNetworkMonitor::tick() {
 			parent_->actor()->state_hash(j->first);
 		}
 	}
-
-	//state_hash_.clear();
 }
