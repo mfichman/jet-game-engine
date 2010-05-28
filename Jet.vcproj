@@ -24,10 +24,10 @@
 			>
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="nmake"
-				ReBuildCommandLine="nmake clean &amp;&amp; nmake"
-				CleanCommandLine="nmake clean"
-				Output="..\Binary\Test.exe"
+				BuildCommandLine="cd Build &amp;&amp; nmake"
+				ReBuildCommandLine="cd Build &amp;&amp; nmake clean &amp;&amp; nmake"
+				CleanCommandLine="cd Build &amp;&amp; nmake clean"
+				Output="Binary\Test.exe"
 				PreprocessorDefinitions="WIN32;_DEBUG"
 				IncludeSearchPath=""
 				ForcedIncludes=""
@@ -66,11 +66,19 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\Source\Jet\Types\Address.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\Jet\Types\Box.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\Source\Jet\Network\BSockNetwork.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Jet\Network\BSockNetworkMonitor.cpp"
 				>
 			</File>
 			<File
@@ -234,6 +242,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\Jet\Utility.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\Jet\Types\Vector.cpp"
 				>
 			</File>
@@ -245,6 +257,10 @@
 			>
 			<File
 				RelativePath=".\Include\Jet\Scene\Actor.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Include\Jet\Types\Address.hpp"
 				>
 			</File>
 			<File
@@ -264,6 +280,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Include\Jet\Network\BSockNetworkMonitor.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Include\Jet\Network\BSockReader.hpp"
 				>
 			</File>
@@ -273,6 +293,10 @@
 			</File>
 			<File
 				RelativePath=".\Include\Jet\Network\BSockSocket.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Include\Jet\Network\BSockState.hpp"
 				>
 			</File>
 			<File
@@ -480,6 +504,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Include\Jet\Scene\NetworkMonitor.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Include\Jet\Scene\Node.hpp"
 				>
 			</File>
@@ -617,6 +645,10 @@
 			</File>
 			<File
 				RelativePath=".\Include\Jet\Types.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Include\Jet\Utility.hpp"
 				>
 			</File>
 			<File

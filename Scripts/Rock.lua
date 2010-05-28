@@ -29,5 +29,5 @@ function Rock:__init()
     }
     
     self.body = self.node.rigid_body
-    self.body.mass = 10.0
+    self.body.mass = 0.0
 end

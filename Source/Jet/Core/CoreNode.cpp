@@ -54,9 +54,12 @@ CoreNode::~CoreNode() {
 		// and notify all the listeners to the node.  This case can
 		// happen if the parent node is destroyed.
 		destroyed_ = true;
+		if (network_monitor_) {
+			network_monitor_->destroy();
+		}
         CoreActor* actor = static_cast<CoreActor*>(actor_.get());
 		if (actor && actor->current_state_) {
-			//actor->current_state_->on_destroy();
+			actor->current_state_->on_destroy();
 		}
 	}
 }
@@ -97,7 +100,11 @@ AudioSource* CoreNode::audio_source() {
 }
 
 NetworkMonitor* CoreNode::network_monitor() {
-	return 0;
+	// Create a network monitor if it hasn't been loaded yet.
+	if (!network_monitor_) {
+		network_monitor_ = engine_->network()->network_monitor(this);
+	}
+	return network_monitor_.get();
 }
 
 Actor* CoreNode::actor() {
@@ -132,7 +139,12 @@ void CoreNode::delete_object(Object* object) {
 }
 
 CoreNode* CoreNode::node(const std::string& name) {
-	return get_object<CoreNode>(name);
+	CoreNode* obj = dynamic_cast<CoreNode*>(object(name));
+	if (!obj) {
+		obj = new CoreNode(engine_, this, name);
+		add_object(name, obj);
+	}
+	return obj;
 }
 
 MeshObject* CoreNode::mesh_object(const std::string& name) {
@@ -189,6 +201,17 @@ Vector CoreNode::linear_velocity() const {
 	// if this mesh does not have a rigid body.
 	if (rigid_body_) {
 		return rigid_body_->linear_velocity();
+	} else {
+		return Vector();
+	}
+}
+
+
+Vector CoreNode::angular_velocity() const {
+	// Return the linear velocity of the rigid body.  Return a zero vector
+	// if this mesh does not have a rigid body.
+	if (rigid_body_) {
+		return rigid_body_->angular_velocity();
 	} else {
 		return Vector();
 	}

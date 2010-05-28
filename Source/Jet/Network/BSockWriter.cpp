@@ -63,3 +63,11 @@ void BSockWriter::string(const std::string& string) {
     memcpy(&out[bytes_written_], string.c_str(), length);
     bytes_written_ += length;
 }
+
+void BSockWriter::destination(const sockaddr_in& addr) {
+	if (ST_DATAGRAM == socket_->type_ || ST_MULTICAST == socket_->type_) {
+		socket_->remote_ = addr;
+	} else {
+		throw std::runtime_error("Cannot set destination on a stream socket");
+	}
+}

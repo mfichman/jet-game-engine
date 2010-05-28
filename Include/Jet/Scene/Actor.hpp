@@ -40,10 +40,17 @@ public:
     //! Returns the current state.  If the object currently has no state, then
     //! the empty state will be returned.
     virtual const std::string& state() const=0;
+
+	//! Returns a hash of the current state.
+	virtual uint32_t state_hash() const=0;
     
     //! Sets the current state.  This will switch the acive state to the
     //! state given by name.
     virtual void state(const std::string& name)=0;
+
+	//! Sets the current state.  This will switch the active state to the
+	//! state given if it matches the hash.
+	virtual void state_hash(uint32_t hash)=0;
     
     //! Adds a new state object to this actor.  A state listens for node
     //! events, and switches when the actor state changes.

@@ -22,6 +22,7 @@
 #pragma once
 
 #include <Jet/Types.hpp>
+#include <Jet/Types/Address.hpp>
 
 namespace Jet {
 
@@ -33,8 +34,6 @@ public:
     //! Creates a new game with the given name.
     inline Match(const std::string& name) :
         name(name),
-        server_port(0),
-        multicast_port(0),
         uuid(rand()),
         timestamp(0.0f) {
         
@@ -43,8 +42,6 @@ public:
     //! Creates a new game
     inline Match() :
         name("Unknown"),
-        server_port(0),
-        multicast_port(0),
         uuid(rand()),
         timestamp(0.0f) {
     }
@@ -58,10 +55,8 @@ public:
     }
     
     std::string name;
-    std::string server_address;
-    std::string multicast_address;
-    uint16_t server_port;
-    uint16_t multicast_port;
+    Address stream_address;
+	Address datagram_address;
     uint32_t uuid;
     float timestamp;
 };

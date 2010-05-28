@@ -24,6 +24,7 @@
 #include <Jet/Core/CoreTypes.hpp>
 #include <Jet/Scene/Node.hpp>
 #include <Jet/Scene/RigidBody.hpp>
+#include <Jet/Scene/NetworkMonitor.hpp>
 #include <Jet/Scene/AudioSource.hpp>
 #include <Jet/Scene/MeshObject.hpp>
 #include <Jet/Scene/ParticleSystem.hpp>
@@ -68,6 +69,7 @@ public:
 	inline CoreNode(CoreEngine* engine) :
 		engine_(engine),
 		parent_(0),
+		name_("/"),
 		visible_(true),
 		destroyed_(false),
 		transform_modified_count_(1),
@@ -78,9 +80,10 @@ public:
     //! Creates a new node with a parent.
     //! @param engine the engine object
     //! @param parent the parent
-	inline CoreNode(CoreEngine* engine, CoreNode* parent) :
+	inline CoreNode(CoreEngine* engine, CoreNode* parent, const std::string& name) :
 		engine_(engine),
 		parent_(parent),
+		name_(parent_->name() + "/" + name),
 		visible_(true),
 		rigid_body_(parent->rigid_body_),
 		destroyed_(false),
@@ -165,10 +168,20 @@ public:
     inline CoreNode* parent() const { 
         return parent_;
     }
+
+	//! Returns the full name of the node
+	inline const std::string& name() const {
+		return name_;
+	}
     
 	//! Returns the visibility of this node.
 	inline bool visible() const {
 		return visible_;
+	}
+
+	//! Returns true if the node is marked for deletion.
+	inline bool destroyed() const {
+		return destroyed_;
 	}
 	
     //! Returns the node's current rotation.
@@ -204,6 +217,9 @@ public:
 	
 	//! Returns the linear velocity.
 	Vector linear_velocity() const;
+
+	//! Returns the angular velocity
+	Vector angular_velocity() const;
 	
 	//! Sets the raw position of this node
 	void raw_position(const Vector& position) {
@@ -288,6 +304,7 @@ private:
   
 	CoreEngine* engine_;
     CoreNode* parent_;
+	std::string name_;
 	bool visible_;
     Vector position_;
     Quaternion rotation_;
@@ -297,6 +314,7 @@ private:
     
     RigidBodyPtr rigid_body_;
     AudioSourcePtr audio_source_;
+	NetworkMonitorPtr network_monitor_;
     ActorPtr actor_;
     std::tr1::unordered_map<std::string, ObjectPtr> object_;
 	std::queue<std::vector<Signal> > signal_;

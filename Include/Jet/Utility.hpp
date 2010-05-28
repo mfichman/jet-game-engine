@@ -21,44 +21,18 @@
  */  
 #pragma once
 
-#include <Jet/Network/BSockTypes.hpp>
-#include <Jet/Network/BSockSocket.hpp>
-#include <Jet/Object.hpp>
+#include <Jet/Types.hpp>
 
-namespace Jet {
+namespace Jet { 
 
-//! Reads data from a socket synchronously.
-//! @class BSockReader
-//! @brief Reads data from a socket synchronously.
-class BSockReader : public Object {
-public:
-    //! Creates a new socket reader and locks the buffer for reading.
-    BSockReader(BSockSocket* socket);
-    
-    //! Destructor
-    ~BSockReader();
+	//! Hashes the given string to create a unique identifier.
+	//! @param str the string to hash
+	uint32_t hash(const std::string& str);
 
-    //! Reads floating-point data from the socket.  Throws an exception if data
-    //! is not available.  Does not block.
-    float real();
-    
-    //! Reads integer data from the socket.  Throws an exception if data is not
-    //! available.  Does not block.
-    int integer();
-    
-    //! Reads a string from the socket.  Throws an exception if data is not
-    //! available.  Does not block.
-    std::string string();
-    
-    //! Returns the socket
-    inline BSockSocket* socket() const {
-        return socket_.get();
-    }
-    
-private:
-    BSockSocketPtr socket_;
-    size_t bytes_read_;
-    std::vector<char> in_;
-};
+	//! Computes a random number using the given seed.  This PRNG is deterministic
+	//! across all platforms, making it ideal for networking.
+	//uint32_t rand();
 
+	//! Seeds the random number generator.
+	//void srand(uint32_t);
 }

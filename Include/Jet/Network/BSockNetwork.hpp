@@ -23,12 +23,16 @@
 
 #include <Jet/Network/BSockTypes.hpp>
 #include <Jet/Network/BSockSocket.hpp>
+#include <Jet/Network/BSockState.hpp>
 #include <Jet/Network/BSockServerSocket.hpp>
+#include <Jet/Network/BSockNetworkMonitor.hpp>
 #include <Jet/Core/CoreEngine.hpp>
 #include <Jet/Types/Player.hpp>
 #include <Jet/Types/Match.hpp>
 #include <Jet/Network.hpp>
-#include <set>
+#include <queue>
+#include <map>
+#include <vector>
 
 namespace Jet {
 
@@ -44,8 +48,10 @@ public:
     ~BSockNetwork();
     
     //! Creates a new network monitor.
-    inline NetworkMonitor* network_monitor() const {
-        return 0;
+    inline BSockNetworkMonitor* network_monitor(Node* node) {
+        BSockNetworkMonitorPtr monitor(new BSockNetworkMonitor(engine_, static_cast<CoreNode*>(node)));
+		network_monitor_[monitor->hash()] = monitor;
+		return monitor.get();
     }
     
     //! Returns the current network state
@@ -97,47 +103,69 @@ public:
     }
     
 private:
+	// System initialization functions
     void on_tick();
     void on_update();
     void on_render() {}
     void on_init();
     
-    void read_rpcs(BSockSocket* socket);
-    
+	// State initialization functions
     void enter_discover();
     void enter_host();
-    void enter_join();
+    void enter_client();
     
+	// State update functions
     void do_discover();
     void do_host();
-    void do_join();
+    void do_client();
     
+	// RPC send functions
     void rpc_match_info(BSockSocket* socket);
     void rpc_match_destroy(BSockSocket* socket);
     void rpc_player_join(BSockSocket* socket);
     void rpc_player_leave(BSockSocket* socket);
     void rpc_player_list(BSockSocket* socket);
+	void rpc_sync_tick(BSockSocket* socket);
+	void rpc_state(BSockSocket* socket);
+	void rpc_ping(BSockSocket* socket);
     void rpc_match_destroy_all();
     void rpc_player_list_all();
 
+	// RPC response functions    
+    void read_rpcs(BSockSocket* socket);
     void on_match_info(BSockReader* reader);
     void on_match_destroy(BSockReader* reader);
     void on_player_join(BSockReader* reader);
     void on_player_leave(BSockReader* reader);
     void on_player_list(BSockReader* reader);
+	void on_sync_tick(BSockReader* reader);
+	void on_state(BSockReader* reader);
+	void on_ping(BSockReader* reader);
     
+
+
     CoreEngine* engine_;
+
+	// Various recordkeeping structures
     float accumulator_;
     NetworkState state_;
-    std::map<BSockSocketPtr, size_t> socket_;
     std::vector<Match> match_;
     std::vector<Player> player_;
     Match current_match_;
     Player current_player_;
+
+	// Buffered state from other hosts
+	std::priority_queue<BSockState> input_state_;
     
+	// Sockets used by the network engine
+	std::vector<BSockSocketPtr> stream_;
     BSockSocketPtr multicast_;
-    BSockSocketPtr client_;
+	BSockSocketPtr datagram_;
     BSockServerSocketPtr server_;
+
+	// This map holds all the network monitors for objects
+	// displayed on the screen
+	std::map<uint32_t, BSockNetworkMonitorPtr> network_monitor_;
 
 };
 

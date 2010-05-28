@@ -29,6 +29,14 @@ using namespace std;
 
 Quaternion Quaternion::IDENTITY;
 
+Quaternion::Quaternion(float w, const Vector& vector) : 
+	w(w),
+	x(vector.x),
+	y(vector.y),
+	z(vector.z) {
+
+}
+
 Quaternion::Quaternion(float w, float x, float y, float z) : 
     w(w),
     x(x),
@@ -190,7 +198,23 @@ bool Quaternion::operator==(const Quaternion other) const {
 
 bool Quaternion::operator!=(const Quaternion& other) const {
     return !operator==(other);
-}   
+}  
+
+Quaternion& Quaternion::operator+=(const Quaternion& other) {
+	x += other.x;
+	y += other.y;
+	z += other.z;
+	w += other.w;
+	return *this;
+}
+
+Quaternion& Quaternion::operator-=(const Quaternion& other) {
+	x -= other.x;
+	y -= other.y;
+	z -= other.z;
+	w -= other.w;
+	return *this;
+}
 
 ostream& operator<<(ostream& out, const Quaternion& quaternion) {
     return out << quaternion.w << " " << quaternion.x << " " << quaternion.y << " " << quaternion.z;

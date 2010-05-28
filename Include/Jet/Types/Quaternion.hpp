@@ -55,6 +55,11 @@ public:
     //! Creates a new quaternion.
     Quaternion(const Matrix& matrix);
 
+	//! Creates a quaternion from the scalar and imaginary parts.
+	//! @param w the scalar part of the quaternion
+	//! @param vector the x, y, z (imaginary) components of the quaternion
+	Quaternion(float w, const Vector& vector);
+
     //! Creates a new identity quaternion
     Quaternion();
 
@@ -105,6 +110,12 @@ public:
     
     //! Returns true if the quaternions are not equal
     bool operator!=(const Quaternion& other) const;
+
+	//! Addition.
+	Quaternion& operator+=(const Quaternion& other);
+
+	//! Subtraction.
+	Quaternion& operator-=(const Quaternion& other);
 
     //! Stream operator
     friend std::ostream& ::operator<<(std::ostream& out, const Quaternion& quaternion);

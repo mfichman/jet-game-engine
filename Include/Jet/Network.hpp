@@ -32,7 +32,7 @@ namespace  Jet {
 class Network : public virtual Object {
 public:
     //! Creates a new network monitor.
-    virtual NetworkMonitor* network_monitor() const=0;
+    virtual NetworkMonitor* network_monitor(Node* parent)=0;
     
     //! Returns the current network state
     virtual NetworkState state() const=0;

@@ -22,6 +22,7 @@
 #pragma once
 
 #include <Jet/Network/BSockTypes.hpp>
+#include <Jet/Types/Address.hpp>
 #include <Jet/Object.hpp>
 #include <vector>
 
@@ -41,17 +42,13 @@ public:
     //! address.
     //! @param ip the destination address
     //! @param port the destination port
-    static BSockServerSocket* server(uint16_t port=0);
+    static BSockServerSocket* server(const Address& address=Address());
         
     //! Returns a socket if one is currently connected
     BSockSocket* socket();
     
-    //! Returns the port
-    inline uint16_t port() const {
-        return port_;
-    }
     //! Returns the ip address
-    inline const std::string& address() const {
+    inline const Address& address() const {
         return address_;
     }
    
@@ -59,10 +56,9 @@ private:
     BSockServerSocket(const sockaddr_in& local, const sockaddr_in& remote);
     
     int socket_;
-    std::string address_;
     sockaddr_in local_;
     sockaddr_in remote_;
-    uint16_t port_;
+	Address address_;
 };
 
 }

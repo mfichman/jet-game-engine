@@ -28,6 +28,12 @@ using namespace std;
 BSockReader::BSockReader(BSockSocket* socket) :
     socket_(socket),
     bytes_read_(sizeof(size_t)) {
+
+	// Swap our vector with the vector that was read from the socket
+	// so that the socket has an empty buffer to work with while we
+	// process this buffer
+	in_.reserve(2048);
+	in_.swap(socket_->in_);
 }
 
 BSockReader::~BSockReader() {
@@ -37,41 +43,33 @@ BSockReader::~BSockReader() {
 }
 
 float BSockReader::real() {
-    if (socket_->in_.size() - bytes_read_ < sizeof(float)) {
+    if (in_.size() - bytes_read_ < sizeof(float)) {
         throw std::runtime_error("No more data in packet");
     }
     
-    float real = *(float*)&socket_->in_[bytes_read_];
+    float real = *(float*)&in_[bytes_read_];
     bytes_read_ += sizeof(real);
     
     return real;
 }
 
 int BSockReader::integer() {
-    if (socket_->in_.size() - bytes_read_ < sizeof(int)) {
+    if (in_.size() - bytes_read_ < sizeof(int)) {
         throw std::runtime_error("No more data in packet");
     }
     
-    int integer = ntohl(*(int*)&socket_->in_[bytes_read_]);
+    int integer = ntohl(*(int*)&in_[bytes_read_]);
     bytes_read_ += sizeof(integer);
     
     return integer;
 }
 
 std::string BSockReader::string() {
-    if (socket_->in_.size() - bytes_read_ == 0) {
+    if (in_.size() - bytes_read_ == 0) {
         throw std::runtime_error("No more data in packet");
     }
     
-    std::string string(&socket_->in_[bytes_read_], 0, socket_->in_.size() - bytes_read_);
+    std::string string(&in_[bytes_read_], 0, in_.size() - bytes_read_);
     bytes_read_ += string.length() + 1;
     return string; 
 }
-    
-    
-    
-    
-    
-    
-    
-    

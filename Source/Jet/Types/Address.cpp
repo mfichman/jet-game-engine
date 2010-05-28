@@ -19,46 +19,36 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */  
-#pragma once
 
-#include <Jet/Network/BSockTypes.hpp>
-#include <Jet/Network/BSockSocket.hpp>
-#include <Jet/Object.hpp>
+#include <Jet/Types/Address.hpp>
+#ifdef WINDOWS
+#include <winsock2.h>
+#else
+#include <arpa/inet.h>
+#endif
 
-namespace Jet {
+using namespace Jet;
+using namespace std;
 
-//! Reads data from a socket synchronously.
-//! @class BSockReader
-//! @brief Reads data from a socket synchronously.
-class BSockReader : public Object {
-public:
-    //! Creates a new socket reader and locks the buffer for reading.
-    BSockReader(BSockSocket* socket);
-    
-    //! Destructor
-    ~BSockReader();
+Address::Address(const std::string& ip, uint16_t port) :
+	address(ntohl(inet_addr(ip.c_str()))),
+	port(port) {
 
-    //! Reads floating-point data from the socket.  Throws an exception if data
-    //! is not available.  Does not block.
-    float real();
-    
-    //! Reads integer data from the socket.  Throws an exception if data is not
-    //! available.  Does not block.
-    int integer();
-    
-    //! Reads a string from the socket.  Throws an exception if data is not
-    //! available.  Does not block.
-    std::string string();
-    
-    //! Returns the socket
-    inline BSockSocket* socket() const {
-        return socket_.get();
-    }
-    
-private:
-    BSockSocketPtr socket_;
-    size_t bytes_read_;
-    std::vector<char> in_;
-};
+}
 
+Address::Address(uint32_t ip, uint16_t port) :
+	address(ip),
+	port(port) {
+
+}
+
+Address::Address(uint16_t port) :
+	address(0),
+	port(port) {
+
+}
+
+Address::Address() :
+	address(0),
+	port(0) {
 }

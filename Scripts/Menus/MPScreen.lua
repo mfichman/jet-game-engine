@@ -74,7 +74,8 @@ end
 function MPScreen:on_match_list_update()
     self.list:clear()
     for i=1,engine.network.match_count do
-        self.list:button(engine.network:match(i-1).name, bind("on_game_click", self))
+        local button = self.list:button(engine.network:match(i-1).name)
+        button.on_click = bind("on_game_click", self)
     end
 end
 

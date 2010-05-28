@@ -50,6 +50,7 @@
 namespace Jet {
     class Actor;
     class ActorState;
+	class Address;
     class Audio;
     class AudioSource;
     class Box;
@@ -143,5 +144,5 @@ namespace Jet {
     enum SyncMode { SM_STATIC, SM_DYNAMIC };
     enum LayoutMode { LM_RELATIVE, LM_ABSOLUTE };
     enum Alignment { AL_TOP, AL_CENTER, AL_BOTTOM, AL_LEFT, AL_RIGHT };
-    enum NetworkState { NS_DISCOVER, NS_HOST, NS_JOIN, NS_RUNNING, NS_DISABLED };
+    enum NetworkState { NS_DISCOVER, NS_HOST, NS_CLIENT, NS_RUNNING, NS_DISABLED };
 }

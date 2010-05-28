@@ -50,6 +50,7 @@
 #include <Jet/Scene/Light.hpp>
 #include <Jet/Scene/RigidBody.hpp>
 #include <Jet/Scene/AudioSource.hpp>
+#include <Jet/Scene/NetworkMonitor.hpp>
 #include <Jet/Scene/CollisionSphere.hpp>
 #include <Jet/Resources/Material.hpp>
 #include <Jet/Resources/Mesh.hpp>
@@ -497,6 +498,7 @@ void LuaScript::init_entity_type_bindings() {
             .property("rigid_body", &Node::rigid_body)
             .property("audio_source", &Node::audio_source)
 			.property("actor", &Node::actor)
+			.property("network_monitor", &Node::network_monitor)
 			.def("node", &Node::node)
             .def("mesh_object", &Node::mesh_object)
             .def("particle_system", &Node::particle_system)
@@ -508,6 +510,9 @@ void LuaScript::init_entity_type_bindings() {
             .def("collision_sphere", &Node::collision_sphere)
             .def("look", &Node::look)
 			.def("destroy", &Node::destroy),
+
+		luabind::class_<NetworkMonitor, NetworkMonitorPtr>("NetworkMonitor")
+			.property("parent", &NetworkMonitor::parent),
             
         luabind::class_<Actor, ActorPtr>("Actor")
             .property("parent", &Actor::parent)
@@ -588,7 +593,7 @@ void LuaScript::init_entity_type_bindings() {
             .property("player_count", &Network::player_count)
             .def("match", &Network::match)
             .def("player", &Network::player)
-            .enum_("NetworkState") [ value("NS_JOIN", NS_JOIN), value("NS_HOST", NS_HOST), value("NS_DISCOVER", NS_DISCOVER), value("NS_DISABLED", NS_DISABLED) ],
+            .enum_("NetworkState") [ value("NS_CLIENT", NS_CLIENT), value("NS_HOST", NS_HOST), value("NS_DISCOVER", NS_DISCOVER), value("NS_DISABLED", NS_DISABLED) ],
 
             
         luabind::class_<Mesh, MeshPtr>("Mesh")

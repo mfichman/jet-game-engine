@@ -21,44 +21,30 @@
  */  
 #pragma once
 
-#include <Jet/Network/BSockTypes.hpp>
-#include <Jet/Network/BSockSocket.hpp>
-#include <Jet/Object.hpp>
+#include <Jet/Types.hpp>
 
-namespace Jet {
+namespace Jet { 
 
-//! Reads data from a socket synchronously.
-//! @class BSockReader
-//! @brief Reads data from a socket synchronously.
-class BSockReader : public Object {
+//! Structure for holding information about an internet address
+//! @class Address
+//! @brief Contains information about an internet address
+class Address {
 public:
-    //! Creates a new socket reader and locks the buffer for reading.
-    BSockReader(BSockSocket* socket);
-    
-    //! Destructor
-    ~BSockReader();
+    //! Creates a new address.
+	Address(const std::string& ip, uint16_t port);
+   
+	//! Creates a new address.
+	Address(uint32_t ip, uint16_t port);
 
-    //! Reads floating-point data from the socket.  Throws an exception if data
-    //! is not available.  Does not block.
-    float real();
-    
-    //! Reads integer data from the socket.  Throws an exception if data is not
-    //! available.  Does not block.
-    int integer();
-    
-    //! Reads a string from the socket.  Throws an exception if data is not
-    //! available.  Does not block.
-    std::string string();
-    
-    //! Returns the socket
-    inline BSockSocket* socket() const {
-        return socket_.get();
-    }
-    
-private:
-    BSockSocketPtr socket_;
-    size_t bytes_read_;
-    std::vector<char> in_;
+	//! Creates a new address
+	Address(uint16_t port);
+
+	//! Creates a new address
+	Address();
+ 
+	uint32_t address;
+	uint16_t port;
 };
 
 }
+

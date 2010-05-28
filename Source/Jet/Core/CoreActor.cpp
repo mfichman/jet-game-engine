@@ -46,3 +46,13 @@ void CoreActor::state(const std::string& state) {
     current_state_ = i->second.get();
     current_state_->on_state_enter();
 }
+
+void CoreActor::state_hash(uint32_t hash) {
+
+	// Search through all the states for a hash that matches
+	for (map<string, ActorStatePtr>::iterator i = actor_state_.begin(); i != actor_state_.end(); i++) {
+		if (Jet::hash(i->first) == hash) {
+			state(i->first);
+		}
+	}
+}

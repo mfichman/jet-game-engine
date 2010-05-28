@@ -27,6 +27,7 @@
 #include <Jet/Types/Player.hpp>
 #include <Jet/Types/Match.hpp>
 #include <cfloat>
+#include <boost/date_time/c_time.hpp>
 
 #ifdef WINDOWS
 #include <winsock2.h>
@@ -44,6 +45,9 @@ BSockNetwork::BSockNetwork(CoreEngine* engine) :
     engine_->option("discover_ip", string("228.5.6.7"));
     engine_->option("discover_port", (float)6789);
 	engine_->option("max_players", (float)2);
+	engine_->option("network_smoothness", 0.5f);
+	engine_->option("network_tick_delay", (float)12); // Delay input by 12 ticks before processing
+	engine_->option("network_packet_rate", (float)6); // Send 1 packet every 6 ticks
     
 #ifdef WINDOWS
     WSAData data;
@@ -66,6 +70,39 @@ void BSockNetwork::on_init() {
 }
 
 void BSockNetwork::on_tick() {
+	try {
+		// Send and packet every 6th physics tick (i.e., every 100ms)
+		if (NS_HOST == state_) {// || NS_CLIENT == state_) {
+			uint32_t packet_rate = (uint32_t)engine_->option<float>("network_packet_rate");
+			rpc_state(datagram_.get());
+		}
+
+		// Remove packets that are too old
+		while (!input_state_.empty() && input_state_.top().tick < engine_->tick_id()) {
+		}
+
+		// Now process packets for this tick
+		while (!input_state_.empty() && input_state_.top().tick == engine_->tick_id()) {
+			cout << "Processing state" << endl;
+		}
+
+		// Process network monitors
+		for (map<uint32_t, BSockNetworkMonitorPtr>::iterator i = network_monitor_.begin(); i != network_monitor_.end(); i++) {
+			CoreNode* node = i->second->parent();
+			if (node) {
+				// Update the network monitor (this copies the state from the network
+				// over to the node)
+				i->second->tick();
+
+			} else {
+				// The node no longer exists, so delete the network monitor
+				network_monitor_.erase(i);
+			}
+		}
+
+	} catch (std::exception&) {
+		engine_->module()->on_network_error();
+	}
 }
 
 void BSockNetwork::on_update() {
@@ -73,7 +110,7 @@ void BSockNetwork::on_update() {
 		switch (state_) {
 			case NS_DISCOVER: do_discover(); break;
 			case NS_HOST: do_host(); break;
-			case NS_JOIN: do_join(); break;
+			case NS_CLIENT: do_client(); break;
 			default: break;
 		}
 	} catch (std::exception&) {
@@ -93,6 +130,7 @@ void BSockNetwork::do_host() {
     accumulator_ += engine_->frame_delta();
     if (accumulator_ > 1.0f/engine_->option<float>("broadcast_rate")) {
         rpc_match_info(multicast_.get());
+		rpc_sync_tick(datagram_.get());
 		accumulator_ = 0.0f;
     }
     
@@ -102,87 +140,89 @@ void BSockNetwork::do_host() {
         // newly accepted socket to it.  Otherwise,
         // the socket will close.
         for (size_t i = 1; i < player_.size(); i++) {
-            if (!player_[i].timestamp) {
-                rpc_player_list(socket.get());
-                socket_.insert(make_pair(socket, i));
+            if (!stream_[i]) {
+				// Set up the new socket and player
+				stream_[i].reset(socket.get());
                 player_[i].timestamp = engine_->frame_time();
-
-			} else {
-				cout << "Match is full" << endl;
+				rpc_sync_tick(socket.get());
 			}
         }
     }
     
-    // Update the sockets by reading for data
-    for (map<BSockSocketPtr, size_t>::iterator i = socket_.begin(); i != socket_.end(); i++) {
-		try {
-			i->first->poll_write();
-			read_rpcs(i->first.get());
-		} catch (std::exception&) {
-			player_[i->second].timestamp = 0.0f;
-			player_[i->second].name = "";
+    // Update the sockets
+	for (size_t i = 0; i < player_.size(); i++) {
+		if (stream_[i]) {
+			
+			try {
+				// Try to send data and/or receive RPCs on the stream socket
+				stream_[i]->poll_write();
+				read_rpcs(stream_[i].get());
+			} catch (std::exception&) {
+				// Erase the socket if an error occurs
+				stream_[i] = 0;
+				player_[i] = Player();
+
+				// Notify the other players that the player has
+				// disconnected
+				if (engine_->module()) {
+					engine_->module()->on_player_list_update();
+				}
+				rpc_player_list_all();
+			}
 		}
     }
-    
-    // Check for timed-out players and dead sockets
-	for (map<BSockSocketPtr, size_t>::iterator i = socket_.begin(); i != socket_.end();) {
-		map<BSockSocketPtr, size_t>::iterator j = i;
-		i++;
-		if (!player_[j->second].timestamp) {
-			socket_.erase(j);
-		}
-	}
+
+	// Check for messages on the UDP socket
+	datagram_->poll_write();
+	read_rpcs(datagram_.get());
 }
 
-void BSockNetwork::do_join() {
+void BSockNetwork::do_client() {
     // Check for incoming messages from the server
-    client_->poll_write();
-    read_rpcs(client_.get());
+	// Send buffered input keystrokes here if possible
+    stream_[0]->poll_write();
+    read_rpcs(stream_[0].get());
+
+	// Check for incoming messages from the UDP socket
+	datagram_->poll_write();
+	read_rpcs(datagram_.get());
 }
 
 void BSockNetwork::state(NetworkState state) {    
     if (state_ == state) {
         return;
-    }
-
-	// Joining match, connect to server
-	if (NS_JOIN == state) {
-        enter_join();
 	}
     
-    // If in host mode, enable the server socket on a random port
-    if (NS_HOST == state) {
-        enter_host();
-    }
-    
-    if (NS_DISCOVER == state) {
-        enter_discover();
-    }
-    
-        // If leaving state, disable the socket
-    if (NS_JOIN == state_) {
+	// Destroy the old client state
+    if (NS_CLIENT == state_) {
 		try {
-			rpc_player_leave(client_.get());
+			rpc_player_leave(stream_[0].get());
 		} catch (std::exception&) {
 		}
-		client_.reset();
-    }
-    
-    // If not in host mode, shut down the server socket
-    if (NS_HOST == state_) {
-        // Notify all that the match is destroyed..?
+		stream_.clear();
+		datagram_.reset();
+    } else if (NS_HOST == state_) {
+        // Notify all that the match is destroyed
 		try {
 			rpc_match_destroy(multicast_.get());
 			rpc_match_destroy_all();
 		} catch (std::exception&) {
 		}
         server_.reset();
-    }
-    
-    // Leaving the discover state
-    if (NS_DISCOVER != state && NS_HOST != state) {
+		datagram_.reset();
+		stream_.clear();
+	} else if (NS_DISCOVER != state_) {
 		multicast_.reset();
 	}
+	
+	// Initialize the new state
+	if (NS_CLIENT == state) {
+        enter_client();
+	} else if (NS_HOST == state) {
+        enter_host();
+    } else if (NS_DISCOVER == state) {
+        enter_discover();
+    }
 
 	state_ = state;
 }
@@ -192,7 +232,7 @@ void BSockNetwork::enter_discover() {
     //! Initialize the multicast socket		
     string ip = engine_->option<string>("discover_ip");
     uint16_t port = (uint16_t)engine_->option<float>("discover_port");
-    multicast_.reset(BSockSocket::multicast(ip, port));
+    multicast_.reset(BSockSocket::multicast(Address(ip, port)));
     
     // Clear the match list
     match_.clear();
@@ -202,11 +242,19 @@ void BSockNetwork::enter_host() {
     
     // Initialize the server socket
     server_.reset(BSockServerSocket::server(0));
+
+	// Seed the random number generator
+	::srand((uint32_t)time(NULL));
+
+	// Initialize the datagram socket to send and receive on a
+	// random port with a random multicast group
+	uint32_t rand_ip = 0xE4000100 | (::rand() & 0xFF);
+	datagram_.reset(BSockSocket::multicast(Address(rand_ip, 0)));
     
     // Initialize the discover multicast socket
     string ip = engine_->option<string>("discover_ip");
     uint16_t port = (uint16_t)engine_->option<float>("discover_port");
-    multicast_.reset(BSockSocket::multicast(ip, port));
+    multicast_.reset(BSockSocket::multicast(Address(ip, port)));
     
     // Clear the match list
     match_.clear();
@@ -215,6 +263,10 @@ void BSockNetwork::enter_host() {
     player_.clear();
     player_.resize((size_t)engine_->option<float>("max_players"));
     player_[0] = current_player_;
+
+	// Clear out client sockets
+	stream_.clear();
+	stream_.resize(player_.size());
     
     // Update the player list
     if (engine_->module()) {
@@ -223,69 +275,75 @@ void BSockNetwork::enter_host() {
     accumulator_ = FLT_MAX;
 }
 
-void BSockNetwork::enter_join() {
+void BSockNetwork::enter_client() {
+	// Resize the stream sockets
+	stream_.clear();
+	stream_.resize(1);
     
     // Create a new client socket to connect to the server
-	client_.reset(BSockSocket::client(current_match_.server_address, current_match_.server_port));
-    rpc_player_join(client_.get());
+	stream_[0].reset(BSockSocket::client(current_match_.stream_address));
+	
+	// Initialize the datagram socket to send to the server's multicast address
+	datagram_.reset(BSockSocket::multicast(current_match_.datagram_address));
+	
+	rpc_player_join(stream_[0].get());
 }
 
 void BSockNetwork::read_rpcs(BSockSocket* socket) {
-    while (BSockSocketReaderPtr reader = socket->reader()) {
-        string rpc = reader->string();
-        if ("match_info" == rpc) {
-            on_match_info(reader.get());
-        } else if ("match_destroy" == rpc) {
-            on_match_destroy(reader.get());
-        } else if ("player_join" == rpc) {
-            on_player_join(reader.get());
-        } else if ("player_leave" == rpc) {
-            on_player_leave(reader.get());
-        } else if ("player_list" == rpc) {
-            on_player_list(reader.get());
-        } else {
-            cout << "Unknown RPC: " << rpc << endl;
-        }
+    while (BSockReaderPtr reader = socket->reader()) {
+        PacketType rpc = static_cast<PacketType>(reader->integer());
+
+		switch (rpc) {
+			case PT_MATCH_INFO: on_match_info(reader.get()); break;
+			case PT_MATCH_DESTROY: on_match_destroy(reader.get()); break;
+			case PT_PLAYER_JOIN: on_player_join(reader.get()); break;
+			case PT_PLAYER_LEAVE: on_player_leave(reader.get()); break;
+			case PT_PLAYER_LIST: on_player_list(reader.get()); break;
+			case PT_STATE: on_state(reader.get()); break;
+			case PT_PING: on_ping(reader.get()); break;
+			case PT_SYNC: on_sync_tick(reader.get()); break;
+			case PT_INPUT: break;
+		}
     }
 }
 
 void BSockNetwork::rpc_match_info(BSockSocket* socket) {
-    if (BSockSocketWriterPtr writer = socket->writer()) {
-        writer->string("match_info");
+    if (BSockWriterPtr writer = socket->writer()) {
+        writer->integer(PT_MATCH_INFO);
         writer->string(current_match_.name);
-        writer->string(server_->address());
-        writer->string("");
-        writer->integer(server_->port()); // Port
-        writer->integer(0); // Multicast port
-        writer->integer(current_match_.uuid);        
+        writer->integer(server_->address().address);
+        writer->integer(server_->address().port); // Port
+        writer->integer(datagram_->address().address);
+        writer->integer(datagram_->address().port); // Multicast port
+        writer->integer(current_match_.uuid);     
     }
 }
 
 void BSockNetwork::rpc_match_destroy(BSockSocket* socket) {
-    if (BSockSocketWriterPtr writer = socket->writer()) {
-        writer->string("match_destroy");
+    if (BSockWriterPtr writer = socket->writer()) {
+        writer->integer(PT_MATCH_DESTROY);
         writer->integer(current_match_.uuid);
     }
 }
 
 void BSockNetwork::rpc_player_join(BSockSocket* socket) {
-    if (BSockSocketWriterPtr writer = socket->writer()) {
-        writer->string("player_join");
+    if (BSockWriterPtr writer = socket->writer()) {
+        writer->integer(PT_PLAYER_JOIN);
         writer->string(current_player_.name);
         writer->integer(current_player_.uuid);
     }
 }
 
 void BSockNetwork::rpc_player_leave(BSockSocket* socket) {
-    if (BSockSocketWriterPtr writer = socket->writer()) {
-        writer->string("player_leave");
+    if (BSockWriterPtr writer = socket->writer()) {
+        writer->integer(PT_PLAYER_LEAVE);
         writer->integer(current_player_.uuid);
     }
 }
 
 void BSockNetwork::rpc_player_list(BSockSocket* socket) {
-    if (BSockSocketWriterPtr writer = socket->writer()) {
-        writer->string("player_list");
+    if (BSockWriterPtr writer = socket->writer()) {
+        writer->integer(PT_PLAYER_LIST);
         writer->integer(player_.size());
         for (size_t i = 0; i < player_.size(); i++) {
             writer->string(player_[i].name);
@@ -294,23 +352,106 @@ void BSockNetwork::rpc_player_list(BSockSocket* socket) {
     }
 }
 
+void BSockNetwork::rpc_state(BSockSocket* socket) {
+	if (BSockWriterPtr writer = socket->writer()) {
+		
+		writer->integer(PT_STATE); // Write the packet type
+		writer->integer(engine_->tick_id()); // Tick this state was sent on
+		writer->integer(current_player_.uuid);
+		
+		// Write state for each actor in the 
+		for (map<uint32_t, BSockNetworkMonitorPtr>::iterator i = network_monitor_.begin(); i != network_monitor_.end();) {
+			
+			// Increment the iterator in case we need to delete the node.
+			// This prevents the iterator from being invalidated.
+			map<uint32_t, BSockNetworkMonitorPtr>::iterator j = i++;
+			CoreNode* node = j->second->parent();
+			
+			// Write the most current state information for the node. This includes 
+			// position, velocity,  and rotation.  If a UDP socket is used, and the
+			// previous buffer has not already been sent, then this will overwrite 
+			// the waiting buffer.  There's no point in sending data that is out
+			// of date.
+			if (!node) {
+				// The node has been destroyed, so erase the network monitor.
+				// This releases the reference on the monitor, thus freeing it.
+				network_monitor_.erase(j);
+			} else if (node->visible()) {
+				writer->integer(j->first); // Node hash (for ID)
+				writer->integer(node->actor()->state_hash()) ;// Write state hash 
+
+				const Vector& position = node->position();
+				writer->real(position.x);
+				writer->real(position.y);
+				writer->real(position.z);
+
+				const Quaternion& rotation = node->rotation();
+				writer->real(rotation.w);
+				writer->real(rotation.x);
+				writer->real(rotation.y);
+				writer->real(rotation.z);
+
+				const Vector& linear_velocity = node->linear_velocity();
+				writer->real(linear_velocity.x);
+				writer->real(linear_velocity.y);
+				writer->real(linear_velocity.z);
+
+				const Vector& angular_velocity = node->angular_velocity();
+				writer->real(angular_velocity.x);
+				writer->real(angular_velocity.y);
+				writer->real(angular_velocity.z);
+			}
+		}
+
+		// Write the end-of-packet marker: a zero word
+		writer->integer(0);
+	}
+}
+
+void BSockNetwork::rpc_ping(BSockSocket* socket) {
+	if (BSockWriterPtr writer = socket->writer()) {
+		cout << "Sending ping" << endl;
+		writer->integer(PT_PING);
+	}
+}
+
+void BSockNetwork::rpc_sync_tick(BSockSocket* socket) {
+	if (BSockWriterPtr writer = socket->writer()) {
+		writer->integer(PT_SYNC);
+		writer->integer(engine_->tick_id());
+	}
+}
+
+
+
 void BSockNetwork::rpc_player_list_all() {      
     // Update the player list for all the players
-    for (map<BSockSocketPtr, size_t>::iterator i = socket_.begin(); i != socket_.end(); i++) {
-        rpc_player_list(i->first.get());
+	for (size_t i = 0; i < stream_.size(); i++) {
+		if (stream_[i]) {
+			rpc_player_list(stream_[i].get());
+		}
     }
+}
+
+void BSockNetwork::rpc_match_destroy_all() {
+	// Destroy the match
+	for (size_t i = 0; i < player_.size(); i++) {
+		if (stream_[i]) {
+			rpc_match_destroy(stream_[i].get());
+		}
+	}
 }
 
 void BSockNetwork::on_match_info(BSockReader* reader) {
     Match match;
     match.name = reader->string();
-    match.server_address = reader->string();
-    match.multicast_address = reader->string();
-    match.server_port = (uint16_t)reader->integer();
-    match.multicast_port = (uint16_t)reader->integer();
+    match.stream_address.address = reader->integer();
+    match.stream_address.port = (uint16_t)reader->integer();
+    match.datagram_address.address = reader->integer();
+    match.datagram_address.port = (uint16_t)reader->integer();
     match.uuid = reader->integer();
     match.timestamp = engine_->frame_time();
-    
+
     // Search for and update/add the match to the list
     vector<Match>::iterator i = find(match_.begin(), match_.end(), match);
     if (i != match_.end()) {
@@ -322,13 +463,6 @@ void BSockNetwork::on_match_info(BSockReader* reader) {
     if (engine_->module()) {
         engine_->module()->on_match_list_update();
     }
-}
-
-void BSockNetwork::rpc_match_destroy_all() {
-	// Destroy the match
-	for (map<BSockSocketPtr, size_t>::iterator i = socket_.begin(); i != socket_.end(); i++) {
-		rpc_match_destroy(i->first.get());
-	}
 }
 
 void BSockNetwork::on_match_destroy(BSockReader* reader) {
@@ -343,33 +477,38 @@ void BSockNetwork::on_match_destroy(BSockReader* reader) {
     
     if (engine_->module()) {
         engine_->module()->on_match_list_update();
-		if (NS_JOIN == state_ && match == current_match_) {
+		if (NS_CLIENT == state_ && match == current_match_) {
 			engine_->module()->on_network_error();
 		}
     }
 }
 
 void BSockNetwork::on_player_join(BSockReader* reader) {
-    map<BSockSocketPtr, size_t>::iterator j = socket_.find(reader->socket());
-    size_t i = j->second;
-    player_[i].name = reader->string();
-    player_[i].uuid = reader->integer();
-    player_[i].timestamp = engine_->frame_time();
-    if (engine_->module()) {
-        engine_->module()->on_player_list_update();
-    }
-    rpc_player_list_all();
+    vector<BSockSocketPtr>::iterator j = find(stream_.begin(), stream_.end(), reader->socket());
+	if (j != stream_.end()) {
+		size_t i = j - stream_.begin();
+		player_[i].name = reader->string();
+		player_[i].uuid = reader->integer();
+		player_[i].timestamp = engine_->frame_time();
+		if (engine_->module()) {
+			engine_->module()->on_player_list_update();
+		}
+		rpc_player_list_all();
+	}
 }
 
 void BSockNetwork::on_player_leave(BSockReader* reader) {
     // Read which player quic, and notify the GUI
-    map<BSockSocketPtr, size_t>::iterator j = socket_.find(reader->socket());
-    size_t i = j->second;
-    player_[i] = Player(); // Reset the player
-    if (engine_->module()) {
-        engine_->module()->on_player_list_update();
-    }
-    rpc_player_list_all();
+    vector<BSockSocketPtr>::iterator j = find(stream_.begin(), stream_.end(), reader->socket());
+	if (j != stream_.end()) {
+		size_t i = j - stream_.begin();
+		stream_[i] = 0;
+		player_[i] = Player();
+		if (engine_->module()) {
+			engine_->module()->on_player_list_update();
+		}
+		rpc_player_list_all();
+	}
 }
 
 void BSockNetwork::on_player_list(BSockReader* reader) {
@@ -383,3 +522,114 @@ void BSockNetwork::on_player_list(BSockReader* reader) {
         }
     }
 }
+
+void BSockNetwork::on_state(BSockReader* reader) {
+	uint32_t tick = reader->integer(); // Read the tick ID
+	uint32_t uuid = reader->integer();
+	uint32_t hash = 0;
+
+	if (uuid == current_player_.uuid) {
+		return;
+	}
+
+	while (hash = reader->integer()) {
+		// Read all the state data in for this node
+		uint32_t state_hash = reader->integer();
+		Vector position;
+		position.x = reader->real();
+		position.y = reader->real();
+		position.z = reader->real();
+
+		Quaternion rotation;
+		rotation.w = reader->real();
+		rotation.x = reader->real();
+		rotation.y = reader->real();
+		rotation.z = reader->real();
+
+		Vector linear_velocity;
+		linear_velocity.x = reader->real();
+		linear_velocity.y = reader->real();
+		linear_velocity.z = reader->real();
+
+		Vector angular_velocity;
+		angular_velocity.x = reader->real();
+		angular_velocity.y = reader->real();
+		angular_velocity.z = reader->real();
+
+		map<uint32_t, BSockNetworkMonitorPtr>::iterator i = network_monitor_.find(hash);
+		if (i != network_monitor_.end()) {
+			BSockNetworkMonitorPtr network_monitor = i->second;
+			network_monitor->state_hash(tick, hash);
+			network_monitor->position(tick, position, linear_velocity);
+			network_monitor->rotation(tick, rotation, angular_velocity);
+		}
+	}
+}
+
+void BSockNetwork::on_ping(BSockReader* reader) {
+	std::cout << "Ping" << std::endl;
+}
+
+
+void BSockNetwork::on_sync_tick(BSockReader* reader) {
+	uint32_t tick = reader->integer();
+	engine_->tick_id(tick);
+
+}
+
+/*
+uint32_t tick_delay = (uint32_t)engine_->option<float>("network_tick_delay");
+	uint32_t tick = reader->integer(); // Read the tick ID
+
+
+	if (tick + tick_delay <= engine_->tick_id()) {
+		// Packet is still usable, because it is early or just on time
+		// Add it to the list of outstanding packets
+		input_state_.push(BSockState(reader, tick + tick_delay));
+	}
+*/
+
+/*
+	uint32_t hash = 0;
+
+	// Calculate the time delta so that we can advance the position and
+	// rotation using the state from the server (which is necessarily old)
+	float delta = (engine_->tick_id() - tick) * engine_->timestep();// + tick_accumulator_;
+
+	while (hash = reader->integer()) {
+		//writer-> Read state hash for the actor, if it exists
+
+		// Read all the state data in for this node
+		Vector position(reader->real(), reader->real(), reader->real());
+		Quaternion rotation(reader->real(), reader->real(), reader->real(), reader->real());
+		Vector linear_velocity(reader->real(), reader->real(), reader->real());
+		Vector angular_velocity(reader->real(), reader->real(), reader->real());
+		
+		// Look up the node by hash
+		map<uint32_t, BSockNetworkMonitorPtr>::iterator i = network_monitor_.find(hash);
+		if (i != network_monitor_.end()) {
+			CoreNode* node = i->second->parent();
+			if (node) {
+				// Advance the position and rotation by the given time
+				position += linear_velocity * delta;
+				rotation += (rotation.unit() * Quaternion(angular_velocity * delta, 0) * 0.5f).unit();
+
+				// Do a smooth interpolation between the network position
+				// and the current position, so that objects don't appear
+				// to jump when a packet arrives
+				position = position.lerp(node->position(), alpha);
+				rotation = rotation.slerp(node->rotation(), alpha);
+				node->position(position);
+				node->rotation(rotation);
+
+				// Snap the linear and angular velocity
+				node->rigid_body()->linear_velocity(linear_velocity);
+				node->rigid_body()->angular_velocity(angular_velocity);
+
+			} else {
+				// The node no longer exists, so delete the network monitor
+				network_monitor_.erase(i);
+			}
+		}
+	}
+*/

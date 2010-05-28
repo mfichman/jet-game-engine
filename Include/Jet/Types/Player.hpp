@@ -33,14 +33,18 @@ public:
     //! Creates a new player with the given name
     inline Player(const std::string& name) :
         name(name),
-        uuid(rand()),
+		uuid(::rand()),
+		datagram_address(0),
+		datagram_port(0),
         timestamp(0.0f) {
     }
     
     //! Creates a new player
     inline Player() :
         name(""),
-        uuid(rand()),
+		uuid(::rand()),
+		datagram_address(0),
+		datagram_port(0),
         timestamp(0.0f) {
             
     }
@@ -55,6 +59,8 @@ public:
     
     std::string name;
     uint32_t uuid;
+	uint32_t datagram_address;
+	uint16_t datagram_port;
     float timestamp;
 };
 

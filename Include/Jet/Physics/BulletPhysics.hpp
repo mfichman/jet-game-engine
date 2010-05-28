@@ -62,7 +62,8 @@ private:
     void on_update();
     void on_render() {}
     
-    static void on_tick(btDynamicsWorld* world, btScalar step);    
+	static void on_pre_tick(btDynamicsWorld* world, btScalar step);
+    static void on_post_tick(btDynamicsWorld* world, btScalar step);    
     CoreEngine* engine_;
     
     std::auto_ptr<btCollisionConfiguration> config_;

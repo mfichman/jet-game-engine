@@ -30,11 +30,11 @@
 using namespace Jet;
 using namespace std;
 
-BSockSocket* BSockSocket::server(uint16_t port) {
+BSockSocket* BSockSocket::server(const Address& address) {
     sockaddr_in local;
     local.sin_family = AF_INET;
     local.sin_addr.s_addr = htonl(INADDR_ANY); // Choose any address
-    local.sin_port = htons(port); // Choose any port for TCP
+    local.sin_port = htons(address.port); // Choose any port for TCP
 
     sockaddr_in remote;
     remote.sin_family = AF_INET;
@@ -44,7 +44,7 @@ BSockSocket* BSockSocket::server(uint16_t port) {
     return new BSockSocket(local, remote, ST_SERVER);
 }
 
-BSockSocket* BSockSocket::client(const std::string& ip, uint16_t port) {
+BSockSocket* BSockSocket::client(const Address& address) {
     sockaddr_in local;
     local.sin_family = AF_INET;
     local.sin_addr.s_addr = htonl(INADDR_ANY); // Choose any address
@@ -52,37 +52,38 @@ BSockSocket* BSockSocket::client(const std::string& ip, uint16_t port) {
 
     sockaddr_in remote;
     remote.sin_family = AF_INET;
-    remote.sin_addr.s_addr = inet_addr(ip.c_str());
-    remote.sin_port = htons(port);
+    remote.sin_addr.s_addr = htonl(address.address);
+    remote.sin_port = htons(address.port);
     
     return new BSockSocket(local, remote, ST_CLIENT);
+
 }
 
-BSockSocket* BSockSocket::multicast(const std::string& ip, uint16_t port) {
+BSockSocket* BSockSocket::multicast(const Address& address) {
     sockaddr_in local;
     local.sin_family = AF_INET;
     local.sin_addr.s_addr = htonl(INADDR_ANY); // Choose any address
-    local.sin_port = htons(port); // Bind local to any given port
+    local.sin_port = htons(address.port); // Bind local to mcast port
 
     sockaddr_in remote;
     remote.sin_family = AF_INET;
-    remote.sin_addr.s_addr = inet_addr(ip.c_str());
-    remote.sin_port = htons(port);
+    remote.sin_addr.s_addr = htonl(address.address);
+    remote.sin_port = htons(address.port);
     
     return new BSockSocket(local, remote, ST_MULTICAST);
 
 }
 
-BSockSocket* BSockSocket::datagram(const std::string& ip, uint16_t port) {
+BSockSocket* BSockSocket::datagram(const Address& address) {
     sockaddr_in local;
     local.sin_family = AF_INET;
     local.sin_addr.s_addr = htonl(INADDR_ANY); // Choose any address
-    local.sin_port = 0; // Bind local to any given port
+    local.sin_port = htons(address.port); // Bind local to any given port
 
     sockaddr_in remote;
     remote.sin_family = AF_INET;
-    remote.sin_addr.s_addr = inet_addr(ip.c_str());
-    remote.sin_port = htons(port);
+    remote.sin_addr.s_addr = 0;
+    remote.sin_port = 0;
     
     return new BSockSocket(local, remote, ST_DATAGRAM);
 }
@@ -93,8 +94,7 @@ BSockSocket::BSockSocket(const sockaddr_in& local, const sockaddr_in& remote, So
     remote_(remote),
 	type_(type),
     write_bytes_(0),
-    read_bytes_(0),
-    port_(0) {
+    read_bytes_(0) {
         
     switch (type_) {
         case ST_DATAGRAM: init_datagram(); break;
@@ -122,8 +122,13 @@ BSockSocket::BSockSocket(const sockaddr_in& local, const sockaddr_in& remote, So
         throw runtime_error(socket_errmsg());
     }
     
-    port_ = ntohs(local_.sin_port);
-    address_ = inet_ntoa(local_.sin_addr);
+	if (ST_MULTICAST == type_) {
+		remote_.sin_port = local_.sin_port;
+		address_.address = ntohl(remote_.sin_addr.s_addr);
+	} else {
+		address_.address = ntohl(local_.sin_addr.s_addr);
+	}
+    address_.port = ntohs(local_.sin_port);
 }
 
 BSockSocket::~BSockSocket() {	
@@ -205,6 +210,12 @@ void BSockSocket::init_multicast() {
     // Attempt to bind the socket to the given port.  If the attempt fails,
     // clean close the socket and throw an exception.
     if(bind(socket_, (sockaddr*)&local_, sizeof(local_)) < 0) {
+        throw runtime_error(socket_errmsg());
+    }
+
+	// Get the port we are bound to
+    socklen_t len = sizeof(local_);
+    if (getsockname(socket_, (sockaddr*)&local_, &len) < 0) {
         throw runtime_error(socket_errmsg());
     }
 }
@@ -347,8 +358,8 @@ void BSockSocket::write_datagram() {
 }
 
 void BSockSocket::read_datagram() {
-    sockaddr_in source;
-    socklen_t socklen = sizeof(source);
+	sockaddr_in address;
+    socklen_t socklen = sizeof(address);
 
     // Assume the packet will be 4096 bytes, max.
     in_.resize(4096);
@@ -358,7 +369,7 @@ void BSockSocket::read_datagram() {
     size_t len = in_.size();
         
     // Read from the socket, and capture the source addres.
-    int rt = recvfrom(socket_, pkt, len, 0, (sockaddr*)&source, &socklen);
+    int rt = recvfrom(socket_, pkt, len, 0, (sockaddr*)&address, &socklen);
 
     // If an error occurred, or the socket is already closed, then throw an
     // exception.

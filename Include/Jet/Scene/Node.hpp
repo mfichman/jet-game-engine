@@ -43,6 +43,9 @@ public:
 	
 	//! Returns true if the node is visible.
 	virtual bool visible() const=0;
+
+	//! Returns true if the node is marked for deletion
+	virtual bool destroyed() const=0;
     
     //! Returns the node's current rotation.
     virtual const Quaternion& rotation() const=0;

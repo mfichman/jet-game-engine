@@ -21,44 +21,22 @@
  */  
 #pragma once
 
-#include <Jet/Network/BSockTypes.hpp>
-#include <Jet/Network/BSockSocket.hpp>
+#include <Jet/Types.hpp>
 #include <Jet/Object.hpp>
 
 namespace Jet {
 
-//! Reads data from a socket synchronously.
-//! @class BSockReader
-//! @brief Reads data from a socket synchronously.
-class BSockReader : public Object {
+//! This class monitors the node for state changes, and synchronizes those
+//! changes with the server/peer.
+//! @class NetworkMonitor
+//! @brief Interface for monitoring network state change
+class NetworkMonitor : public Object {
 public:
-    //! Creates a new socket reader and locks the buffer for reading.
-    BSockReader(BSockSocket* socket);
-    
-    //! Destructor
-    ~BSockReader();
+    //! Returns the parent node.
+    virtual Node* parent() const=0;
 
-    //! Reads floating-point data from the socket.  Throws an exception if data
-    //! is not available.  Does not block.
-    float real();
-    
-    //! Reads integer data from the socket.  Throws an exception if data is not
-    //! available.  Does not block.
-    int integer();
-    
-    //! Reads a string from the socket.  Throws an exception if data is not
-    //! available.  Does not block.
-    std::string string();
-    
-    //! Returns the socket
-    inline BSockSocket* socket() const {
-        return socket_.get();
-    }
-    
-private:
-    BSockSocketPtr socket_;
-    size_t bytes_read_;
-    std::vector<char> in_;
+	//! Destroys this network monitor
+	virtual void destroy()=0;
 };
 
 }

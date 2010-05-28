@@ -24,7 +24,6 @@
 #include <Jet/Network/BSockTypes.hpp>
 #include <Jet/Network/BSockSocket.hpp>
 #include <Jet/Object.hpp>
-#include <boost/thread.hpp>
 
 namespace Jet {
 
@@ -47,6 +46,9 @@ public:
     
     //! Writes a string to the socket
     void string(const std::string& string);
+
+	//! Writes the address of the desintation.
+	void destination(const sockaddr_in& addr);
     
     //! Returns the socket
     inline BSockSocket* socket() const {

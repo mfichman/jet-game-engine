@@ -62,7 +62,7 @@ void SDLInput::on_update() {
 			case SDL_MOUSEMOTION: on_mouse_moved(evt.motion.x, evt.motion.y); break;
         }
     }
-    
+    // Save the keyboard state using SDL_GetKeyState and SDL_GetMouseState
 }
 
 void SDLInput::on_tick() {
@@ -73,6 +73,7 @@ void SDLInput::on_tick() {
 }
 
 void SDLInput::on_key_pressed(const std::string& key) {
+	// Get the current game module, and send a notification
     Module* module = engine_->module();
     if (module) {
         int x, y;
@@ -80,15 +81,15 @@ void SDLInput::on_key_pressed(const std::string& key) {
         module->on_key_pressed(key, normalized_mouse(x, y));
     }
 
-
+	// Send a notification of the key press to the overlay
     CoreOverlay* overlay = static_cast<CoreOverlay*>(engine_->focused_overlay());
     if (overlay) {
+		// Convert to uppercase if SHIFT is being held by the user
+		// N.B.: This doesn't work for special keys yet
 		if ((key.length() == 1) && (SDL_GetModState() & KMOD_LSHIFT || SDL_GetModState() & KMOD_RSHIFT)) {
-			//if (isalpha(key[0])) {
-				string upper(" ");
-				upper[0] = toupper(key[0]);
-				overlay->key_pressed(upper);
-			//}
+			string upper(" ");
+			upper[0] = toupper(key[0]);
+			overlay->key_pressed(upper);
 		} else {
 			overlay->key_pressed(key);
 		}

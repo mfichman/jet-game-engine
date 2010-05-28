@@ -59,7 +59,7 @@ function MPLobby:__init()
     }
     
     -- Set put us into host mode
-    engine.network.state = Network.NS_JOIN
+    engine.network.state = Network.NS_CLIENT
 end
 
 function MPLobby:on_player_list_update(number, name)

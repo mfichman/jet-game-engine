@@ -99,6 +99,11 @@ public:
 	inline float timestep() const {
 		return 1.0f/60.0f;
 	}
+
+	//! Frame accumulator
+	inline float frame_accumulator() const {
+		return frame_accumulator_;
+	}
 	
 	//! The delta since the last render
 	inline float frame_delta() const {
@@ -110,10 +115,15 @@ public:
 		return frame_time_;
 	}
     
-    //! Returns the frame ide
+    //! Returns the frame ID
     inline uint32_t frame_id() const {
         return frame_id_;
     }
+
+	//! Returns the tick ID
+	inline uint32_t tick_id() const {
+		return tick_id_;
+	}
     
     //! Returns an engine option.  This method will return nil if the option
     //! cannot bet found.
@@ -195,7 +205,7 @@ public:
 	//! Returns the input system
 	Input* input() const;
 	
-		//! Returns the network interface.
+	//! Returns the network interface.
 	inline void network(Network* network) {
 		network_ = network;
 	}
@@ -224,7 +234,18 @@ public:
 	inline void input(Input* input) {
 		input_ = input;
 	}
-	
+
+	//! Sets the tick id
+	inline void tick_id(uint32_t tick) {
+		tick_id_ = tick;
+	}
+
+	//! Increments the tick count
+	inline void tick_id_inc() {
+		frame_accumulator_ -= timestep();
+		tick_id_++;
+	}
+
     //! Adds a listener, which listens for engine events.
     //! @param listener the engine listener.
     inline void listener(EngineListener* listener) {
@@ -337,7 +358,6 @@ private:
     void update_frame_delta();
 	void update_fps();
 	void init_systems();
-	void delete_mesh(const std::string& name);
 	
 	// Map containing engine options
 	std::map<std::string, boost::any> option_;
@@ -377,6 +397,7 @@ private:
 	bool initialized_;
     float frame_delta_;
 	float frame_time_;
+	float frame_accumulator_;
 	unsigned fps_frame_count_;
 	float fps_elapsed_time_;
 	size_t auto_name_counter_;
@@ -388,6 +409,7 @@ private:
 	timeval prev_time_;
 #endif
     uint32_t frame_id_;
+	uint32_t tick_id_;
 };
 
 }

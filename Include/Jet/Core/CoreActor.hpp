@@ -25,6 +25,7 @@
 #include <Jet/Core/CoreNode.hpp>
 #include <Jet/Core/CoreEngine.hpp>
 #include <Jet/Scene/Actor.hpp>
+#include <Jet/Utility.hpp>
 #include <map>
 
 namespace Jet {
@@ -54,10 +55,18 @@ public:
     inline const std::string& state() const {
         return state_;
     }
+
+	//! Returns a hash of the current state name.
+	inline uint32_t state_hash() const {
+		return Jet::hash(state_);
+	}
     
     //! Sets the current state.  This will switch the acive state to the
     //! state given by name.
     void state(const std::string& name);
+
+	//! Sets the current state by hash.
+	void state_hash(uint32_t hash);
     
     //! Adds a new state object to this actor.  A state listens for node
     //! events, and switches when the actor state changes.

@@ -22,6 +22,7 @@
 #pragma once
 
 #include <Jet/Network/BSockTypes.hpp>
+#include <Jet/Types/Address.hpp>
 #include <Jet/Object.hpp>
 #include <vector>
 #include <queue>
@@ -42,27 +43,27 @@ public:
     //! address.
     //! @param ip the destination address
     //! @param port the destination port
-    static BSockSocket* client(const std::string& ip, uint16_t port);
+    static BSockSocket* client(const Address& addres);
     
     //! Creates a unicast TCP socket serving on the given port and IP
     //! address.
     //! @param ip the destination address
     //! @param port the destination port
-    static BSockSocket* server(uint16_t port);
+    static BSockSocket* server(const Address& address);
     
     //! Creates a multicast UDP socket on the given port and using the
     //! specified multicast IP.  Returns immediately if the port is free,
     //! or throws an std::runtime_error if the operation fails.
     //! @param ip the destination address
     //! @param port the destination port
-    static BSockSocket* multicast(const std::string& ip, uint16_t port);
+    static BSockSocket* multicast(const Address& address);
     
     //! Creates a unicast UDP socket on the given port.  Returns immediately
     //! if the port is free, or throws an std::runtime_error if the operation
     //! fails
     //! @param ip the group ip
     //! @param port the group port
-    static BSockSocket* datagram(const std::string& ip, uint16_t port);
+    static BSockSocket* datagram(const Address& address);
         
     //! Returns a packet writer for this socket, or null if no data is
     //! available.
@@ -79,14 +80,9 @@ public:
     void poll_write();
     
     //! Returns the port
-    inline uint16_t port() const {
-        return port_;
-    }
-    
-    //! Returns the IP address
-    inline const std::string& address() const {
+    inline const Address& address() const {
         return address_;
-    }
+	}
    
 private:
     BSockSocket(const sockaddr_in& local, const sockaddr_in& remote, SocketType type, int socket=INVALID_SOCKET);
@@ -111,8 +107,7 @@ private:
     SocketType type_;
     size_t write_bytes_;
     size_t read_bytes_;
-    uint16_t port_;
-    std::string address_;
+	Address address_;
     
     friend class BSockReader;
     friend class BSockWriter;

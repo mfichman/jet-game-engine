@@ -26,11 +26,11 @@
 using namespace Jet;
 using namespace std;
 
-BSockServerSocket* BSockServerSocket::server(uint16_t port) {
+BSockServerSocket* BSockServerSocket::server(const Address& address) {
     sockaddr_in local;
     local.sin_family = AF_INET;
     local.sin_addr.s_addr = htonl(INADDR_ANY); // Choose any address
-    local.sin_port = htons(port); // Choose any port for TCP
+    local.sin_port = htons(address.port); // Choose any port for TCP
 
     sockaddr_in remote;
     remote.sin_family = AF_INET;
@@ -42,8 +42,7 @@ BSockServerSocket* BSockServerSocket::server(uint16_t port) {
 
 BSockServerSocket::BSockServerSocket(const sockaddr_in& local, const sockaddr_in& remote) :
 	local_(local),
-	remote_(remote),
-    port_(0) {
+	remote_(remote) {
 
     // Create a new TCP socket.  If the attempt fails, throw an exception.
     socket_ = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -89,8 +88,8 @@ BSockServerSocket::BSockServerSocket(const sockaddr_in& local, const sockaddr_in
     local_.sin_addr = *(in_addr*)*entry->h_addr_list;
     local_.sin_port = port;
     
-    port_ = ntohs(local_.sin_port);
-    address_ = inet_ntoa(local_.sin_addr);
+    address_.address = ntohl(local_.sin_addr.s_addr);
+    address_.port = ntohs(local_.sin_port);
 }
 
 BSockServerSocket::~BSockServerSocket() {

@@ -52,8 +52,11 @@ function StartScreen:__init()
     }    
     self.box_body = self.box_node.rigid_body
     self.box_body.mass = 10000.0
+    self.box_body.linear_velocity = Vector(-3, .002, .003)
+    
+    local monitor = self.box_node.network_monitor
 
-    self.box_body.angular_velocity = Vector(.05, .2, 0)
+    self.box_body.angular_velocity = Vector(.05, .9, 0)
     
 
     engine.network.state = Network.NS_DISABLED

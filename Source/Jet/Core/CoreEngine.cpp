@@ -48,6 +48,7 @@
 #include <Jet/Audio/FMODAudio.hpp>
 #include <fstream>
 #include <memory>
+#include <boost/date_time/c_time.hpp>
 
 #define JET_MAX_TIME_LAG 0.5f
 
@@ -57,6 +58,7 @@ using namespace boost::filesystem;
 using namespace boost;
 
 Engine* Engine::create() {
+	srand((::uint32_t)time(NULL));
 	auto_ptr<CoreEngine> engine(new CoreEngine());
     engine->network(new BSockNetwork(engine.get()));
 	engine->graphics(new OpenGLGraphics(engine.get()));
@@ -77,10 +79,12 @@ CoreEngine::CoreEngine() :
 	initialized_(false),
 	frame_delta_(0.0f),
 	frame_time_(0.0f),
+	frame_accumulator_(0.0f),
 	fps_frame_count_(0),
 	fps_elapsed_time_(0.0f),
 	auto_name_counter_(0),
-    frame_id_(0) {
+    frame_id_(0),
+	tick_id_(0) {
 		
 	cout << "Starting kernel" << endl;
 	
@@ -354,10 +358,6 @@ void CoreEngine::update_frame_delta() {
 	prev_time_ = current_time;
 
 #endif
-}
-
-void CoreEngine::delete_mesh(const std::string& name) {
-	mesh_.erase(name);	
 }
 
 Network* CoreEngine::network() const {

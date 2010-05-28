@@ -60,18 +60,39 @@ namespace Jet {
 
     class BSockGame;
     class BSockPlayer;
+	class BSockNetworkMonitor;
     class BSockNetworkSystem;
     class BSockShader;
     class BSockServerSocket;
     class BSockSocket;
+	class BSockState;
     class BSockWriter;
     class BSockReader;
     
-    typedef boost::intrusive_ptr<BSockNetworkSystem> BSockNetworkSystemPtr;
+	typedef boost::intrusive_ptr<BSockNetworkMonitor> BSockNetworkMonitorPtr;
+	typedef boost::intrusive_ptr<BSockNetworkSystem> BSockNetworkSystemPtr;
     typedef boost::intrusive_ptr<BSockServerSocket> BSockServerSocketPtr;
     typedef boost::intrusive_ptr<BSockSocket> BSockSocketPtr;
-    typedef boost::intrusive_ptr<BSockReader> BSockSocketReaderPtr;
-    typedef boost::intrusive_ptr<BSockWriter> BSockSocketWriterPtr;
+    typedef boost::intrusive_ptr<BSockReader> BSockReaderPtr;
+    typedef boost::intrusive_ptr<BSockWriter> BSockWriterPtr;
 
-    enum SocketType { ST_SERVER, ST_CLIENT, ST_MULTICAST, ST_DATAGRAM, ST_STREAM };
+    enum SocketType { 
+		ST_SERVER, 
+		ST_CLIENT, 
+		ST_MULTICAST, 
+		ST_DATAGRAM, 
+		ST_STREAM 
+	};
+
+	enum PacketType { 
+		PT_PING,
+		PT_MATCH_INFO,
+		PT_MATCH_DESTROY,
+		PT_PLAYER_JOIN,
+		PT_PLAYER_LEAVE,
+		PT_PLAYER_LIST,
+		PT_STATE,
+		PT_INPUT,
+		PT_SYNC
+	};
 }

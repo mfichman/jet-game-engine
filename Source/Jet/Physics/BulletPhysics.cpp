@@ -41,7 +41,8 @@ BulletPhysics::BulletPhysics(CoreEngine* engine) :
 	world_->setGravity(btVector3(0.0f, -10.0f, 0.0f));
     
     // Enable the pre-tick callback
-    world_->setInternalTickCallback(&BulletPhysics::on_tick, this, true);
+	world_->setInternalTickCallback(&BulletPhysics::on_post_tick, this, false);
+    world_->setInternalTickCallback(&BulletPhysics::on_pre_tick, this, true);
     btGImpactCollisionAlgorithm::registerAlgorithm(dispatcher_.get());    
 }
 
@@ -55,14 +56,24 @@ void BulletPhysics::on_update() {
     
     // Step simulation returns how many substeps were taken.  If at least one
     // substep was taken, then we have to update matrices for our objects.
-	world_->stepSimulation(engine_->frame_delta(), 4, engine_->timestep());
+	int steps = world_->stepSimulation(engine_->frame_delta(), 4, engine_->timestep());
 }
 
 void BulletPhysics::on_init() {
     std::cout << "Initializing physics system" << std::endl;
 }
 
-void BulletPhysics::on_tick(btDynamicsWorld* world, btScalar step) {
+void BulletPhysics::on_post_tick(btDynamicsWorld* world, btScalar step) {
+    BulletPhysics* system = static_cast<BulletPhysics*>(world->getWorldUserInfo());
+
+    // Update all engine listeners
+    for (Iterator<EngineListenerPtr> i = system->engine_->listeners(); i; i++) {
+        (*i)->on_tick();
+    }
+
+}
+
+void BulletPhysics::on_pre_tick(btDynamicsWorld* world, btScalar step) {
     
     // Clear force, and apply gravity to all rigid bodies
     btCollisionObjectArray objects = world->getCollisionObjectArray();
@@ -75,12 +86,7 @@ void BulletPhysics::on_tick(btDynamicsWorld* world, btScalar step) {
     }
 
     BulletPhysics* system = static_cast<BulletPhysics*>(world->getWorldUserInfo());
-    
-    // Update all engine listeners
-    for (Iterator<EngineListenerPtr> i = system->engine_->listeners(); i; i++) {
-        (*i)->on_tick();
-    }
-	
+
     // Update the active module
     if (system->engine_->module()) {
         system->engine_->module()->on_tick();
@@ -108,6 +114,8 @@ void BulletPhysics::on_tick(btDynamicsWorld* world, btScalar step) {
             cb->parent()->collision(ca->parent(), Vector(pb.x(), pb.y(), pb.z()));
         }
     }
+
+	system->engine_->tick_id_inc();
     
     return;
 }
