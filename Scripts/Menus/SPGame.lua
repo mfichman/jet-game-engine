@@ -76,13 +76,13 @@ function SPGame:on_load()
 end
 
 function SPGame:on_update(delta)
-	if (engine.network.state == Network.NS_CLIENT) then
+	--[[if (engine.network.state == Network.NS_CLIENT) then
 		if (self.ship) then
 			camera_node:look(self.ship.position, Vector(0, 1, 0))
 		end
-	else
+	else]]
 		self:update_camera(delta)
-	end
+	--end
 end
 
 function SPGame:update_camera(delta)

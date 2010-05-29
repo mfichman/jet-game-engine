@@ -18,7 +18,7 @@ else
     engine:option("fullscreen_enabled", false)
     engine:option("fsaa_enabled", false)
     engine:option("fsaa_samples", 0)
-    engine:option("shadows_enabled", false)
+    engine:option("shadows_enabled", true)
     engine:option("normal_mapping_enabled", false)
     engine:option("specular_mapping_enabled", false)
 end
