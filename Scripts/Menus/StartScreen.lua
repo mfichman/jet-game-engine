@@ -51,8 +51,7 @@ function StartScreen:__init()
         material = "Metal.mtl"
     }    
     local box_body = box_node.rigid_body
-    box_body.mass = 10000.0
-    box_body.angular_velocity = Vector(.05, .9, 0)
+    box_body.mass = 0
       
 
     engine.network.state = Network.NS_DISABLED

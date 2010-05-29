@@ -58,6 +58,7 @@ function SPGame:on_load()
     -- Create rocks
     print("Creating rocks")
     self.rocks = {}
+    math.randomseed(10)
     for i=1,10 do
         self.rocks[i] = Rock()
         local x = math.random(-100, 100)
