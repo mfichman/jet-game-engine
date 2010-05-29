@@ -56,7 +56,7 @@ void BulletPhysics::on_update() {
     
     // Step simulation returns how many substeps were taken.  If at least one
     // substep was taken, then we have to update matrices for our objects.
-	int steps = world_->stepSimulation(engine_->frame_delta(), 4, engine_->timestep());
+	world_->stepSimulation(engine_->frame_delta(), 4, engine_->timestep());
 }
 
 void BulletPhysics::on_init() {

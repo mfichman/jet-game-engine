@@ -196,9 +196,17 @@ void BSockSocket::init_multicast() {
         throw runtime_error(socket_errmsg());
     }
     
+
+    int yes = 1;
+#ifdef SO_REUSEPORT
+	// OS X hack...for some reason, this needs to be set in OS X only
+	if (setsockopt(socket_, SOL_SOCKET, SO_REUSEPORT, (char*)&yes, sizeof(yes)) < 0) {
+		throw runtime_error(socket_errmsg());
+	}
+#endif
+
     // Set the port to be reusable.  If the attempt fails, close the socket
     // and throw an exception.
-    int yes = 1;
     if (setsockopt(socket_, SOL_SOCKET, SO_REUSEADDR, (char*)&yes, sizeof(yes)) < 0) {
         throw runtime_error(socket_errmsg());
     }

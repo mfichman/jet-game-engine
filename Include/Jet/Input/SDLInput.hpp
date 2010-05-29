@@ -26,7 +26,11 @@
 #include <Jet/Core/CoreEngine.hpp>
 #include <Jet/Input.hpp>
 #include <queue>
+#ifdef WINDOWS
 #include <unordered_map>
+#else
+#include <tr1/unordered_map>
+#endif
 
 namespace Jet {
 

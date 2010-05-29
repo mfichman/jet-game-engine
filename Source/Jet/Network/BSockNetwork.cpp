@@ -572,13 +572,12 @@ void BSockNetwork::on_player_list(BSockReader* reader) {
 void BSockNetwork::on_state(BSockReader* reader) {
 	uint32_t tick = reader->integer(); // Read the tick ID
 	uint32_t uuid = reader->integer();
-	uint32_t hash = 0;
 
 	if (uuid == current_player_.uuid) {
 		return;
 	}
 
-	while (hash = reader->integer()) {
+	while (uint32_t hash = reader->integer()) {
 		// Read all the state data in for this node
 		uint32_t state_hash = reader->integer();
 		Vector position;
