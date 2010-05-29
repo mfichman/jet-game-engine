@@ -21,27 +21,33 @@
  */  
 #pragma once
 
-#include <Jet/Network/BSockTypes.hpp>
-#include <Jet/Network/BSockReader.hpp>
+#include <Jet/Types.hpp>
+#include <Jet/Types/Point.hpp>
+#include <vector>
 
 namespace Jet {
 
-//! Contains a state packet.
-//! @class BSockState
-//! @brief Contains a state packet.
-class BSockState : public Object {
+//! Represents a complete capture of the game input state
+//! @class InputState
+//! @brief Capture of the game input state
+class InputState {
 public:
-	inline BSockState(BSockReader* reader, uint32_t tick) :
-		reader(reader),
-		tick(tick) {
+	inline InputState() :
+		player_uuid(0),
+		tick(0),
+		mouse_button(0) {
 	}
 
-	bool operator<(const BSockState& other) const {
-		return tick < other.tick;
+	//! Compares this input state with another for sorting
+	bool operator<(const InputState& other) const {
+		return tick > other.tick;
 	}
 
-	BSockReaderPtr reader;
-	uint32_t tick;
+	uint32_t player_uuid;
+    uint32_t tick; // Time at which input becomes valid
+	uint32_t mouse_button;
+	Point mouse; // Normalized mouse coordinates
+	std::vector<uint8_t> key;
 };
 
 }

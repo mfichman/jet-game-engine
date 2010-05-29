@@ -23,12 +23,11 @@
 
 #include <Jet/Network/BSockTypes.hpp>
 #include <Jet/Network/BSockSocket.hpp>
-#include <Jet/Network/BSockState.hpp>
 #include <Jet/Network/BSockServerSocket.hpp>
 #include <Jet/Network/BSockNetworkMonitor.hpp>
 #include <Jet/Core/CoreEngine.hpp>
 #include <Jet/Types/Player.hpp>
-#include <Jet/Types/Match.hpp>
+#include <Jet/Types/NetworkMatch.hpp>
 #include <Jet/Network.hpp>
 #include <queue>
 #include <map>
@@ -70,7 +69,7 @@ public:
     }
     
     //! Returns information about a game.
-    inline const Match& match(size_t index) const {
+    inline const NetworkMatch& match(size_t index) const {
         return match_[index];
     }
     
@@ -80,7 +79,7 @@ public:
     }
     
     //! Returns information about the current local match
-    inline const Match& current_match() const {
+    inline const NetworkMatch& current_match() const {
         return current_match_;
     }
     
@@ -93,7 +92,7 @@ public:
     void state(NetworkState state);
     
     //! Sets the current game.
-    inline void current_match(const Match& match) {
+    inline void current_match(const NetworkMatch& match) {
         current_match_ = match;
     }
     
@@ -127,6 +126,7 @@ private:
     void rpc_player_list(BSockSocket* socket);
 	void rpc_sync_tick(BSockSocket* socket);
 	void rpc_state(BSockSocket* socket);
+	void rpc_input(BSockSocket* socket);
 	void rpc_ping(BSockSocket* socket);
     void rpc_match_destroy_all();
     void rpc_player_list_all();
@@ -140,6 +140,7 @@ private:
     void on_player_list(BSockReader* reader);
 	void on_sync_tick(BSockReader* reader);
 	void on_state(BSockReader* reader);
+	void on_input(BSockReader* reader);
 	void on_ping(BSockReader* reader);
 
 	void update_stats();
@@ -149,17 +150,14 @@ private:
 	// Various recordkeeping structures
     float accumulator_;
     NetworkState state_;
-    std::vector<Match> match_;
+    std::vector<NetworkMatch> match_;
     std::vector<Player> player_;
-    Match current_match_;
+    NetworkMatch current_match_;
     Player current_player_;
 
 	uint32_t tx_bytes_;
 	uint32_t rx_bytes_;
 	float stats_elapsed_time_;
-
-	// Buffered state from other hosts
-	std::priority_queue<BSockState> input_state_;
     
 	// Sockets used by the network engine
 	std::vector<BSockSocketPtr> stream_;

@@ -58,7 +58,8 @@ public:
 
 	//! Returns a hash of the current state name.
 	inline uint32_t state_hash() const {
-		return Jet::hash(state_);
+		uint32_t local = Jet::hash(state_);
+		return local;
 	}
     
     //! Sets the current state.  This will switch the acive state to the

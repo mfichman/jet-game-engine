@@ -22,8 +22,9 @@
 
 #include <Jet/Input/SDLInput.hpp>
 #include <Jet/Core/CoreEngine.hpp>
-#include <Jet/Core/CoreOverlay.hpp> // TODO HACK HACK HACK
+#include <Jet/Core/CoreOverlay.hpp>
 #include <Jet/Types/Point.hpp>
+#include <Jet/Types/Player.hpp>
 #include <SDL/SDL.h>
 #include <cmath>
 #include <cctype>
@@ -37,6 +38,10 @@ SDLInput::SDLInput(CoreEngine* engine) :
     engine_(engine){
 
     engine_->listener(this);
+
+	for (uint32_t key = SDLK_FIRST; key != SDLK_LAST; key++) {
+		key_map_.insert(make_pair(SDL_GetKeyName((SDLKey)key), (SDLKey)key));
+	}
 }
 
 SDLInput::~SDLInput() {
@@ -66,21 +71,85 @@ void SDLInput::on_update() {
 }
 
 void SDLInput::on_tick() {
-    int x, y;
-    SDL_GetMouseState(&x, &y);
-    CoreOverlay* overlay = static_cast<CoreOverlay*>(engine_->screen());
+
+	int x;
+	int y;
+	int length;
+
+	uint32_t delay = (uint32_t)engine_->option<float>("input_delay");
+	uint32_t button = SDL_GetMouseState(&x, &y);
+	uint8_t* keys = SDL_GetKeyState(&length);
+
+	// Save the current input state and push it onto the 
+	// priority queue
+	local_input_state_.player_uuid = engine_->network()->current_player().uuid;
+	local_input_state_.tick = engine_->tick_id() + delay;
+	local_input_state_.mouse_button = button;
+	local_input_state_.mouse = normalized_mouse(x, y);
+	local_input_state_.key.resize(length);
+	copy(keys, keys + length, local_input_state_.key.begin());
+
+	input_state_.push(local_input_state_);
+
+	// Upate the overlay input directly, because it doesn't need to be
+	// sent across the network
+	CoreOverlay* overlay = static_cast<CoreOverlay*>(engine_->screen());
 	overlay->mouse_moved((float)x, (float)y);
+
+	// For each state in the queue, process it with the previous state
+	// to look for button presses, mouse movement, etc
+	while (!input_state_.empty()) {
+		//input_state_.top().tick <= engine_->tick_id()) {
+		const InputState& state = input_state_.top();
+		if (state.tick <= engine_->tick_id()) {
+			input_state_.pop();
+			process_state(state);
+			prev_state_[state.player_uuid] = state;
+		} else {
+			break;
+		}
+	}
+}
+
+void SDLInput::process_state(const InputState& state) {
+	// Get the previous state, if it exists
+	const InputState& prev = prev_state_[state.player_uuid];
+	
+	// Get the current module, and don't do processing if no module is loaded
+	Module* module = engine_->module();
+	if (!module) {
+		return;
+	}
+
+	// Process the keyboard input state by iterating over all the keys
+	// in the keyboard and looking for differences
+	for (size_t i = 0; i < min(prev.key.size(), state.key.size()); i++) {
+		if (prev.key[i] != state.key[i]) {
+			const string key = SDL_GetKeyName((SDLKey)i);
+			if (state.key[i]) {
+				module->on_key_pressed(key, state.mouse);
+			} else {
+				module->on_key_released(key, state.mouse);
+			}
+		}
+	}
+
+	// Process mouse input in a similar fashion
+	for (size_t i = 1; i <= 3; i++) {
+		if ((SDL_BUTTON(i) & prev.mouse_button) != (SDL_BUTTON(i) & state.mouse_button)) {
+			if (SDL_BUTTON(i) & prev.mouse_button) {
+				module->on_mouse_pressed(i, state.mouse);
+			} else {
+				module->on_mouse_released(i, state.mouse);
+			}
+		}
+	}
+
+	// Process the mouse position
+	module->on_mouse_motion(state.mouse);
 }
 
 void SDLInput::on_key_pressed(const std::string& key) {
-	// Get the current game module, and send a notification
-    Module* module = engine_->module();
-    if (module) {
-        int x, y;
-        SDL_GetMouseState(&x, &y);
-        module->on_key_pressed(key, normalized_mouse(x, y));
-    }
-
 	// Send a notification of the key press to the overlay
     CoreOverlay* overlay = static_cast<CoreOverlay*>(engine_->focused_overlay());
     if (overlay) {
@@ -97,12 +166,6 @@ void SDLInput::on_key_pressed(const std::string& key) {
 }
 
 void SDLInput::on_key_released(const std::string& key) {
-    Module* module = engine_->module();
-    if (module) {
-        int x, y;
-        SDL_GetMouseState(&x, &y);
-        module->on_key_released(key, normalized_mouse(x, y));
-    }
     CoreOverlay* overlay = static_cast<CoreOverlay*>(engine_->focused_overlay());
     if (overlay) {
         overlay->key_released(key);
@@ -110,28 +173,25 @@ void SDLInput::on_key_released(const std::string& key) {
 }
 
 void SDLInput::on_mouse_pressed(int button, int x, int y) {
-    Module* module = engine_->module();
-    if (module) {
-        module->on_mouse_pressed(button, normalized_mouse(x, y));
-    }
+
 	CoreOverlay* overlay = static_cast<CoreOverlay*>(engine_->screen());
 	overlay->mouse_pressed(button, (float)x, (float)y);
 }
 
 void SDLInput::on_mouse_released(int button, int x, int y) {
-    Module* module = engine_->module();
+    /*Module* module = engine_->module();
     if (module) {
         module->on_mouse_released(button, normalized_mouse(x, y));
-    }
+    }*/
 	CoreOverlay* overlay = static_cast<CoreOverlay*>(engine_->screen());
 	overlay->mouse_released(button, (float)x, (float)y);
 }
 
 void SDLInput::on_mouse_moved(int x, int y) {
-    Module* module = engine_->module();
+    /*Module* module = engine_->module();
     if (module) {
         module->on_mouse_motion(normalized_mouse(x, y));
-    }
+    }*/
 
 }
 
@@ -154,4 +214,24 @@ Point SDLInput::normalized_mouse(int x, int y) {
     point.x = max(-1.0f, min(1.0f, point.x));
     
     return point;
+}
+
+bool SDLInput::key_down(uint32_t uuid, const string& key) {
+	const InputState& state = prev_state_[uuid];
+	SDLKey keycode = key_map_[key];
+	if (state.key.size() > (size_t)keycode) {
+		return state.key[keycode] != 0;
+	} else {
+		return false;
+	}
+}
+
+bool SDLInput::mouse_down(uint32_t uuid, int button) {
+	const InputState& state = prev_state_[uuid];
+	return (state.mouse_button & SDL_BUTTON(button)) != 0;
+}
+
+const Point& SDLInput::mouse_position(uint32_t uuid) {
+	const InputState& state = prev_state_[uuid];
+	return state.mouse;
 }

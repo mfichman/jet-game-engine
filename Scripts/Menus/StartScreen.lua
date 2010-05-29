@@ -52,35 +52,8 @@ function StartScreen:__init()
     }    
     local box_body = box_node.rigid_body
     box_body.mass = 10000.0
-    box_body.linear_velocity = Vector(-3, .002, .003)
     box_body.angular_velocity = Vector(.05, .9, 0)
-    local monitor = box_node.network_monitor
-        
-       -- Set up the box
-    local box_node = engine.root:node("box2")
-    box_node.position = Vector(-30, 0, -14)
-    local box = box_node:mesh_object("box") {
-        mesh = "Box.obj",
-        material = "Metal.mtl"
-    }    
-    local box_body = box_node.rigid_body
-    box_body.mass = 10000.0
-    box_body.linear_velocity = Vector(-3, .002, .003)
-    box_body.angular_velocity = Vector(.05, .9, 0)
-    local monitor = box_node.network_monitor
-    
-    -- Set up the box
-    local box_node = engine.root:node("box3")
-    box_node.position = Vector(-60, 0, -14)
-    local box = box_node:mesh_object("box") {
-        mesh = "Box.obj",
-        material = "Metal.mtl"
-    }    
-    local box_body = box_node.rigid_body
-    box_body.mass = 10000.0
-    box_body.linear_velocity = Vector(-3, .002, .003)
-    box_body.angular_velocity = Vector(.05, .9, 0)
-    local monitor = box_node.network_monitor
+      
 
     engine.network.state = Network.NS_DISABLED
 end

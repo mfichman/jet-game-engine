@@ -22,8 +22,11 @@
 #pragma once
 
 #include <Jet/Input/SDLTypes.hpp>
+#include <Jet/Types/InputState.hpp>
 #include <Jet/Core/CoreEngine.hpp>
 #include <Jet/Input.hpp>
+#include <queue>
+#include <unordered_map>
 
 namespace Jet {
 
@@ -39,6 +42,27 @@ public:
     //! Destructor.
     ~SDLInput();
 
+	//! Returns the current input state for the local player
+	inline const InputState& input_state() const {
+		return local_input_state_;
+	}
+
+	//! Adds an input state to the input queue 
+	inline void input_state(const InputState& state) {
+		if (state.tick >= engine_->tick_id()) {
+			input_state_.push(state);
+		}
+	}
+
+	//! Returns true if the key is down for the given player
+	bool key_down(uint32_t uuid, const std::string& key);
+
+	//! Returns true if the mouse is down for the given key and player
+	bool mouse_down(uint32_t uuid, int button);
+
+	//! Returns the mouse position
+	const Point& mouse_position(uint32_t uuid);
+
 private:
     void on_tick();
     void on_init();
@@ -51,10 +75,16 @@ private:
     void on_mouse_released(int button, int x, int y);
 	void on_mouse_moved(int x, int y);
     void on_joystick(int button, int x, int y, int z);
+
+	void process_state(const InputState& state);
     
     Point normalized_mouse(int x, int y);
     
     CoreEngine* engine_;
+	InputState local_input_state_;
+	std::priority_queue<InputState> input_state_;
+	std::map<uint32_t, InputState> prev_state_;
+	std::tr1::unordered_map<std::string, SDLKey> key_map_;
 };
 
 }

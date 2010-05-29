@@ -296,10 +296,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Include\Jet\Network\BSockState.hpp"
-				>
-			</File>
-			<File
 				RelativePath=".\Include\Jet\Network\BSockTypes.hpp"
 				>
 			</File>
@@ -444,6 +440,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Include\Jet\Types\InputState.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Include\Jet\Types\Iterator.hpp"
 				>
 			</File>
@@ -476,10 +476,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Include\Jet\Types\Match.hpp"
-				>
-			</File>
-			<File
 				RelativePath=".\Include\Jet\Resources\Material.hpp"
 				>
 			</File>
@@ -501,6 +497,10 @@
 			</File>
 			<File
 				RelativePath=".\Include\Jet\Network.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Include\Jet\Types\NetworkMatch.hpp"
 				>
 			</File>
 			<File
@@ -688,10 +688,6 @@
 		</File>
 		<File
 			RelativePath=".\Scripts\Engine\ActorSupport.lua"
-			>
-		</File>
-		<File
-			RelativePath=".\Scripts\Box.lua"
 			>
 		</File>
 		<File

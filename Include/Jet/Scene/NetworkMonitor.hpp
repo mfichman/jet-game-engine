@@ -35,6 +35,12 @@ public:
     //! Returns the parent node.
     virtual Node* parent() const=0;
 
+	//! Returns the UUID of the player that owns the parent node
+	virtual uint32_t player_uuid() const=0;
+
+	//! Sets the UUID of the owner of this node
+	virtual void player_uuid(uint32_t uuid)=0;
+
 	//! Destroys this network monitor
 	virtual void destroy()=0;
 };

@@ -25,7 +25,8 @@
 #include <Jet/Network/BSockWriter.hpp>
 #include <Jet/Core/CoreEngine.hpp>
 #include <Jet/Types/Player.hpp>
-#include <Jet/Types/Match.hpp>
+#include <Jet/Types/NetworkMatch.hpp>
+#include <Jet/Types/InputState.hpp>
 #include <cfloat>
 #include <boost/date_time/c_time.hpp>
 
@@ -49,7 +50,7 @@ BSockNetwork::BSockNetwork(CoreEngine* engine) :
     engine_->option("discover_port", (float)6789);
 	engine_->option("max_players", (float)3);
 	engine_->option("network_smoothness", 0.5f);
-	engine_->option("network_tick_delay", (float)12); // Delay input by 12 ticks before processing
+	engine_->option("input_delay", (float)12); // Delay input by 12 ticks before processing
 	engine_->option("network_packet_rate", (float)6); // Send 1 packet every 6 ticks
 	engine_->option("stat_tx_rate", (float)0);
 	engine_->option("stat_rx_rate", (float)0);
@@ -76,21 +77,18 @@ void BSockNetwork::on_init() {
 
 void BSockNetwork::on_tick() {
 	try {
-		// Send and packet every 6th physics tick (i.e., every 100ms)
-		if (NS_HOST == state_) {// || NS_CLIENT == state_) {
-			uint32_t packet_rate = (uint32_t)engine_->option<float>("network_packet_rate");
-			if (engine_->tick_id() % packet_rate == 0) {
+		uint32_t packet_rate = (uint32_t)engine_->option<float>("network_packet_rate");
+		if (engine_->tick_id() % packet_rate == 0) {
+			
+			// Send and packet every 6th physics tick (i.e., every 100ms)
+			if (NS_HOST == state_) {
 				rpc_state(datagram_.get());
 			}
-		}
 
-		// Remove packets that are too old
-		while (!input_state_.empty() && input_state_.top().tick < engine_->tick_id()) {
-		}
-
-		// Now process packets for this tick
-		while (!input_state_.empty() && input_state_.top().tick == engine_->tick_id()) {
-			cout << "Processing state" << endl;
+			// Send input to other hosts
+			if (NS_HOST == state_ || NS_CLIENT == state_) {
+				rpc_input(datagram_.get());
+			}
 		}
 
 		// Process network monitors
@@ -312,7 +310,7 @@ void BSockNetwork::read_rpcs(BSockSocket* socket) {
 			case PT_STATE: on_state(reader.get()); break;
 			case PT_PING: on_ping(reader.get()); break;
 			case PT_SYNC: on_sync_tick(reader.get()); break;
-			case PT_INPUT: break;
+			case PT_INPUT: on_input(reader.get()); break;
 		}
     }
 }
@@ -376,6 +374,7 @@ void BSockNetwork::rpc_state(BSockSocket* socket) {
 			// This prevents the iterator from being invalidated.
 			map<uint32_t, BSockNetworkMonitorPtr>::iterator j = i++;
 			CoreNode* node = j->second->parent();
+			uint32_t uuid = j->second->player_uuid();
 			
 			// Write the most current state information for the node. This includes 
 			// position, velocity,  and rotation.  If a UDP socket is used, and the
@@ -386,7 +385,10 @@ void BSockNetwork::rpc_state(BSockSocket* socket) {
 				// The node has been destroyed, so erase the network monitor.
 				// This releases the reference on the monitor, thus freeing it.
 				network_monitor_.erase(j);
-			} else if (node->visible()) {
+			} else if (node->visible() && (!uuid || uuid == current_player_.uuid)) {
+				// If the node is visible and owned by the local player, then broadcast
+				// information about the node to all other players
+				
 				writer->integer(j->first); // Node hash (for ID)
 				writer->integer(node->actor()->state_hash()) ;// Write state hash 
 
@@ -415,6 +417,40 @@ void BSockNetwork::rpc_state(BSockSocket* socket) {
 
 		// Write the end-of-packet marker: a zero word
 		writer->integer(0);
+	}
+}
+
+void BSockNetwork::rpc_input(BSockSocket* socket) {
+	if (BSockWriterPtr writer = socket->writer()) {
+		const InputState& state = engine_->input()->input_state();
+
+		writer->integer(PT_INPUT);
+		writer->integer(state.player_uuid); // Write the player UUID
+		writer->integer(state.tick); // Active tick
+		writer->integer(state.mouse_button);
+		writer->real(state.mouse.x);
+		writer->real(state.mouse.y);
+
+		uint32_t words = (uint32_t)ceil((float)state.key.size()/(float)32);
+		writer->integer(words);
+
+		// Compress the key state by sending a bitset instead of
+		// the whole array of byte-flags
+		uint32_t word = 0;
+		size_t i;
+		for (i = 0; i < state.key.size(); i++) {
+			uint32_t bit = i % 32;		
+			if (state.key[i]) {
+				word |= 1 << bit;
+			}
+			if ((i % 32) ==  31) {
+				writer->integer(word);
+				word = 0;
+			}
+		}
+		if ((i % 32) != 0) {
+			writer->integer(word);
+		}
 	}
 }
 
@@ -453,7 +489,7 @@ void BSockNetwork::rpc_match_destroy_all() {
 }
 
 void BSockNetwork::on_match_info(BSockReader* reader) {
-    Match match;
+    NetworkMatch match;
     match.name = reader->string();
     match.stream_address.address = reader->integer();
     match.stream_address.port = (uint16_t)reader->integer();
@@ -463,7 +499,7 @@ void BSockNetwork::on_match_info(BSockReader* reader) {
     match.timestamp = engine_->frame_time();
 
     // Search for and update/add the match to the list
-    vector<Match>::iterator i = find(match_.begin(), match_.end(), match);
+    vector<NetworkMatch>::iterator i = find(match_.begin(), match_.end(), match);
     if (i != match_.end()) {
         *i = match;
     } else {
@@ -476,11 +512,11 @@ void BSockNetwork::on_match_info(BSockReader* reader) {
 }
 
 void BSockNetwork::on_match_destroy(BSockReader* reader) {
-    Match match;
+    NetworkMatch match;
     match.uuid = reader->integer();
     
     // Search for and erase the match
-    vector<Match>::iterator i = find(match_.begin(), match_.end(), match);
+    vector<NetworkMatch>::iterator i = find(match_.begin(), match_.end(), match);
     if (i != match_.end()) {
         match_.erase(i);
     }
@@ -569,11 +605,40 @@ void BSockNetwork::on_state(BSockReader* reader) {
 		map<uint32_t, BSockNetworkMonitorPtr>::iterator i = network_monitor_.find(hash);
 		if (i != network_monitor_.end()) {
 			BSockNetworkMonitorPtr network_monitor = i->second;
-			network_monitor->state_hash(tick, hash);
+			network_monitor->state_hash(tick, state_hash);
 			network_monitor->position(tick, position, linear_velocity);
 			network_monitor->rotation(tick, rotation, angular_velocity);
 		}
 	}
+}
+
+void BSockNetwork::on_input(BSockReader* reader) {
+
+	InputState state;
+	state.player_uuid = reader->integer();
+	if (state.player_uuid == current_player_.uuid) {
+		return;
+	}
+
+	state.tick = reader->integer();
+	state.mouse_button = reader->integer();
+	state.mouse.x = reader->real();
+	state.mouse.y = reader->real();
+
+	state.key.resize(reader->integer() * 32);
+
+	uint32_t word;
+	for (size_t i = 0; i < state.key.size(); i++) {
+		if (i % 32 == 0) {
+			word = reader->integer();
+		}
+		uint32_t bit = i % 32;
+		if (word & (1 << bit)) {
+			state.key[i] = 1;
+		}
+	}
+
+	engine_->input()->input_state(state);
 }
 
 void BSockNetwork::on_ping(BSockReader* reader) {

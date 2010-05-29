@@ -27,12 +27,12 @@
 namespace Jet {
 
 //! Holds information about a multiplayer game.
-//! @class Match
+//! @class NetworkMatch
 //! @brief Holds information about a multiplayer game.
-class Match {
+class NetworkMatch {
 public:
     //! Creates a new game with the given name.
-    inline Match(const std::string& name) :
+    inline NetworkMatch(const std::string& name) :
         name(name),
         uuid(rand()),
         timestamp(0.0f) {
@@ -40,17 +40,17 @@ public:
     }
     
     //! Creates a new game
-    inline Match() :
+    inline NetworkMatch() :
         name("Unknown"),
         uuid(rand()),
         timestamp(0.0f) {
     }
     
-    inline bool operator==(const Match& other) const {
+    inline bool operator==(const NetworkMatch& other) const {
         return uuid == other.uuid;
     }
     
-    inline bool operator<(const Match& other) const {
+    inline bool operator<(const NetworkMatch& other) const {
         return uuid < other.uuid;
     }
     

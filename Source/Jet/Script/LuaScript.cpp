@@ -28,9 +28,10 @@
 #include <Jet/Script/LuaTask.hpp>
 #include <Jet/Types.hpp>
 #include <Jet/Network.hpp>
+#include <Jet/Input.hpp>
 #include <Jet/Interface/Overlay.hpp>
 #include <Jet/Types/Player.hpp>
-#include <Jet/Types/Match.hpp>
+#include <Jet/Types/NetworkMatch.hpp>
 #include <Jet/Types/Vector.hpp>
 #include <Jet/Types/Quaternion.hpp>
 #include <Jet/Types/Range.hpp>
@@ -446,10 +447,10 @@ void LuaScript::init_value_type_bindings() {
 			.def_readonly("name", &Player::name)
 			.def_readonly("uuid", &Player::uuid),
 
-		luabind::class_<Match>("Match")
+		luabind::class_<NetworkMatch>("NetworkMatch")
 			.def(luabind::constructor<const string&>())
-			.def_readonly("name", &Match::name)
-			.def_readonly("uuid", &Match::uuid)
+			.def_readonly("name", &NetworkMatch::name)
+			.def_readonly("uuid", &NetworkMatch::uuid)
 
     ];
 }
@@ -512,7 +513,8 @@ void LuaScript::init_entity_type_bindings() {
 			.def("destroy", &Node::destroy),
 
 		luabind::class_<NetworkMonitor, NetworkMonitorPtr>("NetworkMonitor")
-			.property("parent", &NetworkMonitor::parent),
+			.property("parent", &NetworkMonitor::parent)
+			.property("player_uuid", (uint32_t (NetworkMonitor::*)() const)&NetworkMonitor::player_uuid, (void (NetworkMonitor::*)(uint32_t))&NetworkMonitor::player_uuid),
             
         luabind::class_<Actor, ActorPtr>("Actor")
             .property("parent", &Actor::parent)
@@ -577,6 +579,7 @@ void LuaScript::init_entity_type_bindings() {
             .property("frame_time", &Engine::frame_time)
             .property("frame_delta", &Engine::frame_delta)           
 			.property("network", &Engine::network)
+			.property("input", &Engine::input)
             .property("running", (bool (Engine::*)() const)&Engine::running, (void (Engine::*)(bool))&Engine::running)
 			.def("mesh", (Mesh* (Engine::*)(const std::string&))&Engine::mesh)
             .def("material", &Engine::material)
@@ -584,10 +587,14 @@ void LuaScript::init_entity_type_bindings() {
             .def("option", (const boost::any& (Engine::*)(const std::string&) const)&Engine::option)
             .def("search_folder", &Engine::search_folder),
 
+		luabind::class_<Input, InputPtr>("Input")
+			.def("key_down", &Input::key_down)
+			.def("mouse_down", &Input::mouse_down)
+			.def("mouse_position", &Input::mouse_position),
             
         luabind::class_<Network, NetworkPtr>("Network")
             .property("state", (NetworkState (Network::*)() const)&Network::state, (void (Network::*)(NetworkState))&Network::state)
-            .property("current_match", (const Match& (Network::*)() const)&Network::current_match, (void (Network::*)(const Match&))&Network::current_match)
+            .property("current_match", (const NetworkMatch& (Network::*)() const)&Network::current_match, (void (Network::*)(const NetworkMatch&))&Network::current_match)
             .property("current_player", (const Player& (Network::*)() const)&Network::current_player, (void (Network::*)(const Player&))&Network::current_player)
             .property("match_count", &Network::match_count)
             .property("player_count", &Network::player_count)

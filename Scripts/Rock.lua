@@ -18,16 +18,16 @@
 -- FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 -- IN THE SOFTWARE.
 
-class 'Rock'
+function Rock()
+    local node = engine.root:node()
 
-function Rock:__init()
-    self.node = engine.root:node()
-
-    self.mesh = self.node:mesh_object() {
-        mesh = "Rock.obj",
-        material = "Rock.mtl"
-    }
+	-- Create an asteroids mesh
+    local mesh = node:mesh_object()
+    mesh.mesh = "Rock.obj"
+    mesh.material = "Rock.mtl"
     
-    self.body = self.node.rigid_body
-    self.body.mass = 0.0
+    -- Set mass to zero (static object)
+    node.rigid_body.mass = 0.0
+    
+    return node
 end

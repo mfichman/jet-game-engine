@@ -60,6 +60,8 @@ function MPLobby:__init()
     
     -- Set put us into host mode
     engine.network.state = Network.NS_CLIENT
+    
+    self.menu:next(SPGame)
 end
 
 function MPLobby:on_player_list_update(number, name)

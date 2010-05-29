@@ -65,7 +65,6 @@ namespace Jet {
     class BSockShader;
     class BSockServerSocket;
     class BSockSocket;
-	class BSockState;
     class BSockWriter;
     class BSockReader;
     

@@ -64,9 +64,10 @@ namespace Jet {
     class FractureObject;
     class FractalPlanet;
     class Frustum;
-    class Match;
+    class NetworkMatch;
     class Geometry;
     class Input;
+	class InputState;
     class Light;
     class Matrix;
     class Material;

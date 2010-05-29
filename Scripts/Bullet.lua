@@ -20,15 +20,12 @@
 
 require 'ActorState'
 
-Bullet = {}
-setmetatable(Bullet, Bullet)
-
 class 'BulletActive' (ActorState)
 class 'BulletInactive' (ActorState)
 
 -- This function creates a blue energy bullet node that creates an
 -- explosion when it hits something
-function Bullet.__call()
+function Bullet()
 	-- Create a new node
     local node = engine.root:node()
     
@@ -54,8 +51,7 @@ function Bullet.__call()
     local sphere = node:collision_sphere()
     sphere.radius = 0.4
     
-    -- Create an actor to handle state transitions for the
-    -- node
+    -- Create an actor to handle state transitions for the node
     node.actor:actor_state("Active", BulletActive(node))
     node.actor:actor_state("Inactive", BulletInactive(node))
     node.actor.state = "Inactive"
@@ -69,14 +65,6 @@ end
 function BulletActive:__init(node)
 	self.node = node
 end
-
-function BulletActive:__finalize()
-	-- Make sure that the explosion node we created is destroyed
-	-- as well when the bullet is destroyed
-	if (self.explosion) then 
-		self.explosion:destroy()
-	end
-end	
 
 function BulletActive:on_state_enter()
     self.node.visible = true
@@ -99,7 +87,7 @@ function BulletActive:on_collision(node, position)
     -- set its position to the collision contact point
     self.explosion = self.explosion or Explosion()
     self.explosion.node.position = position
-    self.explosion.actor.state = "Alive"
+    self.explosion.actor.state = "Active"
     
     -- Switch states to inactive
     self.node.actor.state = "Inactive"

@@ -32,7 +32,21 @@ namespace Jet {
 class Input : public virtual Object {
 public:
     
-    
+	//! Returns the current input state for the local player.
+	virtual const InputState& input_state() const=0;
+
+    //! Offers an input state for the given player.  This allows the
+	//! network system to add an input state for processing.
+	virtual void input_state(const InputState& state)=0;
+
+	//! Returns true if the key is down for the given player UUID
+	virtual bool key_down(uint32_t uuid, const std::string& key)=0;
+
+	//! Returns true if the mouse button is down for the given player UUID
+	virtual bool mouse_down(uint32_t uuid, int button)=0;
+
+	//! Returns the current mouse position
+	virtual const Point& mouse_position(uint32_t uuid)=0;
 };
 
 }

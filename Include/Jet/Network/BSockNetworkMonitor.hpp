@@ -42,12 +42,18 @@ public:
 		engine_(engine),
 		parent_(node),
 		hash_(Jet::hash(node->name())),
-		state_tick_(0) {
+		state_tick_(0),
+		player_uuid_(0) {
 	}
 
     //! Returns the parent node.
 	inline CoreNode* parent() const {
 		return parent_;
+	}
+
+	//! Returns the UUID of the owner of the node
+	inline uint32_t player_uuid() const {
+		return player_uuid_;
 	}
 
 	//! Returns the network ID of the node.
@@ -58,6 +64,11 @@ public:
 	//! Destroys the network monitor
 	inline void destroy() {
 		parent_ = 0;
+	}
+
+	//! Sets the player UUID
+	inline void player_uuid(uint32_t uuid) {
+		player_uuid_ = uuid;
 	}
 
 	//! Adds a vote for the hash.  The state of the node at the end 
@@ -84,6 +95,7 @@ private:
 	Vector angular_velocity_;
 	Vector position_;
 	Quaternion rotation_;
+	uint32_t player_uuid_;
 };
 
 }

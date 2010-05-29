@@ -44,13 +44,13 @@ public:
     virtual size_t player_count() const=0;
     
     //! Returns information about a game.
-    virtual const Match& match(size_t index) const=0;
+    virtual const NetworkMatch& match(size_t index) const=0;
     
     //! Returns information about a player in the game.
     virtual const Player& player(size_t index) const=0;
     
     //! Returns information about the current local match
-    virtual const Match& current_match() const=0;
+    virtual const NetworkMatch& current_match() const=0;
     
     //! Returns information about the current player.
     virtual const Player& current_player() const=0;
@@ -59,7 +59,7 @@ public:
     virtual void state(NetworkState state)=0;
     
     //! Sets the current game.
-    virtual void current_match(const Match& match)=0;
+    virtual void current_match(const NetworkMatch& match)=0;
     
     //! Sets information about the current player.
     virtual void current_player(const Player& player)=0;

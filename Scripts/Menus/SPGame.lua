@@ -31,9 +31,6 @@ function SPGame:__init()
     Module.__init(self)
     math.randomseed(os.time())
 
-    self.yaw = 0
-    self.pitch = 0
-    self.roll = 0
     self.camera_position = Vector()
     self.camera_rotation = Quaternion()
     self.bullet = {}
@@ -55,16 +52,9 @@ function SPGame:on_load()
     -- Set up scene objects and apply some forces
     print("Creating objects")
     self.ship = Dagger("Red")
-    self.ship.node.position = Vector(0, 0, -80)    
+    self.ship.position = Vector(0, 0, -80) 
+    self.ship.network_monitor.player_uuid = engine.network:player(0).uuid   
     
-    self.audio = engine.root.audio_source
-    self.audio:sound(0, "Zap2.wav")
-    
-    
-    self.dagger = Dagger("Orange")
-    self.dagger.node.position = Vector(-20, -20, -20)
-    self.dagger.body.linear_velocity = Vector(0, 0, 20)
-
     -- Create rocks
     print("Creating rocks")
     self.rocks = {}
@@ -73,85 +63,34 @@ function SPGame:on_load()
         local x = math.random(-100, 100)
         local y = math.random(-100, 100)
         local z = math.random(-100, 100)
-        local pos = Vector(x, y, z)
-        self.rocks[i].node.position = pos
+        self.rocks[i].position = Vector(x, y, z)
         
         local x = math.random(-100, 100)
         local y = math.random(-100, 100)
         local z = math.random(-100, 100)
-        local pos = Vector(x, y, z)
-        self.rocks[i].body.angular_velocity = pos.unit * 0.4
-
-    ---self.rocks[i].body.linear_velocity = -pos.unit * 5;
+        self.rocks[i].rigid_body.angular_velocity = Vector(x, y, z).unit * 0.4
     end
     
-    
     self.menu.overlay.visible = false
-    self.thrust = true
-    
 end
 
 function SPGame:on_update(delta)
-    self:update_camera(delta)
-end
-
-function SPGame:on_tick()
-    self:update_ship()
-    self:update_enemy()
-end
-
-function SPGame:on_mouse_motion(point)
-    self.yaw = point.x
-    self.pitch = point.y
-end
-
-function SPGame:on_mouse_pressed(button, point)
-    --self.audio:state(0, AudioSource.PS_PLAY)
-
-    self.bullet[self.bullet_index] = self.bullet[self.bullet_index] or Bullet()
-    
-    local forward = self.ship.node.matrix.forward
-    self.bullet[self.bullet_index].position = self.ship.node.position + forward * 2.5
-    self.bullet[self.bullet_index].rigid_body.linear_velocity = forward * 120 + self.ship.body.linear_velocity
-    self.bullet[self.bullet_index].actor.state = "Active"
-    self.bullet_index = (self.bullet_index + 1) % 10
-end
-
-function SPGame:on_key_pressed(key, point)
-
-    if (key == 'q') then
-        engine.running = false
-    elseif (key == 'i') then
-        --self.thrust = true
-        --self.ship.flame.life = -1
-        self.dagger.actor.state = "Dead"
-    elseif (key == 'u') then
-        self.roll = -1
-    elseif (key == 'o') then
-        self.roll = 1
-    end
-end
-
-function SPGame:on_key_released(key, point)
-    
-    if (key == 'i') then
-        --self.thrust = false
-        --self.ship.flame.life = 0
-    elseif (key == 'u') then
-        self.roll = 0
-    elseif (key == 'o') then
-        self.roll = 0
-    end
-    
+	if (engine.network.state == Network.NS_CLIENT) then
+		if (self.ship) then
+			camera_node:look(self.ship.position, Vector(0, 1, 0))
+		end
+	else
+		self:update_camera(delta)
+	end
 end
 
 function SPGame:update_camera(delta)
     if (not self.ship) then return end
 
    
-    if (self.ship.actor.state == "Alive") then
-        self.ship_position = Vector(self.ship.node.position)
-        self.ship_rotation = Quaternion(self.ship.node.rotation)
+    if (self.ship.actor.state == "Active") then
+        self.ship_position = Vector(self.ship.position)
+        self.ship_rotation = Quaternion(self.ship.rotation)
     end
     
 
@@ -170,123 +109,23 @@ function SPGame:update_camera(delta)
     self.camera_position = self.camera_position:lerp(position, alpha2)
     camera_node.position = self.camera_position + self.ship_position
     
-    if (self.ship.actor.state == "Dead") then
-        camera_node:look(self.ship.node.position + target, up)
+    if (self.ship.actor.state == "Inactive") then
+        camera_node:look(self.ship.position + target, up)
     else
         camera_node:look(self.ship_position + target, up)
     end
-    --camera_node.position
 end
 
-function SPGame:update_enemy()
+--[[
+function SPGame:on_mouse_pressed(button, point)
+    --self.audio:state(0, AudioSource.PS_PLAY)
+	if (not self.ship) then return end
 
-    if (not self.dagger or self.dagger.actor.state == "Dead") then return end
+    self.bullet[self.bullet_index] = self.bullet[self.bullet_index] or Bullet()
     
-
-    local max_force = 24
-    local max_speed = 20
-
-    local mass = self.dagger.body.mass
-    
-        -- Auto-correct if the thruster is on
-    local forward = self.dagger.node.matrix.forward*max_speed
-    local direction = forward - self.dagger.body.linear_velocity
-    
-    -- Correct for differences in the direction of the velocity
-    -- vector (this is the auto-correct activated after collision or
-    -- during a turn)
-    local difference = direction.length
-    
-    -- Select the magnitude of the force applied.  This is always
-    -- less than the total force the thrusters can apply
-    local magnitude = math.min(max_force, difference*100)
-    
-    
-    if (math.abs(magnitude) < 0.01) then
-        -- Do the final correction to get the speed where we want it
-        self.dagger.body.linear_velocity = forward
-    else
-        -- Apply the velocity correction by using a force in the
-        -- velocity difference direction
-        self.dagger.body:apply_force(direction.unit * magnitude)
-    end
-
-    local hmagnitude = -max_force * -0.4
-    local hradius = mass * math.pow(max_speed, 2) / hmagnitude
-    local hangular = Vector(0, max_speed/hradius, 0)
-    hangular = self.dagger.node.rotation * hangular
-        
-    local vmagnitude = max_force * 0.2
-    local vradius = mass * math.pow(max_speed, 2) / vmagnitude
-    local vangular = Vector(max_speed/vradius, 0, 0)
-    vangular = self.ship.node.rotation * vangular
-    
-    local zmagnitude = max_force * 0.2
-    local zradius = mass * math.pow(max_speed, 2) / zmagnitude
-    local zangular = Vector(0, 0, max_speed/zradius)
-    zangular = self.ship.node.rotation * zangular
-    
-    self.dagger.body.angular_velocity = hangular + vangular + zangular;
-
-end
-
-function SPGame:update_ship()
-    if (not self.ship or self.ship.actor.state == "Dead") then return end
-
-
-    local max_force = 35
-    local max_speed = 19
-    
-    local mass = self.ship.body.mass
-    
-    
-
-    -- Handle the thrust and automatic course correction
-    if (self.thrust) then
-        
-        -- Auto-correct if the thruster is on
-        local forward = self.ship.node.matrix.forward*max_speed
-        local direction = forward - self.ship.body.linear_velocity
-        
-        -- Correct for differences in the direction of the velocity
-        -- vector (this is the auto-correct activated after collision or
-        -- during a turn)
-        local difference = direction.length
-        
-        -- Select the magnitude of the force applied.  This is always
-        -- less than the total force the thrusters can apply
-        local magnitude = math.min(max_force, difference*100)
-        
-        
-        if (math.abs(magnitude) < 0.01) then
-            -- Do the final correction to get the speed where we want it
-            self.ship.body.linear_velocity = forward
-        else
-            -- Apply the velocity correction by using a force in the
-            -- velocity difference direction
-            self.ship.body:apply_force(direction.unit * magnitude)
-        end
-    end
-    
-    -- Handle each turn individually if the key is pressed, and
-    -- add total angular velocity at the end
-    
-    -- Calculate horizontal circular motion
-    local hmagnitude = -max_force * self.yaw
-    local hradius = mass * math.pow(max_speed, 2) / hmagnitude
-    local hangular = Vector(0, max_speed/hradius, 0)
-    hangular = self.ship.node.rotation * hangular
-    
-    -- Calculate the vertical circular motion
-    local vmagnitude = max_force * self.pitch
-    local vradius = mass * math.pow(max_speed, 2) / vmagnitude
-    local vangular = Vector(max_speed/vradius, 0, 0)
-    vangular = self.ship.node.rotation * vangular
-    
-    local zmagnitude = max_force * self.roll
-    local zradius = mass * math.pow(max_speed, 2) / zmagnitude
-    local zangular = Vector(0, 0, max_speed/zradius)
-    zangular = self.ship.node.rotation * zangular
-    
-    self.ship.body.angular_velocity = hangular + vangular + zangular
-end
+    local forward = self.ship.node.matrix.forward
+    self.bullet[self.bullet_index].position = self.ship.node.position + forward * 3
+    self.bullet[self.bullet_index].rigid_body.linear_velocity = forward * 120 + self.ship.body.linear_velocity
+    self.bullet[self.bullet_index].actor.state = "Active"
+    self.bullet_index = (self.bullet_index + 1) % 10
+end]]

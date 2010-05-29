@@ -26,7 +26,7 @@ class 'MPHost' (Module)
 function MPHost:__init()
     Module.__init(self)
     
-    local match = Match(engine.network.current_player.name.."'s game")
+    local match = NetworkMatch(engine.network.current_player.name.."'s game")
     
     -- Overlay
     self.menu = Menu {
@@ -67,6 +67,8 @@ function MPHost:__init()
     -- Set put us into host mode
     engine.network.current_match = match
     engine.network.state = Network.NS_HOST
+    
+    self.menu:next(SPGame)
 end
 
 function MPHost:on_player_list_update()
