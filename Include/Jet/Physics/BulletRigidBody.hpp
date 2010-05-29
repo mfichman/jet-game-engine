@@ -134,7 +134,7 @@ private:
     float mass_;
 	bool active_;
 
-    std::vector<boost::shared_ptr<btCollisionShape>> component_;
+    std::vector<boost::shared_ptr<btCollisionShape> > component_;
     std::auto_ptr<btRigidBody> body_;
     std::auto_ptr<btCompoundShape> shape_;
     

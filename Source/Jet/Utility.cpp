@@ -93,10 +93,9 @@ uint32_t Jet::hash(const std::string& key) {
 	return murmur_hash2(key.c_str(), key.length(), 0);
 }
 
-
+/*
 static int seed_ = 3;
 static int x_ = 3;
-/*
 uint32_t Jet::rand() {
 	// This is a hacked version of Blum Blum Shub.  I don't take care of
 	// the case where the x^2 value overflows, but it still seems to work

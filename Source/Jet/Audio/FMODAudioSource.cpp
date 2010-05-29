@@ -82,9 +82,10 @@ void FMODAudioSource::state(size_t chan, PlaybackState state) {
 void FMODAudioSource::position(const Vector& position) {
     for (size_t i = 0; i < channel_.size(); i++) {
         if (channel_[i]) {
-            
+			Vector linvel = parent_->linear_velocity();            
+
             FMOD_VECTOR* u = (FMOD_VECTOR*)&position;
-            FMOD_VECTOR* v = (FMOD_VECTOR*)&parent_->linear_velocity();
+            FMOD_VECTOR* v = (FMOD_VECTOR*)&linvel;
             
             fmod_check(FMOD_Channel_Set3DAttributes(channel_[i], u, v));
         }
