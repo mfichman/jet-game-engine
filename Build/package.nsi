@@ -1,9 +1,9 @@
 !include MUI.nsh
 
 !define VERSION "alpha"
-Name "Asteroids"
-OutFile "asteroids-demo-${VERSION}.exe"
-InstallDir "$PROGRAMFILES\Asteroids"
+Name "Zero Combat"
+OutFile "zero-combat-demo-${VERSION}.exe"
+InstallDir "$PROGRAMFILES\Zero Combat"
 LicenseData "license.txt"
 ShowInstDetails show
 
@@ -26,18 +26,24 @@ UninstallIcon "${NSISDIR}\contrib\graphics\icons\orange-uninstall.ico"
 Section "Main"
   SetOutPath $INSTDIR
   File /r /x *.lib /x *.exp /x *.ilk /x *.pdb /x *resource* ..\Binary*
-  File /r /x .hg* ..\Content*
-  File /r /x .hg* ..\Lib*
+  File /r /x .hg* /x *.blend* ..\Blender*
+  File /r /x .hg* ..\Fonts*
+  File /r /x .hg* ..\Scripts*
+  File /r /x .hg* ..\Shaders*
+  File /r /x .hg* ..\Sounds*
+  File /r /x .hg* ..\Textures*
+  File ..\Engine.lua
+  File ..\Options.lua
 
   WriteUninstaller "$INSTDIR\Uninstall.exe"
 
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Asteroids" "DisplayName" "Asteroids Demo"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Asteroids" "DisplayName" "Zero Combat Demo"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Asteroids" "Publisher" "Matt Fichman <mfichman@stanford.edu>"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Asteroids" "URLInfoAbout" "http://stanford.edu/~mfichman/asteroids-demo.exe"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Asteroids" "URLUpdateInfo" "http://stanford.edu/~mfichman/asteroids-demo.exe"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Asteroids" "URLInfoAbout" "http://stanford.edu/~mfichman/zero-combat-demo.exe"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Asteroids" "URLUpdateInfo" "http://stanford.edu/~mfichman/zero-combat-demo.exe"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Asteroids" "UninstallString" "$INSTDIR\Uninstall.exe"
 
-  CreateShortCut "$DESKTOP\Asteroids Demo.lnk" "$INSTDIR\Binary\game.exe" ""
+  CreateShortCut "$DESKTOP\Zero Combat Demo.lnk" "$INSTDIR\Binary\test.exe" ""
 
 SectionEnd
 

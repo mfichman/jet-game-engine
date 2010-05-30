@@ -59,7 +59,6 @@ OpenGLGraphics::OpenGLGraphics(CoreEngine* engine) :
 }
 	
 OpenGLGraphics::~OpenGLGraphics() {
-	SDL_Quit();
 }
 
 void OpenGLGraphics::init_window() {
@@ -423,7 +422,7 @@ void OpenGLGraphics::render_final(CoreLight* light) {
     
     // Render to the back buffer.
 	render_visible_mesh_objects();
-  //  render_skysphere();
+	render_skysphere();
 	render_visible_particle_systems();
 }
 

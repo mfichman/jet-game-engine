@@ -62,10 +62,11 @@ Engine* Engine::create() {
 	auto_ptr<CoreEngine> engine(new CoreEngine());
     engine->network(new BSockNetwork(engine.get()));
 	engine->graphics(new OpenGLGraphics(engine.get()));
-	engine->script(new LuaScript(engine.get()));
 	engine->input(new SDLInput(engine.get()));
 	engine->physics(new BulletPhysics(engine.get()));
 	engine->audio(new FMODAudio(engine.get()));
+	engine->script(new LuaScript(engine.get()));
+
 	return engine.release();
 }
 
@@ -89,7 +90,17 @@ CoreEngine::CoreEngine() :
 	cout << "Starting kernel" << endl;
 	
 	option("engine_build", string("Jet Game Engine 2.0.1 "__DATE__" "__TIME__));
-		
+	option("simulation_speed", 1.0f);
+	option("display_width", 800.0f);
+	option("display_height", 600.0f);
+	option("fullscreen_enabled", false);
+	option("vsync_enabled", false);
+	option("fsaa_enabled", false);
+	option("fsaa_samples", 0.0f);
+	option("shadows_enabled", false);
+	option("shaders_enabled", false);
+	option("window_title", string(""));
+
 	// Add some default search folders
 	search_folder(".");
 	search_folder("..");
@@ -126,17 +137,31 @@ CoreEngine::~CoreEngine() {
 	// Free the scene graph, the free all resources
 	root_.reset();
 	screen_.reset();
+	camera_.reset();
 	focused_overlay_.reset();
 	module_.reset();
+
+	// Free resources
+	sound_.clear();
+	material_.clear();
 	mesh_.clear();
 	texture_.clear();
-	sound_.clear();
 	cubemap_.clear();
 	shader_.clear();
-	material_.clear();
+	font_.clear();
+	geometry_.clear();
 	
 	cout << "Shutting down" << endl;
 	listener_.clear();
+
+	network_.reset();
+	graphics_.reset();
+	input_.reset();
+	physics_.reset();
+	audio_.reset();
+	script_.reset();
+
+	//option_.clear();
 
 	// Quit the SDL image library
 	IMG_Quit();
@@ -317,6 +342,7 @@ void CoreEngine::update() {
 	
 	frame_time_ += frame_delta_ * option<float>("simulation_speed");
     frame_id_++;
+
 }
 
 void CoreEngine::update_fps() {

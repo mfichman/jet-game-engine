@@ -21,8 +21,7 @@
 require 'Module'
 require 'Menu'
 require 'List'
-require 'MPHost'
-require 'MPLobby'
+require 'SPGame'
 
 class 'MPScreen' (Module)
 
@@ -68,7 +67,8 @@ function MPScreen:on_game_click(widget, button)
     end
 
     engine.network.current_player = Player(self.player_name.buffer)
-    self.menu:next(MPLobby)
+    engine.network.state = Network.NS_CLIENT
+    self.menu:next(SPGame)
 end
 
 function MPScreen:on_match_list_update()
@@ -81,7 +81,9 @@ end
 
 function MPScreen:on_host_click(widget, button)
     engine.network.current_player = Player(self.player_name.buffer)
-    self.menu:next(MPHost)
+    engine.network.current_match = NetworkMatch(engine.network.current_player.name.."'s game")
+	engine.network.state = Network.NS_HOST
+	self.menu:next(SPGame)
 end
 
 function MPScreen:on_back_click(widget, button)

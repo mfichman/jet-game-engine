@@ -31,6 +31,7 @@ BulletPhysics::BulletPhysics(CoreEngine* engine) :
     engine_(engine) {
         
     engine_->listener(this);
+	engine_->option("gravity", 0.0f);
         
     // Blah blah blah config blah blah
     config_.reset(new btDefaultCollisionConfiguration);

@@ -15,7 +15,6 @@ int main(int argc, char** argv) {
 
     try {
         Jet::EnginePtr engine(Jet::Engine::create()); 
-        
         while (engine->running()) {
 			engine->update();
 		}

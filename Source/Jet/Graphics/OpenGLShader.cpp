@@ -93,23 +93,22 @@ void OpenGLShader::init_program() {
 	glAttachShader(program_, fshader_);
 	glAttachShader(program_, vshader_);
 	glLinkProgram(program_);
-	
-	// Check for errors
-	GLchar log[1024];
-	GLsizei length;
+
 	
 	// Fragment shader errors
-	glGetShaderInfoLog(fshader_, 1024, &length, log);
-	if (length) {
-		throw runtime_error("Fragment shader log: " + string(log, length));
-	}
-	
-	// Vertex shader errors
-	glGetShaderInfoLog(vshader_, 1024, &length, log);
-	if (length) {
-		throw runtime_error("Vertex shader log: " + string(log, length));
-	}
-	
+	GLint success;
+	glGetProgramiv(program_, GL_LINK_STATUS, &success);
+	if (!success) {
+		// Check for errors
+		GLchar log[1024];
+		GLsizei length;
+
+		glGetShaderInfoLog(fshader_, 1024, &length, log);
+		string fshader_log(log, length);
+		glGetShaderInfoLog(vshader_, 1024, &length, log);
+		string vshader_log(log, length);
+		throw runtime_error(fshader_log + vshader_log);
+	}	
 }
 
 void OpenGLShader::read_source(const string& path, vector<char>& source) {
