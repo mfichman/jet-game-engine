@@ -43,13 +43,16 @@ public:
     
     //! Writes an integer number to the socket.
     void integer(int integer);
+
+	//! Writes a byte to the socket
+	void byte(uint8_t byte);
     
     //! Writes a string to the socket
     void string(const std::string& string);
 
-	//! Writes the address of the desintation.
-	void destination(const sockaddr_in& addr);
-    
+	//! Writes the whole packet stored in the given reader.
+	void packet(BSockReader* reader);
+
     //! Returns the socket
     inline BSockSocket* socket() const {
         return socket_.get();

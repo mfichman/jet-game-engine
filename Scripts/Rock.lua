@@ -18,12 +18,14 @@
 -- FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 -- IN THE SOFTWARE.
 
-function Rock()
+function Rock(size)
     local node = engine.root:node()
+
+	size = size or "Jumbo"
 
 	-- Create an asteroids mesh
     local mesh = node:mesh_object()
-    mesh.mesh = "Rock.obj"
+    mesh.mesh = size.."Rock.obj"
     mesh.material = "Rock.mtl"
     
     -- Set mass to zero (static object)

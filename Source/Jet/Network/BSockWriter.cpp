@@ -21,6 +21,7 @@
  */
 
 #include <Jet/Network/BSockWriter.hpp>
+#include <Jet/Network/BSockReader.hpp>
 
 using namespace Jet;
 using namespace std;
@@ -54,6 +55,14 @@ void BSockWriter::integer(int integer) {
     bytes_written_ += sizeof(integer);
 }
 
+void BSockWriter::byte(uint8_t byte) {
+    vector<char>& out = socket_->out_.back();
+        
+    out.resize(out.size() + sizeof(byte));
+    *(uint8_t*)&out[bytes_written_] = byte;
+    bytes_written_ += sizeof(byte);
+}
+
 void BSockWriter::string(const std::string& string) {
     vector<char>& out = socket_->out_.back();
     
@@ -64,10 +73,12 @@ void BSockWriter::string(const std::string& string) {
     bytes_written_ += length;
 }
 
-void BSockWriter::destination(const sockaddr_in& addr) {
-	if (ST_DATAGRAM == socket_->type_ || ST_MULTICAST == socket_->type_) {
-		socket_->remote_ = addr;
-	} else {
-		throw std::runtime_error("Cannot set destination on a stream socket");
-	}
-}
+void BSockWriter::packet(BSockReader* reader) {
+	vector<char>& out = socket_->out_.back();
+
+	size_t length = reader->in_.size();
+	out.resize(out.size() + length);
+
+	copy(reader->in_.begin(), reader->in_.end(), out.begin() + bytes_written_);
+	bytes_written_ += length;
+}	

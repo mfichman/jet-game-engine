@@ -43,17 +43,15 @@ public:
 		lua_State* env = script->env();
 		lua_getref(env, ref);
 		lua_unref(env, ref);
-
         
         self_ = luabind::object(luabind::from_stack(env, -1));  
-    }
+    
+		lua_pop(env, 1);
+		assert(!lua_gettop(env));
+	}
 
     inline void on_update(float delta) {
         self_["on_update"](self_, delta);
-	}
-
-    inline void on_render() {
-		self_["on_render"](self_);
 	}
 
 	inline void on_collision(Node* node, const Vector& position) {

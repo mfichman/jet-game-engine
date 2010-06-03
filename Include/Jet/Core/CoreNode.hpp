@@ -22,6 +22,7 @@
 #pragma once
 
 #include <Jet/Core/CoreTypes.hpp>
+#include <Jet/Core/CoreEngine.hpp>
 #include <Jet/Scene/Node.hpp>
 #include <Jet/Scene/RigidBody.hpp>
 #include <Jet/Scene/NetworkMonitor.hpp>
@@ -35,6 +36,7 @@
 #include <Jet/Scene/Camera.hpp>
 #include <Jet/Scene/Actor.hpp>
 #include <Jet/Types/Quaternion.hpp>
+#include <Jet/Types/Player.hpp>
 #include <Jet/Types/Vector.hpp>
 #include <Jet/Types/Matrix.hpp>
 #include <Jet/Types/Signal.hpp>
@@ -183,6 +185,17 @@ public:
 	inline bool destroyed() const {
 		return destroyed_;
 	}
+
+	//! Returns true if this node is the master node.  If networking is currently
+	//! enabled, then the node is the master if the player name of the network
+	//! monitor matches the local player name.
+	inline bool master() const {
+		if (network_monitor_ && (NS_CLIENT == engine_->network()->state() || NS_HOST == engine_->network()->state())) {
+			return (engine_->network()->current_player().uuid == network_monitor_->player_uuid());
+		} else {
+			return true;
+		}
+	}
 	
     //! Returns the node's current rotation.
     inline const Quaternion& rotation() const {
@@ -261,10 +274,6 @@ public:
 	//! graph immediately, but won't be garbage collected until all references
 	//! to the node are destroyed.
 	void destroy();
-
-	//! Called when this node is rendered.  This function is only called if
-	//! the node is visible.
-	void render();
 
 	//! Called during a physics update.  This function is only called if the
 	//! node has a rigid body attached.

@@ -66,88 +66,6 @@ using namespace Jet;
 using namespace std;
 
 
-namespace luabind {
-    
-    template <>
-    struct default_converter<boost::any> : native_converter_base<boost::any> {
-        static int compute_score(lua_State* env, int index) {
-            return 0;
-        }
-        
-        boost::any from(lua_State* env, int index) {
-            boost::optional<Vector> o1;
-            boost::optional<Quaternion> o2;
-            switch (lua_type(env, index)) {
-                case LUA_TNIL: return boost::any();
-                case LUA_TSTRING: return boost::any(string(lua_tostring(env, index)));
-                case LUA_TNUMBER: return boost::any((float)lua_tonumber(env, index));
-#ifdef WINDOWS
-#pragma warning(disable:4800)
-#endif
-                case LUA_TBOOLEAN: return boost::any((bool)lua_toboolean(env, index));
-#ifdef WINDOWS
-#pragma warning(default:4800)
-#endif
-                case LUA_TUSERDATA:
-                    o1 = object_cast_nothrow<Vector>(object(from_stack(env, index)));
-                    if (o1) {
-                        return o1.get();
-                    }
-                    o2 = object_cast_nothrow<Quaternion>(object(from_stack(env, index)));
-                    if (o2) {
-                        return o2.get();
-                    }
-
-                default: return boost::any();
-            }          
-        }
-        
-        void to(lua_State* env, boost::any const& any) {
-            if (typeid(float) == any.type()) {
-                lua_pushnumber(env, boost::any_cast<float>(any));
-            } else if (typeid(string) == any.type()) {
-                lua_pushstring(env, boost::any_cast<string>(any).c_str());
-            } else if (typeid(bool) == any.type()) {
-                lua_pushboolean(env, boost::any_cast<bool>(any));
-            } else if (typeid(Vector) == any.type()) {
-                object o(env, boost::any_cast<Vector>(any));
-                o.push(env);
-            } else if (typeid(Quaternion) == any.type()) {
-                object o(env, boost::any_cast<Quaternion>(any));
-                o.push(env);
-            } else {
-                lua_pushnil(env);
-            }
-        }
-    };
-    
-    template <>
-    struct default_converter<boost::any const&> : default_converter<boost::any> {
-        
-    };
-}
-
-namespace luabind {
-    
-    template <>
-    struct default_converter<Object*> : native_converter_base<Object*> {
-        static int compute_score(lua_State* env, int index) {
-            return 0;
-        }
-        
-        Object* from(lua_State* env, int index) {
-            return 0;
-        }
-        
-        void to(lua_State* env, Object* any) {
-            //lua_pushnil(env);
-            lua_pushstring(env, "hello, world!!");
-        }
-    };
-}
-
-
-
 LuaScript::LuaScript(CoreEngine* engine) :
     engine_(engine),
     env_(lua_open()) {
@@ -169,7 +87,17 @@ LuaScript::LuaScript(CoreEngine* engine) :
         lua_pushcclosure(env_, &LuaScript::adopt_actor_state, 1);
         lua_setfield(env_, -2, "actor_state");
         lua_pop(env_, 1);
-	    
+
+		// Network RPC functions
+		lua_getglobal(env_, "Network");
+		lua_pushlightuserdata(env_, this);
+		lua_pushcclosure(env_, &LuaScript::network_unreliable_rpc, 1);
+		lua_setfield(env_, -2, "unreliable_rpc");
+	    lua_pushlightuserdata(env_, this);
+		lua_pushcclosure(env_, &LuaScript::network_reliable_rpc, 1);
+		lua_setfield(env_, -2, "reliable_rpc");
+		lua_pop(env_, 1);
+
 		// Add __adopt_widget function
 		lua_pushlightuserdata(env_, this);
 		lua_pushcclosure(env_, &LuaScript::adopt_widget, 1);
@@ -202,6 +130,8 @@ LuaScript::LuaScript(CoreEngine* engine) :
 			throw runtime_error("Could not load script: " + message);
 		}
 
+		assert(!lua_gettop(env_));
+
 	} catch(...) {
 		lua_close(env_);
 		throw;
@@ -209,6 +139,8 @@ LuaScript::LuaScript(CoreEngine* engine) :
     
     engine_->listener(this);
         
+	
+	assert(!lua_gettop(env_));
 }
 
 //! Destructor
@@ -218,6 +150,31 @@ LuaScript::~LuaScript() {
 	}
     lua_close(env_);
     
+}
+
+CoreNode* LuaScript::node(const std::string& type, const std::string& name) {
+	using namespace luabind;
+
+	// Locate the node constructor function
+	object constructor = globals(env_)[type];
+	if (!constructor) {
+		throw runtime_error("Invalid node constructor: " + type);
+	}
+
+	// Create a new core node
+	CoreNode* node;
+	if (name.empty()) {
+		node = static_cast<CoreNode*>(object_cast<Node*>(constructor()));
+	} else {
+		node = static_cast<CoreNode*>(object_cast<Node*>(constructor(name)));
+	}
+
+	// Check to make sure the node is valid
+	if (!node) {
+		throw runtime_error("Invalid node constructor: " + type);
+	} else {
+		return node;
+	}
 }
 
 void LuaScript::on_init() {
@@ -260,6 +217,8 @@ int LuaScript::adopt_actor_state(lua_State* env) {
     Actor* actor = object_cast<Actor*>(object(from_stack(env, 1)));
     string name = lua_tostring(env, 2);
     int ref = lua_ref(env, LUA_REGISTRYINDEX);
+
+	lua_pop(env, lua_gettop(env));
     
     LuaActorStatePtr state(new LuaActorState(self->engine_, ref));
     actor->actor_state(name, state.get());
@@ -276,6 +235,8 @@ int LuaScript::adopt_widget(lua_State* env) {
     CoreOverlay* overlay = static_cast<CoreOverlay*>(object_cast<Overlay*>(object(from_stack(env, 2))));
     string name = lua_tostring(env, 3);
     
+	lua_pop(env, lua_gettop(env));
+
     ObjectPtr obj = new LuaWidget(self->engine_, overlay, ref, name);
     
     return 0;
@@ -310,6 +271,44 @@ int LuaScript::on_error(lua_State* env) {
     return 0;
 }
 
+
+int LuaScript::network_unreliable_rpc(lua_State* env) {
+	using namespace luabind;
+	LuaScript* self = static_cast<LuaScript*>(lua_touserdata(env, lua_upvalueindex(1)));
+    
+	// Arg 1 is the network object
+	string name = lua_tostring(env, 2);
+	vector<boost::any> args;
+	args.resize(lua_gettop(env) - 2);
+
+	// Read each of the RPC arguments
+	for (size_t i = 0; i < args.size(); i++) {
+		args[i] = object_cast<boost::any>(object(from_stack(env, i+2)));
+	}
+
+	self->engine_->network()->unreliable_rpc(name, args);
+
+	return 0;
+}
+
+int LuaScript::network_reliable_rpc(lua_State* env) {
+	using namespace luabind;
+	LuaScript* self = static_cast<LuaScript*>(lua_touserdata(env, lua_upvalueindex(1)));
+    
+	// Arg 1 is the network object
+	string name = lua_tostring(env, 2);
+	vector<boost::any> args;
+	args.resize(lua_gettop(env) - 2);
+
+	// Read each of the RPC arguments
+	for (size_t i = 0; i < args.size(); i++) {
+		args[i] = object_cast<boost::any>(object(from_stack(env, i+3)));
+	}
+
+	self->engine_->network()->reliable_rpc(name, args);
+
+	return 0;
+}
 
 void LuaScript::init_value_type_bindings() {
     // Load Lua bindings for basic value types exported by the engine.

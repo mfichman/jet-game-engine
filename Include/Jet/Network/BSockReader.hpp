@@ -45,10 +45,18 @@ public:
     //! Reads integer data from the socket.  Throws an exception if data is not
     //! available.  Does not block.
     int integer();
+
+	//! Reads a byte from the socket.
+	uint8_t byte();
     
     //! Reads a string from the socket.  Throws an exception if data is not
     //! available.  Does not block.
     std::string string();
+
+	//! Returns the underlying socket type
+	inline SocketType socket_type() {
+		return socket_->type_;
+	}
     
     //! Returns the socket
     inline BSockSocket* socket() const {
@@ -59,6 +67,8 @@ private:
     BSockSocketPtr socket_;
     size_t bytes_read_;
     std::vector<char> in_;
+
+	friend class BSockWriter;
 };
 
 }

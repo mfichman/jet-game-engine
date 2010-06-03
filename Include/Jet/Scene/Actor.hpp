@@ -72,9 +72,6 @@ public:
     //! application.
     virtual void on_update(float delta)=0;
     
-    //! Called during each frame if the node is visible.
-    virtual void on_render()=0;
-    
     //! Called when a colllision is detected by the physics engine.
     virtual void on_collision(Node* node, const Vector& position)=0;
     

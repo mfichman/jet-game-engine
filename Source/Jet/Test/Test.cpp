@@ -1,4 +1,7 @@
 #include <Jet/Engine.hpp>
+#include <Jet/Script.hpp>
+#include <Jet/Types/Vector.hpp>
+#include <Jet/Scene/Node.hpp>
 #include <iostream>
 #include <stdexcept>
 #include <SDL/SDL.h>
@@ -15,6 +18,8 @@ int main(int argc, char** argv) {
 
     try {
         Jet::EnginePtr engine(Jet::Engine::create()); 
+		engine->update();
+
         while (engine->running()) {
 			engine->update();
 		}

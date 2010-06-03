@@ -52,6 +52,8 @@ public:
 		network_monitor_[monitor->hash()] = monitor;
 		return monitor.get();
     }
+
+
     
     //! Returns the current network state
     inline NetworkState state() const {
@@ -101,6 +103,19 @@ public:
         current_player_ = player;
     }
     
+	//! Invokes an unreliable RPC on all connected machines.  One should keep the
+	//! number of arguments to a minimum to conserve bandwidth.  Only number, Vector, 
+	//! Quaternion, and string types are permitted.
+	//! @param name the name of the RPC
+	//! @param args the arguments to invoke
+	void unreliable_rpc(const std::string& name, const std::vector<boost::any>& args);
+
+	//! Invokes a reliable RPC on all connected machines.  Note that 
+	//! reliable RPCs should not be used frequently, because they are slow 
+	//! and can cause packet loss in the low-latency UDP packet stream as
+	//! a side-effect of the interaction between UDP and TCP.
+	void reliable_rpc(const std::string& name, const std::vector<boost::any>& args);
+
 private:
 	// System initialization functions
     void on_tick();
@@ -128,6 +143,7 @@ private:
 	void rpc_state(BSockSocket* socket);
 	void rpc_input(BSockSocket* socket);
 	void rpc_ping(BSockSocket* socket);
+	void rpc_user_rpc(BSockSocket* socket, const std::string& name, const std::vector<boost::any>& args);
     void rpc_match_destroy_all();
     void rpc_player_list_all();
 
@@ -142,6 +158,7 @@ private:
 	void on_state(BSockReader* reader);
 	void on_input(BSockReader* reader);
 	void on_ping(BSockReader* reader);
+	void on_user_rpc(BSockReader* reader);
 
 	void update_stats();
     

@@ -92,6 +92,14 @@ namespace Jet {
 		PT_PLAYER_LIST,
 		PT_STATE,
 		PT_INPUT,
-		PT_SYNC
+		PT_SYNC,
+		PT_USER_RPC,
+	};
+
+	enum DataType {
+		DT_NUMBER,
+		DT_STRING,
+		DT_BOOL,
+		DT_NIL
 	};
 }

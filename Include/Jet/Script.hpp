@@ -34,5 +34,8 @@ public:
     
     //! Returns the memory usage of the script subsystem in KB
     virtual size_t memory_usage() const=0;
+
+	//! Builds a node with the given name and script template.
+	virtual Node* node(const std::string& type, const std::string& name="")=0;
 };
 }

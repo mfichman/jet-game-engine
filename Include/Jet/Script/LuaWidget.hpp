@@ -50,6 +50,9 @@ public:
         overlay_->listener(this);
 		self_ = luabind::object(luabind::from_stack(env, -1));
         self_["overlay"] = static_cast<Overlay*>(overlay_);
+
+		lua_pop(env, 1);
+		assert(!lua_gettop(env));
     }
     
     //! Destructor

@@ -22,6 +22,8 @@
 #pragma once
 
 #include <Jet/Types.hpp>
+#include <vector>
+#include <boost/any.hpp>
 
 namespace Jet {
     
@@ -39,6 +41,9 @@ public:
 
 	//! Called when there is a network error
 	virtual void on_network_error()=0;
+
+	//! Called when an RPC is received over the network.
+	virtual void on_rpc(const std::string& name, const std::vector<boost::any> args)=0;
     
     //! Called when a key is pressed.
     //! @param key the key

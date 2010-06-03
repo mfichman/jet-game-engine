@@ -52,37 +52,58 @@ function SPGame:on_load()
     -- Set up scene objects and apply some forces
     print("Creating objects")
     self.ship = Dagger("Red")
-    self.ship.position = Vector(0, 0, -80) 
+    self.ship.position = Vector(0, 0, 300) 
     self.ship.network_monitor.player_uuid = engine.network:player(0).uuid   
     
     -- Create rocks
     print("Creating rocks")
-    self.rocks = {}
     math.randomseed(10)
-    for i=1,10 do
-        self.rocks[i] = Rock()
-        local x = math.random(-100, 100)
-        local y = math.random(-100, 100)
-        local z = math.random(-100, 100)
-        self.rocks[i].position = Vector(x, y, z)
-        
-        local x = math.random(-100, 100)
-        local y = math.random(-100, 100)
-        local z = math.random(-100, 100)
-        self.rocks[i].rigid_body.angular_velocity = Vector(x, y, z).unit * 0.4
-    end
+    
+    for i=1,2 do
+		local rock = Rock("Large")
+		local x = math.random(-80, 80)
+		local y = math.random(-80, 80)
+		local z = math.random(-80, 80)
+        rock.position = Vector(x, y, z)
+        rock.rotation = Quaternion(1, x, y, z).unit
+	end
+	
+	for i=1,24 do
+		local rock = Rock("Medium")		
+		local x = math.random(-80, 80)
+		local y = math.random(-80, 80)
+		local z = math.random(-80, 80)
+        rock.position = Vector(x, y, z)
+        rock.rotation = Quaternion(1, x, y, z).unit
+	end
+		
+	for i=1,32 do
+		local rock = Rock("Small")
+		local x = math.random(-50, 50)
+		local y = math.random(-50, 50)
+		local z = math.random(-50, 50)
+        rock.position = Vector(x, y, z)
+        rock.rotation = Quaternion(1, x, y, z).unit
+	end
     
     self.menu.overlay.visible = false
+    
+    print("sending RPC")
+    engine.network:reliable_rpc("rpc_test", "hello, world!", 1, 2, 3, 4, 5, true)
+end
+
+function SPGame:rpc_test(...)
+	print("RPC!!", ...)
 end
 
 function SPGame:on_update(delta)
-	--[[if (engine.network.state == Network.NS_CLIENT) then
+	if (engine.network.state == Network.NS_CLIENT) then
 		if (self.ship) then
 			camera_node:look(self.ship.position, Vector(0, 1, 0))
 		end
-	else]]
+	else
 		self:update_camera(delta)
-	--end
+	end
 end
 
 function SPGame:update_camera(delta)

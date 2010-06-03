@@ -64,6 +64,17 @@ int BSockReader::integer() {
     return integer;
 }
 
+uint8_t BSockReader::byte() {
+    if (in_.size() - bytes_read_ < sizeof(uint8_t)) {
+        throw std::runtime_error("No more data in packet");
+    }
+    
+    uint8_t byte = *(uint8_t*)&in_[bytes_read_];
+    bytes_read_ += sizeof(byte);
+    
+    return byte;
+} 
+
 std::string BSockReader::string() {
     if (in_.size() - bytes_read_ == 0) {
         throw std::runtime_error("No more data in packet");

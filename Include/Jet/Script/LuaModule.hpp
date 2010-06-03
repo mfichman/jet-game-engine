@@ -36,13 +36,16 @@ public:
     //! Creates a new script module
     inline LuaModule(CoreEngine* engine, int ref) :
         engine_(engine) {
-           
-		LuaScript* script = static_cast<LuaScript*>(engine_->script());
-		lua_State* env = script->env();
-		lua_getref(env, ref);
-		lua_unref(env, ref);
 
-		self_ = luabind::object(luabind::from_stack(env, -1));
+		LuaScript* script = static_cast<LuaScript*>(engine_->script());
+		env_ = script->env();
+		lua_getref(env_, ref);
+		lua_unref(env_, ref);
+
+		self_ = luabind::object(luabind::from_stack(env_, -1));
+
+		lua_pop(env_, 1);		
+		assert(!lua_gettop(env_));
     }
     
 private:
@@ -61,6 +64,38 @@ private:
     inline void on_match_list_update() {
         self_["on_match_list_update"](self_);
     }
+
+	//! Called when a remote procedure call is received.
+	inline void on_rpc(const std::string& name, const std::vector<boost::any> args) {
+
+		using namespace std;
+		cout << lua_gettop(env_) << endl;
+		// Push the function name
+		self_.push(env_);
+		lua_getfield(env_, -1, name.c_str());
+		lua_remove(env_, -2);
+		self_.push(env_); // "self"
+		
+		// Push the arguments
+		for (size_t i = 0; i < args.size(); i++) {
+			if (typeid(float) == args[i].type()) {
+                lua_pushnumber(env_, boost::any_cast<float>(args[i]));
+			} else if (typeid(std::string) == args[i].type()) {
+				lua_pushstring(env_, boost::any_cast<std::string>(args[i]).c_str());
+            } else if (typeid(bool) == args[i].type()) {
+                lua_pushboolean(env_, boost::any_cast<bool>(args[i]));
+			} else {
+				lua_pushnil(env_);
+			}
+		}
+
+		// Call the function
+		if (lua_pcall(env_, args.size() + 1, 0, 0)) {
+			std::string message = lua_tostring(env_, -1);
+			throw std::runtime_error(message);
+		}
+
+	}
     
     //! Called when a key is pressed.
     //! @param key the key
@@ -118,6 +153,7 @@ private:
     //! Called when the Module is updated (during the physics update)
     inline void on_update(float delta) {
         self_["on_update"](self_, delta);
+
     }
     
     //! Called when the Module is rendered.
@@ -137,6 +173,7 @@ private:
     
 private:
 	CoreEngine* engine_;
+	lua_State* env_;
     luabind::object self_;
 };
 

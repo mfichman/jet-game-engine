@@ -7,6 +7,7 @@ syntax: glob
 Build/TempSource/*
 Build/Debug/*
 Build/Makefile
+Build/zero-combat-demo-alpha.exe
 Binary/*
 Documentation/*
 *CMakeFiles

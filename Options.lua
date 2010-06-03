@@ -3,14 +3,15 @@
 
 if (false) then
     engine:option("shadow_texture_size", 2048)
-    engine:option("display_width", 1440)
-    engine:option("display_height", 900)
-    engine:option("fullscreen_enabled", false)
-    engine:option("fsaa_enabled", false)
-    engine:option("fsaa_samples", 0)
+    engine:option("display_width", 1680)
+    engine:option("display_height", 1050)
+    engine:option("fullscreen_enabled", true)
+    engine:option("fsaa_enabled", true)
+    engine:option("fsaa_samples", 4)
     engine:option("shadows_enabled", true)
     engine:option("normal_mapping_enabled", true)
     engine:option("specular_mapping_enabled", true)
+    engine:option("skysphere_texture", "Nebula.png")
 else
     engine:option("shadow_texture_size", 1024)
     engine:option("display_width", 800)
@@ -21,9 +22,10 @@ else
     engine:option("shadows_enabled", true)
     engine:option("normal_mapping_enabled", false)
     engine:option("specular_mapping_enabled", false)
+    engine:option("skysphere_texture", "")
 end
-engine:option("skysphere_texture", "Nebula.png")
-engine:option("vsync_enabled", false)
+
+engine:option("vsync_enabled", true)
 engine:option("shadow_distance", 400)
 engine:option("shadow_cascades", 4)
 engine:option("shadow_correction", 0.55)

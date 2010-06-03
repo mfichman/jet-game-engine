@@ -43,6 +43,7 @@ public:
             
         LuaScript* script = static_cast<LuaScript*>(engine_->script());
 		lua_State* env = script->env();
+
         thread_ = lua_newthread(env);
         ref_ = lua_ref(env, LUA_REGISTRYINDEX);
         lua_getref(thread_, ref);
@@ -51,6 +52,9 @@ public:
         lua_getfield(thread_, -1, "on_run");
         lua_pushvalue(thread_, -2);
         lua_remove(thread_, -3);
+
+
+		assert(!lua_gettop(env));
     }
     
     //! Destroys the task
@@ -85,6 +89,9 @@ public:
             resume_time_ += 0.0001f;
         }
         lua_pop(thread_, lua_gettop(thread_));
+
+		
+		assert(!lua_gettop(thread_));
     }
     
 private:

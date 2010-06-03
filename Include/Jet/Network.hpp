@@ -23,6 +23,7 @@
 
 #include <Jet/Types.hpp>
 #include <Jet/Object.hpp>
+#include <vector>
 
 namespace  Jet {
 
@@ -63,6 +64,21 @@ public:
     
     //! Sets information about the current player.
     virtual void current_player(const Player& player)=0;
+	
+	//! Invokes an unreliable RPC on all connected machines.  One should keep the
+	//! number of arguments to a minimum to conserve bandwidth.  Only number, Vector, 
+	//! Quaternion, and string types are permitted.  Note that RPCs are only invoked
+	//! on the remote machine(s) and not the local machine.
+	//! @param name the name of the RPC
+	//! @param args the arguments to invoke
+	virtual void unreliable_rpc(const std::string& name, const std::vector<boost::any>& args)=0;
+
+	//! Invokes a reliable RPC on all connected machines.  Note that 
+	//! reliable RPCs should not be used frequently, because they are slow 
+	//! and can cause packet loss in the low-latency UDP packet stream as
+	//! a side-effect of the interaction between UDP and TCP.  Note that RPCs are only invoked
+	//! on the remote machine(s) and not on the local machine.
+	virtual void reliable_rpc(const std::string& name, const std::vector<boost::any>& args)=0;
 };
     
 }

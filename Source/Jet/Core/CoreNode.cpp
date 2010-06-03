@@ -293,19 +293,13 @@ void CoreNode::destroy() {
     }
 }
 
-void CoreNode::render() {
-	// Handle a render event by notifying all listeners
-    CoreActor* actor = static_cast<CoreActor*>(actor_.get());
-	if (actor && actor->current_state_) {
-		actor->current_state_->on_render();
-	}
-}
-
 void CoreNode::collision(Node* node, const Vector& position) {
-	// Handle a collision event by notifying all listeners
-    CoreActor* actor = static_cast<CoreActor*>(actor_.get());
-	if (actor && actor->current_state_) {
+	if (master()) {
+		// Handle a collision event by notifying all listeners
+		CoreActor* actor = static_cast<CoreActor*>(actor_.get());
+		if (actor && actor->current_state_) {
 			actor->current_state_->on_collision(node, position);
+		}
 	}
 }
 

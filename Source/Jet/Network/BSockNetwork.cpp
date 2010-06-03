@@ -297,6 +297,30 @@ void BSockNetwork::enter_client() {
 	rpc_player_join(stream_[0].get());
 }
 
+void BSockNetwork::unreliable_rpc(const string& name, const vector<boost::any>& args) {
+	if (NS_CLIENT == state_ || NS_HOST == state_) {
+		rpc_user_rpc(datagram_.get(), name, args);
+	}
+}
+
+void BSockNetwork::reliable_rpc(const string& name, const vector<boost::any>& args) {
+	if (NS_CLIENT == state_) {
+		// Send the RPC to the server, which will forward the RPC to the other
+		// clients on behalf of the client.
+		rpc_user_rpc(stream_[0].get(), name, args);
+	} else if (NS_HOST == state_) {
+		// Send one packet to each client
+		for (size_t i = 0; i < stream_.size(); i++) {
+			if (stream_[i]) {
+				rpc_user_rpc(stream_[i].get(), name, args);
+			}
+		}
+	} else {
+		// Client is not connected; discard the RPC
+		return;
+	}
+}
+
 void BSockNetwork::read_rpcs(BSockSocket* socket) {
     while (BSockReaderPtr reader = socket->reader()) {
         PacketType rpc = static_cast<PacketType>(reader->integer());
@@ -311,6 +335,7 @@ void BSockNetwork::read_rpcs(BSockSocket* socket) {
 			case PT_PING: on_ping(reader.get()); break;
 			case PT_SYNC: on_sync_tick(reader.get()); break;
 			case PT_INPUT: on_input(reader.get()); break;
+			case PT_USER_RPC: on_user_rpc(reader.get()); break;
 		}
     }
 }
@@ -468,7 +493,32 @@ void BSockNetwork::rpc_sync_tick(BSockSocket* socket) {
 	}
 }
 
+void BSockNetwork::rpc_user_rpc(BSockSocket* socket, const string& name, const vector<boost::any>& args) {
+	if (BSockWriterPtr writer = socket->writer()) {
+		writer->integer(PT_USER_RPC);
+		writer->integer(current_player_.uuid); // Player UUID
+		writer->string(name); // Name of the RPC function to be called
+		writer->integer(args.size()); // Number of parameters
 
+		// Iterate through the list and serialize the argument list to
+		// the socket.  N.B.: Efficiency in terms of bytes used to marshall
+		// the parameters could probably be better here.
+		for (size_t i = 0; i < args.size(); i++) {
+			if (typeid(float) == args[i].type()) {
+				writer->byte(DT_NUMBER);
+				writer->real(boost::any_cast<float>(args[i]));
+			} else if (typeid(string) == args[i].type()) {
+				writer->byte(DT_STRING);
+				writer->string(boost::any_cast<string>(args[i]));
+			} else if (typeid(bool) == args[i].type()) {
+				writer->byte(DT_BOOL);
+				writer->byte(boost::any_cast<bool>(args[i]));
+			} else {
+				writer->byte(DT_NIL);
+			}
+		}
+	}
+}
 
 void BSockNetwork::rpc_player_list_all() {      
     // Update the player list for all the players
@@ -651,6 +701,51 @@ void BSockNetwork::on_sync_tick(BSockReader* reader) {
 
 }
 
+void BSockNetwork::on_user_rpc(BSockReader* reader) {
+	// Make sure there is a module to receive the RPC
+	if (!engine_->module()) {
+		return;
+	}
+
+	// Forward the RPC to other clients if we are in server
+	// mode and using the stream socket
+	if (ST_STREAM == reader->socket_type() && NS_HOST == state_) {
+		for (size_t i = 0; i < stream_.size(); i++) {
+			if (stream_[i]) {
+				// Copy the whole packet over to the outgoing socket
+				BSockWriterPtr writer = stream_[i]->writer();
+				writer->packet(reader);
+			}
+		}
+	}
+
+	// Only read the packet if the local player didn't send it
+	if (reader->integer() != current_player_.uuid) {
+		// Prepare a vector to hold the incoming arguments
+		vector<boost::any> args;
+		string name = reader->string();
+		args.resize(reader->integer());
+
+		
+		// Read all of the marshalled arguments into the list of values
+		for (size_t i = 0; i < args.size(); i++) {
+			DataType type = (DataType)reader->byte();
+			switch (type) {
+				case DT_NUMBER: args[i] = reader->real(); break;
+				case DT_STRING: args[i] = reader->string(); break;
+#pragma warning (disable:4800)
+				case DT_BOOL: args[i] = (bool)reader->byte(); break;
+#pragma warning (default:4800)
+				case DT_NIL: break;
+				default: break;
+			}
+		}
+
+		// Invoke the RPC on the local machine
+		engine_->module()->on_rpc(name, args);
+	}
+}
+
 void BSockNetwork::update_stats() {
 	stats_elapsed_time_ += engine_->frame_delta();
 	if (stats_elapsed_time_ > 0.5f) {
@@ -661,60 +756,3 @@ void BSockNetwork::update_stats() {
 		stats_elapsed_time_ = 0.0f;
 	}
 }
-
-/*
-uint32_t tick_delay = (uint32_t)engine_->option<float>("network_tick_delay");
-	uint32_t tick = reader->integer(); // Read the tick ID
-
-
-	if (tick + tick_delay <= engine_->tick_id()) {
-		// Packet is still usable, because it is early or just on time
-		// Add it to the list of outstanding packets
-		input_state_.push(BSockState(reader, tick + tick_delay));
-	}
-*/
-
-/*
-	uint32_t hash = 0;
-
-	// Calculate the time delta so that we can advance the position and
-	// rotation using the state from the server (which is necessarily old)
-	float delta = (engine_->tick_id() - tick) * engine_->timestep();// + tick_accumulator_;
-
-	while (hash = reader->integer()) {
-		//writer-> Read state hash for the actor, if it exists
-
-		// Read all the state data in for this node
-		Vector position(reader->real(), reader->real(), reader->real());
-		Quaternion rotation(reader->real(), reader->real(), reader->real(), reader->real());
-		Vector linear_velocity(reader->real(), reader->real(), reader->real());
-		Vector angular_velocity(reader->real(), reader->real(), reader->real());
-		
-		// Look up the node by hash
-		map<uint32_t, BSockNetworkMonitorPtr>::iterator i = network_monitor_.find(hash);
-		if (i != network_monitor_.end()) {
-			CoreNode* node = i->second->parent();
-			if (node) {
-				// Advance the position and rotation by the given time
-				position += linear_velocity * delta;
-				rotation += (rotation.unit() * Quaternion(angular_velocity * delta, 0) * 0.5f).unit();
-
-				// Do a smooth interpolation between the network position
-				// and the current position, so that objects don't appear
-				// to jump when a packet arrives
-				position = position.lerp(node->position(), alpha);
-				rotation = rotation.slerp(node->rotation(), alpha);
-				node->position(position);
-				node->rotation(rotation);
-
-				// Snap the linear and angular velocity
-				node->rigid_body()->linear_velocity(linear_velocity);
-				node->rigid_body()->angular_velocity(angular_velocity);
-
-			} else {
-				// The node no longer exists, so delete the network monitor
-				network_monitor_.erase(i);
-			}
-		}
-	}
-*/

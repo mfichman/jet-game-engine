@@ -23,6 +23,7 @@
 
 #include <Jet/Script/LuaTypes.hpp>
 #include <Jet/Core/CoreEngine.hpp>
+#include <Jet/Core/CoreNode.hpp>
 #include <Jet/Script.hpp>
 #include <queue>
 #include <vector>
@@ -50,6 +51,9 @@ public:
         return lua_gc(env_, LUA_GCCOUNT, 0);
     }
 
+	//! Creates a new node with the given name and type
+	CoreNode* node(const std::string& type, const std::string& name);
+
 private:
     void on_tick() {}
     void on_init();
@@ -64,6 +68,9 @@ private:
     static int adopt_module(lua_State* env);
     static int adopt_task(lua_State* env);
     static int on_error(lua_State* env);
+
+	static int network_unreliable_rpc(lua_State* env);
+	static int network_reliable_rpc(lua_State* env);
     
     class Compare {
     public:
