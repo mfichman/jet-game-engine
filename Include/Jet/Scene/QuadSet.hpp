@@ -39,21 +39,33 @@ class QuadSet : public Object {
 public:    
     //! Returns the parent node.
     virtual Node* parent() const=0;
-    
-    //! Gets the quad at the given index.
-    //! @param index the index of the quad
-    virtual const Quad& quad(size_t index) const=0;
+
+	//! Returns the texture for this quad.
+	virtual Texture* texture() const=0;
+
+	//! Returns the number of quads in the quad set.
+	virtual size_t quad_count() const=0;
+
+    //! Returns the number of vertices.
+    virtual size_t vertex_count() const=0;
     
     //! Returns the list of vertices.
     virtual const Vertex* vertex_data() const=0;
-    
-    //! Returns the number of vertices.
-    virtual size_t vertex_count() const=0;
+
+	//! Sets the current texture.
+	virtual void texture(Texture* texture)=0;
+
+	//! Sets the current texture by name.
+	//! @param name the name of the texture
+	virtual void texture(const std::string& name)=0;
     
     //! Sets the quad at the given index
     //! @param index the index of the quad
     //! @param quad the quad.
     virtual void quad(size_t index, const Quad& quad)=0;
+
+	//! Sets the number of quads in the quad set.
+	virtual void quad_count(size_t count)=0;
 };
 
 }

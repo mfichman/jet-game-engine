@@ -53,7 +53,8 @@ function SPGame:on_load()
     print("Creating objects")
     self.ship = Dagger("Red")
     self.ship.position = Vector(0, 0, 300) 
-    self.ship.network_monitor.player_uuid = engine.network:player(0).uuid   
+    self.ship:look(Vector(0, 0, 0), Vector(0, 1, 0))
+    self.ship.network_monitor.player_uuid = engine.network:player(0).uuid  
     
     -- Create rocks
     print("Creating rocks")
@@ -97,13 +98,13 @@ function SPGame:rpc_test(...)
 end
 
 function SPGame:on_update(delta)
-	if (engine.network.state == Network.NS_CLIENT) then
+	--[[if (engine.network.state == Network.NS_CLIENT) then
 		if (self.ship) then
 			camera_node:look(self.ship.position, Vector(0, 1, 0))
 		end
-	else
+	else]]
 		self:update_camera(delta)
-	end
+	--end
 end
 
 function SPGame:update_camera(delta)

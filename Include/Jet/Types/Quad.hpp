@@ -40,6 +40,12 @@ public:
     //! @param height the height of the quad
     Quad(const Vector& normal, const Vector& up, float width, float height);
 
+	//! Creates a default quad.
+	inline Quad() :
+		width(0.0f),
+		height(0.0f) {
+	}
+
     //! Comparison operator.
     inline bool operator<(const Quad& other) const {
         if (up != other.up) return up < other.up;

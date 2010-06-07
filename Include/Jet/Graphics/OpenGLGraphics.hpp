@@ -95,6 +95,7 @@ private:
     void render_shadow_casters();
     void render_visible_mesh_objects();
     void render_visible_particle_systems();
+	void render_visible_quad_sets();
     void render_fullscreen_quad();
     void render_overlays();
     void render_overlay(CoreOverlay* overlay);
@@ -103,7 +104,7 @@ private:
     
     static bool compare_mesh_objects(MeshObjectPtr o1, MeshObjectPtr o2);
     static bool compare_particle_systems(ParticleSystemPtr o1, ParticleSystemPtr o2);
-    
+    static bool compare_quad_sets(QuadSetPtr o1, QuadSetPtr o2);
     CoreEngine* engine_;
     
     // Shadow-mapping variables
@@ -113,6 +114,7 @@ private:
     std::vector<CoreMeshObjectPtr> mesh_objects_;
     std::vector<CoreParticleSystemPtr> particle_systems_;
     std::vector<CoreLightPtr> lights_;
+	std::vector<CoreQuadSetPtr> quad_sets_;
 };
 
 }

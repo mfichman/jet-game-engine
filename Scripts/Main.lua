@@ -48,4 +48,8 @@ camera = camera_node:camera("camera") {
 -- Set up FPS counter
 Stats(engine.screen, "stats")
 
+local quad_set = engine.root:quad_set("test_quad")
+quad_set:quad(0, Quad(Vector(0, 0, -1), Vector(0, 1, 0), 20, 20))
+quad_set.texture = "Electricity.png"
+
 StartScreen()

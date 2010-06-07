@@ -352,6 +352,14 @@ void LuaScript::init_value_type_bindings() {
             .def_readwrite("u", &Texcoord::u)
             .def_readwrite("v", &Texcoord::v)
             .def(luabind::tostring(luabind::const_self)),
+
+		luabind::class_<Quad>("Quad")
+            .def(luabind::constructor<const Vector&, const Vector&, float, float>())
+            .def(luabind::constructor<>())
+            .def_readwrite("normal", &Quad::normal)
+            .def_readwrite("up", &Quad::normal)
+			.def_readwrite("width", &Quad::width)
+			.def_readwrite("height", &Quad::height),
             
         luabind::class_<Quaternion>("Quaternion")
             .def(luabind::constructor<>())
@@ -610,6 +618,11 @@ void LuaScript::init_entity_type_bindings() {
             .property("parent", &CollisionSphere::parent)
             .property("radius", (float (CollisionSphere::*)() const)&CollisionSphere::radius, (void (CollisionSphere::*)(float))&CollisionSphere::radius),
 
+		luabind::class_<QuadSet, QuadSetPtr>("QuadSet")
+			.property("parent", &QuadSet::parent)
+			.property("texture", (Texture* (QuadSet::*)() const)&QuadSet::texture, (void (QuadSet::*)(const std::string&))&QuadSet::texture)
+			.property("quad_count", (size_t (QuadSet::*)() const)&QuadSet::quad_count, (void (QuadSet::*)(size_t))&QuadSet::quad_count)
+			.def("quad", &QuadSet::quad),
                     
         luabind::class_<Overlay, OverlayPtr>("Overlay")
             .def("overlay", &Overlay::overlay)

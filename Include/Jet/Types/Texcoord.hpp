@@ -74,6 +74,15 @@ public:
 	inline Texcoord operator*(float scale) const {
 		return Texcoord(u * scale, v * scale);
 	}
+    //! Returns a pointer to the internal float data of this color
+    inline operator const float*() const {
+        return &u;
+    }
+    
+    //! Returns a pointer to the internal float data of this color
+    inline operator float*() {
+        return &u;
+    }
 
     float u;
     float v;

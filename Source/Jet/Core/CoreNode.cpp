@@ -262,7 +262,7 @@ void CoreNode::look(const Vector& target, const Vector& up) {
     Vector xaxis = (up.cross(zaxis)).unit();
     Vector yaxis = (zaxis.cross(xaxis)).unit();
     
-    rotation_ = Quaternion(xaxis, yaxis, zaxis);   
+    rotation(Quaternion(xaxis, yaxis, zaxis));   
 }
 
 void CoreNode::destroy() {

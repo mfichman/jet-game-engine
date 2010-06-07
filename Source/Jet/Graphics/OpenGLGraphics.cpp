@@ -26,6 +26,7 @@
 #include <Jet/Graphics/OpenGLShader.hpp>
 #include <Jet/Graphics/OpenGLTexture.hpp>
 #include <Jet/Graphics/OpenGLMaterial.hpp>
+#include <Jet/Core/CoreQuadSet.hpp>
 #include <Jet/Core/CoreOverlay.hpp>
 #include <Jet/Core/CoreLight.hpp>
 #include <Jet/Core/CoreMeshObject.hpp>
@@ -272,12 +273,15 @@ void OpenGLGraphics::on_render() {
 	mesh_objects_.clear();
 	particle_systems_.clear();
 	lights_.clear();
+	quad_sets_.clear();
 	generate_render_list(static_cast<CoreNode*>(engine_->root()));
 	
 	// Sort the meshes by material
 	sort(mesh_objects_.begin(), mesh_objects_.end(), &OpenGLGraphics::compare_mesh_objects);
 	sort(particle_systems_.begin(), particle_systems_.end(), &OpenGLGraphics::compare_particle_systems);
-    
+	sort(quad_sets_.begin(), quad_sets_.end(), &OpenGLGraphics::compare_quad_sets);
+
+
     // Render the scene once for each light
 	bool shaders_enabled = engine_->option<bool>("shaders_enabled");
 	bool shadows_enabled = engine_->option<bool>("shadows_enabled");
@@ -424,6 +428,7 @@ void OpenGLGraphics::render_final(CoreLight* light) {
 	render_visible_mesh_objects();
 	render_skysphere();
 	render_visible_particle_systems();
+	render_visible_quad_sets();
 }
 
 void OpenGLGraphics::render_shadow_casters() {
@@ -524,6 +529,53 @@ void OpenGLGraphics::render_visible_particle_systems() {
 	particle_buffer_->texture(0);
 }
 
+void OpenGLGraphics::render_visible_quad_sets() {
+	OpenGLTexture* texture = 0;
+
+	glDisable(GL_LIGHTING);
+	glDisable(GL_CULL_FACE);
+	glEnable(GL_BLEND);
+	glEnable(GL_TEXTURE_2D);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glColor3f(1.0f, 1.0f, 1.0f);
+
+
+	// Render all quad sets
+	for (vector<CoreQuadSetPtr>::iterator i = quad_sets_.begin(); i != quad_sets_.end(); i++) {
+		// Switch textures if necessary
+		CoreQuadSet* quad_set = i->get();
+		OpenGLTexture* next_texture = static_cast<OpenGLTexture*>(quad_set->texture());
+		if (texture != next_texture) {
+			texture = next_texture;
+			texture->sampler(TS_DIFFUSE);
+		}
+
+		// Transform the modelview an dtexture matrics
+		glMatrixMode(GL_MODELVIEW);
+		glPushMatrix();
+		glMultMatrixf(quad_set->parent()->matrix());
+
+		glBegin(GL_QUADS);
+		for (size_t i = 0; i < quad_set->vertex_count(); i++) {
+			const Vertex& v = quad_set->vertex_data()[i];
+			glNormal3fv(v.normal);
+			glTexCoord2fv(v.texcoord);
+			glVertex3fv(v.position);
+		}
+		glEnd();
+
+		// Set the matrix mode
+		glMatrixMode(GL_MODELVIEW);
+		glPopMatrix();
+	}
+
+	glEnable(GL_LIGHTING);
+	glEnable(GL_CULL_FACE);
+	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_BLEND);
+	
+}
+
 void OpenGLGraphics::render_overlays() {
 	float width = engine_->option<float>("display_width");
 	float height = engine_->option<float>("display_height");
@@ -542,7 +594,7 @@ void OpenGLGraphics::render_overlays() {
 	glDisable(GL_CULL_FACE);
 	glEnable(GL_BLEND);
 	glEnable(GL_TEXTURE_2D);
-	glActiveTexture(GL_TEXTURE0);
+	//glActiveTexture(GL_TEXTURE0);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	
 	render_overlay(static_cast<CoreOverlay*>(engine_->screen()));
@@ -662,7 +714,13 @@ void OpenGLGraphics::generate_render_list(CoreNode* node) {
 				mesh_objects_.push_back(mesh_object);
 			}
 			
-        } else if (typeid(CoreLight) == type) {
+		} else if (typeid(CoreQuadSet) == type) {
+			// Add the quad set to the list of objects
+			CoreQuadSet* quad_set = static_cast<CoreQuadSet*>(i->get());
+			if (quad_set->texture()) {
+				quad_sets_.push_back(quad_set);
+			}
+		} else if (typeid(CoreLight) == type) {
 			// Add all lights
 			lights_.push_back(static_cast<CoreLight*>(i->get()));
 			
@@ -709,5 +767,9 @@ bool OpenGLGraphics::compare_mesh_objects(MeshObjectPtr o1, MeshObjectPtr o2) {
 }
 
 bool OpenGLGraphics::compare_particle_systems(ParticleSystemPtr o1, ParticleSystemPtr o2) {
+	return o1->texture() < o2->texture();
+}
+
+bool OpenGLGraphics::compare_quad_sets(QuadSetPtr o1, QuadSetPtr o2) {
 	return o1->texture() < o2->texture();
 }

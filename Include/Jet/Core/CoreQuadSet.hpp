@@ -22,6 +22,8 @@
 #pragma once
 
 #include <Jet/Scene/QuadSet.hpp>
+#include <Jet/Core/CoreEngine.hpp>
+#include <Jet/Core/CoreNode.hpp>
 #include <vector>
 
 namespace Jet {
@@ -42,34 +44,51 @@ public:
     inline CoreNode* parent() const {
         return parent_;
     }
-    
-    //! Gets the quad at the given index.
-    //! @param index the index of the quad
-    inline const Quad& quad(size_t index) const {
-        return quad_[index];
-    }
-    
+
+	//! Returns the texture for the quad set.
+	inline Texture* texture() const {
+		return texture_.get();
+	}
+
+	//! Returns the number of quads in this quad set.
+	inline size_t quad_count() const {
+		return vertex_.size() / 4;
+	}
+
+    //! Returns the number of vertices.
+    inline size_t vertex_count() const {
+        return vertex_.size();
+	}
+
     //! Returns the list of vertices.
     inline const Vertex* vertex_data() const {
         return vertex_.size() ? &vertex_.front() : 0;
     }
-    
-    //! Returns the number of vertices.
-    inline size_t vertex_count() const {
-        return vertex_.size();
-    }
-    
+
+	//! Sets the texture.
+	inline void texture(Texture* texture) {
+		texture_ = texture;
+	}
+
+	//! Sets the texture by name.
+	inline void texture(const std::string& name) {
+		texture_ = engine_->texture(name);
+	}
+
     //! Sets the quad at the given index
     //! @param index the index of the quad
     //! @param quad the quad.
-    inline void quad(size_t index, const Quad& quad) {
-        throw std::runtime_error("Not implemented");
-    }
+    void quad(size_t index, const Quad& quad);
+
+	//! Sets the number of quads in this quad set.
+	inline void quad_count(size_t count) {
+		vertex_.resize(count * 4);
+	}
     
 private:    
     CoreEngine* engine_;
     CoreNode* parent_;
-    std::vector<Quad> quad_;
+	TexturePtr texture_;
     std::vector<Vertex> vertex_;
 };
 
