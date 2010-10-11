@@ -71,7 +71,7 @@ void OpenGLMesh::state(ResourceState state) {
 }
 
 void OpenGLMesh::free_hardware_buffers() {
-	assert(ibuffer_ && vbuffer_);
+	assert(vbuffer_ && !ibuffer_.empty());
 	
 	// Free the vertex buffers
 	if (!parent_) {
@@ -79,14 +79,12 @@ void OpenGLMesh::free_hardware_buffers() {
 		// this mesh.
 		glDeleteBuffers(1, &vbuffer_);
 	}
-	glDeleteBuffers(1, &ibuffer_);
-	ibuffer_ = 0;
+	glDeleteBuffers(ibuffer_.size(), &ibuffer_[0]);
 	vbuffer_ = 0;
-	nindices_ = 0;
 }
 
 void OpenGLMesh::init_hardware_buffers() {
-	assert(!ibuffer_ && !vbuffer_);	
+	assert(!vbuffer_);	
 
 	// Choose the appropriate buffer mode.  TODO: Calling glBufferData
 	// below may be destructive in terms of performance; investigate
@@ -109,12 +107,12 @@ void OpenGLMesh::init_hardware_buffers() {
 	}
 
 	// Copy index data to graphics card
-	glGenBuffers(1, &ibuffer_);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibuffer_);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_count()*sizeof(uint32_t), index_data(), mode);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-	nindices_ = index_count();
+	glGenBuffers(ibuffer_.size(), &ibuffer_[0]);
+	for (size_t i = 0; i < group_count(); i++) {
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibuffer_[i]);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_count(i)*sizeof(uint32_t), index_data(i), mode);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	}
 }
 
 //! Updates tangent vectors for the mesh
@@ -129,27 +127,29 @@ void OpenGLMesh::update_tangents() {
 		
 		// Iterate through faces and add each face's contribution to
 		// the tangents of its vertices
-		for (size_t i = 2; i < index_.size(); i += 3) {
-			Vertex& p0 = vertex_[index_[i-2]];
-			Vertex& p1 = vertex_[index_[i-1]];
-			Vertex& p2 = vertex_[index_[i-0]];
-			
-			// Tangent calculation
-			Vector d1 = p1.position - p0.position;
-			Vector d2 = p2.position - p1.position;
-			const Texcoord& tex0 = p0.texcoord;
-			const Texcoord& tex1 = p1.texcoord;
-			const Texcoord& tex2 = p2.texcoord;
-			float s1 = tex1.u - tex0.u;
-			float t1 = tex1.v - tex0.v;
-			float s2 = tex2.u - tex0.u;
-			float t2 = tex2.v - tex0.v;
-			float a = 1/(s1*t2 - s2*t1);
-			
-			// Add tangent contribution
-			p0.tangent += ((d1*t2 - d2*t1)*a).unit();
-			p1.tangent += ((d1*t2 - d2*t1)*a).unit();
-			p2.tangent += ((d1*t2 - d2*t1)*a).unit();
+		for (size_t g = 0; g < group_count(); g++) {
+			for (size_t i = 2; i < index_.size(); i += 3) {
+				Vertex& p0 = vertex_[index_[g][i-2]];
+				Vertex& p1 = vertex_[index_[g][i-1]];
+				Vertex& p2 = vertex_[index_[g][i-0]];
+				
+				// Tangent calculation
+				Vector d1 = p1.position - p0.position;
+				Vector d2 = p2.position - p1.position;
+				const Texcoord& tex0 = p0.texcoord;
+				const Texcoord& tex1 = p1.texcoord;
+				const Texcoord& tex2 = p2.texcoord;
+				float s1 = tex1.u - tex0.u;
+				float t1 = tex1.v - tex0.v;
+				float s2 = tex2.u - tex0.u;
+				float t2 = tex2.v - tex0.v;
+				float a = 1/(s1*t2 - s2*t1);
+				
+				// Add tangent contribution
+				p0.tangent += ((d1*t2 - d2*t1)*a).unit();
+				p1.tangent += ((d1*t2 - d2*t1)*a).unit();
+				p2.tangent += ((d1*t2 - d2*t1)*a).unit();
+			}
 		}
 		
 		// Normalize all the tangents
@@ -183,11 +183,15 @@ void OpenGLMesh::render(OpenGLShader* shader) {
 	
 	// Bind and enable the vertex and index buffers
 	glBindBuffer(GL_ARRAY_BUFFER, vbuffer_);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibuffer_);
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_NORMAL_ARRAY);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_NORMAL_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+	// Initialize buffer pointers
+	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), (void*)0);
+	glNormalPointer(GL_FLOAT, sizeof(Vertex), (void*)(3*sizeof(GLfloat)));
+	glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), (void*)(9*sizeof(GLfloat)));
+
 	if (shader && engine_->option<bool>("shaders_enabled")) {
 		// Enable tangent vectors
 		GLint tangent_attrib = shader->attrib_location("tangent");
@@ -195,16 +199,19 @@ void OpenGLMesh::render(OpenGLShader* shader) {
 		glVertexAttribPointer(tangent_attrib, 3, GL_FLOAT, 1, sizeof(Vertex), (void*)(6*sizeof(GLfloat)));
 	}
 
-	// Set up the buffer offsets (equivalent of FVF in D3D9)
-	// and then render the indexed buffers
-    glVertexPointer(3, GL_FLOAT, sizeof(Vertex), (void*)0);
-    glNormalPointer(GL_FLOAT, sizeof(Vertex), (void*)(3*sizeof(GLfloat)));
-    glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), (void*)(9*sizeof(GLfloat)));
-    glDrawElements(GL_TRIANGLES, nindices_, GL_UNSIGNED_INT, (void*)0);
+	// Draw each submesh using the appropriate index buffer
+	// All submeshes share the same vertex buffer
+	for (size_t g = 0; g < group_count(); g++) {
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibuffer_[g]);
 
+		// Set up the buffer offsets (equivalent of FVF in D3D9)
+		// and then render the indexed buffers
+		glDrawElements(GL_TRIANGLES, index_[g].size(), GL_UNSIGNED_INT, (void*)0);
+	}
+		
 	// Disable index and vertex buffers
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_NORMAL_ARRAY);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -226,16 +233,22 @@ void OpenGLMesh::vertex(size_t i, const Vertex& vertex) {
 	}
 }
 
-void OpenGLMesh::index(size_t i, uint32_t index) {
-	if (i >= index_.size()) {
-		index_count(i + 1);
+void OpenGLMesh::index(size_t group, size_t i, uint32_t index) {
+	if (group >= group_count()) {
+		throw std::runtime_error("Invalid mesh group");
 	}
-	index_[i] = index;
+	if (i >= index_count(group)) {
+		index_count(group, i + 1);
+	}
+	index_[group][i] = index;
 }
 
-void OpenGLMesh::index_count(size_t size) {
-	if (size != index_.size()) {
-		index_.resize(size);
+void OpenGLMesh::index_count(size_t group, size_t size) {
+	if (group >= group_count()) {
+		throw std::runtime_error("Invalid mesh group");
+	}
+	if (size != index_[group].size()) {
+		index_[group].resize(size);
 	}
 }
 
@@ -243,7 +256,6 @@ void OpenGLMesh::vertex_count(size_t size) {
 	if (parent_) {
 		throw runtime_error("Vertex data is read-only");
 	}
-	
 	if (size != vertex_.size()) {
 		vertex_.resize(size);
 	}
@@ -265,8 +277,18 @@ Vertex& OpenGLMesh::vertex(size_t i) {
 	}
 }
 
-uint32_t OpenGLMesh::index(size_t i) const {
-	return index_[i];
+uint32_t OpenGLMesh::index(size_t group, size_t i) const {
+	if (group >= group_count()) {
+		throw std::runtime_error("Invalid mesh group");
+	}
+	return index_[group][i];
+}
+
+void OpenGLMesh::group_count(size_t group) {
+	assert(!vbuffer_);
+	group_.resize(group);
+	index_.resize(group);
+	ibuffer_.resize(group);
 }
 
 const Vertex* OpenGLMesh::vertex_data() const {
@@ -277,6 +299,9 @@ const Vertex* OpenGLMesh::vertex_data() const {
 	}
 }
 
-const uint32_t* OpenGLMesh::index_data() const {
-	return index_.size() ? &index_.front() : 0;
+const uint32_t* OpenGLMesh::index_data(size_t group) const {
+	if (group >= group_count()) {
+		throw std::runtime_error("Invalid mesh group");
+	}
+	return index_[group].size() ? &index_[group].front() : 0;
 }

@@ -38,31 +38,39 @@ public:
     //! @param vertex the vertex to add.
     virtual void vertex(size_t i, const Vertex& vertex)=0;
 
-    //! Sets an index that is part of this mesh.  This method dynamically
-    //! resizes the buffer as needed.
-    //! @param i the index of the index.
-    //! @param index the index to add
-    virtual void index(size_t i, uint32_t index)=0;
+	//! Sets an index that is part of this mesh.  This method dynamically
+	//! resizes the buffer as needed.
+	//! @param group the group index
+	//! @param i the index of the index
+	//! @param index the index to add
+	virtual void index(size_t group, size_t i, uint32_t index)=0;
 
 	//! Returns the resource state of the mesh
 	virtual void state(ResourceState state)=0;
 	
 	//! Sets the sync mode.
 	virtual void sync_mode(SyncMode mode)=0;
-    
-    //! Returns a vertex that is part of this mesh
-    //! @param i the index of the vertex in the vertex buffer
-    virtual const Vertex& vertex(size_t i) const=0;
-
-    //! Returns an index that is part of this mesh.
-    //! @param i the index of the index in the index buffer
-    virtual uint32_t index(size_t i) const=0;
 	
 	//! Sets the number of vertices in this mesh
 	virtual void vertex_count(size_t size)=0;
-	
-	//! Sets the number of indices in this mesh
-	virtual void index_count(size_t size)=0;
+
+	//! Sets the number of indices in this mesh group.
+	virtual void index_count(size_t group, size_t size)=0;
+
+	//! Sets the number of groups.
+	virtual void group_count(size_t size)=0;
+
+	//! Sets the group at the given index.
+	virtual void group(size_t index, const std::string& name)=0;
+
+	//! Returns a vertex that is part of this mesh
+    //! @param i the index of the vertex in the vertex buffer
+    virtual const Vertex& vertex(size_t i) const=0;
+
+	//! Returns an index that is part of this mesh.
+	//! @param group the index of the group
+	//! @param i the index of the index in the index buffer
+	virtual uint32_t index(size_t group, size_t i) const=0;
 	
 	//! Sets the state of the mesh.
 	virtual ResourceState state() const=0;
@@ -77,14 +85,25 @@ public:
     virtual const Vertex* vertex_data() const=0;
 
     //! Returns a pointer to the beginning of the index buffer.
-    virtual const uint32_t* index_data() const=0;
+	//! @param group the group for the index data
+    virtual const uint32_t* index_data(size_t group) const=0;
 
     //! Returns the number of vertices.
     virtual size_t vertex_count() const=0;
 
-    //! Returns the number of indices.
-    virtual size_t index_count() const=0;
-	
+    //! Returns the number of indices in the group.
+	//! @param group the group
+    virtual size_t index_count(size_t group) const=0;
+
+	//! Returns the number of groups.
+	virtual size_t group_count() const=0;
+
+	//! Returns the group at the specified index.
+	virtual const std::string& group(size_t index) const=0;
+
+	//! Returns the index of the specified group.
+	virtual size_t group(const std::string& name) const=0;
+
 	//! Returns the physics geometry associated with this mesh.
 	virtual Geometry* geometry() const=0;
 };

@@ -612,7 +612,7 @@ void LuaScript::init_entity_type_bindings() {
             
         luabind::class_<Mesh, MeshPtr>("Mesh")
             .def("vertex", (void (Mesh::*)(size_t, const Vertex&))&Mesh::vertex)
-            .def("index", (void (Mesh::*)(size_t, uint32_t))&Mesh::index),
+            .def("index", (void (Mesh::*)(size_t, size_t, uint32_t))&Mesh::index),
               
         luabind::class_<CollisionSphere, CollisionSpherePtr>("CollisionSphere")
             .property("parent", &CollisionSphere::parent)

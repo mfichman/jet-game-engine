@@ -47,28 +47,32 @@ void BulletGeometry::state(ResourceState state) {
 }
 
 void BulletGeometry::update_collision_shape() {
+	shape_ = btConvexHullShape();
+	btTriangleIndexVertexArray vertex_array;
+
     // Create a triangle array using the data loaded from the disk
     MeshPtr mesh = BulletGeometry::mesh();
-	btIndexedMesh imesh;
-	imesh.m_numTriangles = mesh->index_count()/3;
-	imesh.m_triangleIndexBase = (uint8_t*)mesh->index_data();
-	imesh.m_triangleIndexStride = 3*sizeof(uint32_t);
-	imesh.m_numVertices = mesh->vertex_count();
-	imesh.m_vertexBase = (uint8_t*)mesh->vertex_data();
-	imesh.m_vertexStride = sizeof(Vertex);
-	btTriangleIndexVertexArray vertex_array;
-	vertex_array.addIndexedMesh(imesh);
+	for (size_t g = 0; g < mesh->group_count(); g++) {
+		btIndexedMesh imesh;
+		imesh.m_numTriangles = mesh->index_count(g)/3;
+		imesh.m_triangleIndexBase = (uint8_t*)mesh->index_data(g);
+		imesh.m_triangleIndexStride = 3*sizeof(uint32_t);
+		imesh.m_numVertices = mesh->vertex_count();
+		imesh.m_vertexBase = (uint8_t*)mesh->vertex_data();
+		imesh.m_vertexStride = sizeof(Vertex);
+		vertex_array.addIndexedMesh(imesh);
+	}
 	
 	//! Create a temporary shape to hold the vertice;
 	btConvexTriangleMeshShape temp_shape(&vertex_array);
 	btShapeHull shape_hull(&temp_shape);
 	btScalar margin = temp_shape.getMargin();
 	shape_hull.buildHull(margin);
-	shape_ = btConvexHullShape();
 	temp_shape.setUserPointer(&shape_hull);
-
+	
 	// Awesome! Create a hull using the hull vertices.
 	for (int i = 0; i < shape_hull.numVertices(); i++) {
 		shape_.addPoint(shape_hull.getVertexPointer()[i]);
 	}
+	
 }

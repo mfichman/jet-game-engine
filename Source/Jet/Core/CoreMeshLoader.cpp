@@ -116,12 +116,13 @@ void CoreMeshLoader::read_face() {
             }
         }
     }
-    
-    insert_face(face);
+
+    mesh_->group_count(1);
+    insert_face(0, face);
     
 }
 
-void CoreMeshLoader::insert_face(Vertex face[3]) {
+void CoreMeshLoader::insert_face(size_t group, Vertex face[3]) {
 	
 	// Add vertices to the buffer
 	for (int i = 0; i < 3; i++) {
@@ -138,6 +139,6 @@ void CoreMeshLoader::insert_face(Vertex face[3]) {
             index = j->second;
 		}
         mesh_->vertex(index, face[i]);
-        mesh_->index(mesh_->index_count(), index);
+        mesh_->index(group, mesh_->index_count(group), index);
 	}
 }

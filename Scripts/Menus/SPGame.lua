@@ -54,7 +54,9 @@ function SPGame:on_load()
     self.ship = Dagger("Red")
     self.ship.position = Vector(0, 0, 300) 
     self.ship:look(Vector(0, 0, 0), Vector(0, 1, 0))
-    self.ship.network_monitor.player_uuid = engine.network:player(0).uuid  
+    if Network.NS_DISABLED ~= engine.network.state then
+		self.ship.network_monitor.player_uuid = engine.network:player(0).uuid  
+    end
     
     -- Create rocks
     print("Creating rocks")
@@ -62,8 +64,8 @@ function SPGame:on_load()
     
     for i=1,2 do
 		local rock = Rock("Large")
-		local x = math.random(-80, 80)
-		local y = math.random(-80, 80)
+		local x = math.random(-120, 120)
+		local y = math.random(-15, 15)
 		local z = math.random(-80, 80)
         rock.position = Vector(x, y, z)
         rock.rotation = Quaternion(1, x, y, z).unit
@@ -71,8 +73,8 @@ function SPGame:on_load()
 	
 	for i=1,24 do
 		local rock = Rock("Medium")		
-		local x = math.random(-80, 80)
-		local y = math.random(-80, 80)
+		local x = math.random(-120, 120)
+		local y = math.random(-15, 15)
 		local z = math.random(-80, 80)
         rock.position = Vector(x, y, z)
         rock.rotation = Quaternion(1, x, y, z).unit
@@ -80,9 +82,9 @@ function SPGame:on_load()
 		
 	for i=1,32 do
 		local rock = Rock("Small")
-		local x = math.random(-50, 50)
-		local y = math.random(-50, 50)
-		local z = math.random(-50, 50)
+		local x = math.random(-120, 120)
+		local y = math.random(-15, 15)
+		local z = math.random(-80, 80)
         rock.position = Vector(x, y, z)
         rock.rotation = Quaternion(1, x, y, z).unit
 	end

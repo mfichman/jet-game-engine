@@ -77,6 +77,9 @@ public:
     
     //! Returns information about a player in the game.
     inline const Player& player(size_t index) const {
+		if (index > player_.size()) {
+			throw std::runtime_error("Player does not exist");
+		}
         return player_[index];
     }
     

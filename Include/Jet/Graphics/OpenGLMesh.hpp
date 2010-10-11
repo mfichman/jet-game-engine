@@ -44,7 +44,6 @@ public:
 		state_(RS_UNLOADED),
 		vbuffer_(0),
 		ibuffer_(0),
-		nindices_(0),
 		sync_mode_(SM_STATIC) {
 	}
 	
@@ -57,7 +56,6 @@ public:
 		state_(RS_UNLOADED),
 		vbuffer_(0),
 		ibuffer_(0),
-		nindices_(0),
 		sync_mode_(SM_STATIC) {
 	}
 
@@ -74,7 +72,7 @@ public:
     //! resizes the buffer as needed.
     //! @param i the index of the index.
     //! @param index the index to add
-    void index(size_t i, uint32_t index);
+    void index(size_t group, size_t i, uint32_t index);
 
     //! Returns a vertex that is part of this mesh
     //! @param i the index of the vertex in the vertex buffer
@@ -85,13 +83,16 @@ public:
 
     //! Returns an index that is part of this mesh.
     //! @param i the index of the index in the index buffer
-    uint32_t index(size_t i) const;
+    uint32_t index(size_t group, size_t i) const;
 	
 	//! Sets the number of vertices in this mesh
 	void vertex_count(size_t size);
 	
 	//! Sets the number of indices in this mesh
-	void index_count(size_t size);
+	void index_count(size_t group, size_t size);
+
+	//! Sets the number of groups
+	void group_count(size_t group);
 	
 	//! Returns the state of this resource.
 	inline ResourceState state() const {
@@ -112,7 +113,7 @@ public:
     const Vertex* vertex_data() const;
 
     //! Returns a pointer to the beginning of the index buffer.
-    const uint32_t* index_data() const;
+    const uint32_t* index_data(size_t group) const;
 
     //! Returns the number of vertices.
     inline size_t vertex_count() const {
@@ -120,9 +121,43 @@ public:
     }
 
     //! Returns the number of indices.
-    inline size_t index_count() const {
-        return index_.size();
+    inline size_t index_count(size_t group) const {
+		if (group >= index_.size()) {
+			throw std::runtime_error("Group does not exist");
+		}
+        return index_[group].size();
     }
+
+	//! Returns the number of groups
+	inline size_t group_count() const {
+		return index_.size();
+	}
+
+	//! Returns the group at the given index.
+	inline const std::string& group(size_t index) const {
+		if (index >= group_.size()) {
+			throw std::runtime_error("Group does not exist");
+		}
+		return group_[index];
+	}
+
+	//! Returns the group id of the group with the given name.
+	inline size_t group(const std::string& name) const {
+		typedef std::vector<std::string>::const_iterator itr_t;
+	    itr_t i = std::find(group_.begin(), group_.end(), name);
+		if (i == group_.end()) {
+			throw std::runtime_error("Could not find group");
+		}
+		return group_.begin() - i;
+	}
+
+	//! Sets the group name for the given group.
+	inline void group(size_t index, const std::string& name) {
+		if (index >= group_count()) {
+			group_count(index + 1);
+		}
+		group_[index] = name;
+	}
 
 	//! Sets the sync mode of this mesh.
 	inline void sync_mode(SyncMode sync_mode) {
@@ -154,10 +189,10 @@ private:
 	std::string name_;
 	ResourceState state_;
     std::vector<Vertex> vertex_;
-    std::vector<uint32_t> index_;
+	std::vector<std::vector<uint32_t>> index_;
+	std::vector<std::string> group_;
 	GLuint vbuffer_;
-	GLuint ibuffer_;
-	GLuint nindices_;
+	std::vector<GLuint> ibuffer_;
 	SyncMode sync_mode_;
 };
 

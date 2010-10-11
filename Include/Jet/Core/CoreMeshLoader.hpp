@@ -42,7 +42,7 @@ public:
     
 private:
 	void read_face();
-	void insert_face(Vertex face[3]);
+	void insert_face(size_t group, Vertex face[3]);
     
     MeshPtr mesh_;
 	std::map<Vertex, uint32_t> cache_;

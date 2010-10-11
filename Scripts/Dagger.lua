@@ -30,7 +30,7 @@ function Dagger(color)
     -- Create a new fracture mesh for the ship
     local mesh = node:fracture_object()
     mesh.mesh = "Dagger.obj"
-    mesh.material = "Dagger"..(color or red)..".mtl"
+    mesh.material = "Dagger"..(color or "Red")..".mtl"
     mesh.fracture_count = 1
     
     -- Node for the engine flame (slight offset from center along z)
