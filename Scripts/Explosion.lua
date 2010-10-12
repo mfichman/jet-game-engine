@@ -78,6 +78,7 @@ function Explosion()
     node.sparks = sparks
     node.explosion = explosion
     node.smoke = smoke
+    node.audio = audio
     
     -- Create an actor
     node.actor:actor_state("Active", ExplosionActive(node))
@@ -95,7 +96,7 @@ function ExplosionActive:on_state_enter()
     self.node.sparks.life = .1
     self.node.explosion.life = .12
     self.node.smoke.life = .1
-    --self.node.audio:state(math.random(0, 3), AudioSource.PS_PLAY)
+    self.node.audio:state(math.random(0, 3), AudioSource.PS_PLAY)
 end
 
 function ExplosionActive:on_tick()

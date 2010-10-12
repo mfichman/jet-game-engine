@@ -128,7 +128,8 @@ void OpenGLParticleBuffer::flush() {
     
     // Bind and enable the vertex buffer.  Use the current buffer.
     glBindBuffer(GL_ARRAY_BUFFER, vbuffer_[current_buffer_]);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, particle_.size()*sizeof(Particle), &particle_.front());    
+    glBufferSubData(GL_ARRAY_BUFFER, 0, particle_.size()*sizeof(Particle), &particle_.front());   
+
     glEnableVertexAttribArray(init_position_attrib_);
 	glEnableVertexAttribArray(init_velocity_attrib_);
 	glEnableVertexAttribArray(init_time_attrib_);
@@ -136,6 +137,7 @@ void OpenGLParticleBuffer::flush() {
 	glEnableVertexAttribArray(init_rotation_attrib_);
 	glEnableVertexAttribArray(life_attrib_);
 	glEnableVertexAttribArray(growth_rate_attrib_);
+
 	glVertexAttribPointer(init_position_attrib_, 3, GL_FLOAT, 1, sizeof(Particle), (void*)0);
 	glVertexAttribPointer(init_velocity_attrib_, 3, GL_FLOAT, 1, sizeof(Particle), (void*)(3*sizeof(GLfloat)));
 	glVertexAttribPointer(init_time_attrib_, 1, GL_FLOAT, 1, sizeof(Particle), (void*)(6*sizeof(GLfloat)));

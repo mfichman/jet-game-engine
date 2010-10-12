@@ -108,9 +108,9 @@ void OpenGLMesh::init_hardware_buffers() {
 
 	// Copy index data to graphics card
 	glGenBuffers(ibuffer_.size(), &ibuffer_[0]);
-	for (size_t i = 0; i < group_count(); i++) {
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibuffer_[i]);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_count(i)*sizeof(uint32_t), index_data(i), mode);
+	for (size_t g = 0; g < group_count(); g++) {
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibuffer_[g]);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_count(g)*sizeof(uint32_t), index_data(g), mode);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 }
@@ -183,43 +183,39 @@ void OpenGLMesh::render(OpenGLShader* shader) {
 	
 	// Bind and enable the vertex and index buffers
 	glBindBuffer(GL_ARRAY_BUFFER, vbuffer_);
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_NORMAL_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
-	// Initialize buffer pointers
-	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), (void*)0);
-	glNormalPointer(GL_FLOAT, sizeof(Vertex), (void*)(3*sizeof(GLfloat)));
-	glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), (void*)(9*sizeof(GLfloat)));
-
-	if (shader && engine_->option<bool>("shaders_enabled")) {
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_NORMAL_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	
+	//if (shader && engine_->option<bool>("shaders_enabled")) {
 		// Enable tangent vectors
-		GLint tangent_attrib = shader->attrib_location("tangent");
-		glEnableVertexAttribArray(tangent_attrib);
-		glVertexAttribPointer(tangent_attrib, 3, GL_FLOAT, 1, sizeof(Vertex), (void*)(6*sizeof(GLfloat)));
-	}
+	//	GLint tangent_attrib = shader->attrib_location("tangent");
+	//	glEnableVertexAttribArray(tangent_attrib);
+	//	glVertexAttribPointer(tangent_attrib, 3, GL_FLOAT, 1, sizeof(Vertex), (void*)(6*sizeof(GLfloat)));
+	//}
 
-	// Draw each submesh using the appropriate index buffer
-	// All submeshes share the same vertex buffer
-	for (size_t g = 0; g < group_count(); g++) {
+	// Set up the buffer offsets (equivalent of FVF in D3D9)
+	// and then render the indexed buffers
+    glVertexPointer(3, GL_FLOAT, sizeof(Vertex), (void*)0);
+    glNormalPointer(GL_FLOAT, sizeof(Vertex), (void*)(3*sizeof(GLfloat)));
+    glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), (void*)(9*sizeof(GLfloat)));
+
+	for(size_t g = 0; g < group_count(); g++) {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibuffer_[g]);
-
-		// Set up the buffer offsets (equivalent of FVF in D3D9)
-		// and then render the indexed buffers
 		glDrawElements(GL_TRIANGLES, index_[g].size(), GL_UNSIGNED_INT, (void*)0);
 	}
-		
+
 	// Disable index and vertex buffers
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_NORMAL_ARRAY);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	if (shader && engine_->option<bool>("shaders_enabled")) {
+	//if (shader && engine_->option<bool>("shaders_enabled")) {
 		// Disable tangent vectors
-		GLint tangent_attrib = shader->attrib_location("tangent");
-		glDisableVertexAttribArray(tangent_attrib);
-	}
+	//	GLint tangent_attrib = shader->attrib_location("tangent");
+	//	glDisableVertexAttribArray(tangent_attrib);
+	//}
 }
 
 void OpenGLMesh::vertex(size_t i, const Vertex& vertex) {

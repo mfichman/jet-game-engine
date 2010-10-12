@@ -179,6 +179,8 @@ void OpenGLFont::create_bitmap(FT_Face face, unsigned char ch) {
     glTranslatef((float)face->glyph->advance.x/64, 0, 0);
     
     glEndList();
+
+	FT_Done_Glyph(glyph);
 }
 
 void OpenGLFont::render(const std::string& text) {
