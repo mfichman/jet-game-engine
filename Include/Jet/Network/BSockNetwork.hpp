@@ -134,6 +134,9 @@ private:
 	// State update functions
     void do_discover();
     void do_host();
+	void do_host_hello();
+	void do_host_incoming_connections();
+	void do_host_poll_sockets();
     void do_client();
     
 	// RPC send functions
@@ -143,7 +146,7 @@ private:
     void rpc_player_leave(BSockSocket* socket);
     void rpc_player_list(BSockSocket* socket);
 	void rpc_sync_tick(BSockSocket* socket);
-	void rpc_state(BSockSocket* socket);
+	void rpc_node_state(BSockSocket* socket);
 	void rpc_input(BSockSocket* socket);
 	void rpc_ping(BSockSocket* socket);
 	void rpc_user_rpc(BSockSocket* socket, const std::string& name, const std::vector<boost::any>& args);
@@ -158,7 +161,7 @@ private:
     void on_player_leave(BSockReader* reader);
     void on_player_list(BSockReader* reader);
 	void on_sync_tick(BSockReader* reader);
-	void on_state(BSockReader* reader);
+	void on_node_state(BSockReader* reader);
 	void on_input(BSockReader* reader);
 	void on_ping(BSockReader* reader);
 	void on_user_rpc(BSockReader* reader);

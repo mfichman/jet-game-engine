@@ -24,9 +24,10 @@ function Rock(size)
 	size = size or "Jumbo"
 
 	-- Create an asteroids mesh
-    local mesh = node:mesh_object()
-    mesh.mesh = size.."Rock.obj"
-    mesh.material = "Rock.mtl"
+    node.mesh = node:mesh_object() {
+		mesh = size.."Rock.obj",
+		material = "Rock.mtl"
+    }
     
     -- Set mass to zero (static object)
     node.rigid_body.mass = 0.0

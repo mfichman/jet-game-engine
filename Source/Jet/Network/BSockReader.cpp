@@ -21,6 +21,7 @@
  */
 
 #include <Jet/Network/BSockReader.hpp>
+#include <Jet/Types/Quaternion.hpp>
 
 using namespace Jet;
 using namespace std;
@@ -40,6 +41,23 @@ BSockReader::~BSockReader() {
     // Clear the buffer so that the next packet can be read.
     socket_->in_.clear();
 	socket_->read_bytes_ = 0;
+}
+
+Vector BSockReader::vector() {
+	Vector vector;
+	vector.x = real();
+	vector.y = real();
+	vector.z = real();
+	return vector;
+}
+
+Quaternion BSockReader::quaternion() {
+	Quaternion quaternion;
+	quaternion.w = real();
+	quaternion.x = real();
+	quaternion.y = real();
+	quaternion.z = real();
+	return quaternion;
 }
 
 float BSockReader::real() {

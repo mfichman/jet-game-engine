@@ -34,6 +34,15 @@ namespace Jet {
 //! @brief 4x4 matrix representation
 class Matrix {
 public:
+	
+	//! Creates a perspective projection matrix
+	static Matrix frustum(float l, float r, float b, float t, float n, float f);
+
+	//! Creates an orthographic projection matrix
+	static Matrix ortho(float l, float r, float b, float t, float n, float f);
+
+	//! Creates a perspective projection matrix using field-of-view
+	static Matrix perspective(float fovy, float aspect, float near, float far);
     
     //! Creates a new matrix using the given array of floats in row-major
     //! order (same as OpenGL).

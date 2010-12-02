@@ -82,7 +82,7 @@ void BSockNetwork::on_tick() {
 			
 			// Send and packet every 6th physics tick (i.e., every 100ms)
 			if (NS_HOST == state_) {
-				rpc_state(datagram_.get());
+				rpc_node_state(datagram_.get());
 			}
 
 			// Send input to other hosts
@@ -133,6 +133,12 @@ void BSockNetwork::do_discover() {
 }
 
 void BSockNetwork::do_host() {
+	do_host_hello();
+	do_host_incoming_connections();
+	do_host_poll_sockets();
+}
+
+void BSockNetwork::do_host_hello() {
     // Send the "hello" message on the multicast socket channel
     accumulator_ += engine_->frame_delta();
     if (accumulator_ > 1.0f/engine_->option<float>("broadcast_rate")) {
@@ -140,12 +146,13 @@ void BSockNetwork::do_host() {
 		rpc_sync_tick(datagram_.get());
 		accumulator_ = 0.0f;
     }
-    
+}
+
+void BSockNetwork::do_host_incoming_connections() {
     // Check for incoming connections
     if (BSockSocketPtr socket = server_->socket()) {
-        // If there is an open slot, then assign the
-        // newly accepted socket to it.  Otherwise,
-        // the socket will close.
+        // If there is an open slot, then assign the newly accepted socket 
+		// to it.  Otherwise, the socket will close.
         for (size_t i = 1; i < player_.size(); i++) {
             if (!stream_[i]) {
 				// Set up the new socket and player
@@ -156,27 +163,31 @@ void BSockNetwork::do_host() {
 			}
         }
     }
+}
+
+void BSockNetwork::do_host_poll_sockets() {
     
     // Update the sockets
 	for (size_t i = 0; i < player_.size(); i++) {
-		if (stream_[i]) {
-			
-			try {
-				// Try to send data and/or receive RPCs on the stream socket
-				stream_[i]->poll_write();
-				read_rpcs(stream_[i].get());
-			} catch (std::exception&) {
-				// Erase the socket if an error occurs
-				stream_[i] = 0;
-				player_[i] = Player();
+		if (!stream_[i]) {
+			continue;
+		}
 
-				// Notify the other players that the player has
-				// disconnected
-				if (engine_->module()) {
-					engine_->module()->on_player_list_update();
-				}
-				rpc_player_list_all();
+		try {
+			// Try to send data and/or receive RPCs on the stream socket
+			stream_[i]->poll_write();
+			read_rpcs(stream_[i].get());
+		} catch (std::exception&) {
+			// Erase the socket if an error occurs
+			stream_[i] = 0;
+			player_[i] = Player();
+
+			// Notify the other players that the player has
+			// disconnected
+			if (engine_->module()) {
+				engine_->module()->on_player_list_update();
 			}
+			rpc_player_list_all();
 		}
     }
 
@@ -186,8 +197,8 @@ void BSockNetwork::do_host() {
 }
 
 void BSockNetwork::do_client() {
-    // Check for incoming messages from the server
-	// Send buffered input keystrokes here if possible
+    // Check for incoming messages from the server, send buffered input 
+	// keystrokes here if possible
     stream_[0]->poll_write();
     read_rpcs(stream_[0].get());
 
@@ -254,8 +265,8 @@ void BSockNetwork::enter_host() {
 	// Seed the random number generator
 	::srand((uint32_t)time(NULL));
 
-	// Initialize the datagram socket to send and receive on a
-	// random port with a random multicast group
+	// Initialize the datagram socket to send and receive on a random port 
+	// with a random multicast group
 	uint32_t rand_ip = 0xE4000100 | (::rand() & 0xFF);
 	datagram_.reset(BSockSocket::multicast(engine_, Address(rand_ip, 0)));
     
@@ -293,7 +304,6 @@ void BSockNetwork::enter_client() {
 	
 	// Initialize the datagram socket to send to the server's multicast address
 	datagram_.reset(BSockSocket::multicast(engine_, current_match_.datagram_address));
-	
 	rpc_player_join(stream_[0].get());
 }
 
@@ -331,7 +341,7 @@ void BSockNetwork::read_rpcs(BSockSocket* socket) {
 			case PT_PLAYER_JOIN: on_player_join(reader.get()); break;
 			case PT_PLAYER_LEAVE: on_player_leave(reader.get()); break;
 			case PT_PLAYER_LIST: on_player_list(reader.get()); break;
-			case PT_STATE: on_state(reader.get()); break;
+			case PT_STATE: on_node_state(reader.get()); break;
 			case PT_PING: on_ping(reader.get()); break;
 			case PT_SYNC: on_sync_tick(reader.get()); break;
 			case PT_INPUT: on_input(reader.get()); break;
@@ -385,14 +395,14 @@ void BSockNetwork::rpc_player_list(BSockSocket* socket) {
     }
 }
 
-void BSockNetwork::rpc_state(BSockSocket* socket) {
+void BSockNetwork::rpc_node_state(BSockSocket* socket) {
 	if (BSockWriterPtr writer = socket->writer()) {
 		
 		writer->integer(PT_STATE); // Write the packet type
 		writer->integer(engine_->tick_id()); // Tick this state was sent on
 		writer->integer(current_player_.uuid);
 		
-		// Write state for each actor in the 
+		// Write state for each actor in the network
 		for (map<uint32_t, BSockNetworkMonitorPtr>::iterator i = network_monitor_.begin(); i != network_monitor_.end();) {
 			
 			// Increment the iterator in case we need to delete the node.
@@ -417,26 +427,11 @@ void BSockNetwork::rpc_state(BSockSocket* socket) {
 				writer->integer(j->first); // Node hash (for ID)
 				writer->integer(node->actor()->state_hash()) ;// Write state hash 
 
-				const Vector& position = node->position();
-				writer->real(position.x);
-				writer->real(position.y);
-				writer->real(position.z);
-
-				const Quaternion& rotation = node->rotation();
-				writer->real(rotation.w);
-				writer->real(rotation.x);
-				writer->real(rotation.y);
-				writer->real(rotation.z);
-
-				const Vector& linear_velocity = node->linear_velocity();
-				writer->real(linear_velocity.x);
-				writer->real(linear_velocity.y);
-				writer->real(linear_velocity.z);
-
-				const Vector& angular_velocity = node->angular_velocity();
-				writer->real(angular_velocity.x);
-				writer->real(angular_velocity.y);
-				writer->real(angular_velocity.z);
+				// Write the rigid body state
+				writer->vector(node->position());
+				writer->quaternion(node->rotation());
+				writer->vector(node->linear_velocity());
+				writer->vector(node->angular_velocity());
 			}
 		}
 
@@ -619,7 +614,7 @@ void BSockNetwork::on_player_list(BSockReader* reader) {
     }
 }
 
-void BSockNetwork::on_state(BSockReader* reader) {
+void BSockNetwork::on_node_state(BSockReader* reader) {
 	uint32_t tick = reader->integer(); // Read the tick ID
 	uint32_t uuid = reader->integer();
 
@@ -630,26 +625,12 @@ void BSockNetwork::on_state(BSockReader* reader) {
 	while (uint32_t hash = reader->integer()) {
 		// Read all the state data in for this node
 		uint32_t state_hash = reader->integer();
-		Vector position;
-		position.x = reader->real();
-		position.y = reader->real();
-		position.z = reader->real();
 
-		Quaternion rotation;
-		rotation.w = reader->real();
-		rotation.x = reader->real();
-		rotation.y = reader->real();
-		rotation.z = reader->real();
-
-		Vector linear_velocity;
-		linear_velocity.x = reader->real();
-		linear_velocity.y = reader->real();
-		linear_velocity.z = reader->real();
-
-		Vector angular_velocity;
-		angular_velocity.x = reader->real();
-		angular_velocity.y = reader->real();
-		angular_velocity.z = reader->real();
+		// Rigid body state information
+		Vector position = reader->vector();
+		Quaternion rotation = reader->quaternion();
+		Vector linear_velocity = reader->vector();
+		Vector angular_velocity = reader->vector();
 
 		map<uint32_t, BSockNetworkMonitorPtr>::iterator i = network_monitor_.find(hash);
 		if (i != network_monitor_.end()) {

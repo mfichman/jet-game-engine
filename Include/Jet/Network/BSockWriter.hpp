@@ -37,6 +37,12 @@ public:
     
     //! Destructor
     ~BSockWriter();
+
+	//! Writes a vector to the socket.  Does not block.
+	void vector(const Vector& vector);
+
+	//! Writes a quaternion to the socket.  Does not block.
+	void quaternion(const Quaternion& quaternion);
     
     //! Writes a floating-point number to the socket.  Does not block.
     void real(float real);

@@ -39,7 +39,6 @@
 #include <Jet/Types/Player.hpp>
 #include <Jet/Types/Vector.hpp>
 #include <Jet/Types/Matrix.hpp>
-#include <Jet/Types/Signal.hpp>
 #include <Jet/Types/Iterator.hpp>
 
 #include <string>
@@ -326,7 +325,6 @@ private:
 	NetworkMonitorPtr network_monitor_;
     ActorPtr actor_;
     std::tr1::unordered_map<std::string, ObjectPtr> object_;
-	std::queue<std::vector<Signal> > signal_;
     bool destroyed_;
 	size_t transform_modified_count_;
 	size_t transform_update_count_;

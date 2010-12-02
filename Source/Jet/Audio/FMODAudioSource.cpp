@@ -73,7 +73,8 @@ void FMODAudioSource::state(size_t chan, PlaybackState state) {
         fmod_check(FMOD_System_PlaySound(system, FMOD_CHANNEL_FREE, sound, true, &channel_[chan]));
         fmod_check(FMOD_Channel_SetUserData(channel_[chan], this));
         fmod_check(FMOD_Channel_SetCallback(channel_[chan], &on_channel_event));
-        fmod_check(FMOD_Channel_SetPaused(channel_[chan], false));
+		//fmod_check(FMOD_Channel_SetMode(channel_[chan], FMOD_LOOP_NORMAL));
+		fmod_check(FMOD_Channel_SetPaused(channel_[chan], false));
     }
 }
 

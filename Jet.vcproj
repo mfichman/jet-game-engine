@@ -632,10 +632,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Include\Jet\Types\Signal.hpp"
-				>
-			</File>
-			<File
 				RelativePath=".\Include\Jet\Resources\Sound.hpp"
 				>
 			</File>
@@ -707,11 +703,11 @@
 			>
 		</File>
 		<File
-			RelativePath="..\Source\Jet\Core\CMakeLists.txt"
+			RelativePath=".\Build\CMakeLists.txt"
 			>
 		</File>
 		<File
-			RelativePath=".\Build\CMakeLists.txt"
+			RelativePath="..\Source\Jet\Core\CMakeLists.txt"
 			>
 		</File>
 		<File

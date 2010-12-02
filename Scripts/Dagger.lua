@@ -28,41 +28,45 @@ function Dagger(color)
 	local node = engine.root:node()
    
     -- Create a new fracture mesh for the ship
-    local mesh = node:fracture_object()
-    mesh.mesh = "Dagger.obj"
-    mesh.material = "Dagger"..(color or "Red")..".mtl"
-    mesh.fracture_count = 1
+    node.mesh = node:fracture_object() {
+		mesh = "Dagger.obj",
+		material = "Dagger"..(color or "Red")..".mtl",
+		fracture_count = 1
+    }
     
     -- Node for the engine flame (slight offset from center along z)
-    local engine = node:node()
-    engine.position = Vector(0, 0, -1.7)
+    node.engine = node:node() {
+		position = Vector(0, 0, -1.7)
+    }
     
-    local flame = engine:particle_system("flame")
-    flame.type = ParticleSystem.ET_POINT
-    flame.quota = 500
-    flame.texture = "IncandescentBlue.png"
-    flame.particle_life = Range(.1, .1)
-    flame.particle_size = Range(2.2, 2.2)
-    flame.particle_growth_rate = Range(-24, -24)
-    flame.life = -1
-    flame.width = Range(0, 0)
-    flame.height = Range(0, 0)
-    flame.depth = Range(0, 0)
-    flame.emission_speed = Range(-28, -28)
-    flame.emission_angle = Range(0, 0)
-    flame.emission_direction = Vector(0, 0, 1)
-    flame.emission_rate = Range(200, 200)
+    node.flame = node.engine:particle_system() {
+		type = ParticleSystem.ET_POINT,
+		quota = 500,
+		texture = "IncandescentBlue.png",
+		particle_life = Range(.1, .1),
+		particle_size = Range(2.2, 2.2),
+		particle_growth_rate = Range(-24, -24),
+		life = -1,
+		width = Range(0, 0),
+		height = Range(0, 0),
+		depth = Range(0, 0),
+		emission_speed = Range(-28, -28),
+		emission_angle = Range(0, 0),
+		emission_direction = Vector(0, 0, 1),
+		emission_rate = Range(200, 200)
+    }
+    
+    -- Positional audio for engine
+    node.audio = node.audio_source
+    node.audio:sound(0, "Cabin.wav")
+    
+    -- Initialize the rigid body
+    node.rigid_body.mass = 1
     
     -- Create an actor to handle state transitions for the node
     node.actor:actor_state("Active", DaggerActive(node))
     node.actor:actor_state("Inactive", DaggerInactive(node))
     node.actor.state = "Active"
-    
-    -- Initialize the rigid body
-    node.rigid_body.mass = 1
-    
-    node.flame = flame
-    node.mesh = mesh
     
     return node
 end
@@ -76,6 +80,8 @@ function DaggerInactive:on_state_enter()
     self.explosion = self.explosion or Explosion()
     self.explosion.position = self.node.position
     self.explosion.actor.state = "Active"
+    
+    self.node.audio:state(0, AudioSource.PS_STOP)
 
     self.node.flame.life = 0
     self.node.mesh.fracture_count = 2
@@ -92,7 +98,7 @@ function DaggerInactive:on_fracture(node)
     node.rigid_body:apply_force(n)
     
     -- Create a new particle system on the node that is fracturing away
-    node:particle_system() {
+    node.sparks = node:particle_system() {
         type = ParticleSystem.ET_ELLIPSOID,
         quota = 300,
         inherit_velocity = false,
@@ -113,6 +119,10 @@ function DaggerActive:__init(node)
 	self.node = node
 end
 
+function DaggerActive:on_state_enter()
+	self.node.audio:state(0, AudioSource.PS_PLAY)
+end
+
 function DaggerActive:on_collision(node, position)
 
 	-- Switch states to inactive
@@ -120,8 +130,8 @@ function DaggerActive:on_collision(node, position)
 end
 
 function DaggerActive:on_tick()
-	local max_force = 35
-	local max_speed = 19
+	local max_force = 50
+	local max_speed = 40
 	
 	local mass = self.node.rigid_body.mass
 	local uuid = self.node.network_monitor.player_uuid

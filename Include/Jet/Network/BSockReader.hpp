@@ -38,12 +38,20 @@ public:
     //! Destructor
     ~BSockReader();
 
-    //! Reads floating-point data from the socket.  Throws an exception if data
-    //! is not available.  Does not block.
+	//! Reads a vector from the socket.  Throws an exception if data is not
+	//! available.  Does not block.
+	Vector vector();
+
+	//! Reads a quaternion from the socket.  Throws an exception if data is 
+	//! not available.  Does not block.
+	Quaternion quaternion();
+
+    //! Reads floating-point data from the socket.  Throws an exception if 
+	//! data is not available.  Does not block.
     float real();
     
-    //! Reads integer data from the socket.  Throws an exception if data is not
-    //! available.  Does not block.
+    //! Reads integer data from the socket.  Throws an exception if data is 
+	//! not available.  Does not block.
     int integer();
 
 	//! Reads a byte from the socket.

@@ -141,16 +141,18 @@ function SPGame:update_camera(delta)
     end
 end
 
---[[
+
 function SPGame:on_mouse_pressed(button, point)
     --self.audio:state(0, AudioSource.PS_PLAY)
 	if (not self.ship) then return end
-
-    self.bullet[self.bullet_index] = self.bullet[self.bullet_index] or Bullet()
+	
+	if (not self.bullet[self.bullet_index]) then
+		self.bullet[self.bullet_index] = Bullet()
+	end
     
-    local forward = self.ship.node.matrix.forward
-    self.bullet[self.bullet_index].position = self.ship.node.position + forward * 3
-    self.bullet[self.bullet_index].rigid_body.linear_velocity = forward * 120 + self.ship.body.linear_velocity
+    local forward = self.ship.matrix.forward
+    self.bullet[self.bullet_index].position = self.ship.position + forward * 3
+    self.bullet[self.bullet_index].rigid_body.linear_velocity = forward * 150 + self.ship.rigid_body.linear_velocity
     self.bullet[self.bullet_index].actor.state = "Active"
     self.bullet_index = (self.bullet_index + 1) % 10
-end]]
+end

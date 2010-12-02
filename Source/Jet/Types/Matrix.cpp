@@ -28,6 +28,31 @@
 
 using namespace Jet;
 
+Matrix Matrix::frustum(float l, float r, float b, float t, float n, float f) {
+	return Matrix(
+		2*n/(r-l),	0,			(r+l)/(r-l),	0,
+		0,			2*n/(t-b),	(t+b)/(t-b),	0,
+		0,			0,			-(f+n)/(f-n),	-2*f*n/(f-n),
+		0,			0,			-1,				0);
+}
+
+Matrix Matrix::ortho(float l, float r, float b, float t, float n, float f) {
+	return Matrix(
+		2/(r-l),	0,			0,				-(r+l)/(r-l),
+		0,			2/(t-b),	0,				-(t+b)/(t-b),
+		0,			0,			-2/(f-n),		-(f+n)/(f-n),
+		0,			0,			0,				1);
+}
+
+Matrix Matrix::perspective(float fov, float aspect, float near, float far) {
+	float top = tan(fov*3.14159f/360.0f) * near;
+	float bottom = -top;
+	float right = aspect * top;
+	float left = aspect * bottom;
+	return Matrix::frustum(left, right, bottom, top, near, far);
+}
+
+
 Matrix::Matrix(const float data[16]) {
     std::copy(data, data+16, this->data);
 }

@@ -30,26 +30,28 @@ function Bullet()
     local node = engine.root:node()
     
     -- Create a blue particle effect for the bullet
-    local flame = node:particle_system()
-    flame.type = ParticleSystem.ET_POINT
-    flame.quota = 300
-    flame.texture = "IncandescentBlue.png"
-    flame.particle_life = Range(1, 1)
-    flame.particle_size = Range(1.45, 1.45)
-    flame.particle_growth_rate = Range(-8, -8)
-    flame.life = -1
-    flame.width = Range(0, 0)
-    flame.height = Range(0, 0)
-    flame.depth = Range(0, 0)
-    flame.emission_speed = Range(0, 0)
-    flame.emission_angle = Range(0, 0)
-    flame.emission_direction = Vector(0, 0, 1)
-    flame.emission_rate = Range(10, 10)
+    node.flame = node:particle_system() {
+		type = ParticleSystem.ET_POINT,
+		quota = 300,
+		texture = "IncandescentBlue.png",
+		particle_life = Range(1, 1),
+		particle_size = Range(1.45, 1.45),
+		particle_growth_rate = Range(-8, -8),
+		life = -1,
+		width = Range(0, 0),
+		height = Range(0, 0),
+		depth = Range(0, 0),
+		emission_speed = Range(0, 0),
+		emission_angle = Range(0, 0),
+		emission_direction = Vector(0, 0, 1),
+		emission_rate = Range(10, 10)
+    }
         
     -- Create a sphere for detecting collisions with the
     -- node/particle system
-    local sphere = node:collision_sphere()
-    sphere.radius = 0.4
+    sphere = node:collision_sphere() {
+		radius = 0.25
+    }
     
     -- Create an actor to handle state transitions for the node
     node.actor:actor_state("Active", BulletActive(node))
@@ -86,7 +88,7 @@ function BulletActive:on_collision(node, position)
     -- Create an explosion object if one doesn't exist, and
     -- set its position to the collision contact point
     self.explosion = self.explosion or Explosion()
-    self.explosion.node.position = position
+    self.explosion.position = position
     self.explosion.actor.state = "Active"
     
     -- Switch states to inactive

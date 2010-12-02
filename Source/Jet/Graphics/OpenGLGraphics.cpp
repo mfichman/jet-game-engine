@@ -392,7 +392,8 @@ void OpenGLGraphics::render_final(CoreLight* light) {
     // Set up the projection matrix
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(camera->field_of_view(), width/height, camera->near_clipping_distance(), camera->far_clipping_distance());
+    //gluPerspective(camera->field_of_view(), width/height, camera->near_clipping_distance(), camera->far_clipping_distance());
+	glLoadMatrixf(Matrix::perspective(camera->field_of_view(), width/height, camera->near_clipping_distance(), camera->far_clipping_distance()));
 	
 	// Modelview matrix setup
 	Vector eye = matrix.origin();

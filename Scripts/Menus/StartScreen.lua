@@ -44,14 +44,14 @@ function StartScreen:__init()
     self.quit_button.on_click = bind("on_quit_click", self)
 
     -- Set up the box
-    local box_node = engine.root:node("box1")
+    --[[local box_node = engine.root:node("box1")
     box_node.position = Vector(0, 0, -14)
     local box = box_node:mesh_object("box") {
         mesh = "Box.obj",
         material = "Metal.mtl"
     }    
     local box_body = box_node.rigid_body
-    box_body.mass = 0
+    box_body.mass = 0]]
       
 
     engine.network.state = Network.NS_DISABLED

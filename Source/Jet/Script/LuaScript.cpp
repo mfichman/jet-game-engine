@@ -57,7 +57,6 @@
 #include <Jet/Resources/Mesh.hpp>
 #include <Jet/Resources/Texture.hpp>
 #include <Jet/Resources/Shader.hpp>
-#include <Jet/Types/Signal.hpp>
 #include <Jet/Resources/Font.hpp>
 #include <luabind/operator.hpp>
 #include <boost/any.hpp>
@@ -408,14 +407,6 @@ void LuaScript::init_value_type_bindings() {
             .def(luabind::constructor<float, float>())
             .def_readwrite("x", &Point::x)
             .def_readwrite("y", &Point::y),
-            
-        luabind::class_<Signal>("Signal")
-            .def(luabind::constructor<const std::string&>())
-            .def(luabind::constructor<const std::string&, const boost::any&, const boost::any&>())
-            .def(luabind::constructor<const std::string&, const boost::any&>())
-            .def_readonly("name", &Signal::name)
-            .def_readonly("first", &Signal::first)
-            .def_readonly("second", &Signal::second),
 
 		luabind::class_<Box>("Box")
 			.def(luabind::constructor<>())

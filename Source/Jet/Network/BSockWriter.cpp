@@ -22,6 +22,7 @@
 
 #include <Jet/Network/BSockWriter.hpp>
 #include <Jet/Network/BSockReader.hpp>
+#include <Jet/Types/Quaternion.hpp>
 
 using namespace Jet;
 using namespace std;
@@ -30,7 +31,7 @@ BSockWriter::BSockWriter(BSockSocket* socket) :
     socket_(socket),
     bytes_written_(sizeof(size_t)) {
 
-    socket_->out_.push(vector<char>());
+	socket_->out_.push(std::vector<char>());
     socket_->out_.back().resize(sizeof(size_t));
 }
 
@@ -39,8 +40,21 @@ BSockWriter::~BSockWriter() {
     socket_->poll_write();
 }
 
+void BSockWriter::quaternion(const Quaternion& quaternion) {
+	real(quaternion.w);
+	real(quaternion.x);
+	real(quaternion.y);
+	real(quaternion.z);
+}
+
+void BSockWriter::vector(const Vector& vector) {
+	real(vector.x);
+	real(vector.y);
+	real(vector.z);
+}
+
 void BSockWriter::real(float real) {
-    vector<char>& out = socket_->out_.back();
+	std::vector<char>& out = socket_->out_.back();
     
     out.resize(out.size() + sizeof(real));
     *(float*)&out[bytes_written_] = real;
@@ -48,7 +62,7 @@ void BSockWriter::real(float real) {
 }
 
 void BSockWriter::integer(int integer) {
-    vector<char>& out = socket_->out_.back();
+	std::vector<char>& out = socket_->out_.back();
         
     out.resize(out.size() + sizeof(integer));
     *(int*)&out[bytes_written_] = htonl(integer);
@@ -56,7 +70,7 @@ void BSockWriter::integer(int integer) {
 }
 
 void BSockWriter::byte(uint8_t byte) {
-    vector<char>& out = socket_->out_.back();
+	std::vector<char>& out = socket_->out_.back();
         
     out.resize(out.size() + sizeof(byte));
     *(uint8_t*)&out[bytes_written_] = byte;
@@ -64,7 +78,7 @@ void BSockWriter::byte(uint8_t byte) {
 }
 
 void BSockWriter::string(const std::string& string) {
-    vector<char>& out = socket_->out_.back();
+	std::vector<char>& out = socket_->out_.back();
     
     size_t length = string.length() + 1;
     out.resize(out.size() + length);
@@ -74,7 +88,7 @@ void BSockWriter::string(const std::string& string) {
 }
 
 void BSockWriter::packet(BSockReader* reader) {
-	vector<char>& out = socket_->out_.back();
+	std::vector<char>& out = socket_->out_.back();
 
 	size_t length = reader->in_.size();
 	out.resize(out.size() + length);

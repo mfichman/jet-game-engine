@@ -51,7 +51,6 @@ public:
     //! @param sound the sound clipe
     virtual void sound(size_t chan, Sound* sound)=0;
     
-    
     //! Sets the mode of the given channel.
     //! @param chan the channel to use
     //! @param mode the audio state
