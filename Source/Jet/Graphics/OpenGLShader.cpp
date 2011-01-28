@@ -121,8 +121,8 @@ void OpenGLShader::read_source(const string& path, vector<char>& source) {
     
     // Seek to the end, and reserve a buffer
     in.seekg(0, ios::end);
-    source.reserve(1 + in.tellg());
-    source.resize(in.tellg());
+    source.reserve(static_cast<size_t>(1 + in.tellg()));
+    source.resize(static_cast<size_t>(in.tellg()));
     in.seekg(0, ios::beg);
     
     if (!source.size()) {

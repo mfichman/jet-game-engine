@@ -21,6 +21,7 @@
  */  
 #pragma once
 
+#include <Jet/Types.hpp>
 #include <boost/intrusive_ptr.hpp>
 #define MAX_SHADOW_CASCADES 4U
 #ifdef WINDOWS

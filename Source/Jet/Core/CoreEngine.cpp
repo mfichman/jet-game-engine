@@ -84,6 +84,7 @@ CoreEngine::CoreEngine() :
 	fps_frame_count_(0),
 	fps_elapsed_time_(0.0f),
 	auto_name_counter_(0),
+    prev_time_(0),
     frame_id_(0),
 	tick_id_(0) {
 		
@@ -113,17 +114,6 @@ CoreEngine::CoreEngine() :
 	// Create the root node of the scene graph
     root_ = new CoreNode(this);
 	screen_ = new CoreOverlay(this);
-	
-	// Platform-dependent timer code
-#ifdef WINDOWS
-	::int64_t counts_per_sec = 0;
-    QueryPerformanceFrequency((LARGE_INTEGER*)&counts_per_sec);
-    secs_per_count_ = 1.0f/(float)counts_per_sec;
-    prev_time_ = 0;
-#else
-	prev_time_.tv_usec = 0;
-	prev_time_.tv_sec = 0;
-#endif
 
 	// Initialize SDL image library
 	IMG_Init(IMG_INIT_JPG|IMG_INIT_PNG);
@@ -362,28 +352,12 @@ void CoreEngine::update_frame_delta() {
 	// Query the counter, and initialize it.  If this is the first time the
 	// function is being called, set the "previous" time equal to the current
 	// time so that there is not a huge lag for the first frame.
-#ifdef WINDOWS
-	::int64_t current_time = 0;
-    QueryPerformanceCounter((LARGE_INTEGER*)&current_time);
+    unsigned current_time = SDL_GetTicks();
     if (!prev_time_) {
         prev_time_ = current_time;
     }
-    frame_delta_ = (current_time - prev_time_) * secs_per_count_;
+    frame_delta_ = (current_time - prev_time_) / 1000.0f;
     prev_time_ = current_time;
-#else
-	timeval current_time;
-	gettimeofday(&current_time, 0);
-	if (prev_time_.tv_sec == 0 && prev_time_.tv_usec == 0) {
-		prev_time_ = current_time;
-	}
-
-	time_t frame_delta_sec = current_time.tv_sec - prev_time_.tv_sec;
-	long frame_delta_usec = current_time.tv_usec - prev_time_.tv_usec;
-
-	frame_delta_ = (float)frame_delta_sec + (float)frame_delta_usec/1000000.0f;
-	prev_time_ = current_time;
-
-#endif
 }
 
 Network* CoreEngine::network() const {

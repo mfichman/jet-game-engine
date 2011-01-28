@@ -54,12 +54,12 @@ BSockServerSocket::BSockServerSocket(CoreEngine* engine, const sockaddr_in& loca
     
     // Attempt to bind the socket to any port.  If the attempt fails,
     // clean close the socket and throw an exception.
-    if (bind(socket_, (sockaddr*)&local_, sizeof(local_)) < 0) {
+    if (::bind(socket_, (sockaddr*)&local_, sizeof(local_)) < 0) {
         throw runtime_error(socket_errmsg());
     }
 
 	// Listen for connections
-	if (listen(socket_, 1) < 0) {
+	if (::listen(socket_, 1) < 0) {
 		throw runtime_error(socket_errmsg());
 	}
 

@@ -183,9 +183,6 @@ void OpenGLMesh::render(OpenGLShader* shader) {
 	
 	// Bind and enable the vertex and index buffers
 	glBindBuffer(GL_ARRAY_BUFFER, vbuffer_);
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_NORMAL_ARRAY);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	
 	//if (shader && engine_->option<bool>("shaders_enabled")) {
 		// Enable tangent vectors
@@ -208,9 +205,6 @@ void OpenGLMesh::render(OpenGLShader* shader) {
 	// Disable index and vertex buffers
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glDisableClientState(GL_VERTEX_ARRAY);
-    glDisableClientState(GL_NORMAL_ARRAY);
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	//if (shader && engine_->option<bool>("shaders_enabled")) {
 		// Disable tangent vectors
 	//	GLint tangent_attrib = shader->attrib_location("tangent");

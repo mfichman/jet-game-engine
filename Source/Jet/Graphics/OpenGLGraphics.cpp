@@ -84,7 +84,7 @@ void OpenGLGraphics::init_window() {
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, vsync_enabled);
-	
+
 	uint32_t flags = SDL_OPENGL;
 	if (fullscreen_enabled) {
 		flags |= SDL_FULLSCREEN;
@@ -96,7 +96,7 @@ void OpenGLGraphics::init_window() {
 		throw runtime_error(string("SDL initialization failed: ") + SDL_GetError());
 	}
     glViewport(0, 0, (uint32_t)width, (uint32_t)height);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	engine_->screen()->width((float)width);
 	engine_->screen()->height((float)height);
@@ -188,6 +188,9 @@ void OpenGLGraphics::init_default_states() {
     glEnable(GL_NORMALIZE);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
+	glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_NORMAL_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     glFrontFace(GL_CCW); // We always use CCW culling
     glCullFace(GL_BACK);
 }
@@ -211,7 +214,7 @@ void OpenGLGraphics::on_init() {
 void OpenGLGraphics::check_video_mode() {
 	// If the video mode has been marked as changed, then switch modes
 	if (!engine_->option<bool>("video_mode_synced")) {
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		SDL_GL_SwapBuffers();
 		
 		// Demote all resources to the RS_CACHED state, because the OpenGL context
@@ -245,11 +248,11 @@ void OpenGLGraphics::check_video_mode() {
 			GLuint size = (GLuint)engine_->option<float>("shadow_texture_size");
 
 			for (size_t i = 0; i < cascades; i++) {
-				shadow_target_.push_back(new OpenGLRenderTarget(size, size, true, 1));
+				shadow_target_.push_back(new OpenGLRenderTarget(size, size, true));
 
 				// These states are used to enable percentage closer filtering for the 
 				// shadow map sampler
-				glBindTexture(GL_TEXTURE_2D, shadow_target_.back()->texture(0));
+				glBindTexture(GL_TEXTURE_2D, shadow_target_.back()->texture());
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 				glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
@@ -280,7 +283,8 @@ void OpenGLGraphics::on_render() {
 	sort(mesh_objects_.begin(), mesh_objects_.end(), &OpenGLGraphics::compare_mesh_objects);
 	sort(particle_systems_.begin(), particle_systems_.end(), &OpenGLGraphics::compare_particle_systems);
 	sort(quad_sets_.begin(), quad_sets_.end(), &OpenGLGraphics::compare_quad_sets);
-
+	
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Render the scene once for each light
 	bool shaders_enabled = engine_->option<bool>("shaders_enabled");
@@ -386,8 +390,6 @@ void OpenGLGraphics::render_final(CoreLight* light) {
 	Matrix matrix = camera->parent()->matrix();
 	float width = engine_->option<float>("display_width");
 	float height = engine_->option<float>("display_height");
-	
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
     // Set up the projection matrix
     glMatrixMode(GL_PROJECTION);

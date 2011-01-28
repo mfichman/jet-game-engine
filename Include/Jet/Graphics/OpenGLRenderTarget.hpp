@@ -37,7 +37,7 @@ public:
     //! @param height the height of the render target
 	//! @param depth_only true if this render target should save depth only (for shadow mapping)
 	//! @param ntargets the number of render targets to be used with this RT
-    OpenGLRenderTarget(uint32_t width, uint32_t height, bool depth_only, uint32_t ntargets=1);
+    OpenGLRenderTarget(uint32_t width, uint32_t height, bool depth_only);
 
     //! Destructor.
     virtual ~OpenGLRenderTarget();
@@ -51,8 +51,8 @@ public:
     void enabled(bool enabled);
 
 	//! Returns a texture that the render target rendered to.
-	inline GLuint texture(size_t index) const {
-		return texture_[index];
+	inline GLuint texture() const {
+		return texture_;
 	}
     
     //! Sets the sampler the texture is bound to.
@@ -60,15 +60,14 @@ public:
 	//! @param index the texture to bind to the sampler;
 	//! when multiple render targets are used, this could
 	//! be render target 0 or render target 1
-	void sampler(uint32_t sampler, size_t index=0);
+	void sampler(uint32_t sampler);
 
 private:
-    GLuint texture_[2];
+    GLuint texture_;
     GLuint framebuffer_;
 	GLuint depth_buffer_;
     uint32_t width_;
     uint32_t height_;
-	uint32_t ntargets_;
     bool enabled_;
 	bool depth_only_;
 };

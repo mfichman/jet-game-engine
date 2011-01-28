@@ -45,9 +45,6 @@
 #include <set>
 #include <stdexcept>
 #include <boost/any.hpp>
-#ifndef WINDOWS
-#include <sys/time.h>
-#endif
 
 namespace Jet {
 
@@ -398,16 +395,11 @@ private:
     float frame_delta_;
 	float frame_time_;
 	float frame_accumulator_;
-	unsigned fps_frame_count_;
+	uint32_t fps_frame_count_;
 	float fps_elapsed_time_;
 	size_t auto_name_counter_;
-	
-#ifdef WINDOWS
-    float secs_per_count_;
-    int64_t prev_time_;
-#else
-	timeval prev_time_;
-#endif
+    
+    uint32_t prev_time_;
     uint32_t frame_id_;
 	uint32_t tick_id_;
 };

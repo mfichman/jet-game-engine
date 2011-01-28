@@ -21,6 +21,10 @@
  */  
 #pragma once
 
+#if defined(_WIN32) && !defined(WINDOWS)
+#define WINDOWS
+#endif
+
 #ifdef WINDOWS
 #include <cstdint>
 #include <cstdlib>

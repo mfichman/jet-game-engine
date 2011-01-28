@@ -3,9 +3,9 @@
 
 if (true) then
     engine:option("shadow_texture_size", 2048)
-    engine:option("display_width", 1024)
-    engine:option("display_height", 768)
-    engine:option("fullscreen_enabled", false)
+    engine:option("display_width", 1680)
+    engine:option("display_height", 1050)
+    engine:option("fullscreen_enabled", true)
     engine:option("fsaa_enabled", true)
     engine:option("fsaa_samples", 4)
     engine:option("shadows_enabled", true)
@@ -25,7 +25,7 @@ else
     engine:option("skysphere_texture", "")
 end
 
-engine:option("vsync_enabled", true)
+engine:option("vsync_enabled", false)
 engine:option("shadow_distance", 400)
 engine:option("shadow_cascades", 4)
 engine:option("shadow_correction", 0.55)
@@ -35,12 +35,6 @@ engine:option("gravity", 0)
 engine:option("network_smoothness", 0.05)
 engine:option("network_packet_rate", 6)
 engine:option("input_delay", 6)
-
---[[
-engine:option("display_width", 1680)
-engine:option("display_height", 1050)
-engine:option("fullscreen", true)
-]]
 
 engine:search_folder("Textures")
 engine:search_folder("Meshes")

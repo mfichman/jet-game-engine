@@ -1,4 +1,7 @@
 syntax: glob
+*.opensdf
+*.sdf
+*.vcxproj*
 *.user
 *.ncb
 *~

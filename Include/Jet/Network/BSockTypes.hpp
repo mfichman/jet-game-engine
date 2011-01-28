@@ -21,14 +21,12 @@
  */  
 #pragma once
 
+#include <Jet/Types.hpp>
 #include <stdexcept>
 #include <boost/intrusive_ptr.hpp>
 #ifdef WINDOWS
 #include <winsock2.h>
 #include <ws2tcpip.h>
-#ifndef EWOULDBLOCK
-#define EWOULDBLOCK WSAEWOULDBLOCK
-#endif
 typedef int socklen_t;
 inline const char* socket_errmsg() {
     static char buffer[512];

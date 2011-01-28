@@ -151,26 +151,26 @@ void BSockSocket::init_server() {
     
     // Attempt to bind the socket to any port.  If the attempt fails,
     // clean close the socket and throw an exception.
-    if(bind(socket_, (sockaddr*)&local_, sizeof(local_)) < 0) {
+    if(::bind(socket_, (sockaddr*)&local_, sizeof(local_)) < 0) {
         throw runtime_error(socket_errmsg());
     }
 
 	// Listen for connections
-	if (listen(socket_, 1) < 0) {
+	if (::listen(socket_, 1) < 0) {
 		throw runtime_error(socket_errmsg());
 	}
 }
 
 void BSockSocket::init_client() {    
     // Create a new TCP socket.  If the attempt fails, throw an exception.
-    socket_ = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    socket_ = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (INVALID_SOCKET == socket_) {
         throw runtime_error(socket_errmsg());
     }
     
     // Attempt to bind the socket to any port.  If the attempt fails,
     // clean close the socket and throw an exception.
-    if(bind(socket_, (sockaddr*)&local_, sizeof(local_)) < 0) {
+    if(::bind(socket_, (sockaddr*)&local_, sizeof(local_)) < 0) {
         throw runtime_error(socket_errmsg());
     }
 
@@ -200,32 +200,32 @@ void BSockSocket::init_multicast() {
     int yes = 1;
 #ifdef SO_REUSEPORT
 	// OS X hack...for some reason, this needs to be set in OS X only
-	if (setsockopt(socket_, SOL_SOCKET, SO_REUSEPORT, (char*)&yes, sizeof(yes)) < 0) {
+	if (::setsockopt(socket_, SOL_SOCKET, SO_REUSEPORT, (char*)&yes, sizeof(yes)) < 0) {
 		throw runtime_error(socket_errmsg());
 	}
 #endif
 
     // Set the port to be reusable.  If the attempt fails, close the socket
     // and throw an exception.
-    if (setsockopt(socket_, SOL_SOCKET, SO_REUSEADDR, (char*)&yes, sizeof(yes)) < 0) {
+    if (::setsockopt(socket_, SOL_SOCKET, SO_REUSEADDR, (char*)&yes, sizeof(yes)) < 0) {
         throw runtime_error(socket_errmsg());
     }
     
     // Join the multicast group.  If the attempt fails, close the socket and
     // throw and exception.
-    if (setsockopt(socket_, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&mreq, sizeof(ip_mreq)) < 0) {
+    if (::setsockopt(socket_, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&mreq, sizeof(ip_mreq)) < 0) {
         throw runtime_error(socket_errmsg());
     }
     
     // Attempt to bind the socket to the given port.  If the attempt fails,
     // clean close the socket and throw an exception.
-    if(bind(socket_, (sockaddr*)&local_, sizeof(local_)) < 0) {
+    if(::bind(socket_, (sockaddr*)&local_, sizeof(local_)) < 0) {
         throw runtime_error(socket_errmsg());
     }
 
 	// Get the port we are bound to
     socklen_t len = sizeof(local_);
-    if (getsockname(socket_, (sockaddr*)&local_, &len) < 0) {
+    if (::getsockname(socket_, (sockaddr*)&local_, &len) < 0) {
         throw runtime_error(socket_errmsg());
     }
 }
@@ -241,13 +241,13 @@ void BSockSocket::init_datagram() {
     // Set the port to be reusable.  If the attempt fails, close the socket
     // and throw an exception.
     int yes = 1;
-    if (setsockopt(socket_, SOL_SOCKET, SO_REUSEADDR, (char*)&yes, sizeof(yes)) < 0) {
+    if (::setsockopt(socket_, SOL_SOCKET, SO_REUSEADDR, (char*)&yes, sizeof(yes)) < 0) {
         throw runtime_error(socket_errmsg());
     }
     
     // Attempt to bind the socket to the given port.  If the attempt fails,
     // clean close the socket and throw an exception.
-    if(bind(socket_, (sockaddr*)&local_, sizeof(local_)) < 0) {
+    if(::bind(socket_, (sockaddr*)&local_, sizeof(local_)) < 0) {
         throw runtime_error(socket_errmsg());
     }
 }

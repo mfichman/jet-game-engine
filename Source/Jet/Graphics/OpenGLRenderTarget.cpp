@@ -27,17 +27,12 @@
 using namespace Jet;
 using namespace std;
 
-OpenGLRenderTarget::OpenGLRenderTarget(uint32_t width, uint32_t height, bool depth_only, uint32_t ntargets) :
+OpenGLRenderTarget::OpenGLRenderTarget(uint32_t width, uint32_t height, bool depth_only) :
 	depth_buffer_(0),
     width_(width),
     height_(height),
-	ntargets_(ntargets),
 	enabled_(false),
 	depth_only_(depth_only) {
-
-	if (ntargets_ < 1 || ntargets_ > 2) {
-		throw runtime_error("Wrong number of render targets");
-	}
 
 	GLenum component = depth_only ? GL_DEPTH_COMPONENT : GL_RGBA;
 
@@ -46,32 +41,31 @@ OpenGLRenderTarget::OpenGLRenderTarget(uint32_t width, uint32_t height, bool dep
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_);
 
     // Initialize the texture
-    glGenTextures(ntargets_, texture_);
-	for (uint32_t i = 0; i < ntargets_; i++) {
-		glBindTexture(GL_TEXTURE_2D, texture_[i]);
-		//Set texture sampling parameters; we use simple filtering
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexImage2D(GL_TEXTURE_2D, 0, component, width, height, 0, component, GL_UNSIGNED_BYTE, 0);
-		glBindTexture(GL_TEXTURE_2D, 0);
+    glGenTextures(1, &texture_);
+	glBindTexture(GL_TEXTURE_2D, texture_);
+	//Set texture sampling parameters; we use simple filtering
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexImage2D(GL_TEXTURE_2D, 0, component, width, height, 0, component, GL_UNSIGNED_BYTE, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
-		if (!depth_only) {
-			// Color buffer
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+i, GL_TEXTURE_2D, texture_[i], 0);
-			glGenRenderbuffers(1, &depth_buffer_);
-		}
+	if (!depth_only) {
+		// Color buffer
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_, 0);
+		glGenRenderbuffers(1, &depth_buffer_);
 	}
+
 
 	if (depth_only) {
 		// Depth buffer texture only
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texture_[0], 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texture_, 0);
 		glDrawBuffer(GL_NONE);
 		glReadBuffer(GL_NONE);
 	} else {
 		GLenum buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-		glDrawBuffers(ntargets_, buffers);
+		glDrawBuffers(1, buffers);
 
 		// Depth buffer
 		glBindRenderbuffer(GL_RENDERBUFFER, depth_buffer_);
@@ -94,7 +88,7 @@ OpenGLRenderTarget::OpenGLRenderTarget(uint32_t width, uint32_t height, bool dep
 
 //! Destructor.
 OpenGLRenderTarget::~OpenGLRenderTarget() {
-    glDeleteTextures(ntargets_, texture_);
+    glDeleteTextures(1, &texture_);
     glDeleteFramebuffers(1, &framebuffer_);
 	if (!depth_only_) {
 		glDeleteRenderbuffers(1, &depth_buffer_);
@@ -118,7 +112,7 @@ void OpenGLRenderTarget::enabled(bool enabled) {
 			glClear(GL_DEPTH_BUFFER_BIT);
 		} else {
 			GLenum buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-			glDrawBuffers(ntargets_, buffers);
+			glDrawBuffers(1, buffers);
 			glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 		}
 	} else {
@@ -129,7 +123,7 @@ void OpenGLRenderTarget::enabled(bool enabled) {
 	enabled_ = enabled;
 }
 
-void OpenGLRenderTarget::sampler(uint32_t sampler, size_t index) {
+void OpenGLRenderTarget::sampler(uint32_t sampler) {
 	glActiveTexture(GL_TEXTURE0 + sampler);
-	glBindTexture(GL_TEXTURE_2D, texture_[index]);
+	glBindTexture(GL_TEXTURE_2D, texture_);
 }
