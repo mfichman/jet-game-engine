@@ -114,7 +114,7 @@ void OpenGLParticleBuffer::flush() {
 		return;
 	}
 	
-	glPointSize(5000.0f);
+	//glPointSize(5000.0f);
 	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 	glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
 	glEnable(GL_BLEND);
@@ -138,13 +138,13 @@ void OpenGLParticleBuffer::flush() {
 	glEnableVertexAttribArray(life_attrib_);
 	glEnableVertexAttribArray(growth_rate_attrib_);
 
-	glVertexAttribPointer(init_position_attrib_, 3, GL_FLOAT, 1, sizeof(Particle), (void*)0);
-	glVertexAttribPointer(init_velocity_attrib_, 3, GL_FLOAT, 1, sizeof(Particle), (void*)(3*sizeof(GLfloat)));
-	glVertexAttribPointer(init_time_attrib_, 1, GL_FLOAT, 1, sizeof(Particle), (void*)(6*sizeof(GLfloat)));
-	glVertexAttribPointer(init_size_attrib_, 1, GL_FLOAT, 1, sizeof(Particle), (void*)(7*sizeof(GLfloat)));
-	glVertexAttribPointer(init_rotation_attrib_, 1, GL_FLOAT, 1, sizeof(Particle), (void*)(8*sizeof(GLfloat)));
-	glVertexAttribPointer(life_attrib_, 1, GL_FLOAT, 1, sizeof(Particle), (void*)(9*sizeof(GLfloat)));
-	glVertexAttribPointer(growth_rate_attrib_, 1, GL_FLOAT, 1, sizeof(Particle), (void*)(10*sizeof(GLfloat)));
+	glVertexAttribPointer(init_position_attrib_, 3, GL_FLOAT, 0, sizeof(Particle), (void*)0);
+	glVertexAttribPointer(init_velocity_attrib_, 3, GL_FLOAT, 0, sizeof(Particle), (void*)(3*sizeof(GLfloat)));
+	glVertexAttribPointer(init_time_attrib_, 1, GL_FLOAT, 0, sizeof(Particle), (void*)(6*sizeof(GLfloat)));
+	glVertexAttribPointer(init_size_attrib_, 1, GL_FLOAT, 0, sizeof(Particle), (void*)(7*sizeof(GLfloat)));
+	glVertexAttribPointer(init_rotation_attrib_, 1, GL_FLOAT, 0, sizeof(Particle), (void*)(8*sizeof(GLfloat)));
+	glVertexAttribPointer(life_attrib_, 1, GL_FLOAT, 0, sizeof(Particle), (void*)(9*sizeof(GLfloat)));
+	glVertexAttribPointer(growth_rate_attrib_, 1, GL_FLOAT, 0, sizeof(Particle), (void*)(10*sizeof(GLfloat)));
    
     // Enable the particle texture and draw the particles
     glDrawArrays(GL_POINTS, 0, particle_.size());

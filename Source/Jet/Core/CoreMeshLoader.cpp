@@ -123,7 +123,6 @@ void CoreMeshLoader::read_face() {
 }
 
 void CoreMeshLoader::insert_face(size_t group, Vertex face[3]) {
-	
 	// Add vertices to the buffer
 	for (int i = 0; i < 3; i++) {
         // Search for the vertex in the cache

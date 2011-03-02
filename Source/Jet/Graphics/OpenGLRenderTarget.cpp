@@ -51,13 +51,6 @@ OpenGLRenderTarget::OpenGLRenderTarget(uint32_t width, uint32_t height, bool dep
 	glTexImage2D(GL_TEXTURE_2D, 0, component, width, height, 0, component, GL_UNSIGNED_BYTE, 0);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	if (!depth_only) {
-		// Color buffer
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_, 0);
-		glGenRenderbuffers(1, &depth_buffer_);
-	}
-
-
 	if (depth_only) {
 		// Depth buffer texture only
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texture_, 0);
@@ -67,7 +60,11 @@ OpenGLRenderTarget::OpenGLRenderTarget(uint32_t width, uint32_t height, bool dep
 		GLenum buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
 		glDrawBuffers(1, buffers);
 
+        // Color buffer
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_, 0);
+
 		// Depth buffer
+        glGenRenderbuffers(1, &depth_buffer_);
 		glBindRenderbuffer(GL_RENDERBUFFER, depth_buffer_);
 		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_buffer_);
@@ -111,8 +108,6 @@ void OpenGLRenderTarget::enabled(bool enabled) {
 			glDrawBuffer(GL_NONE);
 			glClear(GL_DEPTH_BUFFER_BIT);
 		} else {
-			GLenum buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-			glDrawBuffers(1, buffers);
 			glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 		}
 	} else {
