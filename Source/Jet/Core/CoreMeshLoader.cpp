@@ -133,11 +133,11 @@ void CoreMeshLoader::insert_face(size_t group, Vertex face[3]) {
 			// into the list.  Add the vertex to the cache
 			index = mesh_->vertex_count();
 			cache_.insert(make_pair(face[i], index));
+            mesh_->vertex(index, face[i]);
 		} else {
 			// Vertex was found, so use the existing index. 
             index = j->second;
 		}
-        mesh_->vertex(index, face[i]);
         mesh_->index(group, mesh_->index_count(group), index);
 	}
 }
