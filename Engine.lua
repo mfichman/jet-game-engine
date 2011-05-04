@@ -53,6 +53,28 @@ function bind(method, self)
     end
 end
 
+local luabind_class = class
+function class(name)
+    local i = name:gfind("%a+")
+    local table = _G
+    local class = nil
+    local token = nil
+    while true do
+        token = i()
+        
+        if (not token) then
+            break
+        end
+        if (class) then
+            table = table[class]
+        end
+        class = token
+    end
+    
+    local ret = luabind_class(name)
+    table[class] = _G[name]
+    return ret
+end
 
 function math.round(num, idp)
     local mult = 10^(idp or 0)
@@ -75,6 +97,12 @@ local node_node = engine.root.node;
 function Node:node(name)
     name = name or ""
     return callable(node_node(self, name))
+end
+
+local node_collision_sphere = engine.root.collision_sphere;
+function Node:collision_sphere(name)
+    name = name or ""
+    return callable(node_collision_sphere(self, name))
 end
 
 local node_mesh_object = engine.root.mesh_object;

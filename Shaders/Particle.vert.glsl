@@ -46,7 +46,7 @@ void main() {
     
     gl_Position = gl_ProjectionMatrix * view_position;
     gl_PointSize = max(scale * init_size / (1.0 + distance) + growth_rate * x, 0.0);
-    gl_TexCoord[0] = gl_MultiTexCoord0;
+   // gl_TexCoord[0] = gl_MultiTexCoord0;
     alpha = clamp(f, 0.0, 1.0);
     rotation = init_rotation;
 }

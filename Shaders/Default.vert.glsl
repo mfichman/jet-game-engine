@@ -42,7 +42,12 @@ void main() {
     vec3 t = normalize(gl_NormalMatrix * tangent);
     vec3 b = cross(n, t);
     
-    vec3 v;
+	mat3 tangent_matrix = transpose(mat3(t, b, n));
+
+	light_dir = tangent_matrix * gl_LightSource[0].position.xyz;
+	eye_dir = tangent_matrix * eye_dir;
+
+   /* vec3 v;
     v.x = dot(gl_LightSource[0].position.xyz, t);
     v.y = dot(gl_LightSource[0].position.xyz, b);
     v.z = dot(gl_LightSource[0].position.xyz, n);
@@ -51,10 +56,11 @@ void main() {
     v.x = dot(eye_dir, t);
     v.y = dot(eye_dir, b);
     v.z = dot(eye_dir, n);
-    eye_dir = v;
+    eye_dir = v;*/
     
 #ifdef SHADOW_MAP
     for (int i = 0; i < cascade_count; i++) {
+		/* gl_TextureMatrix[0] is the model's matrix (no view) */
         shadow_coord[i] = gl_TextureMatrix[3+i] * gl_TextureMatrix[0] * gl_Vertex;
     }
 #endif

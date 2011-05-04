@@ -18,18 +18,19 @@
 -- FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 -- IN THE SOFTWARE.
 
-require 'Actor'
+function Rock(size)
+    local node = engine.root:node()
 
-class 'Rock' (Actor)
+	size = size or "Jumbo"
 
-function Rock:__init(node, name)
-    Actor.__init(self, node, name)
-
-    self.mesh = self.node:mesh_object() {
-        mesh = "Rock.obj",
-        material = "Rock.mtl"
+	-- Create an asteroids mesh
+    node.mesh = node:mesh_object() {
+		mesh = size.."Rock.obj",
+		material = "Rock.mtl"
     }
     
-    self.body = self.node:rigid_body()
-    self.body.mass = 10.0
+    -- Set mass to zero (static object)
+    node.rigid_body.mass = 0.0
+    
+    return node
 end

@@ -45,8 +45,23 @@ public:
 	//! Returns the current module.
 	virtual Module* module() const=0;
 	
+	//! Returns the physics interface.
+	virtual Physics* physics() const=0;
+	
+	//! Returns the audio interface
+	virtual Audio* audio() const=0;
+	
 	//! Returns the network interface.
 	virtual Network* network() const=0;
+	
+	//! Returns the script interface
+	virtual Script* script() const=0;
+	
+	//! Returns the renderer interface
+	virtual Graphics* graphics() const=0;
+	
+	//! Returns the input interface
+	virtual Input* input() const=0;
         
     //! Returns true if the engine is running
     virtual bool running() const=0;
@@ -82,6 +97,9 @@ public:
     //! load the underlying resource if load is set to true.
     //! @param name the name of the texture
     virtual Texture* texture(const std::string& name="")=0;
+	
+	//! Returns the given cube texture descriptor.
+	virtual Cubemap* cubemap(const std::string& name="")=0;
     
     //! Returns the given shader descriptor.  This function will attempt to
     //! load the underlying resource if load is set to true.
@@ -125,8 +143,11 @@ public:
     //! elapsed time.
     virtual void update()=0;
 	
-	//! Creates a new engine.
+	//! Creates a new engine with the standard subsystems plugged in.
 	static Engine* create();
+    
+    //! Creates an engine with no subsystems automatically plugged in.
+    static Engine* create_custom();
 };
 
 //! Listens for engine events.  Examples include on_pre_render (called before

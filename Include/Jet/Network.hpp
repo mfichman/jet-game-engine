@@ -23,6 +23,7 @@
 
 #include <Jet/Types.hpp>
 #include <Jet/Object.hpp>
+#include <vector>
 
 namespace  Jet {
 
@@ -31,45 +32,53 @@ namespace  Jet {
 //! @brief Sets network options for the engine.
 class Network : public virtual Object {
 public:
+    //! Creates a new network monitor.
+    virtual NetworkMonitor* network_monitor(Node* parent)=0;
     
-    //! Returns the current user name.
-    virtual const std::string& current_player() const=0;
-    
-    //! Returns the current game name.
-    virtual const std::string& current_game() const=0;
-
-    //! Returns the name of the player.
-    virtual const std::string& player(size_t index)=0;
-    
-    //! Returns the name of a game.
-    virtual const std::string& game(size_t index)=0;
-    
-    //! Gets the number of players in the current game.
-    virtual size_t player_count() const=0;
-        
-    //! Returns the number of games available since the last network refresh.
-    virtual size_t game_count() const=0;
-    
-    //! Returns the state of the network interface.  The state can be one
-    //! of the following: DISCOVER (to search for new games), HOST (to host
-    //! a game), or PLAY (when the game is actually taking place), or DISABLED
-    //! (the network is not running)
+    //! Returns the current network state
     virtual NetworkState state() const=0;
     
-    //! Sets the current player name.
-    virtual void current_player(const std::string& name)=0;
+    //! Returns the number of games available.
+    virtual size_t match_count() const=0;
     
-    //! Sets the game name, if the user is in the HOST state, or joins a game
-    //! if the player is in the discover state.
-    virtual void current_game(const std::string& name)=0;
+    //! Returns the number of players in the current game.
+    virtual size_t player_count() const=0;
     
-    //! Sets the network state.
+    //! Returns information about a game.
+    virtual const NetworkMatch& match(size_t index) const=0;
+    
+    //! Returns information about a player in the game.
+    virtual const Player& player(size_t index) const=0;
+    
+    //! Returns information about the current local match
+    virtual const NetworkMatch& current_match() const=0;
+    
+    //! Returns information about the current player.
+    virtual const Player& current_player() const=0;
+    
+    //! Sets the current mode of the network
     virtual void state(NetworkState state)=0;
     
-    //! Sends a signal to the running module on the remote machines and the
-    //! local machine so that the signal will occur simultaneously on all
-    //! machines.
-    virtual void signal(const Signal& signal)=0;
+    //! Sets the current game.
+    virtual void current_match(const NetworkMatch& match)=0;
+    
+    //! Sets information about the current player.
+    virtual void current_player(const Player& player)=0;
+	
+	//! Invokes an unreliable RPC on all connected machines.  One should keep the
+	//! number of arguments to a minimum to conserve bandwidth.  Only number, Vector, 
+	//! Quaternion, and string types are permitted.  Note that RPCs are only invoked
+	//! on the remote machine(s) and not the local machine.
+	//! @param name the name of the RPC
+	//! @param args the arguments to invoke
+	virtual void unreliable_rpc(const std::string& name, const std::vector<boost::any>& args)=0;
+
+	//! Invokes a reliable RPC on all connected machines.  Note that 
+	//! reliable RPCs should not be used frequently, because they are slow 
+	//! and can cause packet loss in the low-latency UDP packet stream as
+	//! a side-effect of the interaction between UDP and TCP.  Note that RPCs are only invoked
+	//! on the remote machine(s) and not on the local machine.
+	virtual void reliable_rpc(const std::string& name, const std::vector<boost::any>& args)=0;
 };
     
 }

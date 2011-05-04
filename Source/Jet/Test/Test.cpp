@@ -1,12 +1,11 @@
 #include <Jet/Engine.hpp>
+#include <Jet/Script.hpp>
+#include <Jet/Types/Vector.hpp>
+#include <Jet/Scene/Node.hpp>
 #include <iostream>
 #include <stdexcept>
 #include <SDL/SDL.h>
 
-#include <Jet/Core/NetworkSystem.hpp>
-#include <Jet/Core/Socket.hpp>
-#include <Jet/Core/SocketWriter.hpp>
-#include <Jet/Core/SocketReader.hpp>
 
 using namespace std;
 using namespace boost;
@@ -19,13 +18,15 @@ int main(int argc, char** argv) {
 
     try {
         Jet::EnginePtr engine(Jet::Engine::create()); 
-        
+		engine->update();
+
         while (engine->running()) {
 			engine->update();
 		}
        	return 0; 
     } catch (std::exception& ex) {
         std::cout << ex.what() << std::endl;
+        system("pause");
 		return 1;
     }
 	

@@ -21,6 +21,10 @@
  */  
 #pragma once
 
+#if defined(_WIN32) && !defined(WINDOWS)
+#define WINDOWS
+#endif
+
 #ifdef WINDOWS
 #include <cstdint>
 #include <cstdlib>
@@ -48,18 +52,26 @@
 #endif
 
 namespace Jet {
-    class ActionQueue;
+    class Actor;
+    class ActorState;
+	class Address;
+    class Audio;
     class AudioSource;
     class Box;
     class Camera;
     class Color;
+    class CollisionSphere;
+    class Cubemap;
     class Engine;
     class EngineListener;
     class Font;
     class FractureObject;
     class FractalPlanet;
     class Frustum;
+    class NetworkMatch;
     class Geometry;
+    class Input;
+	class InputState;
     class Light;
     class Matrix;
     class Material;
@@ -69,21 +81,23 @@ namespace Jet {
     class Network;
     class NetworkMonitor;
     class Node;
-    class NodeListener;
     class Object;
     class Overlay;
     class OverlayListener;
     class Particle;
     class ParticleSystem;
+    class Player;
     class Plane;
     class Point;
+    class Physics;
     class Quad;
     class QuadChain;
     class QuadSet;
     class Quaternion;
     class Range;
+    class Graphics;
     class RigidBody;
-    class ScriptWidget;
+    class Script;
     class Signal;
     class Shader;
     class Sound;
@@ -92,15 +106,20 @@ namespace Jet {
     class Vector;
     class Vertex;
 
-    typedef boost::intrusive_ptr<ActionQueue> ActionQueuePtr;
+    typedef boost::intrusive_ptr<Actor> ActorPtr;
+    typedef boost::intrusive_ptr<ActorState> ActorStatePtr;
+    typedef boost::intrusive_ptr<Audio> AudioPtr;
     typedef boost::intrusive_ptr<AudioSource> AudioSourcePtr;
     typedef boost::intrusive_ptr<Camera> CameraPtr;
+    typedef boost::intrusive_ptr<CollisionSphere> CollisionSpherePtr;
+    typedef boost::intrusive_ptr<Cubemap> CubemapPtr;
     typedef boost::intrusive_ptr<Engine> EnginePtr;
     typedef boost::intrusive_ptr<EngineListener> EngineListenerPtr;
     typedef boost::intrusive_ptr<Font> FontPtr;
     typedef boost::intrusive_ptr<FractureObject> FractureObjectPtr;
     typedef boost::intrusive_ptr<FractalPlanet> FractalPlanetPtr;
     typedef boost::intrusive_ptr<Geometry> GeometryPtr;
+    typedef boost::intrusive_ptr<Input> InputPtr;
     typedef boost::intrusive_ptr<Light> LightPtr;
     typedef boost::intrusive_ptr<Material> MaterialPtr;
     typedef boost::intrusive_ptr<Mesh> MeshPtr;
@@ -109,25 +128,26 @@ namespace Jet {
     typedef boost::intrusive_ptr<Network> NetworkPtr;
     typedef boost::intrusive_ptr<NetworkMonitor> NetworkMonitorPtr;
     typedef boost::intrusive_ptr<Node> NodePtr;
-    typedef boost::intrusive_ptr<NodeListener> NodeListenerPtr;
     typedef boost::intrusive_ptr<Object> ObjectPtr;
     typedef boost::intrusive_ptr<Overlay> OverlayPtr;
     typedef boost::intrusive_ptr<OverlayListener> OverlayListenerPtr;
     typedef boost::intrusive_ptr<ParticleSystem> ParticleSystemPtr;
+    typedef boost::intrusive_ptr<Physics> PhysicsPtr;
     typedef boost::intrusive_ptr<QuadChain> QuadChainPtr;
     typedef boost::intrusive_ptr<RigidBody> RigidBodyPtr;
-    typedef boost::intrusive_ptr<ScriptWidget> ScriptWidgetPtr;
+    typedef boost::intrusive_ptr<Graphics> GraphicsPtr;
+    typedef boost::intrusive_ptr<Script> ScriptPtr;
     typedef boost::intrusive_ptr<Shader> ShaderPtr;
     typedef boost::intrusive_ptr<Sound> SoundPtr;
     typedef boost::intrusive_ptr<Texture> TexturePtr;
     typedef boost::intrusive_ptr<QuadSet> QuadSetPtr;
  
-    enum LightType { POINT_LIGHT, DIRECTIONAL_LIGHT };
-    enum EmitterType { BOX_EMITTER, ELLIPSOID_EMITTER, POINT_EMITTER };
-    enum PlaybackState { PLAY, STOP };
-    enum ResourceState { UNLOADED, CACHED, LOADED };
-    enum SyncMode { STATIC_SYNC, DYNAMIC_SYNC };
-    enum LayoutMode { RELATIVE_LAYOUT, ABSOLUTE_LAYOUT };
-    enum Alignment { TOP, CENTER, BOTTOM, LEFT, RIGHT };
-    enum NetworkState { DISCOVER, HOST, RUNNING, DISABLED };
+    enum LightType { LT_POINT, LT_DIRECTIONAL };
+    enum EmitterType { ET_BOX, ET_ELLIPSOID, ET_POINT };
+    enum PlaybackState { PS_PLAY, PS_STOP };
+    enum ResourceState { RS_UNLOADED, RS_CACHED, RS_LOADED };
+    enum SyncMode { SM_STATIC, SM_DYNAMIC };
+    enum LayoutMode { LM_RELATIVE, LM_ABSOLUTE };
+    enum Alignment { AL_TOP, AL_CENTER, AL_BOTTOM, AL_LEFT, AL_RIGHT };
+    enum NetworkState { NS_DISCOVER, NS_HOST, NS_CLIENT, NS_RUNNING, NS_DISABLED };
 }

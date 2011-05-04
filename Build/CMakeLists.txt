@@ -28,6 +28,7 @@ add_definitions(-g)
 add_definitions(-Wall -Werror)
 include_directories(/usr/local/include/Bullet/)
 include_directories(/Developer/FMOD Programmers API Mac/api/inc) 
+include_directories(/usr/local/include/freetype2/)
 endif()
 
 if(UNIX AND NOT APPLE)
@@ -41,7 +42,16 @@ include_directories(${Jet_SOURCE_DIR}/../Include)
 add_definitions(-DFREEGLUT_STATIC)
 
 
-file(GLOB files "../Source/Jet/*.cpp" "../Source/Jet/Core/*.cpp")
+file(GLOB files
+    "../Source/Jet/*.cpp"
+    "../Source/Jet/Types/*.cpp"
+    "../Source/Jet/Physics/*.cpp"
+    "../Source/Jet/Audio/*.cpp"
+    "../Source/Jet/Script/*.cpp"
+    "../Source/Jet/Graphics/*.cpp"
+    "../Source/Jet/Input/*.cpp"
+    "../Source/Jet/Network/*.cpp"
+    "../Source/Jet/Core/*.cpp")
 add_library(Jet ${files})
 
 file(GLOB files "../Source/Jet/Test/*.cpp")
@@ -58,20 +68,17 @@ find_library(BOOST_SYSTEM NAMES boost_system PATHS ${LIB_DIRS})
 find_library(BOOST_FILESYSTEM NAMES boost_filesystem PATHS ${LIB_DIRS})
 find_library(FMOD_EX NAMES fmod FMOD fmodex PATHS ${LIB_DIRS})
 find_library(FREETYPE NAMES freetype PATHS ${LIB_DIRS})
+find_library(LUA NAMES lua PATHS ${LIB_DIRS})
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 find_library(BULLET_COLLISION NAMES libbulletcollision_d bulletcollision PATHS ${LIB_DIRS})
 find_library(BULLET_DYNAMICS NAMES libbulletdynamics_d bulletdynamics PATHS ${LIB_DIRS})
 find_library(BULLET_MATH NAMES libbulletmath_d bulletmath PATHS ${LIB_DIRS})
-find_library(LUA NAMES lua_d lua PATHS ${LIB_DIRS})
 find_library(LUABIND NAMES luabind_d luabind PATHS ${LIB_DIRS})
-else()
-find_library(BULLET_COLLISION NAMES libbulletcollision bulletcollision PATHS ${LIB_DIRS})
-find_library(BULLET_DYNAMICS NAMES libbulletdynamics bulletdynamics PATHS ${LIB_DIRS})
-find_library(BULLET_MATH NAMES libbulletmath bulletmath PATHS ${LIB_DIRS})
-find_library(LUA NAMES lua PATHS ${LIB_DIRS})
-find_library(LUABIND NAMES luabind PATHS ${LIB_DIRS})
-endif()
+
+#find_library(BULLET_COLLISION NAMES libbulletcollision bulletcollision PATHS ${LIB_DIRS})
+#find_library(BULLET_DYNAMICS NAMES libbulletdynamics bulletdynamics PATHS ${LIB_DIRS})
+#find_library(BULLET_MATH NAMES libbulletmath bulletmath PATHS ${LIB_DIRS})
+#find_library(LUABIND NAMES luabind PATHS ${LIB_DIRS})
 
 
 set(LIBRARIES ${LIBRARIES} ${GL})
