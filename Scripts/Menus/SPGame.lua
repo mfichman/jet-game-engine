@@ -54,9 +54,7 @@ function SPGame:on_load()
     self.ship = Dagger("Red")
     self.ship.position = Vector(0, 0, 300) 
     self.ship:look(Vector(0, 0, 0), Vector(0, 1, 0))
-    if Network.NS_DISABLED ~= engine.network.state then
-		self.ship.network_monitor.player_uuid = engine.network:player(0).uuid  
-    end
+	self.ship.network_monitor.player_uuid = engine.network:player(0).uuid  
     
     -- Create rocks
     print("Creating rocks")
