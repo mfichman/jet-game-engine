@@ -1,0 +1,257 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{53569E6F-AC5C-4B8F-8A31-AA6B52462B1B}</ProjectGuid>
+    <RootNamespace>Jet</RootNamespace>
+    <Keyword>MakeFileProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Build\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Build\$(Configuration)\</IntDir>
+    <NMakeBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cd Build &amp;&amp; nmake</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cd Build &amp;&amp; nmake clean &amp;&amp; nmake</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cd Build &amp;&amp; nmake clean</NMakeCleanCommandLine>
+    <NMakeOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Binary\Test.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
+    <NMakeForcedIncludes Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(NMakeForcedIncludes)</NMakeForcedIncludes>
+    <NMakeAssemblySearchPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(NMakeAssemblySearchPath)</NMakeAssemblySearchPath>
+    <NMakeForcedUsingAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(NMakeForcedUsingAssemblies)</NMakeForcedUsingAssemblies>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
+    <NMakeBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd build &amp;&amp; nmake</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd build &amp;&amp; nmake clean &amp;&amp; nmake</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd build &amp;&amp; nmake clean</NMakeCleanCommandLine>
+    <NMakeOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Binary\Jet.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
+    <NMakeForcedIncludes Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(NMakeForcedIncludes)</NMakeForcedIncludes>
+    <NMakeAssemblySearchPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(NMakeAssemblySearchPath)</NMakeAssemblySearchPath>
+    <NMakeForcedUsingAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(NMakeForcedUsingAssemblies)</NMakeForcedUsingAssemblies>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:\Include;Include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\Jet\Types\Address.cpp" />
+    <ClCompile Include="Source\Jet\Types\Box.cpp" />
+    <ClCompile Include="Source\Jet\Network\BSockNetwork.cpp" />
+    <ClCompile Include="Source\Jet\Network\BSockNetworkMonitor.cpp" />
+    <ClCompile Include="Source\Jet\Network\BSockReader.cpp" />
+    <ClCompile Include="Source\Jet\Network\BSockServerSocket.cpp" />
+    <ClCompile Include="Source\Jet\Network\BSockSocket.cpp" />
+    <ClCompile Include="Source\Jet\Network\BSockWriter.cpp" />
+    <ClCompile Include="Source\Jet\Physics\BulletGeometry.cpp" />
+    <ClCompile Include="Source\Jet\Physics\BulletPhysics.cpp" />
+    <ClCompile Include="Source\Jet\Physics\BulletRigidBody.cpp" />
+    <ClCompile Include="Source\Jet\Types\Color.cpp" />
+    <ClCompile Include="Source\Jet\Core\CoreActor.cpp" />
+    <ClCompile Include="Source\Jet\Core\CoreCamera.cpp" />
+    <ClCompile Include="Source\Jet\Core\CoreEngine.cpp" />
+    <ClCompile Include="Source\Jet\Core\CoreFractureObject.cpp" />
+    <ClCompile Include="Source\Jet\Core\CoreMaterialLoader.cpp" />
+    <ClCompile Include="Source\Jet\Core\CoreMeshLoader.cpp" />
+    <ClCompile Include="Source\Jet\Core\CoreNode.cpp" />
+    <ClCompile Include="Source\Jet\Core\CoreOverlay.cpp" />
+    <ClCompile Include="Source\Jet\Core\CoreParticleSystem.cpp" />
+    <ClCompile Include="Source\Jet\Core\CoreQuadSet.cpp" />
+    <ClCompile Include="Source\Jet\Audio\FMODAudio.cpp" />
+    <ClCompile Include="Source\Jet\Audio\FMODAudioSource.cpp" />
+    <ClCompile Include="Source\Jet\Audio\FMODSound.cpp" />
+    <ClCompile Include="Source\Jet\Script\LuaScript.cpp" />
+    <ClCompile Include="Source\Jet\Types\Matrix.cpp" />
+    <ClCompile Include="Source\Jet\Graphics\OpenGLCubemap.cpp" />
+    <ClCompile Include="Source\Jet\Graphics\OpenGLFont.cpp" />
+    <ClCompile Include="Source\Jet\Graphics\OpenGLGraphics.cpp" />
+    <ClCompile Include="Source\Jet\Graphics\OpenGLMaterial.cpp" />
+    <ClCompile Include="Source\Jet\Graphics\OpenGLMesh.cpp" />
+    <ClCompile Include="Source\Jet\Graphics\OpenGLParticleBuffer.cpp" />
+    <ClCompile Include="Source\Jet\Graphics\OpenGLRenderTarget.cpp" />
+    <ClCompile Include="Source\Jet\Graphics\OpenGLShader.cpp" />
+    <ClCompile Include="Source\Jet\Graphics\OpenGLTexture.cpp" />
+    <ClCompile Include="Source\Jet\Types\Plane.cpp" />
+    <ClCompile Include="Source\Jet\Types\Point.cpp" />
+    <ClCompile Include="Source\Jet\Types\Quad.cpp" />
+    <ClCompile Include="Source\Jet\Types\Quaternion.cpp" />
+    <ClCompile Include="Source\Jet\Types\Range.cpp" />
+    <ClCompile Include="Source\Jet\Types\Rectangle.cpp" />
+    <ClCompile Include="Source\Jet\Input\SDLInput.cpp" />
+    <ClCompile Include="Source\Jet\Test\Test.cpp" />
+    <ClCompile Include="Source\Jet\Types\Texcoord.cpp" />
+    <ClCompile Include="Source\Jet\Utility.cpp" />
+    <ClCompile Include="Source\Jet\Types\Vector.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Include\Jet\Scene\Actor.hpp" />
+    <ClInclude Include="Include\Jet\Types\Address.hpp" />
+    <ClInclude Include="Include\Jet\Audio.hpp" />
+    <ClInclude Include="Include\Jet\Scene\AudioSource.hpp" />
+    <ClInclude Include="Include\Jet\Types\Box.hpp" />
+    <ClInclude Include="Include\Jet\Network\BSockNetwork.hpp" />
+    <ClInclude Include="Include\Jet\Network\BSockNetworkMonitor.hpp" />
+    <ClInclude Include="Include\Jet\Network\BSockReader.hpp" />
+    <ClInclude Include="Include\Jet\Network\BSockServerSocket.hpp" />
+    <ClInclude Include="Include\Jet\Network\BSockSocket.hpp" />
+    <ClInclude Include="Include\Jet\Network\BSockTypes.hpp" />
+    <ClInclude Include="Include\Jet\Network\BSockWriter.hpp" />
+    <ClInclude Include="Include\Jet\Physics\BulletGeometry.hpp" />
+    <ClInclude Include="Include\Jet\Physics\BulletPhysics.hpp" />
+    <ClInclude Include="Include\Jet\Physics\BulletRigidBody.hpp" />
+    <ClInclude Include="Include\Jet\Physics\BulletTypes.hpp" />
+    <ClInclude Include="Include\Jet\Scene\Camera.hpp" />
+    <ClInclude Include="Include\Jet\Scene\CollisionSphere.hpp" />
+    <ClInclude Include="Include\Jet\Types\Color.hpp" />
+    <ClInclude Include="Include\Jet\Core\CoreActor.hpp" />
+    <ClInclude Include="Include\Jet\Core\CoreCamera.hpp" />
+    <ClInclude Include="Include\Jet\Core\CoreCollisionSphere.hpp" />
+    <ClInclude Include="Include\Jet\Core\CoreEngine.hpp" />
+    <ClInclude Include="Include\Jet\Core\CoreFractureObject.hpp" />
+    <ClInclude Include="Include\Jet\Core\CoreLight.hpp" />
+    <ClInclude Include="Include\Jet\Core\CoreMaterialLoader.hpp" />
+    <ClInclude Include="Include\Jet\Core\CoreMeshLoader.hpp" />
+    <ClInclude Include="Include\Jet\Core\CoreMeshObject.hpp" />
+    <ClInclude Include="Include\Jet\Core\CoreNode.hpp" />
+    <ClInclude Include="Include\Jet\Core\CoreOverlay.hpp" />
+    <ClInclude Include="Include\Jet\Core\CoreParticleSystem.hpp" />
+    <ClInclude Include="Include\Jet\Core\CoreQuadChain.hpp" />
+    <ClInclude Include="Include\Jet\Core\CoreQuadSet.hpp" />
+    <ClInclude Include="Include\Jet\Core\CoreTypes.hpp" />
+    <ClInclude Include="Include\Jet\Resources\Cubemap.hpp" />
+    <ClInclude Include="Include\Jet\Engine.hpp" />
+    <ClInclude Include="Include\Jet\Audio\FMODAudio.hpp" />
+    <ClInclude Include="Include\Jet\Audio\FMODAudioSource.hpp" />
+    <ClInclude Include="Include\Jet\Audio\FMODSound.hpp" />
+    <ClInclude Include="Include\Jet\Audio\FMODTypes.hpp" />
+    <ClInclude Include="Include\Jet\Resources\Font.hpp" />
+    <ClInclude Include="Include\Jet\Scene\FractureObject.hpp" />
+    <ClInclude Include="Include\Jet\Types\Frustum.hpp" />
+    <ClInclude Include="Include\Jet\Resources\Geometry.hpp" />
+    <ClInclude Include="Include\Jet\Graphics.hpp" />
+    <ClInclude Include="Include\Jet\Input.hpp" />
+    <ClInclude Include="Include\Jet\Types\InputState.hpp" />
+    <ClInclude Include="Include\Jet\Types\Iterator.hpp" />
+    <ClInclude Include="Include\Jet\Scene\Light.hpp" />
+    <ClInclude Include="Include\Jet\Script\LuaActorState.hpp" />
+    <ClInclude Include="Include\Jet\Script\LuaModule.hpp" />
+    <ClInclude Include="Include\Jet\Script\LuaScript.hpp" />
+    <ClInclude Include="Include\Jet\Script\LuaTask.hpp" />
+    <ClInclude Include="Include\Jet\Script\LuaTypes.hpp" />
+    <ClInclude Include="Include\Jet\Script\LuaWidget.hpp" />
+    <ClInclude Include="Include\Jet\Resources\Material.hpp" />
+    <ClInclude Include="Include\Jet\Types\Matrix.hpp" />
+    <ClInclude Include="Include\Jet\Resources\Mesh.hpp" />
+    <ClInclude Include="Include\Jet\Scene\MeshObject.hpp" />
+    <ClInclude Include="Include\Jet\Module.hpp" />
+    <ClInclude Include="Include\Jet\Network.hpp" />
+    <ClInclude Include="Include\Jet\Types\NetworkMatch.hpp" />
+    <ClInclude Include="Include\Jet\Scene\NetworkMonitor.hpp" />
+    <ClInclude Include="Include\Jet\Scene\Node.hpp" />
+    <ClInclude Include="Include\Jet\Object.hpp" />
+    <ClInclude Include="Include\Jet\Graphics\OpenGLCubemap.hpp" />
+    <ClInclude Include="Include\Jet\Graphics\OpenGLFont.hpp" />
+    <ClInclude Include="Include\Jet\Graphics\OpenGLGraphics.hpp" />
+    <ClInclude Include="Include\Jet\Graphics\OpenGLMaterial.hpp" />
+    <ClInclude Include="Include\Jet\Graphics\OpenGLMesh.hpp" />
+    <ClInclude Include="Include\Jet\Graphics\OpenGLParticleBuffer.hpp" />
+    <ClInclude Include="Include\Jet\Graphics\OpenGLRenderTarget.hpp" />
+    <ClInclude Include="Include\Jet\Graphics\OpenGLShader.hpp" />
+    <ClInclude Include="Include\Jet\Graphics\OpenGLTexture.hpp" />
+    <ClInclude Include="Include\Jet\Graphics\OpenGLTypes.hpp" />
+    <ClInclude Include="Include\Jet\Interface\Overlay.hpp" />
+    <ClInclude Include="Include\Jet\Types\Particle.hpp" />
+    <ClInclude Include="Include\Jet\Scene\ParticleSystem.hpp" />
+    <ClInclude Include="Include\Jet\Physics.hpp" />
+    <ClInclude Include="Include\Jet\Types\Plane.hpp" />
+    <ClInclude Include="Include\Jet\Types\Player.hpp" />
+    <ClInclude Include="Include\Jet\Types\Point.hpp" />
+    <ClInclude Include="Include\Jet\Types\Quad.hpp" />
+    <ClInclude Include="Include\Jet\Scene\QuadChain.hpp" />
+    <ClInclude Include="Include\Jet\Scene\QuadSet.hpp" />
+    <ClInclude Include="Include\Jet\Types\Quaternion.hpp" />
+    <ClInclude Include="Include\Jet\Types\Range.hpp" />
+    <ClInclude Include="Include\Jet\Types\Rectangle.hpp" />
+    <ClInclude Include="Include\Jet\Scene\RigidBody.hpp" />
+    <ClInclude Include="Include\Jet\Script.hpp" />
+    <ClInclude Include="Include\Jet\Input\SDLInput.hpp" />
+    <ClInclude Include="Include\Jet\Input\SDLTypes.hpp" />
+    <ClInclude Include="Include\Jet\Resources\Shader.hpp" />
+    <ClInclude Include="Include\Jet\Resources\Sound.hpp" />
+    <ClInclude Include="Include\Jet\Types\Texcoord.hpp" />
+    <ClInclude Include="Include\Jet\Resources\Texture.hpp" />
+    <ClInclude Include="Include\Jet\Types.hpp" />
+    <ClInclude Include="Include\Jet\Utility.hpp" />
+    <ClInclude Include="Include\Jet\Types\Vector.hpp" />
+    <ClInclude Include="Include\Jet\Types\Vertex.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Scripts\Engine\ActorState.lua" />
+    <None Include="Scripts\Engine\ActorSupport.lua" />
+    <None Include="Scripts\Widgets\Build.lua" />
+    <None Include="Scripts\Bullet.lua" />
+    <None Include="Scripts\Widgets\Button.lua" />
+    <None Include="..\Source\Jet\Core\CMakeLists.txt" />
+    <None Include="Build\CMakeLists.txt" />
+    <None Include="Scripts\Dagger.lua" />
+    <None Include="Shaders\Default.frag.glsl" />
+    <None Include="Shaders\Default.vert.glsl" />
+    <None Include="Shaders\Default2.frag.glsl" />
+    <None Include="Shaders\Default2.vert.glsl" />
+    <None Include="Engine.lua" />
+    <None Include="Scripts\Explosion.lua" />
+    <None Include="Shaders\Gaussian.frag.glsl" />
+    <None Include="Shaders\Gaussian.vert.glsl" />
+    <None Include="Scripts\Widgets\Label.lua" />
+    <None Include="Scripts\Widgets\List.lua" />
+    <None Include="Scripts\Main.lua" />
+    <None Include="Scripts\Widgets\Menu.lua" />
+    <None Include="Scripts\Engine\Module.lua" />
+    <None Include="Scripts\Menus\MPScreen.lua" />
+    <None Include="Options.lua" />
+    <None Include="Shaders\Particle.frag.glsl" />
+    <None Include="Shaders\Particle.vert.glsl" />
+    <None Include="readme.txt" />
+    <None Include="Scripts\Rock.lua" />
+    <None Include="Shaders\Sky.frag.glsl" />
+    <None Include="Shaders\Sky.vert.glsl" />
+    <None Include="Scripts\Animation\Slide.lua" />
+    <None Include="Scripts\Menus\SPGame.lua" />
+    <None Include="Scripts\Menus\StartScreen.lua" />
+    <None Include="Scripts\Widgets\Stats.lua" />
+    <None Include="Scripts\Engine\Task.lua" />
+    <None Include="Shaders\Terrain.frag.glsl" />
+    <None Include="Shaders\Terrain.frag.hlsl" />
+    <None Include="Scripts\Widgets\TextField.lua" />
+    <None Include="Scripts\Engine\Widget.lua" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

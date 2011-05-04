@@ -61,7 +61,7 @@ BSockNetwork::BSockNetwork(CoreEngine* engine) :
         throw std::string("Could not start Winsock");
     }
 #endif
-
+    player_.resize(engine_->option<float>("max_players"));
     engine_->listener(this);
 }
 

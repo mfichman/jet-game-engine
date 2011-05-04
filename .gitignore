@@ -1,0 +1,8 @@
+Binary
+Build
+*.orig
+*~
+*.ncb
+*.user
+*.sdf
+*.suo
