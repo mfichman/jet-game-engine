@@ -36,6 +36,7 @@ inline const char* socket_errmsg() {
 inline int socket_errcode() {
     return WSAGetLastError();
 }
+#define EWOULDBLOCK WSAEWOULDBLOCK
 #else
 #include <netdb.h>
 #include <netinet/in.h>

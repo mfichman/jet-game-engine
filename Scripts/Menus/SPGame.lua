@@ -54,7 +54,11 @@ function SPGame:on_load()
     self.ship = Dagger("Red")
     self.ship.position = Vector(0, 0, 300) 
     self.ship:look(Vector(0, 0, 0), Vector(0, 1, 0))
-	self.ship.network_monitor.player_uuid = engine.network:player(0).uuid  
+    if Network.NS_DISABLED ~= engine.network.state then
+        self.ship.network_monitor.player_uuid = engine.network:player(0).uuid  
+    else
+        self.ship.network_monitor.player_uuid = engine.network.current_player.uuid
+    end
     
     -- Create rocks
     print("Creating rocks")
@@ -98,6 +102,14 @@ function SPGame:rpc_test(...)
 end
 
 function SPGame:on_update(delta)
+    if not self.ship then return end
+
+    if Network.NS_DISABLED ~= engine.network.state then
+        self.ship.network_monitor.player_uuid = engine.network:player(0).uuid  
+    else
+        self.ship.network_monitor.player_uuid = engine.network.current_player.uuid
+    end
+
 	--[[if (engine.network.state == Network.NS_CLIENT) then
 		if (self.ship) then
 			camera_node:look(self.ship.position, Vector(0, 1, 0))

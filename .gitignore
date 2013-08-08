@@ -2,3 +2,7 @@ Binary
 Build
 *.ncb
 *.orig
+*~
+*.user
+*.sdf
+*.suo

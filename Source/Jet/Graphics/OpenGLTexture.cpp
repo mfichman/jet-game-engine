@@ -68,7 +68,7 @@ void OpenGLTexture::read_texture_data() {
 	
 	// Check to make sure the image was supported
 	if (!surface) {
-		throw runtime_error("Unsupported image format: " + name_);
+		throw runtime_error(IMG_GetError());
 	}
 	
 	// Check image format

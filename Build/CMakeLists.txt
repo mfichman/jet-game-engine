@@ -68,7 +68,7 @@ find_library(BOOST_SYSTEM NAMES boost_system PATHS ${LIB_DIRS})
 find_library(BOOST_FILESYSTEM NAMES boost_filesystem PATHS ${LIB_DIRS})
 find_library(FMOD_EX NAMES fmod FMOD fmodex PATHS ${LIB_DIRS})
 find_library(FREETYPE NAMES freetype PATHS ${LIB_DIRS})
-find_library(LUA NAMES lua PATHS ${LIB_DIRS})
+find_library(LUA NAMES lua51 PATHS ${LIB_DIRS})
 
 find_library(BULLET_COLLISION NAMES libbulletcollision_d bulletcollision PATHS ${LIB_DIRS})
 find_library(BULLET_DYNAMICS NAMES libbulletdynamics_d bulletdynamics PATHS ${LIB_DIRS})
