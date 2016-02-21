@@ -26,7 +26,7 @@
 #include <boost/intrusive_ptr.hpp>
 #include <boost/any.hpp>
 #include <luabind/luabind.hpp>
-#include <lua/lua.hpp>
+#include <lua.hpp>
 
 namespace Jet { 
     class LuaActorState;

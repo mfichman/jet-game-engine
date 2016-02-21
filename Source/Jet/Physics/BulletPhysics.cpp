@@ -100,8 +100,8 @@ void BulletPhysics::on_pre_tick(btDynamicsWorld* world, btScalar step) {
     int nmanifolds = world->getDispatcher()->getNumManifolds();
     for (int i = 0; i < nmanifolds; i++) {
         btPersistentManifold* manifold = world->getDispatcher()->getManifoldByIndexInternal(i);
-        btCollisionObject* a = static_cast<btCollisionObject*>(manifold->getBody0());
-        btCollisionObject* b = static_cast<btCollisionObject*>(manifold->getBody1());
+        btCollisionObject const* a = static_cast<btCollisionObject const*>(manifold->getBody0());
+        btCollisionObject const* b = static_cast<btCollisionObject const*>(manifold->getBody1());
 
         BulletRigidBody* ca = static_cast<BulletRigidBody*>(a->getUserPointer());
         BulletRigidBody* cb = static_cast<BulletRigidBody*>(b->getUserPointer());

@@ -26,7 +26,7 @@ function Rock(size)
 	-- Create an asteroids mesh
     node.mesh = node:mesh_object() {
 		mesh = size.."Rock.obj",
-		material = "Rock.mtl"
+		material = "White.mtl"
     }
     
     -- Set mass to zero (static object)

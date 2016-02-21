@@ -29,9 +29,15 @@
 #include <windows.h>
 #define putenv _putenv
 #endif
+#ifdef WINDOWS
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+#else
+#include <GL/glew.h>
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+#endif
 
 namespace Jet {
     class OpenGLCubemap;

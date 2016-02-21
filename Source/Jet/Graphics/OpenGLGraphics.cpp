@@ -56,7 +56,7 @@ OpenGLGraphics::OpenGLGraphics(CoreEngine* engine) :
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		throw runtime_error(string("SDL initialization failed: ") + SDL_GetError());
 	}
-	putenv("SDL_VIDEO_WINDOW_POS=center");
+	setenv("SDL_VIDEO_WINDOW_POS", "center", 1);
 }
 	
 OpenGLGraphics::~OpenGLGraphics() {
@@ -75,7 +75,6 @@ void OpenGLGraphics::init_window() {
 	if (fsaa_enabled) {
 		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
 		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, fsaa_samples);
-		glEnable(GL_MULTISAMPLE);
 	}
 	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
@@ -95,9 +94,6 @@ void OpenGLGraphics::init_window() {
 	if (!SDL_SetVideoMode(width, height, 0, flags)) {
 		throw runtime_error(string("SDL initialization failed: ") + SDL_GetError());
 	}
-    glViewport(0, 0, (uint32_t)width, (uint32_t)height);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
 	engine_->screen()->width((float)width);
 	engine_->screen()->height((float)height);
 }
@@ -108,6 +104,16 @@ void OpenGLGraphics::init_extensions() {
 	if (GLEW_OK != glewInit()) {
         throw runtime_error("GLEW initialization failed");
     }
+    
+    GLuint width = (GLuint)engine_->option<float>("display_width");
+    GLuint height = (GLuint)engine_->option<float>("display_height");
+	bool fsaa_enabled = engine_->option<bool>("fsaa_enabled");
+    if (fsaa_enabled) {
+		glEnable(GL_MULTISAMPLE);
+    } 
+    glViewport(0, 0, (uint32_t)width, (uint32_t)height);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
 
 	// If OpenGL 2.0 is not supported, we have to check extensions individually, and
 	// copy the function pointers that GLEW set up for us.  Most extensions that

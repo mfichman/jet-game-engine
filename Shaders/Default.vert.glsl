@@ -20,8 +20,10 @@
  * IN THE SOFTWARE.
  */
 
+#version 120
 #define MAX_CASCADES 4
 #define SHADOW_MAP
+
 
 uniform int cascade_count;
 

@@ -714,9 +714,13 @@ void BSockNetwork::on_user_rpc(BSockReader* reader) {
 			switch (type) {
 				case DT_NUMBER: args[i] = reader->real(); break;
 				case DT_STRING: args[i] = reader->string(); break;
+#ifdef WINDOWS
 #pragma warning (disable:4800)
+#endif
 				case DT_BOOL: args[i] = (bool)reader->byte(); break;
+#ifdef WINDOWS
 #pragma warning (default:4800)
+#endif
 				case DT_NIL: break;
 				default: break;
 			}

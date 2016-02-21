@@ -38,7 +38,8 @@ FMODAudio::FMODAudio(CoreEngine* engine) :
     
     // Check device capabilities
     fmod_check(FMOD_System_Create(&system_));
-    fmod_check(FMOD_System_GetDriverCaps(system_, 0, &caps, 0, 0, &mode));
+    //fmod_check(FMOD_System_GetDriverCaps(system_, 0, &caps, 0, 0, &mode));
+    fmod_check(FMOD_System_GetDriverCaps(system_, 0, &caps, 0, &mode));
     fmod_check(FMOD_System_SetSpeakerMode(system_, mode));
     fmod_check(FMOD_System_Init(system_, 32, FMOD_INIT_NORMAL, 0));
     fmod_check(FMOD_System_Set3DSettings(system_, 1.0f, 1.0f, 0.05f));

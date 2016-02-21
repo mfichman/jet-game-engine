@@ -34,7 +34,7 @@ class CoreCollisionSphere : public CollisionSphere {
 public:
     //! Creates a new collision sphere
     inline CoreCollisionSphere(CoreEngine* engine, CoreNode* node) :
-        engine_(engine),
+        //engine_(engine),
         parent_(node) {
         
     }
@@ -55,7 +55,7 @@ public:
     }
     
 private:
-    CoreEngine* engine_;
+    //CoreEngine* engine_;
     CoreNode* parent_;
     float radius_;
 };

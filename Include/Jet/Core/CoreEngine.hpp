@@ -31,6 +31,7 @@
 #include <Jet/Resources/Mesh.hpp>
 #include <Jet/Resources/Font.hpp>
 #include <Jet/Scene/Camera.hpp>
+#include <Jet/Object.hpp>
 #include <Jet/Engine.hpp>
 #include <Jet/Physics.hpp>
 #include <Jet/Network.hpp>

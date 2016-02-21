@@ -189,7 +189,7 @@ private:
 	std::string name_;
 	ResourceState state_;
     std::vector<Vertex> vertex_;
-	std::vector<std::vector<uint32_t>> index_;
+	std::vector<std::vector<uint32_t> > index_;
 	std::vector<std::string> group_;
 	GLuint vbuffer_;
 	std::vector<GLuint> ibuffer_;

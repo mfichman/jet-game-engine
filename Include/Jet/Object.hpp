@@ -61,12 +61,12 @@ private:
     mutable size_t refcount_;
 };
 
-}
-
 inline void intrusive_ptr_add_ref(Jet::Object* object) {
     object->refcount_inc();
 }
 
 inline void intrusive_ptr_release(Jet::Object* object) {
     object->refcount_dec();
+}
+
 }
